@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Complexities — Part 2</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<header>
+  <a class="logo" href="../../../../../index.html">upskill</a>
+  <nav class="breadcrumb">
+    <a href="../../../../../index.html">Home</a><span class="sep">/</span>
+    <a href="../../../../../index.html">DSA</a><span class="sep">/</span>
+    <a href="../../../../../index.html">Part 2</a><span class="sep">/</span>
+    <span class="cur">Complexities</span>
+  </nav>
+</header>
+
+<div class="sec-nav">
+  <a class="pill blue"           href="approach-picker.html">Approach Picker</a>
+  <a class="pill red"            href="common-mistakes.html">Common Mistakes</a>
+  <a class="pill green current"  href="complexities.html">Complexities</a>
+  <a class="pill purple"         href="key-patterns.html">Key Patterns</a>
+  <a class="pill amber"          href="revision-tags.html">Revision Tags</a>
+  <a class="pill orange"         href="leetcode-references.html">LeetCode Refs</a>
+</div>
+
+<main>
+  <div class="page-title">Complexities</div>
+  <div class="page-sub">Part 2 · Days 21–31</div>
+
+  <div class="note">Table = complexity from source comments. Explanation below each = why that cost is what it is.</div>
+
+  <!-- d21 -->
+  <div class="sec">
+    <div class="sec-title">d21 — Binary Search on Array</div>
+    <div class="tbl-wrap">
+      <table>
+        <thead><tr><th>Method</th><th>Time</th><th>Space</th></tr></thead>
+        <tbody>
+          <tr><td><code>searchForStartAndEndIndexOfAnElementInAnArray</code></td><td class="c-time">O(log N)</td><td class="c-space">O(1)</td></tr>
+          <tr><td><code>positionWhereTargetIsPresentOrShouldBeInserted</code></td><td class="c-time">O(log N)</td><td class="c-space">O(1)</td></tr>
+          <tr><td><code>singleElementInASortedArray</code></td><td class="c-time">O(log N)</td><td class="c-space">O(1)</td></tr>
+          <tr><td><code>peakElement</code></td><td class="c-time">O(log N)</td><td class="c-space">O(1)</td></tr>
+          <tr><td><code>maximumHeightOfAStaircase</code></td><td class="c-time">O(√N)</td><td class="c-space">O(1)</td></tr>
+          <tr><td><code>minimumCostToBuildAnArray</code></td><td class="c-time">O(A × B × log B)</td><td class="c-space">O(1)</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="why-box">
+      <div class="why-label">Why O(log N) — binary search</div>
+      <p>Each step cuts the remaining candidates in half. Start with N positions → after one comparison N/2 remain → after two N/4. It takes at most log₂(N) comparisons before one candidate remains. No extra storage is allocated, so space stays O(1).</p>
+    </div>
+    <div class="why-box">
+      <div class="why-label">Why O(√N) — maximum height staircase</div>
+      <p>You add stairs one at a time: stair 1 costs 1 block, stair 2 costs 2, and so on. You stop when blocks run out. The sum 1+2+…+k = k×(k+1)/2. Setting that equal to N gives k ≈ √(2N), so the loop runs about √N iterations.</p>
+    </div>
+    <div class="why-box">
+      <div class="why-label">Why O(A × B × log B) — minimum cost to build array</div>
+      <p><strong>Sort phase:</strong> each of the A rows has B elements. One sort costs B×logB. All rows together: A×B×logB.<br><br><strong>Search phase:</strong> for each of the A−1 consecutive row pairs, walk B elements in the upper row and run a binary search (logB) on the lower row. That is (A−1)×B×logB.<br><br>Both phases are the same order — total O(A×B×logB). Sorting is in-place so space is O(1).</p>
+    </div>
+  </div>
+
+  <!-- d22 -->
+  <div class="sec">
+    <div class="sec-title">d22 — More Binary Search</div>
+    <div class="tbl-wrap">
+      <table>
+        <thead><tr><th>Method</th><th>Time</th><th>Space</th></tr></thead>
+        <tbody>
+          <tr><td><code>squareRootOfANumber</code></td><td class="c-time">O(log N)</td><td class="c-space">O(1)</td></tr>
+          <tr><td><code>rotatedSortedArraySearch</code></td><td class="c-time">O(log N)</td><td class="c-space">O(1)</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="why-box">
+      <div class="why-label">Why O(log N) — rotated array</div>
+      <p>Even though the array is rotated, at every step one half of the remaining range is fully sorted. You can check in O(1) whether the target is in that half. If yes, search there; if no, search the other half. The range still halves every step.</p>
+    </div>
+  </div>
+
+  <!-- d24-25 -->
+  <div class="sec">
+    <div class="sec-title">d24–25 — Linked Lists</div>
+    <div class="tbl-wrap">
+      <table>
+        <thead><tr><th>Operation</th><th>Time</th><th>Space</th></tr></thead>
+        <tbody>
+          <tr><td>traversal / insert / delete</td><td class="c-time">O(N)</td><td class="c-space">O(1)</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="why-box">
+      <div class="why-label">Why O(N)</div>
+      <p>No index exists. To reach position k you follow k next-pointers from the head. In the worst case that is the last node — N steps. The relinking itself is O(1), but the walk dominates.</p>
+    </div>
+  </div>
+
+  <!-- d26 -->
+  <div class="sec">
+    <div class="sec-title">d26 — Stacks Basics</div>
+    <div class="tbl-wrap">
+      <table>
+        <thead><tr><th>Operation</th><th>Time</th><th>Space</th></tr></thead>
+        <tbody>
+          <tr><td>all stack-based methods</td><td class="c-time">O(N)</td><td class="c-space">O(N)</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="why-box">
+      <div class="why-label">Why O(N) time and O(N) space</div>
+      <p>Every element enters the stack at most once and leaves at most once — two events per element across N elements = O(N) work. The stack can hold all N elements at once in the worst case (e.g. all open brackets with no closes yet), so space is O(N).</p>
+    </div>
+  </div>
+
+  <!-- d27 -->
+  <div class="sec">
+    <div class="sec-title">d27 — Monotonic Stack</div>
+    <div class="tbl-wrap">
+      <table>
+        <thead><tr><th>Operation</th><th>Time</th><th>Space</th></tr></thead>
+        <tbody>
+          <tr><td>all monotonic stack methods</td><td class="c-time">O(N)</td><td class="c-space">O(N)</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="why-box">
+      <div class="why-label">Why O(N) despite the inner pop loop</div>
+      <p>Each element is pushed exactly once and popped at most once. The total number of pops across the entire pass is bounded by N — you cannot pop more than you pushed. Even with a nested while loop, total work is O(N), not O(N²).</p>
+    </div>
+  </div>
+
+  <!-- d28 -->
+  <div class="sec">
+    <div class="sec-title">d28 — Queues</div>
+    <div class="tbl-wrap">
+      <table>
+        <thead><tr><th>Operation</th><th>Time</th><th>Space</th></tr></thead>
+        <tbody>
+          <tr><td>sliding window max / first unique</td><td class="c-time">O(N)</td><td class="c-space">O(K)</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="why-box">
+      <div class="why-label">Why O(N) time and O(K) space</div>
+      <p>Each index is added to the deque once and removed once — no element is processed more than twice across the whole array. Space is O(K) where K is the window size, because the deque never holds more than K indices at a time.</p>
+    </div>
+  </div>
+
+  <!-- d29-31 -->
+  <div class="sec">
+    <div class="sec-title">d29–31 — Trees and BST</div>
+    <div class="tbl-wrap">
+      <table>
+        <thead><tr><th>Operation</th><th>Time</th><th>Space</th></tr></thead>
+        <tbody>
+          <tr><td>full tree traversal (DFS / BFS)</td><td class="c-time">O(N)</td><td class="c-space">O(H) DFS · O(W) BFS</td></tr>
+          <tr><td>BST search / validate / insert</td><td class="c-time">O(H)</td><td class="c-space">O(H)</td></tr>
+          <tr><td>sorted array → balanced BST</td><td class="c-time">O(N)</td><td class="c-space">O(N)</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="why-box">
+      <div class="why-label">Why O(N) — tree traversal</div>
+      <p>Every node is visited exactly once. DFS call-stack depth = tree height H. BFS queue width = widest level W. Both are O(N) in the worst case (degenerate tree).</p>
+    </div>
+    <div class="why-box">
+      <div class="why-label">Why O(H) — BST operations</div>
+      <p>At each node you make one binary decision — go left or go right — and descend one level. You touch one node per level, so cost = H levels. Balanced BST: H = O(logN). Degenerate (sorted input, no rebalancing): H = O(N).</p>
+    </div>
+  </div>
+</main>
+
+</body>
+</html>

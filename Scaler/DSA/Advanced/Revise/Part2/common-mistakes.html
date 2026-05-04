@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Common Mistakes — Part 2</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<header>
+  <a class="logo" href="../../../../../index.html">upskill</a>
+  <nav class="breadcrumb">
+    <a href="../../../../../index.html">Home</a><span class="sep">/</span>
+    <a href="../../../../../index.html">DSA</a><span class="sep">/</span>
+    <a href="../../../../../index.html">Part 2</a><span class="sep">/</span>
+    <span class="cur">Common Mistakes</span>
+  </nav>
+</header>
+
+<div class="sec-nav">
+  <a class="pill blue"         href="approach-picker.html">Approach Picker</a>
+  <a class="pill red current"  href="common-mistakes.html">Common Mistakes</a>
+  <a class="pill green"        href="complexities.html">Complexities</a>
+  <a class="pill purple"       href="key-patterns.html">Key Patterns</a>
+  <a class="pill amber"        href="revision-tags.html">Revision Tags</a>
+  <a class="pill orange"       href="leetcode-references.html">LeetCode Refs</a>
+</div>
+
+<main>
+  <div class="page-title">Common Mistakes</div>
+  <div class="page-sub">Part 2 · Days 21–31</div>
+
+  <div class="note">Generic pitfalls by technique — not edge cases per problem.</div>
+
+  <div class="sec">
+    <div class="sec-title">Binary Search</div>
+
+    <div class="m-card">
+      <div class="m-title">Wrong mid calculation — integer overflow</div>
+      <div class="m-body">Writing <code>(low + high) / 2</code> works until both values are large integers — their sum wraps and gives a negative mid. Always write <code>low + (high - low) / 2</code>.</div>
+    </div>
+
+    <div class="m-card">
+      <div class="m-title">Wrong loop condition — missing the last element</div>
+      <div class="m-body">Using <code>while (low &lt; high)</code> exits one step early. The answer can sit exactly where low == high, and a strict &lt; skips that position entirely. Use <code>while (low &lt;= high)</code>.</div>
+    </div>
+
+    <div class="m-card">
+      <div class="m-title">Not shrinking the range — infinite loop</div>
+      <div class="m-body">Writing <code>low = mid</code> or <code>high = mid</code> without ±1 means the range never shrinks when low and high are adjacent. The loop spins forever. Always write <code>low = mid + 1</code> or <code>high = mid - 1</code>.</div>
+    </div>
+
+    <div class="m-card">
+      <div class="m-title">Returning on first match instead of continuing</div>
+      <div class="m-body">The moment you find the target and return, you get one arbitrary occurrence. For leftmost: save mid, keep going left (<code>high = mid - 1</code>). For rightmost: save mid, keep going right (<code>low = mid + 1</code>).</div>
+    </div>
+
+    <div class="m-card">
+      <div class="m-title">Checking only one side of lower_bound</div>
+      <div class="m-body"><code>lower_bound</code> gives the first index ≥ target. The truly closest element could be just before that index. Always check both <code>lb</code> and <code>lb - 1</code> and take the smaller absolute difference.</div>
+    </div>
+  </div>
+
+  <div class="sec">
+    <div class="sec-title">Linked List</div>
+
+    <div class="m-card">
+      <div class="m-title">Losing the rest of the list before relinking</div>
+      <div class="m-body">Redirecting <code>curr.next</code> before saving where it pointed loses everything after. Save the next pointer first, then redirect.</div>
+    </div>
+
+    <div class="m-card">
+      <div class="m-title">Treating head deletion as a special case</div>
+      <div class="m-body">Deleting the head requires returning a new head. Use a dummy node before the real head — then head deletion is just "delete the next of dummy", same as any other node.</div>
+    </div>
+  </div>
+
+  <div class="sec">
+    <div class="sec-title">Stack</div>
+
+    <div class="m-card">
+      <div class="m-title">Calling pop or peek without checking isEmpty</div>
+      <div class="m-body">An empty stack throws or returns garbage. Always check <code>isEmpty()</code> before every pop and peek — no exceptions.</div>
+    </div>
+
+    <div class="m-card">
+      <div class="m-title">Matching the wrong bracket pair</div>
+      <div class="m-body">When a closing bracket arrives, the stack top must be the exact corresponding open bracket. Checking only that the stack is non-empty lets mismatched pairs pass silently.</div>
+    </div>
+
+    <div class="m-card">
+      <div class="m-title">Forgetting that the operator determines redundancy</div>
+      <div class="m-body">In redundant-braces problems, after popping to the matching <code>(</code>, if no operator was found among the popped items those braces are redundant. Check inside the pop loop, not after it.</div>
+    </div>
+  </div>
+
+  <div class="sec">
+    <div class="sec-title">Trees</div>
+
+    <div class="m-card">
+      <div class="m-title">Accessing a child without checking for null first</div>
+      <div class="m-body">Calling <code>node.left.val</code> without confirming <code>node.left != null</code> crashes immediately. Handle null as the very first thing in every recursive function.</div>
+    </div>
+
+    <div class="m-card">
+      <div class="m-title">Using int bounds for BST validation</div>
+      <div class="m-body">Passing <code>Integer.MIN_VALUE</code> / <code>Integer.MAX_VALUE</code> as initial bounds fails when a node holds exactly those values. Use <code>Long.MIN_VALUE</code> / <code>Long.MAX_VALUE</code>.</div>
+    </div>
+
+    <div class="m-card">
+      <div class="m-title">Off-by-one in tree construction from two traversals</div>
+      <div class="m-body">The number of nodes in the left subtree drives every index arithmetic when building from inorder + pre/postorder. Being off by one silently builds the wrong tree with no error thrown.</div>
+    </div>
+
+    <div class="m-card">
+      <div class="m-title">Not propagating the failure sentinel upward</div>
+      <div class="m-body">When a helper returns -1 to signal failure (e.g. subtree is unbalanced), every parent call must check for -1 before computing its own result. Skipping the check produces a wrong answer that looks like success.</div>
+    </div>
+  </div>
+</main>
+
+</body>
+</html>

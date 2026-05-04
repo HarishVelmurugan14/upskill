@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Key Patterns — Part 2</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<header>
+  <a class="logo" href="../../../../../index.html">upskill</a>
+  <nav class="breadcrumb">
+    <a href="../../../../../index.html">Home</a><span class="sep">/</span>
+    <a href="../../../../../index.html">DSA</a><span class="sep">/</span>
+    <a href="../../../../../index.html">Part 2</a><span class="sep">/</span>
+    <span class="cur">Key Patterns</span>
+  </nav>
+</header>
+
+<div class="sec-nav">
+  <a class="pill blue"            href="approach-picker.html">Approach Picker</a>
+  <a class="pill red"             href="common-mistakes.html">Common Mistakes</a>
+  <a class="pill green"           href="complexities.html">Complexities</a>
+  <a class="pill purple current"  href="key-patterns.html">Key Patterns</a>
+  <a class="pill amber"           href="revision-tags.html">Revision Tags</a>
+  <a class="pill orange"          href="leetcode-references.html">LeetCode Refs</a>
+</div>
+
+<main>
+  <div class="page-title">Key Patterns</div>
+  <div class="page-sub">Part 2 · Days 21–31</div>
+
+  <div class="note">Each section: signals in the question that point to this approach, then the standard solution skeleton in plain English.</div>
+
+  <div class="acc open">
+    <div class="acc-hdr" onclick="this.parentElement.classList.toggle('open')">
+      <span>Binary Search on a Sorted Array <span class="acc-day">d21, d22</span></span>
+      <span class="acc-arrow">▼</span>
+    </div>
+    <div class="acc-body">
+      <div class="sub-label">Signals in the question</div>
+      <p>The array is sorted, or sorting is implied. You are looking for a position, boundary, or specific value — not all elements. Brute force would scan the whole array but the problem hints at O(logN). The key test: for any candidate mid, can you say "the answer is to my left" or "to my right" in O(1)?</p>
+      <div class="sub-label">Standard solution skeleton</div>
+      <p>Set <code>low = 0</code>, <code>high = N-1</code>. Each step: <code>mid = low + (high - low) / 2</code>. Compare element at mid to your target. Too small → <code>low = mid + 1</code>. Too large → <code>high = mid - 1</code>. Exact match → return, or save and keep searching for first/last occurrence. Loop until <code>low &gt; high</code>.<br><br>For <strong>lower_bound</strong> (first index ≥ value): when <code>a[mid] &gt;= target</code> save mid and move <code>high = mid - 1</code>. When <code>a[mid] &lt; target</code> move <code>low = mid + 1</code>. Return saved value at end.</p>
+    </div>
+  </div>
+
+  <div class="acc">
+    <div class="acc-hdr" onclick="this.parentElement.classList.toggle('open')">
+      <span>Binary Search on Answer Space <span class="acc-day">d23</span></span>
+      <span class="acc-arrow">▼</span>
+    </div>
+    <div class="acc-body">
+      <div class="sub-label">Signals in the question</div>
+      <p>The answer is a single number (time, cost, distance) and you know its minimum and maximum possible value. The question is phrased as "minimize the maximum" or "maximize the minimum." You can write a check function that, given a candidate answer, tells you in O(N) whether it is achievable.</p>
+      <div class="sub-label">Standard solution skeleton</div>
+      <p>Set <code>low = smallest possible answer</code>, <code>high = largest possible answer</code>. Binary search this range. At each mid, run the feasibility check. If mid works, record it and try to do better by tightening the boundary. If it doesn't work, move the other boundary. Return the last value that passed.</p>
+    </div>
+  </div>
+
+  <div class="acc">
+    <div class="acc-hdr" onclick="this.parentElement.classList.toggle('open')">
+      <span>Linked List <span class="acc-day">d24, d25</span></span>
+      <span class="acc-arrow">▼</span>
+    </div>
+    <div class="acc-body">
+      <div class="sub-label">Signals in the question</div>
+      <p>The input is a chain of nodes connected by pointers. You need to insert, delete, or rearrange without needing random access by index. Modifying the head is possible, which means the caller needs a new head back.</p>
+      <div class="sub-label">Standard solution skeleton</div>
+      <p>Use a dummy node before the real head to eliminate head-deletion special cases. Walk with a <code>prev</code> and <code>curr</code> pointer. To delete curr: <code>prev.next = curr.next</code>. To insert newNode before curr: <code>newNode.next = curr</code>, then <code>prev.next = newNode</code>. Always save <code>curr.next</code> before relinking. Return <code>dummy.next</code> as the new head.</p>
+    </div>
+  </div>
+
+  <div class="acc">
+    <div class="acc-hdr" onclick="this.parentElement.classList.toggle('open')">
+      <span>Stack — Matching, Evaluation, Cancellation <span class="acc-day">d26</span></span>
+      <span class="acc-arrow">▼</span>
+    </div>
+    <div class="acc-body">
+      <div class="sub-label">Signals in the question</div>
+      <p>Pairs that must open and close in the right order (brackets, braces). An expression to evaluate where operands come before operators (postfix). Adjacent elements that cancel each other. You need the most recent unprocessed item — which is exactly what a stack gives you.</p>
+      <div class="sub-label">Standard solution skeleton</div>
+      <p>Walk the input left to right. On an opening item or value, push. On a closing item or operator, pop and process the pair. After the full pass, an empty stack means everything matched. Always check <code>isEmpty()</code> before popping. For expression evaluation: pop two operands, apply the operator, push the result back.</p>
+    </div>
+  </div>
+
+  <div class="acc">
+    <div class="acc-hdr" onclick="this.parentElement.classList.toggle('open')">
+      <span>Monotonic Stack — Nearest Smaller / Greater <span class="acc-day">d27</span></span>
+      <span class="acc-arrow">▼</span>
+    </div>
+    <div class="acc-body">
+      <div class="sub-label">Signals in the question</div>
+      <p>"For each element, find the nearest element to its left/right that is smaller/greater." Rectangle areas or contributions that depend on left/right boundaries. The answer for each element depends on the first element that breaks a sorted order around it.</p>
+      <div class="sub-label">Standard solution skeleton</div>
+      <p>Walk left to right. Maintain a stack of <strong>indices</strong> (not values). Before pushing index i, pop all indices from the top whose values violate the order you want. Each popped index has just found its answer — the current element i is the nearest that broke the order. Push i. Anything still in the stack at the end has no answer on that side (use 0, -1, or N). Store indices so you can compute distances.</p>
+    </div>
+  </div>
+
+  <div class="acc">
+    <div class="acc-hdr" onclick="this.parentElement.classList.toggle('open')">
+      <span>Queue / Deque <span class="acc-day">d28</span></span>
+      <span class="acc-arrow">▼</span>
+    </div>
+    <div class="acc-body">
+      <div class="sub-label">Signals in the question</div>
+      <p>A fixed-size window slides across an array and you need the max or min at each position. Elements expire after a fixed number of steps. You need to know which element arrived first among the currently active ones.</p>
+      <div class="sub-label">Standard solution skeleton</div>
+      <p>Use a deque of indices in decreasing order of their values. For each new index i: remove all indices from the <strong>back</strong> whose values are smaller than current (they are useless — current is better and lasts longer). Then remove the <strong>front</strong> if its index is outside the current window. The front is always the current window's maximum.</p>
+    </div>
+  </div>
+
+  <div class="acc">
+    <div class="acc-hdr" onclick="this.parentElement.classList.toggle('open')">
+      <span>Tree Recursion / DFS <span class="acc-day">d29, d30</span></span>
+      <span class="acc-arrow">▼</span>
+    </div>
+    <div class="acc-body">
+      <div class="sub-label">Signals in the question</div>
+      <p>The problem can be expressed as: compute something for a node using results from its left and right children. Path problems, subtree sums, structural checks (balanced, symmetric). The same logic applies at every level.</p>
+      <div class="sub-label">Standard solution skeleton</div>
+      <p><strong>Base case first:</strong> if the node is null, return a neutral value (0 for sums, true for validations, empty list for collections). <strong>Recursive case:</strong> call the same function on left and right children, get their results, combine with the current node's contribution, return the combined result. Carry all state upward through return values — avoid global variables.</p>
+    </div>
+  </div>
+
+  <div class="acc">
+    <div class="acc-hdr" onclick="this.parentElement.classList.toggle('open')">
+      <span>BST <span class="acc-day">d31</span></span>
+      <span class="acc-arrow">▼</span>
+    </div>
+    <div class="acc-body">
+      <div class="sub-label">Signals in the question</div>
+      <p>The tree has an ordering constraint — left subtree &lt; root &lt; right subtree. You need to search, validate ordering, or build a balanced structure from sorted data. BST properties let you eliminate half the tree at each step, similar to binary search.</p>
+      <div class="sub-label">Standard solution skeleton</div>
+      <p><strong>Search:</strong> compare target with node.val, go left if smaller, go right if larger. <strong>Validate:</strong> pass min and max bounds down the recursion — a node is valid only if <code>min &lt; node.val &lt; max</code>. Use <code>long</code> bounds to safely handle <code>Integer.MIN/MAX_VALUE</code>. <strong>Build from sorted array:</strong> always pick the middle index as root, recurse on the left half for the left subtree and the right half for the right subtree — this keeps the tree balanced.</p>
+    </div>
+  </div>
+</main>
+
+</body>
+</html>

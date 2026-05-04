@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>DSA Revision Notes</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #0d1117; --bg-card: #161b22; --bg-card-hover: #21262d;
+      --border: #30363d; --text: #e6edf3; --text-muted: #8b949e;
+      --blue: #58a6ff; --green: #3fb950; --red: #f85149;
+      --purple: #bc8cff; --amber: #d29922; --orange: #ff7b72;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      background: var(--bg); color: var(--text);
+      font-family: 'Inter', system-ui, sans-serif;
+      font-size: 14px; line-height: 1.6; min-height: 100vh;
+    }
+    header {
+      padding: 14px 28px; border-bottom: 1px solid var(--border);
+      display: flex; align-items: center; gap: 14px;
+      position: sticky; top: 0;
+      background: rgba(13,17,23,0.93); backdrop-filter: blur(12px); z-index: 100;
+    }
+    .logo { font-size: 13px; font-weight: 700; color: var(--blue); letter-spacing: 1px; text-transform: uppercase; cursor: pointer; }
+    .breadcrumb { display: flex; align-items: center; gap: 6px; font-size: 12px; color: var(--text-muted); }
+    .breadcrumb .bc { cursor: pointer; transition: color 0.15s; }
+    .breadcrumb .bc:hover { color: var(--text); }
+    .breadcrumb .sep { color: var(--border); }
+    .breadcrumb .cur { color: var(--text); font-weight: 500; pointer-events: none; }
+
+    .view { display: none; animation: fade 0.18s ease; }
+    .view.active { display: block; }
+    @keyframes fade { from { opacity:0; transform: translateY(4px); } to { opacity:1; transform: translateY(0); } }
+
+    /* HOME */
+    .home-wrap { display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: calc(100vh - 53px); gap: 14px; }
+    .eyebrow { font-size: 11px; color: var(--text-muted); letter-spacing: 3px; text-transform: uppercase; }
+    .dsa-btn {
+      font-size: 26px; font-weight: 700; color: var(--text);
+      background: var(--bg-card); border: 1px solid var(--border);
+      border-radius: 14px; padding: 22px 64px; cursor: pointer;
+      transition: all 0.2s; letter-spacing: 4px;
+    }
+    .dsa-btn:hover { border-color: var(--blue); background: var(--bg-card-hover); box-shadow: 0 0 32px rgba(88,166,255,0.1); transform: translateY(-2px); }
+
+    /* PARTS */
+    .wrap { max-width: 740px; margin: 0 auto; padding: 52px 24px; }
+    .wrap h1 { font-size: 22px; font-weight: 700; margin-bottom: 6px; }
+    .wrap .sub { font-size: 13px; color: var(--text-muted); margin-bottom: 32px; }
+    .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(190px, 1fr)); gap: 14px; }
+    .card {
+      background: var(--bg-card); border: 1px solid var(--border);
+      border-radius: 12px; padding: 20px 22px; cursor: pointer; transition: all 0.2s;
+    }
+    .card:hover { border-color: var(--blue); background: var(--bg-card-hover); transform: translateY(-2px); box-shadow: 0 4px 24px rgba(88,166,255,0.08); }
+    .card.dim { opacity: 0.4; cursor: default; }
+    .card.dim:hover { transform: none; box-shadow: none; border-color: var(--border); background: var(--bg-card); }
+    .card-eye { font-size: 10px; font-weight: 600; color: var(--text-muted); letter-spacing: 1.5px; text-transform: uppercase; margin-bottom: 6px; }
+    .card-num { font-size: 22px; font-weight: 700; margin-bottom: 4px; }
+    .card-desc { font-size: 12px; color: var(--text-muted); margin-bottom: 12px; line-height: 1.5; }
+    .badge { display: inline-block; font-size: 10px; font-weight: 600; padding: 2px 9px; border-radius: 20px; background: rgba(88,166,255,0.1); color: var(--blue); border: 1px solid rgba(88,166,255,0.2); }
+    .badge.dim { background: rgba(139,148,158,0.08); color: var(--text-muted); border-color: rgba(139,148,158,0.15); }
+
+    /* PART 2 SECTIONS */
+    .p2-header { padding: 32px 0 28px; border-bottom: 1px solid var(--border); margin-bottom: 32px; }
+    .p2-header h1 { font-size: 20px; font-weight: 700; margin-bottom: 5px; }
+    .p2-header p { font-size: 12px; color: var(--text-muted); }
+    .sections-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 14px; }
+    .sec-card {
+      display: block; text-decoration: none;
+      background: var(--bg-card); border: 1px solid var(--border);
+      border-radius: 12px; padding: 20px 22px;
+      transition: all 0.2s;
+    }
+    .sec-card:hover { background: var(--bg-card-hover); transform: translateY(-2px); box-shadow: 0 4px 20px rgba(0,0,0,0.2); }
+    .sec-card.blue:hover   { border-color: var(--blue);   box-shadow: 0 4px 20px rgba(88,166,255,0.1); }
+    .sec-card.red:hover    { border-color: var(--red);    box-shadow: 0 4px 20px rgba(248,81,73,0.1); }
+    .sec-card.green:hover  { border-color: var(--green);  box-shadow: 0 4px 20px rgba(63,185,80,0.1); }
+    .sec-card.purple:hover { border-color: var(--purple); box-shadow: 0 4px 20px rgba(188,140,255,0.1); }
+    .sec-card.amber:hover  { border-color: var(--amber);  box-shadow: 0 4px 20px rgba(210,153,34,0.1); }
+    .sec-card.orange:hover { border-color: var(--orange); box-shadow: 0 4px 20px rgba(255,123,114,0.1); }
+    .sc-dot { width: 8px; height: 8px; border-radius: 50%; margin-bottom: 14px; }
+    .blue .sc-dot   { background: var(--blue); }
+    .red .sc-dot    { background: var(--red); }
+    .green .sc-dot  { background: var(--green); }
+    .purple .sc-dot { background: var(--purple); }
+    .amber .sc-dot  { background: var(--amber); }
+    .orange .sc-dot { background: var(--orange); }
+    .sc-title { font-size: 15px; font-weight: 600; color: var(--text); margin-bottom: 5px; }
+    .sc-desc  { font-size: 12px; color: var(--text-muted); line-height: 1.5; }
+    .sc-arrow { font-size: 11px; color: var(--text-muted); margin-top: 14px; }
+
+    ::-webkit-scrollbar { width: 5px; } ::-webkit-scrollbar-track { background: transparent; } ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+  </style>
+</head>
+<body>
+
+<header>
+  <div class="logo" onclick="show('home')">upskill</div>
+  <div class="breadcrumb" id="bc"></div>
+</header>
+
+<main>
+
+  <!-- HOME -->
+  <div class="view active" id="v-home">
+    <div class="home-wrap">
+      <div class="eyebrow">revision notes</div>
+      <div class="dsa-btn" onclick="show('dsa')">DSA</div>
+    </div>
+  </div>
+
+  <!-- DSA PARTS -->
+  <div class="view" id="v-dsa">
+    <div class="wrap">
+      <h1>Advanced DSA</h1>
+      <div class="sub">Select a part to begin revision</div>
+      <div class="grid">
+        <div class="card dim"><div class="card-eye">Part</div><div class="card-num">0</div><div class="card-desc">Foundations</div><span class="badge dim">Coming soon</span></div>
+        <div class="card dim"><div class="card-eye">Part</div><div class="card-num">1</div><div class="card-desc">Core concepts</div><span class="badge dim">Coming soon</span></div>
+        <div class="card" onclick="show('part2')">
+          <div class="card-eye">Part</div>
+          <div class="card-num">2</div>
+          <div class="card-desc">Binary Search · Stacks · Queues · Trees</div>
+          <span class="badge">Available</span>
+        </div>
+        <div class="card dim"><div class="card-eye">Part</div><div class="card-num">3</div><div class="card-desc">Advanced topics</div><span class="badge dim">Coming soon</span></div>
+        <div class="card dim"><div class="card-eye">Part</div><div class="card-num">4</div><div class="card-desc">Advanced topics</div><span class="badge dim">Coming soon</span></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- PART 2 -->
+  <div class="view" id="v-part2">
+    <div class="wrap" style="max-width:860px">
+      <div class="p2-header">
+        <h1>Part 2 — Binary Search · Linked Lists · Stacks · Queues · Trees</h1>
+        <p>Days 21–31 &nbsp;·&nbsp; 6 revision sections</p>
+      </div>
+      <div class="sections-grid">
+
+        <a class="sec-card blue" href="Scaler/DSA/Advanced/Revise/Part2/approach-picker.html">
+          <div class="sc-dot"></div>
+          <div class="sc-title">Approach Picker</div>
+          <div class="sc-desc">When to reach for which tool — one row per chapter topic</div>
+          <div class="sc-arrow">Open →</div>
+        </a>
+
+        <a class="sec-card red" href="Scaler/DSA/Advanced/Revise/Part2/common-mistakes.html">
+          <div class="sc-dot"></div>
+          <div class="sc-title">Common Mistakes</div>
+          <div class="sc-desc">Generic pitfalls by technique — binary search, lists, stacks, trees</div>
+          <div class="sc-arrow">Open →</div>
+        </a>
+
+        <a class="sec-card green" href="Scaler/DSA/Advanced/Revise/Part2/complexities.html">
+          <div class="sc-dot"></div>
+          <div class="sc-title">Complexities</div>
+          <div class="sc-desc">Time/space per day with plain-English explanations of why</div>
+          <div class="sc-arrow">Open →</div>
+        </a>
+
+        <a class="sec-card purple" href="Scaler/DSA/Advanced/Revise/Part2/key-patterns.html">
+          <div class="sc-dot"></div>
+          <div class="sc-title">Key Patterns</div>
+          <div class="sc-desc">Question signals and standard solution skeletons per approach</div>
+          <div class="sc-arrow">Open →</div>
+        </a>
+
+        <a class="sec-card amber" href="Scaler/DSA/Advanced/Revise/Part2/revision-tags.html">
+          <div class="sc-dot"></div>
+          <div class="sc-title">Revision Tags</div>
+          <div class="sc-desc">What to re-read ✅ vs re-solve 🔁 across all days d21–d31</div>
+          <div class="sc-arrow">Open →</div>
+        </a>
+
+        <a class="sec-card orange" href="Scaler/DSA/Advanced/Revise/Part2/leetcode-references.html">
+          <div class="sc-dot"></div>
+          <div class="sc-title">LeetCode Refs</div>
+          <div class="sc-desc">Method-to-LC problem mapping with source comments</div>
+          <div class="sc-arrow">Open →</div>
+        </a>
+
+      </div>
+    </div>
+  </div>
+
+</main>
+
+<script>
+  const bc = document.getElementById('bc');
+
+  function show(id) {
+    document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+    document.getElementById('v-' + id).classList.add('active');
+    window.scrollTo(0, 0);
+
+    if (id === 'home')  { bc.innerHTML = ''; return; }
+    if (id === 'dsa')   { bc.innerHTML = `<span class="bc" onclick="show('home')">Home</span><span class="sep">/</span><span class="cur">DSA</span>`; return; }
+    if (id === 'part2') { bc.innerHTML = `<span class="bc" onclick="show('home')">Home</span><span class="sep">/</span><span class="bc" onclick="show('dsa')">DSA</span><span class="sep">/</span><span class="cur">Part 2</span>`; return; }
+  }
+</script>
+
+</body>
+</html>
