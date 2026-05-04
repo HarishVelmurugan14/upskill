@@ -3,6 +3,7 @@
 | When you see... | Think... | Source |
 |---|---|---|
 | Find element / insert position in sorted array | **Binary search** | d21 |
+| Min absolute diff between elements of consecutive rows | **Sort each row + binary search (lower_bound)** per element | d21 |
 | Single element in sorted array of pairs | **Binary search on index parity** (even/odd) | d21 |
 | Find peak element | **Binary search**: compare mid vs mid+1 | d21 |
 | Square root of N | **Binary search on [0,N]**: check mid² ≤ N | d22 |

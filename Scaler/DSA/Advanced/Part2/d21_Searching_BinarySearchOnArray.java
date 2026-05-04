@@ -293,6 +293,22 @@ public class d21_Searching_BinarySearchOnArray {
     }
 
     public int minimumCostToBuildAnArray(int A, int B, int[][] C) {
+        // Complexity : Time : [ O(A * B * logB) ]
+        // Complexity : Space : [ O(1) ]
+        /* QUESTION :
+        Given a matrix C of size A x B, where A is the number of rows and B is the number of columns,
+        find the minimum absolute difference between any element chosen from row i and any element
+        chosen from the adjacent row i+1, across all consecutive row pairs.
+        Each row is sorted independently and binary search (lower_bound) is used to find the closest
+        element in the next row for each element in the current row.
+        Return the minimum such absolute difference.
+        Example:
+        A = 3, B = 2, C = {{7, 3}, {2, 1}, {4, 9}}
+        Sorted C = {{3, 7}, {1, 2}, {4, 9}}
+        Min diff between row 0 and row 1: |3-2| = 1
+        Min diff between row 1 and row 2: |2-4| = 2
+        Output: 1
+        */
       int x;
       int ans = 1000000000; // Initialize answer as a large number
       int lb;

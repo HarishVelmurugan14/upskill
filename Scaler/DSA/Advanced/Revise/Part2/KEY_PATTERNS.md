@@ -7,6 +7,7 @@
 - **Peak Element**: compare mid with mid+1; move toward the ascending side
 - **Search a Matrix**: treat 2D as 1D array, binary search with row=mid/cols, col=mid%cols
 - **Max Height Staircase**: binary search on answer — N*(N+1)/2 ≤ A
+- **Min Cost to Build Array**: sort each row → for each element in row i, use lower_bound on row i+1 → check both lb and lb-1 for closest match → track global minimum absolute diff
 
 ## Day 22 — Binary Search Problems (`d22_Searching2_BinarySearchProblems`)
 - **Square Root**: binary search on [0, A], check mid² ≤ A

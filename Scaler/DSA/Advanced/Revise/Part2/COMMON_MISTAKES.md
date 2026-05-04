@@ -9,6 +9,8 @@
 - `if (N == 0)` — empty array guard for searchForStartAndEndIndex
 - `if (N == 1)` — single element array guard for singleElement and peakElement
 - Peak element: check `A[0] >= A[1]` and `A[N-1] >= A[N-2]` — peak could be at boundaries
+- `minimumCostToBuildAnArray`: check both `lb` (first ≥ val) **and** `lb-1` (last < val) — closest element can be on either side of the lower_bound index
+- `minimumCostToBuildAnArray`: guard `lb != B` before accessing `C[i+1][lb]` (lb == B means no element ≥ val exists)
 
 ### d22 — Square Root
 - `if (A == 0)` — zero input guard

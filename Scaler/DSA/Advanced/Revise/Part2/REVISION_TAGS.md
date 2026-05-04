@@ -12,6 +12,7 @@
 | `peakElement()` | 🔁 |
 | `searhAMatrix()` | 🔁 |
 | `maximumHeightOfAStaircase(int)` | 🔁 |
+| `minimumCostToBuildAnArray(int, int, int[][])` | 🔁 |
 
 ## d22_Searching2_BinarySearchProblems
 

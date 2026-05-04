@@ -11,6 +11,7 @@
 | `singleElementInASortedArray` | O(logN) | O(1) |
 | `peakElement` | O(logN) | O(1) |
 | `maximumHeightOfAStaircase` | ?? | ?? |
+| `minimumCostToBuildAnArray` | O(A × B × logB) | O(1) |
 
 ## d22_Searching2_BinarySearchProblems
 
