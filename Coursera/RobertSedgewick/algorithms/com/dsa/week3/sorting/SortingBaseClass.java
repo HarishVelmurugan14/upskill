@@ -1,12 +1,12 @@
 package RobertSedgewick.algorithms.com.dsa.week3.sorting;
 
-import Standalone.Utility;
+import Resources.Utilities.GenericUtil;
 
 import java.util.Arrays;
 
 @SuppressWarnings("ALL")
 public class SortingBaseClass{
-    private static Utility utility = new Utility();
+    private static GenericUtil utility = new GenericUtil();
 
     private static void print(Comparable[] array){
         System.out.println(Arrays.toString(array));

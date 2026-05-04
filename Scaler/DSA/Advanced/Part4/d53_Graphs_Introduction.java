@@ -66,7 +66,7 @@ public class d53_Graphs_Introduction {
 
     public void dfs(int node, Map<Integer, List<Integer>> adj, boolean[] visited, int level, Map<Integer, List<Integer>> levelList) {
         visited[node] = true;
-        levelList.computeIfAbsent(level, _ -> new ArrayList<>()).add(node);
+        levelList.computeIfAbsent(level, x -> new ArrayList<>()).add(node);
 
         for (int neighbour : adj.get(node)) {
             if (!visited[neighbour]) {
@@ -83,8 +83,8 @@ public class d53_Graphs_Introduction {
         for (int i = 0; i < A - 1; i++) {
             int u = B[i];
             int v = C[i];
-            adj.computeIfAbsent(u, _ -> new ArrayList<>()).add(v);
-            adj.computeIfAbsent(v, _ -> new ArrayList<>()).add(u);
+            adj.computeIfAbsent(u, x -> new ArrayList<>()).add(v);
+            adj.computeIfAbsent(v, x -> new ArrayList<>()).add(u);
         }
         return adj;
     }
