@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Key Patterns — Part 0</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<header>
+  <a class="logo" href="../../../../../index.html">upskill</a>
+  <nav class="breadcrumb">
+    <a href="../../../../../index.html">Home</a><span class="sep">/</span>
+    <a href="../../../../../index.html">DSA</a><span class="sep">/</span>
+    <a href="../../../../../index.html">Part 0</a><span class="sep">/</span>
+    <span class="cur">Key Patterns</span>
+  </nav>
+</header>
+
+<div class="sec-nav">
+  <a class="pill blue"            href="approach-picker.html">Approach Picker</a>
+  <a class="pill red"             href="common-mistakes.html">Common Mistakes</a>
+  <a class="pill green"           href="complexities.html">Complexities</a>
+  <a class="pill purple current"  href="key-patterns.html">Key Patterns</a>
+  <a class="pill amber"           href="revision-tags.html">Revision Tags</a>
+  <a class="pill orange"          href="leetcode-references.html">LeetCode Refs</a>
+</div>
+
+<main>
+  <div class="page-title">Key Patterns</div>
+  <div class="page-sub">Part 0 · Days 3–7</div>
+
+  <div class="note">Each section: signals in the question that point to this approach, then the standard solution skeleton in plain English.</div>
+
+  <div class="acc open">
+    <div class="acc-hdr" onclick="this.parentElement.classList.toggle('open')">
+      <span>Prefix Sum <span class="acc-day">d03</span></span>
+      <span class="acc-arrow">▼</span>
+    </div>
+    <div class="acc-body">
+      <div class="sub-label">Signals in the question</div>
+      <p>Multiple queries ask for the sum of a range [L, R] in an array. Computing each sum from scratch is too slow. The array doesn't change between queries (static array).</p>
+      <div class="sub-label">Standard solution skeleton</div>
+      <p>Allocate a prefix array of size N. Set prefix[0] = A[0]. For each i from 1 to N−1 set prefix[i] = prefix[i−1] + A[i]. To answer sum(L, R): return prefix[R] − prefix[L−1] (handle L=0 as a special case returning prefix[R]). For even/odd prefix sums, build two separate prefix arrays — one for even-indexed elements and one for odd-indexed.</p>
+    </div>
+  </div>
+
+  <div class="acc">
+    <div class="acc-hdr" onclick="this.parentElement.classList.toggle('open')">
+      <span>Carry Forward <span class="acc-day">d04</span></span>
+      <span class="acc-arrow">▼</span>
+    </div>
+    <div class="acc-body">
+      <div class="sub-label">Signals in the question</div>
+      <p>You need a count or aggregate that depends on what came before the current element. You only need to scan in one direction. The answer for each position can be derived from a single running value maintained from previous positions.</p>
+      <div class="sub-label">Standard solution skeleton</div>
+      <p>Initialize a carry variable to 0 before the loop. Scan left to right (or right to left depending on direction needed). At each element, either update the carry (when you see an 'A') or use the carry to contribute to the answer (when you see a 'G'). No second pass needed.</p>
+    </div>
+  </div>
+
+  <div class="acc">
+    <div class="acc-hdr" onclick="this.parentElement.classList.toggle('open')">
+      <span>Contribution Technique <span class="acc-day">d04/d05</span></span>
+      <span class="acc-arrow">▼</span>
+    </div>
+    <div class="acc-body">
+      <div class="sub-label">Signals in the question</div>
+      <p>The question asks for the sum of something across all subarrays. Enumerating every subarray is O(N²) or O(N³) and too slow. Each element's contribution to the total can be expressed as a formula based on its position.</p>
+      <div class="sub-label">Standard solution skeleton</div>
+      <p>For sum of all subarray sums: iterate once. At index i (0-based), A[i] contributes A[i] × (i+1) × (N−i) to the total. Sum this for all i. For other contribution problems, identify what property of position drives how many times an element appears in the answer.</p>
+    </div>
+  </div>
+
+  <div class="acc">
+    <div class="acc-hdr" onclick="this.parentElement.classList.toggle('open')">
+      <span>Sliding Window <span class="acc-day">d05</span></span>
+      <span class="acc-arrow">▼</span>
+    </div>
+    <div class="acc-body">
+      <div class="sub-label">Signals in the question</div>
+      <p>You have a fixed window size K and need to compute something (max sum, average, condition) for every window position. Recomputing from scratch for each position would be O(N×K).</p>
+      <div class="sub-label">Standard solution skeleton</div>
+      <p>Compute the sum of the first K elements as the initial window. Then for each new position i from K to N−1: add A[i] (the incoming element) and subtract A[i−K] (the outgoing element). The window sum is always current. Apply your condition or track maximum/minimum as you go.</p>
+    </div>
+  </div>
+
+  <div class="acc">
+    <div class="acc-hdr" onclick="this.parentElement.classList.toggle('open')">
+      <span>Memory Management <span class="acc-day">d07</span></span>
+      <span class="acc-arrow">▼</span>
+    </div>
+    <div class="acc-body">
+      <div class="sub-label">Signals in the question</div>
+      <p>Not a problem-solving pattern — a Java behavior pattern. Applies whenever you pass arrays or objects to methods and expect changes to propagate back to the caller.</p>
+      <div class="sub-label">Standard solution skeleton</div>
+      <p>Primitives (int, double) are copied — changes inside the method do not affect the caller. Return the new value to propagate it. Arrays and objects pass the reference — mutations to existing elements (<code>a[0] = x</code>) are visible to the caller. But re-initializing the reference (<code>a = new int[]{...}</code>) inside the method creates a new heap object — the caller's reference is unaffected. To propagate a new array, return it.</p>
+    </div>
+  </div>
+</main>
+
+</body>
+</html>

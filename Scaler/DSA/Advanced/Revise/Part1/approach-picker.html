@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Approach Picker — Part 1</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+<header>
+  <a class="logo" href="../../../../../index.html">upskill</a>
+  <nav class="breadcrumb">
+    <a href="../../../../../index.html">Home</a><span class="sep">/</span>
+    <a href="../../../../../index.html">DSA</a><span class="sep">/</span>
+    <a href="../../../../../index.html">Part 1</a><span class="sep">/</span>
+    <span class="cur">Approach Picker</span>
+  </nav>
+</header>
+<div class="sec-nav">
+  <a class="pill blue current" href="approach-picker.html">Approach Picker</a>
+  <a class="pill red"          href="common-mistakes.html">Common Mistakes</a>
+  <a class="pill green"        href="complexities.html">Complexities</a>
+  <a class="pill purple"       href="key-patterns.html">Key Patterns</a>
+  <a class="pill amber"        href="revision-tags.html">Revision Tags</a>
+  <a class="pill orange"       href="leetcode-references.html">LeetCode Refs</a>
+</div>
+<main>
+  <div class="page-title">Approach Picker</div>
+  <div class="page-sub">Part 1 · Days 8–19</div>
+  <div class="note">One row per chapter topic. The signal is generic — not a specific problem.</div>
+  <div class="tbl-wrap">
+    <table>
+      <thead><tr><th>When the question feels like…</th><th>Reach for…</th><th>Days</th></tr></thead>
+      <tbody>
+        <tr><td class="c-signal">Find the maximum sum of a contiguous subarray</td><td class="c-reach">Kadane's — track currentSum, reset to 0 when negative</td><td class="c-day">d08</td></tr>
+        <tr><td class="c-signal">Calculate how much water is trapped between bars of varying heights</td><td class="c-reach">Prefix-max left + Suffix-max right — water at i = min(L,R) − height[i]</td><td class="c-day">d08</td></tr>
+        <tr><td class="c-signal">Apply range updates [L,R] to an array and query final values</td><td class="c-reach">Difference Array — diff[L]+=val, diff[R+1]−=val, then prefix sum</td><td class="c-day">d08</td></tr>
+        <tr><td class="c-signal">Add 1 to a number represented as an array of digits</td><td class="c-reach">Carry propagation from right to left until no carry remains</td><td class="c-day">d08</td></tr>
+        <tr><td class="c-signal">Sum of all sub-matrices of a 2D matrix</td><td class="c-reach">2D Contribution — each cell contributes (i+1)×(j+1)×(N−i)×(M−j) times</td><td class="c-day">d09</td></tr>
+        <tr><td class="c-signal">Search in a matrix where rows and columns are both sorted</td><td class="c-reach">Staircase search — start top-right, go left if too big, go down if too small</td><td class="c-day">d09</td></tr>
+        <tr><td class="c-signal">Rotate or transpose a matrix in-place</td><td class="c-reach">Transpose upper triangle then reverse each row</td><td class="c-day">d09</td></tr>
+        <tr><td class="c-signal">First missing positive integer in an array</td><td class="c-reach">In-place sign marking — negate A[A[i]−1] for valid values in [1,N]</td><td class="c-day">d10</td></tr>
+        <tr><td class="c-signal">Merge overlapping intervals</td><td class="c-reach">Sort by start, then merge adjacent intervals if they overlap</td><td class="c-day">d10</td></tr>
+        <tr><td class="c-signal">Next larger permutation of an array</td><td class="c-reach">Next Permutation — find rightmost ascent, swap with next larger, reverse suffix</td><td class="c-day">d10</td></tr>
+        <tr><td class="c-signal">Single element among all pairs</td><td class="c-reach">XOR all elements — duplicates cancel, unique survives</td><td class="c-day">d11</td></tr>
+        <tr><td class="c-signal">One unique among elements appearing 3 times</td><td class="c-reach">Bit count mod 3 at each of 32 positions</td><td class="c-day">d12</td></tr>
+        <tr><td class="c-signal">Two uniques among elements appearing exactly 2 times</td><td class="c-reach">XOR all → rightmost set bit → split into two groups → XOR each</td><td class="c-day">d12</td></tr>
+        <tr><td class="c-signal">Minimum XOR pair in an array</td><td class="c-reach">Sort then XOR adjacent pairs — closest values produce smallest XOR</td><td class="c-day">d12</td></tr>
+        <tr><td class="c-signal">Compute A^N efficiently</td><td class="c-reach">Binary Exponentiation — square and multiply, O(logN)</td><td class="c-day">d14, d15</td></tr>
+        <tr><td class="c-signal">GCD of two numbers</td><td class="c-reach">Euclidean Algorithm — gcd(a,b) = gcd(b, a%b)</td><td class="c-day">d15</td></tr>
+        <tr><td class="c-signal">Count pairs with sum divisible by M</td><td class="c-reach">Remainder frequency array — pair remainder r with M−r</td><td class="c-day">d15</td></tr>
+        <tr><td class="c-signal">Subarray with sum = 0 or count them</td><td class="c-reach">Prefix sum + HashSet/HashMap — duplicate prefix sum = zero-sum subarray</td><td class="c-day">d16, d17</td></tr>
+        <tr><td class="c-signal">Distinct elements in a sliding window of size K</td><td class="c-reach">HashMap frequency tracking — add incoming, decrement outgoing</td><td class="c-day">d17</td></tr>
+        <tr><td class="c-signal">Count inversions in an array</td><td class="c-reach">Merge Sort — count when right element is picked over left during merge</td><td class="c-day">d18</td></tr>
+        <tr><td class="c-signal">Sort an array of 0s, 1s, and 2s in one pass</td><td class="c-reach">Dutch National Flag — 3-pointer (low, mid, high)</td><td class="c-day">d19</td></tr>
+        <tr><td class="c-signal">Form the largest number from array elements</td><td class="c-reach">Custom comparator — compare a+b vs b+a as strings</td><td class="c-day">d19</td></tr>
+      </tbody>
+    </table>
+  </div>
+</main>
+</body>
+</html>

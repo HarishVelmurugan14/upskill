@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Key Patterns — Part 3</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+<header>
+  <a class="logo" href="../../../../../index.html">upskill</a>
+  <nav class="breadcrumb">
+    <a href="../../../../../index.html">Home</a><span class="sep">/</span>
+    <a href="../../../../../index.html">DSA</a><span class="sep">/</span>
+    <a href="../../../../../index.html">Part 3</a><span class="sep">/</span>
+    <span class="cur">Key Patterns</span>
+  </nav>
+</header>
+<div class="sec-nav">
+  <a class="pill blue"            href="approach-picker.html">Approach Picker</a>
+  <a class="pill red"             href="common-mistakes.html">Common Mistakes</a>
+  <a class="pill green"           href="complexities.html">Complexities</a>
+  <a class="pill purple current"  href="key-patterns.html">Key Patterns</a>
+  <a class="pill amber"           href="revision-tags.html">Revision Tags</a>
+  <a class="pill orange"          href="leetcode-references.html">LeetCode Refs</a>
+</div>
+<main>
+  <div class="page-title">Key Patterns</div>
+  <div class="page-sub">Part 3 · Days 33–40</div>
+  <div class="note">Each section: signals in the question that point to this approach, then the standard solution skeleton in plain English.</div>
+
+  <div class="acc open">
+    <div class="acc-hdr" onclick="this.parentElement.classList.toggle('open')">
+      <span>Sieve of Eratosthenes — All Primes up to N <span class="acc-day">d33</span></span>
+      <span class="acc-arrow">▼</span>
+    </div>
+    <div class="acc-body">
+      <div class="sub-label">Signals in the question</div>
+      <p>You need all primes in a range, not just whether one number is prime. N can be up to 10^6 or more. Checking each number independently with a primality test would be too slow.</p>
+      <div class="sub-label">Standard solution skeleton</div>
+      <p>Create a boolean array <code>isPrime[0..N]</code>, all true. Set isPrime[0] = isPrime[1] = false. For each p from 2 to √N: if isPrime[p] is still true, mark all multiples of p starting from p² as false. The indices still marked true at the end are all primes.</p>
+    </div>
+  </div>
+
+  <div class="acc">
+    <div class="acc-hdr" onclick="this.parentElement.classList.toggle('open')">
+      <span>Two Pointers — Contiguous Subarray with Given Sum <span class="acc-day">d35</span></span>
+      <span class="acc-arrow">▼</span>
+    </div>
+    <div class="acc-body">
+      <div class="sub-label">Signals in the question</div>
+      <p>Find a contiguous subarray with a specific sum. The array contains only non-negative numbers (if negatives are possible, use prefix sum + HashMap instead). You need O(N).</p>
+      <div class="sub-label">Standard solution skeleton</div>
+      <p>Maintain a running window sum with two pointers, <code>left</code> and <code>right</code>. Expand right to increase the sum. When sum exceeds target, shrink from left. Stop when sum equals target or right reaches end.</p>
+    </div>
+  </div>
+
+  <div class="acc">
+    <div class="acc-hdr" onclick="this.parentElement.classList.toggle('open')">
+      <span>Backtracking — Permutations, Subsets, Parentheses <span class="acc-day">d36</span></span>
+      <span class="acc-arrow">▼</span>
+    </div>
+    <div class="acc-body">
+      <div class="sub-label">Signals in the question</div>
+      <p>Generate all valid arrangements: "all permutations", "all subsets", "all combinations", "all valid bracket strings". You need to explore every possibility but prune invalid branches early. The output is a list of all results, not just a count.</p>
+      <div class="sub-label">Standard solution skeleton</div>
+      <p><strong>Permutations:</strong> At each position, try every remaining element — swap it in, recurse, swap it back.<br><br><strong>Subsets:</strong> At each element make a binary choice — include (add to current, recurse, remove) or exclude (recurse without adding). All 2^N leaves are valid.<br><br><strong>Parentheses:</strong> Track open count and close count. Add '(' if open &lt; n. Add ')' if close &lt; open. When length == 2n, record the result.<br><br>The undo step (swap back, remove last element) is what makes it backtracking, not just recursion.</p>
+    </div>
+  </div>
+
+  <div class="acc">
+    <div class="acc-hdr" onclick="this.parentElement.classList.toggle('open')">
+      <span>Slow/Fast Pointer — Linked List Middle &amp; Cycle <span class="acc-day">d39</span></span>
+      <span class="acc-arrow">▼</span>
+    </div>
+    <div class="acc-body">
+      <div class="sub-label">Signals in the question</div>
+      <p>Find the middle of a linked list, detect a cycle, or find where a cycle starts — all without extra space. Two pointers moving at different speeds solve these in one pass.</p>
+      <div class="sub-label">Standard solution skeleton</div>
+      <p><strong>Middle:</strong> slow moves +1, fast moves +2. When fast reaches the end, slow is at the middle.<br><br><strong>Cycle detection:</strong> Same setup. If fast and slow meet, there is a cycle. If fast reaches null, no cycle.<br><br><strong>Cycle start:</strong> After they meet inside the cycle, reset one pointer to head. Advance both by +1 each step. They meet exactly at the cycle's start node — a mathematical guarantee from the structure of cycles.</p>
+    </div>
+  </div>
+
+  <div class="acc">
+    <div class="acc-hdr" onclick="this.parentElement.classList.toggle('open')">
+      <span>Merge Sort on Linked List <span class="acc-day">d39</span></span>
+      <span class="acc-arrow">▼</span>
+    </div>
+    <div class="acc-body">
+      <div class="sub-label">Signals in the question</div>
+      <p>Sort a linked list in O(N log N). You cannot use an auxiliary array. Random access is O(N) so quicksort with a good pivot is impractical. Merge sort is the natural fit because splitting and merging singly-linked lists is O(N).</p>
+      <div class="sub-label">Standard solution skeleton</div>
+      <p>Find the middle using slow/fast pointers. Disconnect the list at the middle. Recursively sort both halves. Merge the two sorted halves with a two-pointer merge (pick the smaller head node each time). Return the new head.</p>
+    </div>
+  </div>
+
+  <div class="acc">
+    <div class="acc-hdr" onclick="this.parentElement.classList.toggle('open')">
+      <span>LRU Cache — HashMap + Doubly Linked List <span class="acc-day">d39</span></span>
+      <span class="acc-arrow">▼</span>
+    </div>
+    <div class="acc-body">
+      <div class="sub-label">Signals in the question</div>
+      <p>Design a cache with O(1) get and O(1) put, evicting the least recently used entry when capacity is exceeded. A plain HashMap gives O(1) lookup but not O(1) eviction order tracking.</p>
+      <div class="sub-label">Standard solution skeleton</div>
+      <p>Combine a HashMap (key → node) with a doubly linked list (most recent at front, LRU at tail). On <strong>get</strong>: look up in map, move the node to front, return value. On <strong>put</strong>: if key exists, update value and move to front; if new, add a node at front and add to map; if over capacity, remove the tail node and delete its map entry.</p>
+    </div>
+  </div>
+</main>
+<script>
+  document.querySelectorAll('.acc-hdr').forEach(h => {
+    h.addEventListener('click', () => h.parentElement.classList.toggle('open'));
+  });
+</script>
+</body>
+</html>

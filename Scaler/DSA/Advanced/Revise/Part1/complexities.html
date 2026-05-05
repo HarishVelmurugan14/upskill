@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Complexities — Part 1</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+<header>
+  <a class="logo" href="../../../../../index.html">upskill</a>
+  <nav class="breadcrumb">
+    <a href="../../../../../index.html">Home</a><span class="sep">/</span>
+    <a href="../../../../../index.html">DSA</a><span class="sep">/</span>
+    <a href="../../../../../index.html">Part 1</a><span class="sep">/</span>
+    <span class="cur">Complexities</span>
+  </nav>
+</header>
+<div class="sec-nav">
+  <a class="pill blue"           href="approach-picker.html">Approach Picker</a>
+  <a class="pill red"            href="common-mistakes.html">Common Mistakes</a>
+  <a class="pill green current"  href="complexities.html">Complexities</a>
+  <a class="pill purple"         href="key-patterns.html">Key Patterns</a>
+  <a class="pill amber"          href="revision-tags.html">Revision Tags</a>
+  <a class="pill orange"         href="leetcode-references.html">LeetCode Refs</a>
+</div>
+<main>
+  <div class="page-title">Complexities</div>
+  <div class="page-sub">Part 1 · Days 8–19</div>
+  <div class="note">Table = complexity from source comments. Explanation below = why that cost is what it is.</div>
+
+  <div class="sec">
+    <div class="sec-title">d08 — Arrays: 1D</div>
+    <div class="tbl-wrap"><table>
+      <thead><tr><th>Method</th><th>Time</th><th>Space</th></tr></thead>
+      <tbody>
+        <tr><td><code>bruteForce</code> (max sum)</td><td class="c-time">O(N³)</td><td class="c-space">O(N)</td></tr>
+        <tr><td><code>prefixSumApproach</code></td><td class="c-time">O(N²)</td><td class="c-space">O(N)</td></tr>
+        <tr><td><code>carryForwardApproach</code></td><td class="c-time">O(N³)</td><td class="c-space">O(N)</td></tr>
+        <tr><td><code>kadanesAlgorithm</code></td><td class="c-time">O(N)</td><td class="c-space">O(1)</td></tr>
+        <tr><td><code>kadanesAlgorithm_withEndPoints</code></td><td class="c-time">O(N)</td><td class="c-space">O(1)</td></tr>
+        <tr><td><code>rainWaterTrapped_brute</code></td><td class="c-time">O(N²)</td><td class="c-space">O(1)</td></tr>
+        <tr><td><code>rainWaterTrapped_optimized</code></td><td class="c-time">O(3N)</td><td class="c-space">O(2N)</td></tr>
+        <tr><td><code>beggarProfit_brute</code></td><td class="c-time">O(N²)</td><td class="c-space">O(N)</td></tr>
+        <tr><td><code>beggarProfit_optimized</code></td><td class="c-time">O(N)</td><td class="c-space">O(2N)</td></tr>
+        <tr><td><code>addOneToNumberProvidedAsArray</code></td><td class="c-time">O(2N)</td><td class="c-space">O(3N)</td></tr>
+      </tbody>
+    </table></div>
+    <div class="why-box">
+      <div class="why-label">Why Kadane's is O(N)</div>
+      <p>You make a single left-to-right pass, maintaining just two variables: the current running sum and the global maximum. At each element you decide whether to extend the current subarray or start fresh — a constant-time decision. No extra array is needed so space is O(1).</p>
+    </div>
+    <div class="why-box">
+      <div class="why-label">Why the optimized rain water is O(3N) space O(2N)</div>
+      <p>One pass builds a left-max array (N values), another builds a right-max array (N values) — that is 2N space. A third pass computes trapped water at each index. Total work: three full scans = O(3N) ≈ O(N).</p>
+    </div>
+  </div>
+
+  <div class="sec">
+    <div class="sec-title">d09 — Arrays: 2D</div>
+    <div class="tbl-wrap"><table>
+      <thead><tr><th>Method</th><th>Time</th><th>Space</th></tr></thead>
+      <tbody>
+        <tr><td><code>bruteForce90Degree</code></td><td class="c-time">O(N×M)</td><td class="c-space">O(1)</td></tr>
+        <tr><td><code>printRowWiseSum</code></td><td class="c-time">O(n×m)</td><td class="c-space">O(1)</td></tr>
+        <tr><td><code>matrixTransposeInPlace</code></td><td class="c-time">O(n×m)</td><td class="c-space">O(1)</td></tr>
+      </tbody>
+    </table></div>
+    <div class="why-box">
+      <div class="why-label">Why in-place rotation is O(N×M) space O(1)</div>
+      <p>Transpose by swapping A[i][j] with A[j][i] — each cell is touched once. Then reverse each row — another O(N×M) pass. No auxiliary matrix is needed; every swap happens inside the original array.</p>
+    </div>
+  </div>
+
+  <div class="sec">
+    <div class="sec-title">d10 — Arrays: Interview Problems</div>
+    <div class="tbl-wrap"><table>
+      <thead><tr><th>Method</th><th>Time</th><th>Space</th></tr></thead>
+      <tbody>
+        <tr><td><code>bruteForce_MissingNaturalNumber</code></td><td class="c-time">O(N²)</td><td class="c-space">O(1)</td></tr>
+        <tr><td><code>approach2_MissingNaturalNumber</code></td><td class="c-time">O(2N)</td><td class="c-space">O(1)</td></tr>
+        <tr><td><code>approach3_MissingNaturalNumber</code></td><td class="c-time">O(2N)</td><td class="c-space">O(1)</td></tr>
+        <tr><td><code>approach4_MissingNaturalNumber</code></td><td class="c-time">O(3N)</td><td class="c-space">O(1)</td></tr>
+        <tr><td><code>mergeIntervalAndProvidePointsMerged</code></td><td class="c-time">O(N)</td><td class="c-space">O(1)</td></tr>
+        <tr><td><code>nextPermutation</code></td><td class="c-time">O(N)</td><td class="c-space">O(1)</td></tr>
+        <tr><td><code>insertANewIntervalAndMergeIfPossible</code></td><td class="c-time">O(N)</td><td class="c-space">O(N)</td></tr>
+      </tbody>
+    </table></div>
+    <div class="why-box">
+      <div class="why-label">Why in-place sign marking is O(3N)</div>
+      <p>Pass 1: replace all values outside [1,N] with N+1. Pass 2: negate A[A[i]−1] for every valid index. Pass 3: scan to find the first positive — that index+1 is the answer. Three sequential scans, no extra storage.</p>
+    </div>
+  </div>
+
+  <div class="sec">
+    <div class="sec-title">d11 — Bit Manipulation 1</div>
+    <div class="tbl-wrap"><table>
+      <thead><tr><th>Method</th><th>Time</th><th>Space</th></tr></thead>
+      <tbody>
+        <tr><td><code>countNumberOfSetBits</code></td><td class="c-time">O(log N)</td><td class="c-space">O(1)</td></tr>
+      </tbody>
+    </table></div>
+    <div class="why-box">
+      <div class="why-label">Why counting set bits is O(log N)</div>
+      <p>N has at most log₂(N) bits. Each iteration of <code>N &amp; (N−1)</code> strips one set bit, so the loop runs at most as many times as there are set bits — bounded by log₂(N).</p>
+    </div>
+  </div>
+
+  <div class="sec">
+    <div class="sec-title">d12 — Bit Manipulation 2</div>
+    <div class="tbl-wrap"><table>
+      <thead><tr><th>Method</th><th>Time</th><th>Space</th></tr></thead>
+      <tbody>
+        <tr><td><code>twoUniqueElements</code></td><td class="c-time">O(N)</td><td class="c-space">O(1)</td></tr>
+        <tr><td><code>findMinXor_Optimal</code></td><td class="c-time">O(N)</td><td class="c-space">O(1)</td></tr>
+        <tr><td><code>sumAfterBitwiseOROperatorOnAllSubArraysOfAnArray</code></td><td class="c-time">O(27N)</td><td class="c-space">O(1)</td></tr>
+        <tr><td><code>strangeEqualityWithFormula_optimal</code></td><td class="c-time">O(log N)</td><td class="c-space">O(1)</td></tr>
+        <tr><td><code>missingTwoNumbers_XOR</code></td><td class="c-time">O(N)</td><td class="c-space">O(1)</td></tr>
+      </tbody>
+    </table></div>
+    <div class="why-box">
+      <div class="why-label">Why sumAfterBitwiseOR is O(27N)</div>
+      <p>For each of the N elements you process up to 27 bit positions (safe upper bound for 10^8 values). At each bit position you calculate how many subarrays have that bit set using the contribution formula — O(1) per bit. Total: 27 passes through N elements.</p>
+    </div>
+  </div>
+
+  <div class="sec">
+    <div class="sec-title">d13 — Recursion 1</div>
+    <div class="tbl-wrap"><table>
+      <thead><tr><th>Method</th><th>Time</th><th>Space</th></tr></thead>
+      <tbody>
+        <tr><td><code>factorial</code></td><td class="c-time">O(N)</td><td class="c-space">O(N)</td></tr>
+        <tr><td><code>printAllNumbersInIncreasingOrder</code></td><td class="c-time">O(N)</td><td class="c-space">O(N)</td></tr>
+        <tr><td><code>printAllNumbersInDecreasingOrder</code></td><td class="c-time">O(N)</td><td class="c-space">O(N)</td></tr>
+      </tbody>
+    </table></div>
+    <div class="why-box">
+      <div class="why-label">Why recursion space is O(N)</div>
+      <p>Each recursive call occupies a stack frame. For a depth-N recursion (factorial, print 1..N) there are N frames alive simultaneously before any returns — that is O(N) stack space.</p>
+    </div>
+  </div>
+
+  <div class="sec">
+    <div class="sec-title">d14 — Recursion 2</div>
+    <div class="tbl-wrap"><table>
+      <thead><tr><th>Method</th><th>Time</th><th>Space</th></tr></thead>
+      <tbody>
+        <tr><td><code>towerOfHanoi</code></td><td class="c-time">O(2^N)</td><td class="c-space">O(N)</td></tr>
+        <tr><td><code>powerOfANumber_brute</code></td><td class="c-time">O(N)</td><td class="c-space">O(N)</td></tr>
+        <tr><td><code>powerOfANumber_approach2</code> (binary exp)</td><td class="c-time">O(log N)</td><td class="c-space">O(log N)</td></tr>
+        <tr><td><code>allIndicesOfATarget_Yahnit</code></td><td class="c-time">O(N/2)</td><td class="c-space">O(N/2)</td></tr>
+      </tbody>
+    </table></div>
+    <div class="why-box">
+      <div class="why-label">Why Tower of Hanoi is O(2^N)</div>
+      <p>To move N disks you must move N−1 disks twice (once to the helper, once to the destination) plus one move for the largest disk. The recurrence T(N) = 2T(N−1) + 1 solves to 2^N − 1 moves.</p>
+    </div>
+    <div class="why-box">
+      <div class="why-label">Why binary exponentiation is O(log N)</div>
+      <p>Instead of multiplying A by itself N times, you square the result at each step. The exponent halves each iteration, so you need log₂(N) steps. The recursion stack is also log₂(N) deep.</p>
+    </div>
+  </div>
+
+  <div class="sec">
+    <div class="sec-title">d17 — Hashing 2</div>
+    <div class="tbl-wrap"><table>
+      <thead><tr><th>Method</th><th>Time</th><th>Space</th></tr></thead>
+      <tbody>
+        <tr><td><code>distinctNumbersInWindow_approach</code></td><td class="c-time">O(N)</td><td class="c-space">O(1)</td></tr>
+        <tr><td><code>distinctNumbersInWindow_brute</code></td><td class="c-time">O(N²)</td><td class="c-space">O(N)</td></tr>
+        <tr><td><code>firstNonRepeatingElementInAnArray</code></td><td class="c-time">O(2N)</td><td class="c-space">O(N)</td></tr>
+      </tbody>
+    </table></div>
+    <div class="why-box">
+      <div class="why-label">Why the sliding window distinct approach is O(N)</div>
+      <p>Each element enters the window once and leaves once — two operations total per element. The frequency map update and distinct-count adjustment are O(1) per event. Total: O(2N) ≈ O(N), with at most K entries in the map at any time.</p>
+    </div>
+  </div>
+
+  <div class="sec">
+    <div class="sec-title">d18 — Sorting: Merge Sort</div>
+    <div class="tbl-wrap"><table>
+      <thead><tr><th>Method</th><th>Time</th><th>Space</th></tr></thead>
+      <tbody>
+        <tr><td><code>mergeSort</code></td><td class="c-time">O(N log N)</td><td class="c-space">O(N)</td></tr>
+        <tr><td><code>mergeContiguousSortedSubArrays</code></td><td class="c-time">O(high−low+1)</td><td class="c-space">O(high−low+1)</td></tr>
+        <tr><td><code>mergeTwoSortedArrays</code></td><td class="c-time">O(N+M)</td><td class="c-space">O(N+M)</td></tr>
+      </tbody>
+    </table></div>
+    <div class="why-box">
+      <div class="why-label">Why merge sort is O(N log N)</div>
+      <p>The array is split in half log₂(N) times (depth of the recursion tree). At each level of the tree the total work to merge all sub-arrays is O(N) — every element is touched once across all merges at that level. Multiplying: log N levels × N work each = O(N log N). The temporary merge buffer is O(N) in the worst case.</p>
+    </div>
+  </div>
+</main>
+</body>
+</html>

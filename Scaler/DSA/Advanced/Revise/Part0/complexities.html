@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Complexities — Part 0</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<header>
+  <a class="logo" href="../../../../../index.html">upskill</a>
+  <nav class="breadcrumb">
+    <a href="../../../../../index.html">Home</a><span class="sep">/</span>
+    <a href="../../../../../index.html">DSA</a><span class="sep">/</span>
+    <a href="../../../../../index.html">Part 0</a><span class="sep">/</span>
+    <span class="cur">Complexities</span>
+  </nav>
+</header>
+
+<div class="sec-nav">
+  <a class="pill blue"           href="approach-picker.html">Approach Picker</a>
+  <a class="pill red"            href="common-mistakes.html">Common Mistakes</a>
+  <a class="pill green current"  href="complexities.html">Complexities</a>
+  <a class="pill purple"         href="key-patterns.html">Key Patterns</a>
+  <a class="pill amber"          href="revision-tags.html">Revision Tags</a>
+  <a class="pill orange"         href="leetcode-references.html">LeetCode Refs</a>
+</div>
+
+<main>
+  <div class="page-title">Complexities</div>
+  <div class="page-sub">Part 0 · Days 3–7</div>
+
+  <div class="note">Table = complexity from source comments. Explanation below each = why that cost is what it is.</div>
+
+  <!-- d03 -->
+  <div class="sec">
+    <div class="sec-title">d03 — Prefix Sum</div>
+    <div class="tbl-wrap">
+      <table>
+        <thead><tr><th>Method</th><th>Time</th><th>Space</th></tr></thead>
+        <tbody>
+          <tr><td><code>bruteForce</code></td><td class="c-time">O(n×q)</td><td class="c-space">O(1)</td></tr>
+          <tr><td><code>optimal</code></td><td class="c-time">O(n)</td><td class="c-space">O(n+q)</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="why-box">
+      <div class="why-label">Why O(n×q) vs O(n)</div>
+      <p>Brute force recomputes the sum for each of q queries by scanning the array each time — q queries × n elements = O(n×q). The optimal approach builds a prefix array once in O(n), then answers each query in O(1) with a subtraction — total O(n + q). For large q the difference is dramatic.</p>
+    </div>
+  </div>
+
+  <!-- d04 carry forward -->
+  <div class="sec">
+    <div class="sec-title">d04 — Carry Forward</div>
+    <div class="tbl-wrap">
+      <table>
+        <thead><tr><th>Method</th><th>Time</th><th>Space</th></tr></thead>
+        <tbody>
+          <tr><td><code>bruteForce (AG pairs)</code></td><td class="c-time">O(N²)</td><td class="c-space">O(1)</td></tr>
+          <tr><td><code>optimal (AG pairs)</code></td><td class="c-time">O(n)</td><td class="c-space">O(1)</td></tr>
+          <tr><td><code>numberOfAGPairsInAString</code></td><td class="c-time">O(n)</td><td class="c-space">O(1)</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="why-box">
+      <div class="why-label">Why O(N²) vs O(N)</div>
+      <p>Brute force checks every pair (i, j) with i &lt; j to see if A[i]='A' and A[j]='G' — that is N×(N−1)/2 pairs. Carry forward scans once: at each 'G', the number of valid pairs ending here equals the number of 'A's seen so far, which is tracked in a single counter. One pass = O(N).</p>
+    </div>
+  </div>
+
+  <!-- d04 subarrays -->
+  <div class="sec">
+    <div class="sec-title">d04 — SubArrays</div>
+    <div class="tbl-wrap">
+      <table>
+        <thead><tr><th>Method</th><th>Time</th><th>Space</th></tr></thead>
+        <tbody>
+          <tr><td><code>bruteForce (smallest subarray with min+max)</code></td><td class="c-time">O(N³)</td><td class="c-space">O(1)</td></tr>
+          <tr><td><code>optimal (smallest subarray with min+max)</code></td><td class="c-time">O(N)</td><td class="c-space">O(1)</td></tr>
+          <tr><td><code>storeAllSubArraysInA2DMatrix</code></td><td class="c-time">O(N³)</td><td class="c-space">O(1)</td></tr>
+          <tr><td><code>maxProfitOnOnlyOneTransaction</code></td><td class="c-time">O(N)</td><td class="c-space">O(1)</td></tr>
+          <tr><td><code>printAllSubArrays</code></td><td class="c-time">O(N³)</td><td class="c-space">O(1)</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="why-box">
+      <div class="why-label">Why O(N³) for brute force subarrays</div>
+      <p>To enumerate all subarrays you have O(N²) start/end pairs. For each pair you might scan the contents (O(N)), giving O(N³). The carry-forward approach for min/max tracking lets you maintain running min and max as you expand right — one pass right-to-left = O(N).</p>
+    </div>
+  </div>
+
+  <!-- ContributionTechnique_4 -->
+  <div class="sec">
+    <div class="sec-title">ContributionTechnique_4</div>
+    <div class="tbl-wrap">
+      <table>
+        <thead><tr><th>Method</th><th>Time</th><th>Space</th></tr></thead>
+        <tbody>
+          <tr><td><code>bruteForce (sum all subarrays)</code></td><td class="c-time">O(N³)</td><td class="c-space">O(1)</td></tr>
+          <tr><td><code>approach1 (prefix sum)</code></td><td class="c-time">O(N²) ⚠️ source has typo "O(N^12)"</td><td class="c-space">O(N)</td></tr>
+          <tr><td><code>approach2 (carry forward)</code></td><td class="c-time">O(N²)</td><td class="c-space">O(1)</td></tr>
+          <tr><td><code>approach3 (contribution formula)</code></td><td class="c-time">O(N)</td><td class="c-space">O(1)</td></tr>
+          <tr><td><code>countSubArraysWithSumLessThanB</code></td><td class="c-time">O(N²)</td><td class="c-space">O(1)</td></tr>
+          <tr><td><code>findCountOfGoodSubArrays</code></td><td class="c-time">O(N²)</td><td class="c-space">O(1)</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="why-box">
+      <div class="why-label">Why O(N) for contribution formula</div>
+      <p>Instead of computing every subarray's sum, observe that A[i] appears in exactly (i+1)×(N−i) subarrays (i+1 choices for the left boundary, N−i choices for the right boundary). Multiply A[i] by this count and sum for all i — one loop, O(N). The O(N²) approaches still enumerate pairs of boundaries.</p>
+    </div>
+  </div>
+
+  <!-- SlidingWindowTechnique_5 -->
+  <div class="sec">
+    <div class="sec-title">SlidingWindowTechnique_5</div>
+    <div class="tbl-wrap">
+      <table>
+        <thead><tr><th>Method</th><th>Time</th><th>Space</th></tr></thead>
+        <tbody>
+          <tr><td><code>approach1 (brute)</code></td><td class="c-time">O(N²)</td><td class="c-space">O(1)</td></tr>
+          <tr><td><code>optimal (sliding window)</code></td><td class="c-time">O(N)</td><td class="c-space">O(1)</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="why-box">
+      <div class="why-label">Why O(N) for sliding window</div>
+      <p>The brute force recomputes the sum of K elements for each of the N−K+1 windows: O(N×K). The sliding window maintains a running sum — each new window is computed by adding one element and removing one element, both O(1). Across N windows that is O(N) total.</p>
+    </div>
+  </div>
+</main>
+
+</body>
+</html>

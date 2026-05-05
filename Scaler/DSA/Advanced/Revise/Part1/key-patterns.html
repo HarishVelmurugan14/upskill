@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Key Patterns — Part 1</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+<header>
+  <a class="logo" href="../../../../../index.html">upskill</a>
+  <nav class="breadcrumb">
+    <a href="../../../../../index.html">Home</a><span class="sep">/</span>
+    <a href="../../../../../index.html">DSA</a><span class="sep">/</span>
+    <a href="../../../../../index.html">Part 1</a><span class="sep">/</span>
+    <span class="cur">Key Patterns</span>
+  </nav>
+</header>
+<div class="sec-nav">
+  <a class="pill blue"            href="approach-picker.html">Approach Picker</a>
+  <a class="pill red"             href="common-mistakes.html">Common Mistakes</a>
+  <a class="pill green"           href="complexities.html">Complexities</a>
+  <a class="pill purple current"  href="key-patterns.html">Key Patterns</a>
+  <a class="pill amber"           href="revision-tags.html">Revision Tags</a>
+  <a class="pill orange"          href="leetcode-references.html">LeetCode Refs</a>
+</div>
+<main>
+  <div class="page-title">Key Patterns</div>
+  <div class="page-sub">Part 1 · Days 8–19</div>
+  <div class="note">Each section: signals in the question that point to this approach, then the standard solution skeleton in plain English.</div>
+
+  <div class="acc open">
+    <div class="acc-hdr" onclick="this.parentElement.classList.toggle('open')">
+      <span>Kadane's Algorithm — Maximum Subarray <span class="acc-day">d08</span></span>
+      <span class="acc-arrow">▼</span>
+    </div>
+    <div class="acc-body">
+      <div class="sub-label">Signals in the question</div>
+      <p>The question asks for the maximum (or minimum) sum over all contiguous subarrays. The array can contain negative numbers — otherwise a simple total would suffice. You need O(N), not O(N²).</p>
+      <div class="sub-label">Standard solution skeleton</div>
+      <p>Maintain two variables: <code>currentSum</code> and <code>maxSum</code>. Walk left to right. At each element, add it to <code>currentSum</code>. If <code>currentSum</code> goes negative, reset it to 0 (there is no point carrying a negative prefix). Update <code>maxSum = max(maxSum, currentSum)</code> at every step. Return <code>maxSum</code>.</p>
+    </div>
+  </div>
+
+  <div class="acc">
+    <div class="acc-hdr" onclick="this.parentElement.classList.toggle('open')">
+      <span>Prefix-Max + Suffix-Max — Rain Water Trap <span class="acc-day">d08</span></span>
+      <span class="acc-arrow">▼</span>
+    </div>
+    <div class="acc-body">
+      <div class="sub-label">Signals in the question</div>
+      <p>You need to know the maximum value to the left of each position AND the maximum to the right. The answer at each position depends on both sides independently. Computing both on the fly in one pass is tricky — precompute instead.</p>
+      <div class="sub-label">Standard solution skeleton</div>
+      <p>Build <code>leftMax[i]</code> = max of A[0..i] in a left-to-right scan. Build <code>rightMax[i]</code> = max of A[i..N-1] in a right-to-left scan. The contribution at index i = <code>min(leftMax[i], rightMax[i]) − A[i]</code>. Sum all contributions.</p>
+    </div>
+  </div>
+
+  <div class="acc">
+    <div class="acc-hdr" onclick="this.parentElement.classList.toggle('open')">
+      <span>Difference Array — Range Update then Query <span class="acc-day">d08</span></span>
+      <span class="acc-arrow">▼</span>
+    </div>
+    <div class="acc-body">
+      <div class="sub-label">Signals in the question</div>
+      <p>Many range-update operations of the form "add value V to every index in [L, R]" are given upfront. Then you need to query the final array. Applying each update naively is O(N) per query — too slow for many updates.</p>
+      <div class="sub-label">Standard solution skeleton</div>
+      <p>Create a <code>diff[]</code> array of zeros. For each update [L, R, V]: <code>diff[L] += V</code>, <code>diff[R+1] -= V</code>. After all updates, take the prefix sum of <code>diff[]</code> — this gives the final value at every index in one O(N) pass.</p>
+    </div>
+  </div>
+
+  <div class="acc">
+    <div class="acc-hdr" onclick="this.parentElement.classList.toggle('open')">
+      <span>In-Place Sign Marking — First Missing Positive <span class="acc-day">d10</span></span>
+      <span class="acc-arrow">▼</span>
+    </div>
+    <div class="acc-body">
+      <div class="sub-label">Signals in the question</div>
+      <p>Find a missing number in range [1, N] using O(1) extra space. The array itself can be used as a presence map — use the sign of each element to encode whether the corresponding index has been seen.</p>
+      <div class="sub-label">Standard solution skeleton</div>
+      <p>Pass 1: Replace all values outside [1, N] with N+1 (they are unusable). Pass 2: For each element whose absolute value v is in [1, N], negate A[v−1] to mark v as present. Pass 3: The first index i with A[i] &gt; 0 means i+1 is missing.</p>
+    </div>
+  </div>
+
+  <div class="acc">
+    <div class="acc-hdr" onclick="this.parentElement.classList.toggle('open')">
+      <span>XOR Tricks — Unique Elements in an Array <span class="acc-day">d11, d12</span></span>
+      <span class="acc-arrow">▼</span>
+    </div>
+    <div class="acc-body">
+      <div class="sub-label">Signals in the question</div>
+      <p>Every element appears an even number of times except one or two. XOR is self-inverse (A XOR A = 0) and identity-neutral (A XOR 0 = A), so pairs cancel out. This is the key property to exploit.</p>
+      <div class="sub-label">Standard solution skeleton</div>
+      <p><strong>One unique:</strong> XOR all elements — pairs cancel, the unique value remains.<br><br><strong>Two uniques (A, B):</strong> XOR all → get (A XOR B). Find the rightmost set bit in (A XOR B) — this bit differs between A and B. Partition the array by that bit; XOR each partition independently to find A and B.</p>
+    </div>
+  </div>
+
+  <div class="acc">
+    <div class="acc-hdr" onclick="this.parentElement.classList.toggle('open')">
+      <span>Binary Exponentiation — Fast Power <span class="acc-day">d14, d15</span></span>
+      <span class="acc-arrow">▼</span>
+    </div>
+    <div class="acc-body">
+      <div class="sub-label">Signals in the question</div>
+      <p>Compute A^N where N can be up to 10^9. Linear multiplication would time out. The problem may also ask for the result modulo a large prime, which means you cannot rely on floating-point shortcuts.</p>
+      <div class="sub-label">Standard solution skeleton</div>
+      <p>If N is even: A^N = (A^(N/2))². If N is odd: A^N = A × A^(N−1). Recurse (or iterate) until the exponent reaches 0 (result = 1). Apply modulo after every multiplication to keep numbers small: <code>result = (result * base) % mod</code>.</p>
+    </div>
+  </div>
+
+  <div class="acc">
+    <div class="acc-hdr" onclick="this.parentElement.classList.toggle('open')">
+      <span>Prefix Sum + HashMap — Subarray Sum Problems <span class="acc-day">d16, d17</span></span>
+      <span class="acc-arrow">▼</span>
+    </div>
+    <div class="acc-body">
+      <div class="sub-label">Signals in the question</div>
+      <p>Count (or find) subarrays with a specific sum. Two-pointer only works for non-negative arrays. For general arrays with negatives, prefix sums paired with a HashMap give O(N).</p>
+      <div class="sub-label">Standard solution skeleton</div>
+      <p>Maintain a running prefix sum. For each new prefix sum S, check if (S − target) exists in the map — if yes, that many subarrays ending here have sum = target. Add S to the map (store first-occurrence index for length queries). Initialize map with {0: −1} so subarrays starting at index 0 are handled correctly.</p>
+    </div>
+  </div>
+
+  <div class="acc">
+    <div class="acc-hdr" onclick="this.parentElement.classList.toggle('open')">
+      <span>Merge Sort — Counting Inversions <span class="acc-day">d18</span></span>
+      <span class="acc-arrow">▼</span>
+    </div>
+    <div class="acc-body">
+      <div class="sub-label">Signals in the question</div>
+      <p>Count pairs (i, j) where i &lt; j but A[i] &gt; A[j]. Brute force is O(N²). Merge sort counts inversions as a side effect of sorting — whenever a right-half element is picked before remaining left-half elements, all those left-half elements form inversions with it.</p>
+      <div class="sub-label">Standard solution skeleton</div>
+      <p>Run merge sort normally. During the merge step, when you pick element from the right sub-array while the left sub-array still has elements remaining, add <code>leftRemaining</code> to the inversion count. Return total inversions along with the sorted array.</p>
+    </div>
+  </div>
+
+  <div class="acc">
+    <div class="acc-hdr" onclick="this.parentElement.classList.toggle('open')">
+      <span>Dutch National Flag — Sort 0s, 1s, 2s <span class="acc-day">d19</span></span>
+      <span class="acc-arrow">▼</span>
+    </div>
+    <div class="acc-body">
+      <div class="sub-label">Signals in the question</div>
+      <p>Sort an array with only 3 distinct values in one pass. Counting sort works but takes two passes and requires knowing the range. DNF does it in one pass with three pointers.</p>
+      <div class="sub-label">Standard solution skeleton</div>
+      <p>Maintain three pointers: <code>low</code> (boundary of 0s), <code>mid</code> (current), <code>high</code> (boundary of 2s). When A[mid] == 0: swap A[low] and A[mid], advance both. When A[mid] == 1: advance mid only. When A[mid] == 2: swap A[mid] and A[high], retreat high (do not advance mid — the swapped value needs inspection). Stop when mid &gt; high.</p>
+    </div>
+  </div>
+</main>
+<script>
+  document.querySelectorAll('.acc-hdr').forEach(h => {
+    h.addEventListener('click', () => h.parentElement.classList.toggle('open'));
+  });
+</script>
+</body>
+</html>

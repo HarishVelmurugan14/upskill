@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Approach Picker — Part 3</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+<header>
+  <a class="logo" href="../../../../../index.html">upskill</a>
+  <nav class="breadcrumb">
+    <a href="../../../../../index.html">Home</a><span class="sep">/</span>
+    <a href="../../../../../index.html">DSA</a><span class="sep">/</span>
+    <a href="../../../../../index.html">Part 3</a><span class="sep">/</span>
+    <span class="cur">Approach Picker</span>
+  </nav>
+</header>
+<div class="sec-nav">
+  <a class="pill blue current" href="approach-picker.html">Approach Picker</a>
+  <a class="pill red"          href="common-mistakes.html">Common Mistakes</a>
+  <a class="pill green"        href="complexities.html">Complexities</a>
+  <a class="pill purple"       href="key-patterns.html">Key Patterns</a>
+  <a class="pill amber"        href="revision-tags.html">Revision Tags</a>
+  <a class="pill orange"       href="leetcode-references.html">LeetCode Refs</a>
+</div>
+<main>
+  <div class="page-title">Approach Picker</div>
+  <div class="page-sub">Part 3 · Days 33–40</div>
+  <div class="note">One row per chapter topic. The signal is generic — not a specific problem.</div>
+  <div class="tbl-wrap">
+    <table>
+      <thead><tr><th>When the question feels like…</th><th>Reach for…</th><th>Days</th></tr></thead>
+      <tbody>
+        <tr><td class="c-signal">Find all prime numbers up to N</td><td class="c-reach">Sieve of Eratosthenes — mark all multiples of each prime as composite</td><td class="c-day">d33</td></tr>
+        <tr><td class="c-signal">Check whether a single number is prime</td><td class="c-reach">Check divisibility only up to √N</td><td class="c-day">d33</td></tr>
+        <tr><td class="c-signal">Contiguous subarray with an exact given sum</td><td class="c-reach">Two Pointers — expand right to increase sum, shrink left to decrease</td><td class="c-day">d35</td></tr>
+        <tr><td class="c-signal">Generate all permutations of an array</td><td class="c-reach">Backtracking — pick element → recurse → undo (swap back)</td><td class="c-day">d36</td></tr>
+        <tr><td class="c-signal">Generate all subsets or subsequences</td><td class="c-reach">Backtracking — include/exclude each element → O(2^N)</td><td class="c-day">d36</td></tr>
+        <tr><td class="c-signal">Generate all valid parentheses combinations</td><td class="c-reach">Backtracking — add '(' if open &lt; n, add ')' if close &lt; open</td><td class="c-day">d36</td></tr>
+        <tr><td class="c-signal">Sort a linked list</td><td class="c-reach">Merge Sort on linked list — find middle → split → sort halves → merge</td><td class="c-day">d39</td></tr>
+        <tr><td class="c-signal">Check if a linked list is a palindrome</td><td class="c-reach">Find middle → reverse second half → compare with first half</td><td class="c-day">d39</td></tr>
+        <tr><td class="c-signal">Merge two sorted linked lists</td><td class="c-reach">Two-pointer merge — link the smaller node each step</td><td class="c-day">d39</td></tr>
+        <tr><td class="c-signal">Find the middle of a linked list</td><td class="c-reach">Slow/fast pointers — slow moves +1, fast moves +2</td><td class="c-day">d39</td></tr>
+        <tr><td class="c-signal">Add two numbers stored as linked lists</td><td class="c-reach">Traverse both lists digit by digit with carry — build result node by node</td><td class="c-day">d39</td></tr>
+        <tr><td class="c-signal">LRU Cache with O(1) get and put</td><td class="c-reach">HashMap + Doubly Linked List — O(1) lookup + O(1) reorder</td><td class="c-day">d39_DLL</td></tr>
+        <tr><td class="c-signal">Detect the start of a cycle in a linked list</td><td class="c-reach">Floyd's algorithm — fast/slow meet → reset one → both +1 → meet at start</td><td class="c-day">d39_DLL</td></tr>
+      </tbody>
+    </table>
+  </div>
+</main>
+</body>
+</html>

@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Common Mistakes — Part 4</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+<header>
+  <a class="logo" href="../../../../../index.html">upskill</a>
+  <nav class="breadcrumb">
+    <a href="../../../../../index.html">Home</a><span class="sep">/</span>
+    <a href="../../../../../index.html">DSA</a><span class="sep">/</span>
+    <a href="../../../../../index.html">Part 4</a><span class="sep">/</span>
+    <span class="cur">Common Mistakes</span>
+  </nav>
+</header>
+<div class="sec-nav">
+  <a class="pill blue"         href="approach-picker.html">Approach Picker</a>
+  <a class="pill red current"  href="common-mistakes.html">Common Mistakes</a>
+  <a class="pill green"        href="complexities.html">Complexities</a>
+  <a class="pill purple"       href="key-patterns.html">Key Patterns</a>
+  <a class="pill amber"        href="revision-tags.html">Revision Tags</a>
+  <a class="pill orange"       href="leetcode-references.html">LeetCode Refs</a>
+</div>
+<main>
+  <div class="page-title">Common Mistakes</div>
+  <div class="page-sub">Part 4 · Days 44–56</div>
+  <div class="note">Generic pitfalls by technique — not edge cases per problem.</div>
+
+  <div class="sec">
+    <div class="sec-title">Heaps</div>
+
+    <div class="m-card">
+      <div class="m-title">Min heap index formulas — getting parent/child wrong</div>
+      <div class="m-body">In a 0-indexed array heap: left child = <code>2i+1</code>, right child = <code>2i+2</code>, parent = <code>(i−1)/2</code>. Using 1-indexed formulas (left = 2i, right = 2i+1) in a 0-indexed array shifts every node and silently corrupts the heap order.</div>
+    </div>
+
+    <div class="m-card">
+      <div class="m-title">Using a max heap when a min heap is needed (or vice versa)</div>
+      <div class="m-body">Java's PriorityQueue is a min heap by default. For a max heap pass <code>Collections.reverseOrder()</code>. For the running-median problem you specifically need both: a max heap for the lower half and a min heap for the upper half. Mixing these up produces the wrong top element.</div>
+    </div>
+
+    <div class="m-card">
+      <div class="m-title">Not balancing the two heaps after each insert in running median</div>
+      <div class="m-body">After each insertion the size difference between the lower-half max heap and the upper-half min heap must stay at most 1. If you skip the rebalancing step, the median read from the top of one heap will be wrong after every other insertion.</div>
+    </div>
+
+    <div class="m-card">
+      <div class="m-title">Brute-force TLE on delivery-time or scheduling problems</div>
+      <div class="m-body">Sorting and repeatedly scanning for the minimum is O(N²). Always reach for a priority queue — inserting and extracting the minimum is O(log N), turning an O(N²) solution into O(N log N).</div>
+    </div>
+  </div>
+
+  <div class="sec">
+    <div class="sec-title">Dynamic Programming</div>
+
+    <div class="m-card">
+      <div class="m-title">Not identifying the state — what changes between subproblems</div>
+      <div class="m-body">A DP state is the set of variables that completely describes a subproblem. For 1D DP the state is usually just the current index. For knapsack it is (index, remaining capacity). If you miss a state variable you will incorrectly reuse a stored answer for a different subproblem.</div>
+    </div>
+
+    <div class="m-card">
+      <div class="m-title">Storing all possibilities instead of just the minimum/maximum</div>
+      <div class="m-body">For problems like "minimum perfect squares summing to N", there may be multiple equally valid ways at some values. The dp table should store only the optimal value at each position, not a list of paths. Storing multiple options inflates memory and makes the recurrence unclear.</div>
+    </div>
+
+    <div class="m-card">
+      <div class="m-title">0/1 Knapsack — iterating capacity forward in the bottom-up table</div>
+      <div class="m-body">In 0/1 knapsack (each item used at most once), the inner loop over capacity must go <strong>from high to low</strong> when using a 1D table. Iterating low-to-high means you may pick the same item twice, effectively turning it into unbounded knapsack.</div>
+    </div>
+
+    <div class="m-card">
+      <div class="m-title">Forgetting to handle blocked cells in grid DP</div>
+      <div class="m-body">When counting paths in a grid with obstacles, explicitly set <code>dp[i][j] = 0</code> for any blocked cell before filling adjacent cells. If you let the recurrence run through a blocked cell it propagates phantom paths to downstream cells.</div>
+    </div>
+  </div>
+
+  <div class="sec">
+    <div class="sec-title">Graph — DFS</div>
+
+    <div class="m-card">
+      <div class="m-title">Returning immediately on finding the target — skipping other neighbors</div>
+      <div class="m-body">In DFS for path-finding, do not return true the moment you reach the target inside a recursive neighbor loop — you must propagate the return value back and also skip processing remaining neighbors. The pattern is: <code>if (dfs(neighbor)) return true;</code>, not: <code>dfs(neighbor); return true;</code>.</div>
+    </div>
+
+    <div class="m-card">
+      <div class="m-title">Cycle detection — confusing visited with recursion stack</div>
+      <div class="m-body">A node being "visited" (seen in any previous DFS call) is not the same as it being on the <em>current recursion stack</em>. A back edge to a visited-but-finished node is NOT a cycle in a directed graph. Only a back edge to a node still on the current stack means a cycle. Use a separate <code>recStack[]</code> array.</div>
+    </div>
+
+    <div class="m-card">
+      <div class="m-title">Building an adjacency list without null-safety</div>
+      <div class="m-body">Always use <code>adj.computeIfAbsent(from, k -&gt; new ArrayList&lt;&gt;()).add(to)</code> instead of manually checking if the key exists first. Missing the check means a NullPointerException when the first edge for a node is added.</div>
+    </div>
+  </div>
+
+  <div class="sec">
+    <div class="sec-title">Graph — BFS &amp; Shortest Path</div>
+
+    <div class="m-card">
+      <div class="m-title">Not seeding all sources at once in multi-source BFS</div>
+      <div class="m-body">In problems like rotten oranges, all rotten cells must be added to the queue before BFS begins. Adding them one at a time and running BFS after each will produce wrong distances — each source must spread simultaneously.</div>
+    </div>
+
+    <div class="m-card">
+      <div class="m-title">Dijkstra — updating distance without re-inserting into the heap</div>
+      <div class="m-body">When a shorter path to a node is found, the updated distance must be pushed into the priority queue as a new (distance, node) pair. Java's PriorityQueue does not support decrease-key — you push duplicates and ignore stale entries when you pop. Forgetting to re-insert means the node's neighbors never get their relaxed distance propagated.</div>
+    </div>
+
+    <div class="m-card">
+      <div class="m-title">Topological sort — processing nodes with non-zero in-degree</div>
+      <div class="m-body">Kahn's algorithm seeds the queue with all nodes whose in-degree is exactly 0. Adding any other nodes to the queue initially breaks the ordering guarantee. After processing a node, decrement its neighbors' in-degrees and enqueue only those that reach 0.</div>
+    </div>
+  </div>
+</main>
+</body>
+</html>

@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Common Mistakes — Part 3</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+<header>
+  <a class="logo" href="../../../../../index.html">upskill</a>
+  <nav class="breadcrumb">
+    <a href="../../../../../index.html">Home</a><span class="sep">/</span>
+    <a href="../../../../../index.html">DSA</a><span class="sep">/</span>
+    <a href="../../../../../index.html">Part 3</a><span class="sep">/</span>
+    <span class="cur">Common Mistakes</span>
+  </nav>
+</header>
+<div class="sec-nav">
+  <a class="pill blue"         href="approach-picker.html">Approach Picker</a>
+  <a class="pill red current"  href="common-mistakes.html">Common Mistakes</a>
+  <a class="pill green"        href="complexities.html">Complexities</a>
+  <a class="pill purple"       href="key-patterns.html">Key Patterns</a>
+  <a class="pill amber"        href="revision-tags.html">Revision Tags</a>
+  <a class="pill orange"       href="leetcode-references.html">LeetCode Refs</a>
+</div>
+<main>
+  <div class="page-title">Common Mistakes</div>
+  <div class="page-sub">Part 3 · Days 33–40</div>
+  <div class="note">Generic pitfalls by technique — not edge cases per problem.</div>
+
+  <div class="sec">
+    <div class="sec-title">Prime Numbers &amp; Sieve</div>
+
+    <div class="m-card">
+      <div class="m-title">Sieve — starting multiples from p instead of p²</div>
+      <div class="m-body">When crossing off multiples in the Sieve of Eratosthenes, start from p² (not 2p). All smaller multiples of p have already been marked by earlier primes. Starting at 2p means redundant work but not wrong results — yet it wastes time on large N.</div>
+    </div>
+
+    <div class="m-card">
+      <div class="m-title">isPrime — iterating past √N</div>
+      <div class="m-body">If no divisor exists up to √N then N is prime. Any factor larger than √N would require a paired factor smaller than √N that you would have already found. Checking up to N is O(N); checking up to √N is O(√N).</div>
+    </div>
+  </div>
+
+  <div class="sec">
+    <div class="sec-title">Backtracking</div>
+
+    <div class="m-card">
+      <div class="m-title">Adding a reference instead of a copy to the result list</div>
+      <div class="m-body">When adding a current state (ArrayList, char array) to the results, you must create a new copy: <code>result.add(new ArrayList&lt;&gt;(currentList))</code>. If you add the reference directly, all entries point to the same list — which ends up empty after backtracking unwinds.</div>
+    </div>
+
+    <div class="m-card">
+      <div class="m-title">Forgetting to undo the choice after recursion</div>
+      <div class="m-body">Backtracking = make choice → recurse → undo choice. If you forget the undo step (e.g., not swapping back, not removing the last element added) the state is corrupted for sibling branches and subsequent results will include elements that should not be there.</div>
+    </div>
+
+    <div class="m-card">
+      <div class="m-title">Using wrong open/close counts for parentheses generation</div>
+      <div class="m-body">You can add '(' only when <code>open &lt; n</code>. You can add ')' only when <code>close &lt; open</code> (never when close ≥ open — that makes an invalid string). Swapping these conditions produces malformed outputs with no syntax error.</div>
+    </div>
+  </div>
+
+  <div class="sec">
+    <div class="sec-title">Linked List Operations</div>
+
+    <div class="m-card">
+      <div class="m-title">Losing the rest of the list when reversing</div>
+      <div class="m-body">When reversing a linked list, always save <code>next = curr.next</code> before you change <code>curr.next = prev</code>. Changing the pointer first severs the connection to the remainder of the list permanently.</div>
+    </div>
+
+    <div class="m-card">
+      <div class="m-title">Finding the wrong middle in slow/fast pointer</div>
+      <div class="m-body">For palindrome-check: you want the start of the second half, not the end of the first. For merge sort: you want the node just before the midpoint so you can split cleanly. The exact stopping condition (<code>fast != null &amp;&amp; fast.next != null</code>) matters for odd vs even length lists — test both.</div>
+    </div>
+
+    <div class="m-card">
+      <div class="m-title">Converting linked list to integer for digit-by-digit addition</div>
+      <div class="m-body">Linked lists can represent numbers with hundreds of digits — converting to int or long will overflow. Always process digit by digit, carrying the overflow explicitly from one node to the next.</div>
+    </div>
+  </div>
+
+  <div class="sec">
+    <div class="sec-title">LRU Cache &amp; Floyd's Cycle Detection</div>
+
+    <div class="m-card">
+      <div class="m-title">LRU — updating map but not moving the node in the list</div>
+      <div class="m-body">When a cache key is accessed (get or put), you must move the corresponding node to the front of the doubly linked list, not just update the HashMap. Skipping the list update means the eviction order is wrong — the actual LRU node won't be at the tail.</div>
+    </div>
+
+    <div class="m-card">
+      <div class="m-title">Floyd's cycle start — resetting only one pointer, not both</div>
+      <div class="m-body">After slow and fast meet inside the cycle, reset one pointer to head. Then advance both by one step at a time. They meet at the cycle start. A common error is advancing both at different speeds after the reset — that breaks the mathematical guarantee.</div>
+    </div>
+  </div>
+</main>
+</body>
+</html>

@@ -72,12 +72,32 @@
         <tbody>
           <tr><td><code>squareRootOfANumber</code></td><td class="c-time">O(log N)</td><td class="c-space">O(1)</td></tr>
           <tr><td><code>rotatedSortedArraySearch</code></td><td class="c-time">O(log N)</td><td class="c-space">O(1)</td></tr>
+          <tr><td><code>findMatrixMedian</code></td><td class="c-time">O(N × log M × log(max))</td><td class="c-space">O(1)</td></tr>
+          <tr><td><code>addOrNot</code></td><td class="c-time">O(N log N)</td><td class="c-space">O(N)</td></tr>
+          <tr><td><code>athMagicalNumber</code></td><td class="c-time">O(log(A × min(B,C)))</td><td class="c-space">O(1)</td></tr>
+          <tr><td><code>BthSmallestTripletSum</code></td><td class="c-time">O(N² × log(max_sum))</td><td class="c-space">O(1)</td></tr>
         </tbody>
       </table>
     </div>
     <div class="why-box">
       <div class="why-label">Why O(log N) — rotated array</div>
       <p>Even though the array is rotated, at every step one half of the remaining range is fully sorted. You can check in O(1) whether the target is in that half. If yes, search there; if no, search the other half. The range still halves every step.</p>
+    </div>
+    <div class="why-box">
+      <div class="why-label">Why O(N × log M × log(max)) — findMatrixMedian</div>
+      <p>Binary search runs on the answer space [0, 10⁹] — that is log(max) outer iterations. For each candidate mid, you count how many elements in the matrix are ≤ mid: for each of the N rows you do a binary search over M elements — O(N × log M) per check. Total: O(N × log M × log(max)).</p>
+    </div>
+    <div class="why-box">
+      <div class="why-label">Why O(N log N) — addOrNot</div>
+      <p>Sort the array once — O(N log N). Then for each of the N elements (as a candidate target), binary search over at most i preceding elements to find the best window count — O(log N) per element, O(N log N) total. Build the prefix sum in O(N). Overall O(N log N).</p>
+    </div>
+    <div class="why-box">
+      <div class="why-label">Why O(log(A × min(B,C))) — athMagicalNumber</div>
+      <p>Binary search on the answer space [2, A × min(B,C)]. At each mid, count magical numbers ≤ mid with the formula: mid/B + mid/C − mid/lcm(B,C) — O(1) per check. The range is A × min(B,C) wide so the search takes log(A × min(B,C)) steps.</p>
+    </div>
+    <div class="why-box">
+      <div class="why-label">Why O(N² × log(max_sum)) — BthSmallestTripletSum</div>
+      <p>Binary search on the answer space [0, sum of three largest] — log(max_sum) outer iterations. For each candidate mid, the check function counts all triplets with sum &lt; mid using two-pointer on sorted pairs: the outer loop is O(N), the inner two-pointer is O(N) per element — O(N²) total per check. Total: O(N² × log(max_sum)).</p>
     </div>
   </div>
 

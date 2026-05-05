@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Complexities — Part 4</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+<header>
+  <a class="logo" href="../../../../../index.html">upskill</a>
+  <nav class="breadcrumb">
+    <a href="../../../../../index.html">Home</a><span class="sep">/</span>
+    <a href="../../../../../index.html">DSA</a><span class="sep">/</span>
+    <a href="../../../../../index.html">Part 4</a><span class="sep">/</span>
+    <span class="cur">Complexities</span>
+  </nav>
+</header>
+<div class="sec-nav">
+  <a class="pill blue"           href="approach-picker.html">Approach Picker</a>
+  <a class="pill red"            href="common-mistakes.html">Common Mistakes</a>
+  <a class="pill green current"  href="complexities.html">Complexities</a>
+  <a class="pill purple"         href="key-patterns.html">Key Patterns</a>
+  <a class="pill amber"          href="revision-tags.html">Revision Tags</a>
+  <a class="pill orange"         href="leetcode-references.html">LeetCode Refs</a>
+</div>
+<main>
+  <div class="page-title">Complexities</div>
+  <div class="page-sub">Part 4 · Days 44–56</div>
+  <div class="note">Table = complexity from source comments. Explanation below = why that cost is what it is.</div>
+
+  <div class="sec">
+    <div class="sec-title">d44–d48 — Heaps</div>
+    <div class="tbl-wrap"><table>
+      <thead><tr><th>Approach</th><th>Time</th><th>Space</th></tr></thead>
+      <tbody>
+        <tr><td>Heap insert / extract-min</td><td class="c-time">O(log N)</td><td class="c-space">O(N)</td></tr>
+        <tr><td>Build min heap (heapify)</td><td class="c-time">O(N)</td><td class="c-space">O(N)</td></tr>
+        <tr><td>Connect N ropes (N inserts + N extracts)</td><td class="c-time">O(N log N)</td><td class="c-space">O(N)</td></tr>
+        <tr><td>Kth largest — min heap of size K</td><td class="c-time">O(N log K)</td><td class="c-space">O(K)</td></tr>
+        <tr><td>Merge K sorted lists — min heap of K heads</td><td class="c-time">O(N log K)</td><td class="c-space">O(K)</td></tr>
+        <tr><td>Running median — two heaps</td><td class="c-time">O(N log N)</td><td class="c-space">O(N)</td></tr>
+      </tbody>
+    </table></div>
+    <div class="why-box">
+      <div class="why-label">Why heap insert/extract is O(log N)</div>
+      <p>A heap is a complete binary tree stored in an array. It has at most log₂(N) levels. Insert puts the new element at the bottom and sifts it up — at most log N swaps. Extract-min takes the top, puts the last element there, then sifts it down — also at most log N swaps.</p>
+    </div>
+    <div class="why-box">
+      <div class="why-label">Why build-heap is O(N) not O(N log N)</div>
+      <p>Naively inserting N elements one by one is O(N log N). But the bottom-up heapify approach starts from the last internal node and sifts down each node. Nodes near the bottom do very little work — the sum of all sift-down work telescopes to O(N). This is a classic result.</p>
+    </div>
+    <div class="why-box">
+      <div class="why-label">Why merge K sorted lists is O(N log K)</div>
+      <p>Total nodes across all lists = N. For each node you do one heap operation (extract the minimum head, push its successor). Each heap operation on K elements is O(log K). Total: N nodes × O(log K) per node = O(N log K).</p>
+    </div>
+  </div>
+
+  <div class="sec">
+    <div class="sec-title">d49–d52 — Dynamic Programming</div>
+    <div class="tbl-wrap"><table>
+      <thead><tr><th>Approach</th><th>Time</th><th>Space</th></tr></thead>
+      <tbody>
+        <tr><td>1D DP — Fibonacci / Climb Stairs</td><td class="c-time">O(N)</td><td class="c-space">O(N) or O(1)</td></tr>
+        <tr><td>1D DP — Minimum Perfect Squares</td><td class="c-time">O(N √N)</td><td class="c-space">O(N)</td></tr>
+        <tr><td>2D DP — Num BSTs (Catalan) — numBSTrees</td><td class="c-time">O(A²)</td><td class="c-space">O(A)</td></tr>
+        <tr><td>2D DP — N-Digit Numbers — nDigitNumbers</td><td class="c-time">O(A × B)</td><td class="c-space">O(A × B)</td></tr>
+        <tr><td>Grid DP — Unique Paths with Obstacles</td><td class="c-time">O(N × M)</td><td class="c-space">O(N × M)</td></tr>
+        <tr><td>0/1 Knapsack</td><td class="c-time">O(N × W)</td><td class="c-space">O(N × W) or O(W)</td></tr>
+        <tr><td>Unbounded Knapsack / Coin Change / Rod Cutting</td><td class="c-time">O(N × W)</td><td class="c-space">O(W)</td></tr>
+        <tr><td>Rod Cutting — maxProfitFromRodCutting</td><td class="c-time">O(N²)</td><td class="c-space">O(N)</td></tr>
+      </tbody>
+    </table></div>
+    <div class="why-box">
+      <div class="why-label">Why minimum perfect squares is O(N √N)</div>
+      <p>The outer loop runs N times (one per target value). The inner loop tries every perfect square ≤ current value. The number of perfect squares up to N is √N. So the total work is N values × √N squares each = O(N √N).</p>
+    </div>
+    <div class="why-box">
+      <div class="why-label">Why Catalan number DP (numBSTrees) is O(A²)</div>
+      <p>To compute dp[n] you sum dp[0] × dp[n−1] through dp[n−1] × dp[0] — that is n multiplications. Do this for all values from 1 to A: total work = 1 + 2 + … + A = A×(A+1)/2 = O(A²). Source confirms: "#states × work per state = A × A iterations".</p>
+    </div>
+    <div class="why-box">
+      <div class="why-label">Why knapsack is O(N × W)</div>
+      <p>The DP table has N rows (items) and W+1 columns (capacities 0 to W). Each cell is filled in O(1) by looking up one or two previously computed cells. Total cells = N × (W+1) ≈ O(N × W). With a 1D rolling array the space drops to O(W).</p>
+    </div>
+  </div>
+
+  <div class="sec">
+    <div class="sec-title">d53–d56 — Graphs</div>
+    <div class="tbl-wrap"><table>
+      <thead><tr><th>Approach</th><th>Time</th><th>Space</th></tr></thead>
+      <tbody>
+        <tr><td>DFS / BFS (adjacency list)</td><td class="c-time">O(V + E)</td><td class="c-space">O(V + E)</td></tr>
+        <tr><td>Cycle detection — DFS with recStack</td><td class="c-time">O(V + E)</td><td class="c-space">O(V + E)</td></tr>
+        <tr><td>Prim's MST — min heap</td><td class="c-time">O(E log V)</td><td class="c-space">O(V + E)</td></tr>
+        <tr><td>Dijkstra — min heap</td><td class="c-time">O((V + E) log V)</td><td class="c-space">O(V + E)</td></tr>
+        <tr><td>Topological Sort — Kahn's BFS</td><td class="c-time">O(V + E)</td><td class="c-space">O(V)</td></tr>
+        <tr><td>Multi-source BFS (rotten oranges)</td><td class="c-time">O(V + E)</td><td class="c-space">O(V)</td></tr>
+      </tbody>
+    </table></div>
+    <div class="why-box">
+      <div class="why-label">Why DFS/BFS is O(V + E)</div>
+      <p>Each vertex is visited once — O(V). For each vertex you check all its edges — across all vertices that is O(E) total edge checks. Sum: O(V + E). The adjacency list itself takes O(V + E) space.</p>
+    </div>
+    <div class="why-box">
+      <div class="why-label">Why Dijkstra is O((V + E) log V)</div>
+      <p>Each vertex is extracted from the min heap at most once — O(V log V). Each edge may trigger a heap insert for a neighbor — O(E log V). Total: O((V + E) log V). The log V factor comes from heap operations on at most V elements.</p>
+    </div>
+    <div class="why-box">
+      <div class="why-label">Why Topological Sort is O(V + E)</div>
+      <p>Building in-degrees scans all edges — O(E). The BFS processes each vertex exactly once when its in-degree hits 0 — O(V). Decrementing neighbors scans edges again — O(E). No heap is needed, so no log factor. Total: O(V + E).</p>
+    </div>
+  </div>
+</main>
+</body>
+</html>

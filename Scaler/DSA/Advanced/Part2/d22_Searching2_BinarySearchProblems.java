@@ -2,6 +2,8 @@ package DSA.Advanced.Part2;
 
 import Resources.Utilities.PrintHelper;
 
+import java.util.Arrays;
+
 /**
  * @author Harish Velmurugan
  * @last-modified 25-02-2025
@@ -15,7 +17,7 @@ public class d22_Searching2_BinarySearchProblems {
     public static void main(String[] args) {
 
         // Inputs
-
+        d22_Searching2_BinarySearchProblems.readme();
 
         // Call Stack
         d22_Searching2_BinarySearchProblems d22Searching2BinarySearchProblems = new d22_Searching2_BinarySearchProblems();
@@ -26,6 +28,43 @@ public class d22_Searching2_BinarySearchProblems {
         int[] B = {1, 3, 4, 5, 8, 10};
         d22Searching2BinarySearchProblems.findMedianInSortedArrays(A, B);
 
+        d22Searching2BinarySearchProblems.findMatrixMedian(null); //AQ1
+        d22Searching2BinarySearchProblems.addOrNot(null, 0); //AQ2
+        d22Searching2BinarySearchProblems.athMagicalNumber(0, 0, 0); //AQ3
+        d22Searching2BinarySearchProblems.BthSmallestTripletSum(null, 0); //AQ4
+
+    }
+
+    private static void readme() {
+        /*
+        Problem AQ1 — Matrix Median
+        The Setup
+            [1, 3, 5]
+            [2, 6, 9]
+            [3, 6, 9]
+        All numbers mixed = 1, 2, 3, 3, 5, 6, 6, 9, 9 →Median = 5
+        The Simple Idea
+        Instead of sorting everything, just guess a number and ask:
+
+        "How many numbers in the matrix are smaller than my guess?"
+
+        If the answer is less than half →median is bigger, guess higher
+        If the answer is more than half →median is smaller, guess lower
+        Play it Out
+        Total numbers = 9
+        Half = 4 (median has exactly 4 numbers smaller than it)
+        Guess 1Billion:
+        Guess 100:
+        Guess 5:
+        Row 1: [1, 3, 5] →numbers < 5 = 2 (just 1 and 3)
+        Row 2: [2, 6, 9] →numbers < 5 = 1 (just 2)
+        Row 3: [3, 6, 9] →numbers < 5 = 1 (just 3)
+        Total = 4
+
+        Exactly 4 numbers smaller than 5 ✅ →5 is the median
+        Why row -by - row binary search?
+        Each row is already sorted, so instead of counting one by one, binary search finds the count instantly.
+        */
     }
 
     /* Section : ----------------------------------- [ Problems ] ------------------------------------ */
@@ -74,7 +113,7 @@ public class d22_Searching2_BinarySearchProblems {
         You are expected to solve this problem with a time complexity of O(log(N)).
         */
 
-        rotatedSortedArraySearch_myversion(new int[]{3,1}, 1);
+        rotatedSortedArraySearch_myversion(new int[]{3, 1}, 1);
 
         int[] A = {9, 10, 3, 5, 6, 8};
         int B = 5;
@@ -193,53 +232,185 @@ public class d22_Searching2_BinarySearchProblems {
         return 0;
     }
 
+    public int lowerBound(int A[], int val) {
+        int l = 0, h = A.length - 1, ans = -1;
+        while (l <= h) {
+            int mid = (h - l) / 2 + l;
+            if (A[mid] < val) {
+                ans = mid;
+                l = mid + 1;
+            } else h = mid - 1;
+        }
+        return ans + 1;
+    }
 
-//    public int medianOfTwoSortedArrays(int[] A, int[] B) {
-//        /* QUESTION :
-//        Given two sorted arrays A and B of size M and N respectively, return the median of the two sorted arrays.
-//        Round of the value to the floor integer [2.6=2, 2.2=2]
-//        */
+    public int findMatrixMedian(int[][] A) {
+
+        /*
+        * Given a matrix of integers A of size N x M in which each row is sorted.
+            Find and return the overall median of matrix A.
+            NOTE: No extra memory is allowed.
+            NOTE: Rows are numbered from top to bottom and columns are numbered from left to right.
+        * */
+
+        A = new int[][]{{1, 3, 5}, {2, 6, 9}, {3, 6, 9}};
+        //A = [1, 2, 3, 3, 5, 6, 6, 9, 9]
+        //Median is 5. So, we return 5.
+
+        int low = 0, high = 1000000000, n = A.length, m = A[0].length;
+        int medPos = n * m / 2, ans = -1; // number of elements less than median element
+        while (low <= high) {
+            int mid = (high - low) / 2 + low;
+            int cnt = 0;
+            //count in each row numer of elements <= mid
+            for (int i = 0; i < n; i++)
+                cnt += lowerBound(A[i], mid);
+            if (cnt > medPos) high = mid - 1;
+            else {
+                ans = mid;
+                low = mid + 1;
+            }
+        }
+        return ans;
+    }
+
+    public int[] addOrNot(int[] A, int B) {
+
+        /*
+        * Given an array of integers A of size N and an integer B.
+            In a single operation, any one element of the array can be increased by 1.
+            * You are allowed to do at most B such operations.
+            Find the number with the maximum number of occurrences and return an array C of size 2,
+            * where C[0] is the number of occurrences, and C[1] is the number with maximum occurrence.
+            If there are several such numbers, your task is to find the minimum one.
+        * */
+
+        A = new int[]{3, 1, 2, 2, 1};
+        B = 3;
+//        Apply operations on A[2] and A[4] A = [3, 2, 2, 2, 2]
+//        Maximum occurrence =  4
+//        Minimum value of element with maximum occurrence = 2
+
+        // To do the prefix sum
+        long prefix[] = new long[A.length + 1];
+        Arrays.sort(A);
+        int n = A.length;
+        // Make prefix array
+        for (int i = 0; i < n; i++) {
+            prefix[i + 1] += A[i] + prefix[i];
+        }
+        int ans[] = new int[2];
+        ans[0] = -1;
+        ans[1] = -1;
+        for (int i = 0; i < n; i++) {
+            int lo = 1, hi = i + 1;
+            int mx = 0;
+            // Binary search to find the value of cnt for each i
+            while (lo <= hi) {
+                int cnt = (lo + hi) / 2;
+                if ((long) A[i] * cnt - (prefix[i + 1] - prefix[i - cnt + 1]) <= B) {
+                    mx = cnt;
+                    lo = cnt + 1;
+                } else {
+                    hi = cnt - 1;
+                }
+            }
+            // Update ans
+            if (ans[0] < mx) {
+                ans[0] = mx;
+                ans[1] = A[i];
+            }
+        }
+        return ans;
+    }
+
+    public int gcd(int x, int y) {
+        if (x == 0)
+            return y;
+        return gcd(y % x, x);
+    }
+
+    public int athMagicalNumber(int A, int B, int C) {
+
+        /*
+        * You are given three positive integers, A, B, and C.
+            Any positive integer is magical if divisible by either B or C.
+            Return the Ath smallest magical number. Since the answer may be very large, return modulo 109 + 7.
+            Note: Ensure to prevent integer overflow while calculating.
+        * */
+
+        A = 1;
+        B = 2;
+        C = 3;
+//        ans = 2
+        // lcm of B and C
+        long lcm = (long) B * C / gcd(B, C);
+        long low = 2, high = ((long) A * Math.min(B, C)), ans = 0;
+        while (low <= high) {
+            long mid = (high - low) / 2 + low;
+            // f(x) = x / B + x / C - x / lcm(B, C)
+            long cntB = mid / B, cntC = mid / C, cntBC = mid / lcm;
+            if (cntB + cntC - cntBC >= A) {
+                ans = mid;
+                high = mid - 1;
+            } else
+                low = mid + 1;
+        }
+        return (int) (ans % (1000 * 1000 * 1000 + 7));
+    }
+
+    public int check(int[] A, int val) {
+        int cnt = 0;
+        for (int i = 0; i < A.length; i++) {
+            int s = i + 1, e = A.length - 1;
+            while (s < e) {
+                if (A[i] + A[s] + A[e] < val) {
+                    cnt += e - s;
+                    s++;
+                } else {
+                    e--;
+                }
+            }
+        }
+        return cnt;
+    }
+
+    public int BthSmallestTripletSum(int[] A, int B) {
+        /*
+        * Given an integer array A of size N.
+        If we store the sum of each triplet of the array A in a new list, then find the Bth smallest element among the list.
+        NOTE: A triplet consists of three elements from the array. Let's say if A[i], A[j], A[k] are the elements of the triplet then i < j < k.
+        *
+        * */
+
+        A = new int[]{2, 4, 3, 2};
+        B = 3;
+
+//  All the triplets of the array A are:
 //
-//        int N = A.length;
-//        int M = B.length;
-//        if (N > M) {
-//            medianOfTwoSortedArrays(B, A);
-//        }
+// (2, 4, 3) = 9
+// (2, 4, 2) = 8
+// (2, 3, 2) = 7
+// (4, 3, 2) = 9
 //
-//        int low = 0;
-//        int high = N; // since we are picking elements all N elements can be taken
-//        int leftSideShouldHave = (N + M + 1) / 2;
-//
-//        while (low <= high) {
-//            int midA = low + ((high - low) / 2);
-//            int midB = leftSideShouldHave - midA;
-//            int leftA = Integer.MIN_VALUE, leftB = Integer.MIN_VALUE;
-//            int rightA = Integer.MAX_VALUE, rightB = Integer.MAX_VALUE;
-//            if (midA < N) {
-//                rightA = A[midA + 1];
-//            }
-//            if (midB < M) {
-//                rightB = B[midB + 1];
-//            }
-//            if (midA > 0) {
-//                leftA = A[midA - 1];
-//            }
-//            if (midB > 0) {
-//                leftB = A[midB - 1];
-//            }
-//            if (leftA <= rightB && leftB <= rightA) {
-//
-//            } else {
-//                if (leftA > rightB) {
-//
-//                } else {
-//
-//                }
-//            }
-//        }
-//
-//        return 0;
-//    }
+// So the 3rd smallest element is 9.
+
+        Arrays.sort(A);
+        int n = A.length;
+        int low = 0, high = A[n - 1] + A[n - 2] + A[n - 3], ans = 0;
+        while (low <= high) {
+            int mid = (high - low) / 2 + low;
+            // count of triplets with sum less than mid
+            int count = check(A, mid);
+            if (count >= B) {
+                high = mid - 1;
+            } else {
+                ans = mid;
+                low = mid + 1;
+            }
+        }
+        return ans;
+    }
 
     /* Section : ------------------------------- [Additional Problems ] ------------------------------------ */
 

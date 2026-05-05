@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Approach Picker — Part 4</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+<header>
+  <a class="logo" href="../../../../../index.html">upskill</a>
+  <nav class="breadcrumb">
+    <a href="../../../../../index.html">Home</a><span class="sep">/</span>
+    <a href="../../../../../index.html">DSA</a><span class="sep">/</span>
+    <a href="../../../../../index.html">Part 4</a><span class="sep">/</span>
+    <span class="cur">Approach Picker</span>
+  </nav>
+</header>
+<div class="sec-nav">
+  <a class="pill blue current" href="approach-picker.html">Approach Picker</a>
+  <a class="pill red"          href="common-mistakes.html">Common Mistakes</a>
+  <a class="pill green"        href="complexities.html">Complexities</a>
+  <a class="pill purple"       href="key-patterns.html">Key Patterns</a>
+  <a class="pill amber"        href="revision-tags.html">Revision Tags</a>
+  <a class="pill orange"       href="leetcode-references.html">LeetCode Refs</a>
+</div>
+<main>
+  <div class="page-title">Approach Picker</div>
+  <div class="page-sub">Part 4 · Days 44–56</div>
+  <div class="note">One row per chapter topic. The signal is generic — not a specific problem.</div>
+  <div class="tbl-wrap">
+    <table>
+      <thead><tr><th>When the question feels like…</th><th>Reach for…</th><th>Days</th></tr></thead>
+      <tbody>
+        <tr><td class="c-signal">Combine items at minimum total cost</td><td class="c-reach">Min Heap — always combine the two smallest available</td><td class="c-day">d44</td></tr>
+        <tr><td class="c-signal">Running median of a growing stream</td><td class="c-reach">Max heap (lower half) + Min heap (upper half) — balance sizes after each insert</td><td class="c-day">d45</td></tr>
+        <tr><td class="c-signal">K-th largest element in a stream or array</td><td class="c-reach">Min heap of size K — top is always the K-th largest</td><td class="c-day">d46</td></tr>
+        <tr><td class="c-signal">Merge K sorted lists efficiently</td><td class="c-reach">Min heap of K heads — pop the minimum, push its next node</td><td class="c-day">d46</td></tr>
+        <tr><td class="c-signal">Minimum window substring containing all target chars</td><td class="c-reach">Two pointers + frequency maps — expand right, shrink left</td><td class="c-day">d48</td></tr>
+        <tr><td class="c-signal">Sort a nearly-sorted array where each element is at most K positions away</td><td class="c-reach">Min heap of size K</td><td class="c-day">d48</td></tr>
+        <tr><td class="c-signal">Minimum meeting rooms or overlapping interval scheduling</td><td class="c-reach">Min heap of end times — pop if a room is free, else add a new room</td><td class="c-day">d48</td></tr>
+        <tr><td class="c-signal">Fibonacci / Climb stairs / simple recurrence with overlapping subproblems</td><td class="c-reach">1D DP — dp[i] = dp[i-1] + dp[i-2]</td><td class="c-day">d49</td></tr>
+        <tr><td class="c-signal">Minimum number of perfect squares summing to N</td><td class="c-reach">1D DP — dp[n] = 1 + min(dp[n-i²]) for all valid i</td><td class="c-day">d49</td></tr>
+        <tr><td class="c-signal">Count BSTs with N nodes / Catalan number</td><td class="c-reach">2D DP — dp[n] = Σ dp[i-1] × dp[n-i]</td><td class="c-day">d50</td></tr>
+        <tr><td class="c-signal">N-digit numbers with a specific digit sum</td><td class="c-reach">2D DP on (position, remaining sum)</td><td class="c-day">d50</td></tr>
+        <tr><td class="c-signal">Grid paths with obstacles</td><td class="c-reach">Grid DP — blocked = 0, else dp[i][j] = dp[i-1][j] + dp[i][j-1]</td><td class="c-day">d50</td></tr>
+        <tr><td class="c-signal">Select items with a weight limit (each item usable once)</td><td class="c-reach">0/1 Knapsack DP — include (if fits) or exclude each item</td><td class="c-day">d51</td></tr>
+        <tr><td class="c-signal">Select items with unlimited supply</td><td class="c-reach">Unbounded Knapsack — same item can be re-included</td><td class="c-day">d51</td></tr>
+        <tr><td class="c-signal">Count ways to make change / cut a rod for max profit</td><td class="c-reach">Unbounded Knapsack variant — Coin Change / Rod Cutting DP</td><td class="c-day">d52</td></tr>
+        <tr><td class="c-signal">Find a path or check reachability in a graph</td><td class="c-reach">DFS with a visited array</td><td class="c-day">d53</td></tr>
+        <tr><td class="c-signal">Detect a cycle in a directed graph</td><td class="c-reach">DFS + recursion stack (recStack[]) — back edge = cycle</td><td class="c-day">d53</td></tr>
+        <tr><td class="c-signal">Multi-source spread (rotten oranges, infection)</td><td class="c-reach">Multi-source BFS — seed all sources into queue, spread level by level</td><td class="c-day">d54</td></tr>
+        <tr><td class="c-signal">Minimum spanning tree</td><td class="c-reach">Prim's — min heap of edges, grow MST greedily</td><td class="c-day">d54</td></tr>
+        <tr><td class="c-signal">Shortest path in a weighted graph (no negative weights)</td><td class="c-reach">Dijkstra — min heap of (dist, node), relax edges</td><td class="c-day">d55</td></tr>
+        <tr><td class="c-signal">Task dependency ordering / detect cycle and order steps</td><td class="c-reach">Topological Sort — Kahn's BFS with in-degree array</td><td class="c-day">d55</td></tr>
+        <tr><td class="c-signal">Shortest path in an unweighted graph</td><td class="c-reach">BFS — level-by-level traversal</td><td class="c-day">d55</td></tr>
+        <tr><td class="c-signal">Maze or grid shortest path / connected components</td><td class="c-reach">BFS on grid for shortest path · DFS flood fill for components</td><td class="c-day">d56</td></tr>
+      </tbody>
+    </table>
+  </div>
+</main>
+</body>
+</html>

@@ -119,16 +119,132 @@
       <h1>Advanced DSA</h1>
       <div class="sub">Select a part to begin revision</div>
       <div class="grid">
-        <div class="card dim"><div class="card-eye">Part</div><div class="card-num">0</div><div class="card-desc">Foundations</div><span class="badge dim">Coming soon</span></div>
-        <div class="card dim"><div class="card-eye">Part</div><div class="card-num">1</div><div class="card-desc">Core concepts</div><span class="badge dim">Coming soon</span></div>
+        <div class="card" onclick="show('part0')">
+          <div class="card-eye">Part</div>
+          <div class="card-num">0</div>
+          <div class="card-desc">Prefix Sum · Carry Forward · Sliding Window</div>
+          <span class="badge">Available</span>
+        </div>
+        <div class="card" onclick="show('part1')">
+          <div class="card-eye">Part</div>
+          <div class="card-num">1</div>
+          <div class="card-desc">Arrays · Bit Manipulation · Recursion · Hashing · Sorting</div>
+          <span class="badge">Available</span>
+        </div>
         <div class="card" onclick="show('part2')">
           <div class="card-eye">Part</div>
           <div class="card-num">2</div>
           <div class="card-desc">Binary Search · Stacks · Queues · Trees</div>
           <span class="badge">Available</span>
         </div>
-        <div class="card dim"><div class="card-eye">Part</div><div class="card-num">3</div><div class="card-desc">Advanced topics</div><span class="badge dim">Coming soon</span></div>
-        <div class="card dim"><div class="card-eye">Part</div><div class="card-num">4</div><div class="card-desc">Advanced topics</div><span class="badge dim">Coming soon</span></div>
+        <div class="card" onclick="show('part3')">
+          <div class="card-eye">Part</div>
+          <div class="card-num">3</div>
+          <div class="card-desc">Primes · Backtracking · Linked Lists · LRU</div>
+          <span class="badge">Available</span>
+        </div>
+        <div class="card" onclick="show('part4')">
+          <div class="card-eye">Part</div>
+          <div class="card-num">4</div>
+          <div class="card-desc">Heaps · Dynamic Programming · Graphs</div>
+          <span class="badge">Available</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- PART 0 -->
+  <div class="view" id="v-part0">
+    <div class="wrap" style="max-width:860px">
+      <div class="p2-header">
+        <h1>Part 0 — Prefix Sum · Carry Forward · Contribution · Sliding Window</h1>
+        <p>Days 3–7 &nbsp;·&nbsp; 6 revision sections</p>
+      </div>
+      <div class="sections-grid">
+        <a class="sec-card blue" href="Scaler/DSA/Advanced/Revise/Part0/approach-picker.html">
+          <div class="sc-dot"></div>
+          <div class="sc-title">Approach Picker</div>
+          <div class="sc-desc">When to reach for which tool — one row per chapter topic</div>
+          <div class="sc-arrow">Open →</div>
+        </a>
+        <a class="sec-card red" href="Scaler/DSA/Advanced/Revise/Part0/common-mistakes.html">
+          <div class="sc-dot"></div>
+          <div class="sc-title">Common Mistakes</div>
+          <div class="sc-desc">Generic pitfalls — prefix sum, carry forward, sliding window</div>
+          <div class="sc-arrow">Open →</div>
+        </a>
+        <a class="sec-card green" href="Scaler/DSA/Advanced/Revise/Part0/complexities.html">
+          <div class="sc-dot"></div>
+          <div class="sc-title">Complexities</div>
+          <div class="sc-desc">Time/space per day with plain-English explanations of why</div>
+          <div class="sc-arrow">Open →</div>
+        </a>
+        <a class="sec-card purple" href="Scaler/DSA/Advanced/Revise/Part0/key-patterns.html">
+          <div class="sc-dot"></div>
+          <div class="sc-title">Key Patterns</div>
+          <div class="sc-desc">Question signals and standard solution skeletons per approach</div>
+          <div class="sc-arrow">Open →</div>
+        </a>
+        <a class="sec-card amber" href="Scaler/DSA/Advanced/Revise/Part0/revision-tags.html">
+          <div class="sc-dot"></div>
+          <div class="sc-title">Revision Tags</div>
+          <div class="sc-desc">What to re-read ✅ vs re-solve 🔁 across all days d03–d07</div>
+          <div class="sc-arrow">Open →</div>
+        </a>
+        <a class="sec-card orange" href="Scaler/DSA/Advanced/Revise/Part0/leetcode-references.html">
+          <div class="sc-dot"></div>
+          <div class="sc-title">LeetCode Refs</div>
+          <div class="sc-desc">Method-to-LC problem mapping with source comments</div>
+          <div class="sc-arrow">Open →</div>
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <!-- PART 1 -->
+  <div class="view" id="v-part1">
+    <div class="wrap" style="max-width:860px">
+      <div class="p2-header">
+        <h1>Part 1 — Arrays · Bit Manipulation · Recursion · Hashing · Sorting</h1>
+        <p>Days 8–19 &nbsp;·&nbsp; 6 revision sections</p>
+      </div>
+      <div class="sections-grid">
+        <a class="sec-card blue" href="Scaler/DSA/Advanced/Revise/Part1/approach-picker.html">
+          <div class="sc-dot"></div>
+          <div class="sc-title">Approach Picker</div>
+          <div class="sc-desc">When to reach for which tool — one row per chapter topic</div>
+          <div class="sc-arrow">Open →</div>
+        </a>
+        <a class="sec-card red" href="Scaler/DSA/Advanced/Revise/Part1/common-mistakes.html">
+          <div class="sc-dot"></div>
+          <div class="sc-title">Common Mistakes</div>
+          <div class="sc-desc">Generic pitfalls — arrays, bit tricks, recursion, hashing, sorting</div>
+          <div class="sc-arrow">Open →</div>
+        </a>
+        <a class="sec-card green" href="Scaler/DSA/Advanced/Revise/Part1/complexities.html">
+          <div class="sc-dot"></div>
+          <div class="sc-title">Complexities</div>
+          <div class="sc-desc">Time/space per day with plain-English explanations of why</div>
+          <div class="sc-arrow">Open →</div>
+        </a>
+        <a class="sec-card purple" href="Scaler/DSA/Advanced/Revise/Part1/key-patterns.html">
+          <div class="sc-dot"></div>
+          <div class="sc-title">Key Patterns</div>
+          <div class="sc-desc">Question signals and standard solution skeletons per approach</div>
+          <div class="sc-arrow">Open →</div>
+        </a>
+        <a class="sec-card amber" href="Scaler/DSA/Advanced/Revise/Part1/revision-tags.html">
+          <div class="sc-dot"></div>
+          <div class="sc-title">Revision Tags</div>
+          <div class="sc-desc">What to re-read ✅ vs re-solve 🔁 across all days d08–d19</div>
+          <div class="sc-arrow">Open →</div>
+        </a>
+        <a class="sec-card orange" href="Scaler/DSA/Advanced/Revise/Part1/leetcode-references.html">
+          <div class="sc-dot"></div>
+          <div class="sc-title">LeetCode Refs</div>
+          <div class="sc-desc">Method-to-LC problem mapping with source comments</div>
+          <div class="sc-arrow">Open →</div>
+        </a>
       </div>
     </div>
   </div>
@@ -186,6 +302,103 @@
 
       </div>
     </div>
+    </div>
+  </div>
+
+  <!-- PART 3 -->
+  <div class="view" id="v-part3">
+    <div class="wrap" style="max-width:860px">
+      <div class="p2-header">
+        <h1>Part 3 — Primes · Backtracking · Linked Lists · LRU Cache</h1>
+        <p>Days 33–40 &nbsp;·&nbsp; 6 revision sections</p>
+      </div>
+      <div class="sections-grid">
+        <a class="sec-card blue" href="Scaler/DSA/Advanced/Revise/Part3/approach-picker.html">
+          <div class="sc-dot"></div>
+          <div class="sc-title">Approach Picker</div>
+          <div class="sc-desc">When to reach for which tool — one row per chapter topic</div>
+          <div class="sc-arrow">Open →</div>
+        </a>
+        <a class="sec-card red" href="Scaler/DSA/Advanced/Revise/Part3/common-mistakes.html">
+          <div class="sc-dot"></div>
+          <div class="sc-title">Common Mistakes</div>
+          <div class="sc-desc">Generic pitfalls — sieve, backtracking, linked list, LRU</div>
+          <div class="sc-arrow">Open →</div>
+        </a>
+        <a class="sec-card green" href="Scaler/DSA/Advanced/Revise/Part3/complexities.html">
+          <div class="sc-dot"></div>
+          <div class="sc-title">Complexities</div>
+          <div class="sc-desc">Time/space per day with plain-English explanations of why</div>
+          <div class="sc-arrow">Open →</div>
+        </a>
+        <a class="sec-card purple" href="Scaler/DSA/Advanced/Revise/Part3/key-patterns.html">
+          <div class="sc-dot"></div>
+          <div class="sc-title">Key Patterns</div>
+          <div class="sc-desc">Question signals and standard solution skeletons per approach</div>
+          <div class="sc-arrow">Open →</div>
+        </a>
+        <a class="sec-card amber" href="Scaler/DSA/Advanced/Revise/Part3/revision-tags.html">
+          <div class="sc-dot"></div>
+          <div class="sc-title">Revision Tags</div>
+          <div class="sc-desc">What to re-read ✅ vs re-solve 🔁 across all days d33–d40</div>
+          <div class="sc-arrow">Open →</div>
+        </a>
+        <a class="sec-card orange" href="Scaler/DSA/Advanced/Revise/Part3/leetcode-references.html">
+          <div class="sc-dot"></div>
+          <div class="sc-title">LeetCode Refs</div>
+          <div class="sc-desc">Method-to-LC problem mapping with source comments</div>
+          <div class="sc-arrow">Open →</div>
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <!-- PART 4 -->
+  <div class="view" id="v-part4">
+    <div class="wrap" style="max-width:860px">
+      <div class="p2-header">
+        <h1>Part 4 — Heaps · Dynamic Programming · Graphs</h1>
+        <p>Days 44–56 &nbsp;·&nbsp; 6 revision sections</p>
+      </div>
+      <div class="sections-grid">
+        <a class="sec-card blue" href="Scaler/DSA/Advanced/Revise/Part4/approach-picker.html">
+          <div class="sc-dot"></div>
+          <div class="sc-title">Approach Picker</div>
+          <div class="sc-desc">When to reach for which tool — one row per chapter topic</div>
+          <div class="sc-arrow">Open →</div>
+        </a>
+        <a class="sec-card red" href="Scaler/DSA/Advanced/Revise/Part4/common-mistakes.html">
+          <div class="sc-dot"></div>
+          <div class="sc-title">Common Mistakes</div>
+          <div class="sc-desc">Generic pitfalls — heaps, DP, graph traversal, shortest path</div>
+          <div class="sc-arrow">Open →</div>
+        </a>
+        <a class="sec-card green" href="Scaler/DSA/Advanced/Revise/Part4/complexities.html">
+          <div class="sc-dot"></div>
+          <div class="sc-title">Complexities</div>
+          <div class="sc-desc">Time/space per day with plain-English explanations of why</div>
+          <div class="sc-arrow">Open →</div>
+        </a>
+        <a class="sec-card purple" href="Scaler/DSA/Advanced/Revise/Part4/key-patterns.html">
+          <div class="sc-dot"></div>
+          <div class="sc-title">Key Patterns</div>
+          <div class="sc-desc">Question signals and standard solution skeletons per approach</div>
+          <div class="sc-arrow">Open →</div>
+        </a>
+        <a class="sec-card amber" href="Scaler/DSA/Advanced/Revise/Part4/revision-tags.html">
+          <div class="sc-dot"></div>
+          <div class="sc-title">Revision Tags</div>
+          <div class="sc-desc">What to re-read ✅ vs re-solve 🔁 across all days d44–d56</div>
+          <div class="sc-arrow">Open →</div>
+        </a>
+        <a class="sec-card orange" href="Scaler/DSA/Advanced/Revise/Part4/leetcode-references.html">
+          <div class="sc-dot"></div>
+          <div class="sc-title">LeetCode Refs</div>
+          <div class="sc-desc">Method-to-LC problem mapping with source comments</div>
+          <div class="sc-arrow">Open →</div>
+        </a>
+      </div>
+    </div>
   </div>
 
 </main>
@@ -200,7 +413,8 @@
 
     if (id === 'home')  { bc.innerHTML = ''; return; }
     if (id === 'dsa')   { bc.innerHTML = `<span class="bc" onclick="show('home')">Home</span><span class="sep">/</span><span class="cur">DSA</span>`; return; }
-    if (id === 'part2') { bc.innerHTML = `<span class="bc" onclick="show('home')">Home</span><span class="sep">/</span><span class="bc" onclick="show('dsa')">DSA</span><span class="sep">/</span><span class="cur">Part 2</span>`; return; }
+    const partMap = { part0: 'Part 0', part1: 'Part 1', part2: 'Part 2', part3: 'Part 3', part4: 'Part 4' };
+    if (partMap[id]) { bc.innerHTML = `<span class="bc" onclick="show('home')">Home</span><span class="sep">/</span><span class="bc" onclick="show('dsa')">DSA</span><span class="sep">/</span><span class="cur">${partMap[id]}</span>`; return; }
   }
 </script>
 

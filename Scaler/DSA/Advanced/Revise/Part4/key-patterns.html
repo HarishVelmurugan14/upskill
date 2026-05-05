@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Key Patterns — Part 4</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+<header>
+  <a class="logo" href="../../../../../index.html">upskill</a>
+  <nav class="breadcrumb">
+    <a href="../../../../../index.html">Home</a><span class="sep">/</span>
+    <a href="../../../../../index.html">DSA</a><span class="sep">/</span>
+    <a href="../../../../../index.html">Part 4</a><span class="sep">/</span>
+    <span class="cur">Key Patterns</span>
+  </nav>
+</header>
+<div class="sec-nav">
+  <a class="pill blue"            href="approach-picker.html">Approach Picker</a>
+  <a class="pill red"             href="common-mistakes.html">Common Mistakes</a>
+  <a class="pill green"           href="complexities.html">Complexities</a>
+  <a class="pill purple current"  href="key-patterns.html">Key Patterns</a>
+  <a class="pill amber"           href="revision-tags.html">Revision Tags</a>
+  <a class="pill orange"          href="leetcode-references.html">LeetCode Refs</a>
+</div>
+<main>
+  <div class="page-title">Key Patterns</div>
+  <div class="page-sub">Part 4 · Days 44–56</div>
+  <div class="note">Each section: signals in the question that point to this approach, then the standard solution skeleton in plain English.</div>
+
+  <div class="acc open">
+    <div class="acc-hdr" onclick="this.parentElement.classList.toggle('open')">
+      <span>Min Heap — Greedy Minimum Cost <span class="acc-day">d44</span></span>
+      <span class="acc-arrow">▼</span>
+    </div>
+    <div class="acc-body">
+      <div class="sub-label">Signals in the question</div>
+      <p>You must combine elements repeatedly and want the minimum total cost. The greedy insight is: always combine the two smallest available values, because combining larger values later accumulates more cost. A min heap gives you the two smallest in O(log N) each time.</p>
+      <div class="sub-label">Standard solution skeleton</div>
+      <p>Insert all initial values into a min heap. While more than one element remains: extract the two minimums, compute their sum (the cost for this step), add the sum back to the heap. Accumulate the total cost. Return total when one element remains.</p>
+    </div>
+  </div>
+
+  <div class="acc">
+    <div class="acc-hdr" onclick="this.parentElement.classList.toggle('open')">
+      <span>Two Heaps — Running Median <span class="acc-day">d45</span></span>
+      <span class="acc-arrow">▼</span>
+    </div>
+    <div class="acc-body">
+      <div class="sub-label">Signals in the question</div>
+      <p>The median of a growing stream must be reported after each insertion. Sorting after every element is too slow. You need O(log N) per insertion and O(1) per median query.</p>
+      <div class="sub-label">Standard solution skeleton</div>
+      <p>Maintain a max heap for the lower half and a min heap for the upper half. On insert: if value ≤ max heap top, push to max heap; else push to min heap. Rebalance: if one heap has more than one extra element, move its top to the other heap. Median = top of the larger heap, or average of both tops if equal sizes.</p>
+    </div>
+  </div>
+
+  <div class="acc">
+    <div class="acc-hdr" onclick="this.parentElement.classList.toggle('open')">
+      <span>Min Heap of Size K — Kth Largest / Nearly Sorted <span class="acc-day">d46, d48</span></span>
+      <span class="acc-arrow">▼</span>
+    </div>
+    <div class="acc-body">
+      <div class="sub-label">Signals in the question</div>
+      <p>Find the K-th largest in a stream or array. Or sort an array where each element is at most K positions away from its sorted position. The common thread: you only care about K elements at a time.</p>
+      <div class="sub-label">Standard solution skeleton</div>
+      <p><strong>Kth largest:</strong> Maintain a min heap of size K. For each new element, if it is larger than the heap's top, pop the top and push the new element. After processing all elements, the heap's top is the Kth largest.<br><br><strong>Nearly sorted (K-sorted):</strong> Push the first K+1 elements into a min heap. Then for each remaining element, pop the min (it is now in its correct position) and push the new element. Drain the heap at the end.</p>
+    </div>
+  </div>
+
+  <div class="acc">
+    <div class="acc-hdr" onclick="this.parentElement.classList.toggle('open')">
+      <span>1D Dynamic Programming — Recurrence on a Single Dimension <span class="acc-day">d49</span></span>
+      <span class="acc-arrow">▼</span>
+    </div>
+    <div class="acc-body">
+      <div class="sub-label">Signals in the question</div>
+      <p>The problem can be broken into subproblems indexed by a single value (position, target sum, step count). The answer for index N depends on a constant number of smaller indices. Naive recursion re-solves the same subproblems exponentially — DP memoizes them.</p>
+      <div class="sub-label">Standard solution skeleton</div>
+      <p>Create a dp array of size N+1. Set the base case(s) (dp[0], dp[1]). Fill left to right: at each index express dp[i] in terms of previously computed values. Return dp[N]. If only the last two values are needed, replace the array with two variables to get O(1) space.</p>
+    </div>
+  </div>
+
+  <div class="acc">
+    <div class="acc-hdr" onclick="this.parentElement.classList.toggle('open')">
+      <span>2D Dynamic Programming — Two Dimensions of State <span class="acc-day">d50</span></span>
+      <span class="acc-arrow">▼</span>
+    </div>
+    <div class="acc-body">
+      <div class="sub-label">Signals in the question</div>
+      <p>The state needs two changing parameters — for example (row, column) in a grid, or (number of digits, remaining sum). One dimension is not enough to uniquely describe the subproblem.</p>
+      <div class="sub-label">Standard solution skeleton</div>
+      <p>Create a 2D dp table. Identify what each cell dp[i][j] means. Fill in base cases (first row, first column, or boundary cells). Fill the rest using the recurrence. For grid paths: dp[i][j] = dp[i−1][j] + dp[i][j−1], set blocked cells to 0. Return dp[rows−1][cols−1].</p>
+    </div>
+  </div>
+
+  <div class="acc">
+    <div class="acc-hdr" onclick="this.parentElement.classList.toggle('open')">
+      <span>Knapsack DP — Include or Exclude Each Item <span class="acc-day">d51, d52</span></span>
+      <span class="acc-arrow">▼</span>
+    </div>
+    <div class="acc-body">
+      <div class="sub-label">Signals in the question</div>
+      <p>Select items from a set given a weight/capacity constraint to maximize value or count ways. Each item either has one use (0/1 knapsack) or unlimited uses (unbounded). The total capacity is the second dimension of the state.</p>
+      <div class="sub-label">Standard solution skeleton</div>
+      <p><strong>0/1 Knapsack:</strong> dp[i][w] = max(dp[i−1][w], value[i] + dp[i−1][w−weight[i]]) if w ≥ weight[i]. Each item row depends only on the previous row — iterate capacity high-to-low with a 1D array to avoid reuse.<br><br><strong>Unbounded Knapsack:</strong> Same recurrence but dp[i][w] can use dp[i][w−weight[i]] (same row) since the item can be picked again. With a 1D array iterate capacity low-to-high.</p>
+    </div>
+  </div>
+
+  <div class="acc">
+    <div class="acc-hdr" onclick="this.parentElement.classList.toggle('open')">
+      <span>Graph DFS — Traversal, Path Finding, Cycle Detection <span class="acc-day">d53</span></span>
+      <span class="acc-arrow">▼</span>
+    </div>
+    <div class="acc-body">
+      <div class="sub-label">Signals in the question</div>
+      <p>Explore all reachable nodes, find if a path exists between two nodes, or detect a cycle in a directed graph. DFS explores one branch as deep as possible before backtracking.</p>
+      <div class="sub-label">Standard solution skeleton</div>
+      <p>Mark the current node as visited and add it to the recursion stack (recStack[]). For each unvisited neighbor, recurse. After processing all neighbors, remove the current node from the recursion stack. For cycle detection: if a neighbor is in the recursion stack, a cycle exists. A neighbor that is visited but NOT in the recursion stack is not a cycle — it is a cross edge.</p>
+    </div>
+  </div>
+
+  <div class="acc">
+    <div class="acc-hdr" onclick="this.parentElement.classList.toggle('open')">
+      <span>Multi-Source BFS — Spread from All Sources Simultaneously <span class="acc-day">d54</span></span>
+      <span class="acc-arrow">▼</span>
+    </div>
+    <div class="acc-body">
+      <div class="sub-label">Signals in the question</div>
+      <p>Multiple starting points all spread at the same rate (infection, rot, fire). You need the minimum time until everything is reachable. Running BFS from each source separately and taking the maximum is wrong — they spread in parallel, not sequentially.</p>
+      <div class="sub-label">Standard solution skeleton</div>
+      <p>Seed the queue with ALL source nodes before starting BFS, not one at a time. Run BFS level by level. Each level represents one time unit. Count levels until the queue is empty. Check whether all cells were reached — if not, return −1.</p>
+    </div>
+  </div>
+
+  <div class="acc">
+    <div class="acc-hdr" onclick="this.parentElement.classList.toggle('open')">
+      <span>Dijkstra — Shortest Path in a Weighted Graph <span class="acc-day">d55</span></span>
+      <span class="acc-arrow">▼</span>
+    </div>
+    <div class="acc-body">
+      <div class="sub-label">Signals in the question</div>
+      <p>Find the shortest path in a weighted graph where all edge weights are non-negative. BFS finds shortest paths in unweighted graphs — Dijkstra generalizes this with a priority queue to handle weights.</p>
+      <div class="sub-label">Standard solution skeleton</div>
+      <p>Initialize dist[] = ∞ for all nodes, dist[source] = 0. Push (0, source) into a min heap. While the heap is not empty: pop the node with the smallest current distance. For each neighbor: if dist[node] + edge_weight &lt; dist[neighbor], update dist[neighbor] and push (new dist, neighbor) into the heap. Ignore stale (old dist, node) entries when popped.</p>
+    </div>
+  </div>
+
+  <div class="acc">
+    <div class="acc-hdr" onclick="this.parentElement.classList.toggle('open')">
+      <span>Topological Sort — Kahn's BFS with In-Degree <span class="acc-day">d55</span></span>
+      <span class="acc-arrow">▼</span>
+    </div>
+    <div class="acc-body">
+      <div class="sub-label">Signals in the question</div>
+      <p>Order tasks with dependencies (compile before link, take course A before course B). Or detect whether a directed graph has a cycle. If a valid ordering exists, the graph is a DAG.</p>
+      <div class="sub-label">Standard solution skeleton</div>
+      <p>Compute in-degree for every node. Add all nodes with in-degree 0 to the queue. While the queue is not empty: pop a node, add it to the result order, and for each neighbor decrement its in-degree. If a neighbor's in-degree reaches 0, add it to the queue. If the result order has fewer than V nodes at the end, a cycle exists.</p>
+    </div>
+  </div>
+</main>
+<script>
+  document.querySelectorAll('.acc-hdr').forEach(h => {
+    h.addEventListener('click', () => h.parentElement.classList.toggle('open'));
+  });
+</script>
+</body>
+</html>

@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Common Mistakes — Part 1</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+<header>
+  <a class="logo" href="../../../../../index.html">upskill</a>
+  <nav class="breadcrumb">
+    <a href="../../../../../index.html">Home</a><span class="sep">/</span>
+    <a href="../../../../../index.html">DSA</a><span class="sep">/</span>
+    <a href="../../../../../index.html">Part 1</a><span class="sep">/</span>
+    <span class="cur">Common Mistakes</span>
+  </nav>
+</header>
+<div class="sec-nav">
+  <a class="pill blue"         href="approach-picker.html">Approach Picker</a>
+  <a class="pill red current"  href="common-mistakes.html">Common Mistakes</a>
+  <a class="pill green"        href="complexities.html">Complexities</a>
+  <a class="pill purple"       href="key-patterns.html">Key Patterns</a>
+  <a class="pill amber"        href="revision-tags.html">Revision Tags</a>
+  <a class="pill orange"       href="leetcode-references.html">LeetCode Refs</a>
+</div>
+<main>
+  <div class="page-title">Common Mistakes</div>
+  <div class="page-sub">Part 1 · Days 8–19</div>
+  <div class="note">Generic pitfalls by technique — not edge cases per problem.</div>
+
+  <div class="sec">
+    <div class="sec-title">Arrays &amp; Prefix Sum</div>
+
+    <div class="m-card">
+      <div class="m-title">Not initializing prefix sum at index 0</div>
+      <div class="m-body">Prefix sum arrays typically need a leading 0 so that a range starting at index 0 can be computed with a single subtraction. If you start filling from index 0 without a sentinel, range queries for the first element require a special case.</div>
+    </div>
+
+    <div class="m-card">
+      <div class="m-title">Off-by-one in range queries</div>
+      <div class="m-body">Sum of range [L, R] = prefix[R] − prefix[L−1]. A common slip is writing prefix[R] − prefix[L], which excludes the element at L. Always double-check the boundary by tracing a small example.</div>
+    </div>
+
+    <div class="m-card">
+      <div class="m-title">In-place matrix rotation — swapping the full matrix</div>
+      <div class="m-body">When transposing in-place, iterate only over the upper triangle (row &lt; col). If you iterate the whole matrix you swap every pair twice, ending up with the original — a silent no-op that is hard to spot.</div>
+    </div>
+
+    <div class="m-card">
+      <div class="m-title">In-place sign marking — not clamping out-of-range values first</div>
+      <div class="m-body">When marking presence via negation (for first-missing-positive style problems), values outside [1, N] are "unusable" slots. Replace them with a safe sentinel like N+1 before the marking pass so their sign never gets misread.</div>
+    </div>
+  </div>
+
+  <div class="sec">
+    <div class="sec-title">Bit Manipulation</div>
+
+    <div class="m-card">
+      <div class="m-title">Hardcoding 32 bits in the bit-count loop</div>
+      <div class="m-body">A loop from 0 to 31 works but misses a small optimization: you can stop at the highest set bit of the maximum element. More importantly, hardcoding makes the code fragile if the problem uses 64-bit integers.</div>
+    </div>
+
+    <div class="m-card">
+      <div class="m-title">Forgetting that Java's % can return negative remainders</div>
+      <div class="m-body">In modular exponentiation, <code>(a * b) % mod</code> can give a negative result if intermediate products overflow into a negative value. Cast to long before multiplying, or use <code>Math.floorMod</code> when the sign matters.</div>
+    </div>
+
+    <div class="m-card">
+      <div class="m-title">Splitting XOR groups incorrectly for two-unique-elements</div>
+      <div class="m-body">The rightmost set bit of (A XOR B) guarantees A and B differ at that position. Partition by that bit — every element goes into exactly one group. A common mistake is using the wrong bit mask or forgetting to XOR both groups from scratch.</div>
+    </div>
+  </div>
+
+  <div class="sec">
+    <div class="sec-title">Recursion</div>
+
+    <div class="m-card">
+      <div class="m-title">Missing the return value in a recursive helper</div>
+      <div class="m-body">When a recursive function computes a value (not just prints), every branch — including the base case — must return something. A missing return on one path silently returns null or 0 in Java and can make the result look correct on happy paths while failing on edge cases.</div>
+    </div>
+
+    <div class="m-card">
+      <div class="m-title">Exponential time in naive Fibonacci — not memoizing</div>
+      <div class="m-body">Plain recursive Fibonacci recomputes the same subproblem exponentially many times. Add a memoization array and check it before recursing — this turns O(2^N) into O(N).</div>
+    </div>
+
+    <div class="m-card">
+      <div class="m-title">Using linear exponentiation instead of binary exponentiation</div>
+      <div class="m-body">Multiplying A by itself N times is O(N). Binary exponentiation squares the result at each step: A^N = (A^(N/2))² — this is O(logN) and becomes critical when N can be 10^9.</div>
+    </div>
+  </div>
+
+  <div class="sec">
+    <div class="sec-title">Hashing</div>
+
+    <div class="m-card">
+      <div class="m-title">Decrementing frequency to zero but not removing the key</div>
+      <div class="m-body">When tracking a sliding window with a frequency map, set the count to 0 but leave the key — then <code>containsKey</code> returns true even when the element is absent. Always remove the key (or check that the value is &gt; 0) when the count hits 0.</div>
+    </div>
+
+    <div class="m-card">
+      <div class="m-title">Storing first-occurrence index but also updating it on revisit</div>
+      <div class="m-body">For longest-subarray problems, the prefix sum's first occurrence index should never be overwritten. If you see the same prefix sum again, that gap is your candidate — updating the stored index shortens the answer incorrectly.</div>
+    </div>
+  </div>
+
+  <div class="sec">
+    <div class="sec-title">Sorting &amp; Comparators</div>
+
+    <div class="m-card">
+      <div class="m-title">Comparing strings by digit value instead of concatenation order</div>
+      <div class="m-body">For "largest number" problems, sorting by numeric value gives the wrong order — "9" should come before "34" because "934" &gt; "349". Always compare by concatenating: compare (a+b) vs (b+a) as strings.</div>
+    </div>
+
+    <div class="m-card">
+      <div class="m-title">Inversion count — incrementing for every remaining element, not just un-picked ones</div>
+      <div class="m-body">In merge sort inversion counting, when you pick the right element over the left, the count increases by the number of elements remaining in the left half (not the total left half). Off-by-one here makes every count wrong.</div>
+    </div>
+  </div>
+</main>
+</body>
+</html>

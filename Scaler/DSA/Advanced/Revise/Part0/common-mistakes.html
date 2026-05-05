@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Common Mistakes — Part 0</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<header>
+  <a class="logo" href="../../../../../index.html">upskill</a>
+  <nav class="breadcrumb">
+    <a href="../../../../../index.html">Home</a><span class="sep">/</span>
+    <a href="../../../../../index.html">DSA</a><span class="sep">/</span>
+    <a href="../../../../../index.html">Part 0</a><span class="sep">/</span>
+    <span class="cur">Common Mistakes</span>
+  </nav>
+</header>
+
+<div class="sec-nav">
+  <a class="pill blue"         href="approach-picker.html">Approach Picker</a>
+  <a class="pill red current"  href="common-mistakes.html">Common Mistakes</a>
+  <a class="pill green"        href="complexities.html">Complexities</a>
+  <a class="pill purple"       href="key-patterns.html">Key Patterns</a>
+  <a class="pill amber"        href="revision-tags.html">Revision Tags</a>
+  <a class="pill orange"       href="leetcode-references.html">LeetCode Refs</a>
+</div>
+
+<main>
+  <div class="page-title">Common Mistakes</div>
+  <div class="page-sub">Part 0 · Days 3–7</div>
+
+  <div class="note">Generic pitfalls by technique — not edge cases per problem.</div>
+
+  <div class="sec">
+    <div class="sec-title">Prefix Sum</div>
+
+    <div class="m-card">
+      <div class="m-title">Recomputing the range sum instead of using the prefix array</div>
+      <div class="m-body">Once the prefix array is built, a range sum [L, R] is prefix[R] − prefix[L−1]. Recomputing from scratch each query turns O(1) into O(N) and defeats the purpose entirely.</div>
+    </div>
+
+    <div class="m-card">
+      <div class="m-title">Off-by-one on the left boundary</div>
+      <div class="m-body">prefix[R] − prefix[L−1] is correct. Writing prefix[R] − prefix[L] skips the element at index L. Always subtract prefix[L−1], not prefix[L].</div>
+    </div>
+
+    <div class="m-card">
+      <div class="m-title">Forgetting that element removal shifts parity of all indices to the right</div>
+      <div class="m-body">When you remove index i, every element at position > i moves left by one — its even/odd index flips. You cannot treat the two halves independently; the parity of the right half is the opposite of what it was.</div>
+    </div>
+  </div>
+
+  <div class="sec">
+    <div class="sec-title">Carry Forward</div>
+
+    <div class="m-card">
+      <div class="m-title">Scanning the wrong direction</div>
+      <div class="m-body">Carry forward works by accumulating a value as you scan in one direction. Scanning right-to-left when you need left-to-right (or vice versa) gives wrong counts. Lock down direction before coding.</div>
+    </div>
+
+    <div class="m-card">
+      <div class="m-title">Counting the element itself when it shouldn't contribute</div>
+      <div class="m-body">When counting AG pairs, at each 'G' you add the count of 'A's seen so far — meaning A must strictly come before G. If you increment the counter before checking the current element, you'll count positions where A and G are the same index.</div>
+    </div>
+  </div>
+
+  <div class="sec">
+    <div class="sec-title">Contribution Technique</div>
+
+    <div class="m-card">
+      <div class="m-title">Confusing the number of subarrays an element belongs to</div>
+      <div class="m-body">Element A[i] (0-indexed) is the left boundary of (i+1) subarrays and the right boundary of (N−i) subarrays. Its total contribution is A[i] × (i+1) × (N−i). Mixing up (i+1) with i, or (N−i) with (N−i−1), silently miscounts every element.</div>
+    </div>
+  </div>
+
+  <div class="sec">
+    <div class="sec-title">Sliding Window</div>
+
+    <div class="m-card">
+      <div class="m-title">Re-summing the window from scratch on each slide</div>
+      <div class="m-body">Brute force recomputes the sum of K elements per step: O(N×K). The sliding window adds one element and removes one element: O(N). For large K the difference is enormous — the window exists specifically to avoid the re-sum.</div>
+    </div>
+
+    <div class="m-card">
+      <div class="m-title">Not removing the outgoing element before adding the incoming one</div>
+      <div class="m-body">Order matters: when sliding from position i to i+1, remove A[i−K+1] (the element leaving) and add A[i+1] (the element entering). Doing it in the wrong order, or forgetting to remove, corrupts the running sum.</div>
+    </div>
+  </div>
+
+  <div class="sec">
+    <div class="sec-title">Memory (d07)</div>
+
+    <div class="m-card">
+      <div class="m-title">Expecting primitive changes inside a method to affect the caller</div>
+      <div class="m-body">Java passes primitives by value — a copy is made. Any change to the local copy is invisible to the caller. To propagate a change, return the new value.</div>
+    </div>
+
+    <div class="m-card">
+      <div class="m-title">Re-initializing an array inside a method and expecting the caller to see it</div>
+      <div class="m-body">Writing <code>a = new int[]{...}</code> inside a method creates a new heap object and points the local reference there. The caller's reference still points to the original. Only mutations to the existing array (<code>a[0] = x</code>) are visible to the caller.</div>
+    </div>
+  </div>
+</main>
+
+</body>
+</html>

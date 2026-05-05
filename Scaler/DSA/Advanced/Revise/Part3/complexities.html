@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Complexities — Part 3</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+<header>
+  <a class="logo" href="../../../../../index.html">upskill</a>
+  <nav class="breadcrumb">
+    <a href="../../../../../index.html">Home</a><span class="sep">/</span>
+    <a href="../../../../../index.html">DSA</a><span class="sep">/</span>
+    <a href="../../../../../index.html">Part 3</a><span class="sep">/</span>
+    <span class="cur">Complexities</span>
+  </nav>
+</header>
+<div class="sec-nav">
+  <a class="pill blue"           href="approach-picker.html">Approach Picker</a>
+  <a class="pill red"            href="common-mistakes.html">Common Mistakes</a>
+  <a class="pill green current"  href="complexities.html">Complexities</a>
+  <a class="pill purple"         href="key-patterns.html">Key Patterns</a>
+  <a class="pill amber"          href="revision-tags.html">Revision Tags</a>
+  <a class="pill orange"         href="leetcode-references.html">LeetCode Refs</a>
+</div>
+<main>
+  <div class="page-title">Complexities</div>
+  <div class="page-sub">Part 3 · Days 33–40</div>
+  <div class="note">Table = complexity from source comments. Explanation below = why that cost is what it is.</div>
+
+  <div class="sec">
+    <div class="sec-title">d33 — Prime Numbers</div>
+    <div class="tbl-wrap"><table>
+      <thead><tr><th>Approach</th><th>Time</th><th>Space</th></tr></thead>
+      <tbody>
+        <tr><td>Sieve of Eratosthenes</td><td class="c-time">O(N log log N)</td><td class="c-space">O(N)</td></tr>
+        <tr><td>isPrimeNumber check</td><td class="c-time">O(√N)</td><td class="c-space">O(1)</td></tr>
+      </tbody>
+    </table></div>
+    <div class="why-box">
+      <div class="why-label">Why Sieve is O(N log log N)</div>
+      <p>For each prime p you cross out N/p multiples. Summing N/p over all primes up to N gives N × (1/2 + 1/3 + 1/5 + 1/7 + …) which converges to N × log(log(N)) — a known result from number theory. In practice it is very close to O(N).</p>
+    </div>
+    <div class="why-box">
+      <div class="why-label">Why isPrime check is O(√N)</div>
+      <p>If N has a factor larger than √N, it must have a paired factor smaller than √N that you would have found earlier. So you only need to check divisors from 2 up to √N — that is at most √N iterations.</p>
+    </div>
+  </div>
+
+  <div class="sec">
+    <div class="sec-title">d35 — Two Pointers</div>
+    <div class="tbl-wrap"><table>
+      <thead><tr><th>Approach</th><th>Time</th><th>Space</th></tr></thead>
+      <tbody>
+        <tr><td>Brute force (nested loops)</td><td class="c-time">O(N²)</td><td class="c-space">O(1)</td></tr>
+        <tr><td>Two-pointer (subarray with given sum)</td><td class="c-time">O(N)</td><td class="c-space">O(1)</td></tr>
+      </tbody>
+    </table></div>
+    <div class="why-box">
+      <div class="why-label">Why two pointers is O(N)</div>
+      <p>The left pointer only moves right and the right pointer only moves right. Together they make at most 2N steps across the whole traversal — each element is entered and exited at most once. No extra storage beyond two index variables.</p>
+    </div>
+  </div>
+
+  <div class="sec">
+    <div class="sec-title">d36 — Backtracking</div>
+    <div class="tbl-wrap"><table>
+      <thead><tr><th>Method</th><th>Time</th><th>Space</th></tr></thead>
+      <tbody>
+        <tr><td><code>generateParenthesis</code></td><td class="c-time">O(2^2N)</td><td class="c-space">O(N)</td></tr>
+        <tr><td><code>generateSubsets_yahnit</code></td><td class="c-time">O(2^N)</td><td class="c-space">O(N)</td></tr>
+        <tr><td><code>generatePermutations</code></td><td class="c-time">O(N!)</td><td class="c-space">O(N)</td></tr>
+      </tbody>
+    </table></div>
+    <div class="why-box">
+      <div class="why-label">Why subsets is O(2^N)</div>
+      <p>At each of N positions you make a binary choice: include or exclude the element. Two choices at each of N levels = 2^N leaf nodes in the recursion tree, and each leaf produces one subset. The stack depth is at most N.</p>
+    </div>
+    <div class="why-box">
+      <div class="why-label">Why permutations is O(N!)</div>
+      <p>For the first position you have N choices, for the second N−1, and so on down to 1. Total permutations = N × (N−1) × … × 1 = N!. Each permutation is a leaf in the recursion tree and takes O(N) to record.</p>
+    </div>
+    <div class="why-box">
+      <div class="why-label">Why parentheses generation is O(2^2N) — or more precisely O(Catalan(N))</div>
+      <p>At each position in a string of 2N characters you make a binary choice (open or close). Naively that is 2^(2N) branches, but validity constraints prune most — the true count is the N-th Catalan number which grows as O(4^N / N^1.5). O(2^2N) is the looser upper bound used in the source.</p>
+    </div>
+  </div>
+
+  <div class="sec">
+    <div class="sec-title">d39 — Linked List: Sorting &amp; Problems</div>
+    <div class="tbl-wrap"><table>
+      <thead><tr><th>Approach</th><th>Time</th><th>Space</th></tr></thead>
+      <tbody>
+        <tr><td>Merge Sort on linked list</td><td class="c-time">O(N log N)</td><td class="c-space">O(log N)</td></tr>
+        <tr><td>Merge two sorted lists</td><td class="c-time">O(N+M)</td><td class="c-space">O(1)</td></tr>
+        <tr><td>Palindrome check (slow/fast + reverse)</td><td class="c-time">O(N)</td><td class="c-space">O(1)</td></tr>
+        <tr><td>Add two numbers digit by digit</td><td class="c-time">O(max(N,M))</td><td class="c-space">O(max(N,M))</td></tr>
+      </tbody>
+    </table></div>
+    <div class="why-box">
+      <div class="why-label">Why merge sort on a linked list uses O(log N) space (not O(N))</div>
+      <p>Unlike array merge sort, there is no auxiliary array needed for merging — you relink existing nodes. The only stack space is the O(log N) recursion depth for splitting the list in half repeatedly.</p>
+    </div>
+  </div>
+
+  <div class="sec">
+    <div class="sec-title">d39 — Doubly Linked List &amp; LRU</div>
+    <div class="tbl-wrap"><table>
+      <thead><tr><th>Operation</th><th>Time</th><th>Space</th></tr></thead>
+      <tbody>
+        <tr><td>LRU Cache get/put</td><td class="c-time">O(1)</td><td class="c-space">O(capacity)</td></tr>
+        <tr><td>Floyd's cycle detection (meet)</td><td class="c-time">O(N)</td><td class="c-space">O(1)</td></tr>
+        <tr><td>Floyd's cycle start (after meet)</td><td class="c-time">O(N)</td><td class="c-space">O(1)</td></tr>
+      </tbody>
+    </table></div>
+    <div class="why-box">
+      <div class="why-label">Why LRU is O(1) per operation</div>
+      <p>HashMap gives O(1) lookup by key. The doubly linked list allows O(1) node removal and insertion at the front (because every node stores both prev and next pointers — no traversal needed). Both structures together give O(1) for both get and put.</p>
+    </div>
+  </div>
+</main>
+</body>
+</html>

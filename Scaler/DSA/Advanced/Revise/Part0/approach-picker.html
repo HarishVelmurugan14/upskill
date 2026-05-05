@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Approach Picker — Part 0</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<header>
+  <a class="logo" href="../../../../../index.html">upskill</a>
+  <nav class="breadcrumb">
+    <a href="../../../../../index.html">Home</a><span class="sep">/</span>
+    <a href="../../../../../index.html">DSA</a><span class="sep">/</span>
+    <a href="../../../../../index.html">Part 0</a><span class="sep">/</span>
+    <span class="cur">Approach Picker</span>
+  </nav>
+</header>
+
+<div class="sec-nav">
+  <a class="pill blue current"  href="approach-picker.html">Approach Picker</a>
+  <a class="pill red"           href="common-mistakes.html">Common Mistakes</a>
+  <a class="pill green"         href="complexities.html">Complexities</a>
+  <a class="pill purple"        href="key-patterns.html">Key Patterns</a>
+  <a class="pill amber"         href="revision-tags.html">Revision Tags</a>
+  <a class="pill orange"        href="leetcode-references.html">LeetCode Refs</a>
+</div>
+
+<main>
+  <div class="page-title">Approach Picker</div>
+  <div class="page-sub">Part 0 · Days 3–7</div>
+
+  <div class="note">One row per chapter topic. The signal is generic — not a specific problem.</div>
+
+  <div class="tbl-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th>When the question feels like…</th>
+          <th>Reach for…</th>
+          <th>Days</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td class="c-signal">The data needs to be queried for range sums repeatedly and efficiently</td>
+          <td class="c-reach">Prefix Sum — build once, query in O(1)</td>
+          <td class="c-day">d03</td>
+        </tr>
+        <tr>
+          <td class="c-signal">After removing one element, check whether even/odd indexed sums are affected</td>
+          <td class="c-reach">Even + Odd prefix sums — parity flips after the removed index</td>
+          <td class="c-day">d03</td>
+        </tr>
+        <tr>
+          <td class="c-signal">Find the index where left sum equals right sum</td>
+          <td class="c-reach">Prefix Sum — compare left running sum to (total − left − A[i])</td>
+          <td class="c-day">d03</td>
+        </tr>
+        <tr>
+          <td class="c-signal">Count how many X appear before each Y as you scan left to right</td>
+          <td class="c-reach">Carry Forward — carry a running count of X, add to answer at each Y</td>
+          <td class="c-day">d04</td>
+        </tr>
+        <tr>
+          <td class="c-signal">Pick the best N elements considering only the left and right edges of the array</td>
+          <td class="c-reach">Prefix + Suffix sums — try every split point</td>
+          <td class="c-day">d04</td>
+        </tr>
+        <tr>
+          <td class="c-signal">Find elements that are greater than everything to their right</td>
+          <td class="c-reach">Carry max from right to left — if A[i] > running max, it is a leader</td>
+          <td class="c-day">d04</td>
+        </tr>
+        <tr>
+          <td class="c-signal">Smallest subarray that contains both the global minimum and maximum</td>
+          <td class="c-reach">Carry Forward — scan right to left tracking last positions of min and max</td>
+          <td class="c-day">d04</td>
+        </tr>
+        <tr>
+          <td class="c-signal">Maximum profit from one buy-sell transaction</td>
+          <td class="c-reach">Carry max from right — profit at i = maxRight[i] − A[i]</td>
+          <td class="c-day">d04</td>
+        </tr>
+        <tr>
+          <td class="c-signal">Sum of all subarray sums efficiently without enumeration</td>
+          <td class="c-reach">Contribution Technique — A[i] appears in (i+1)×(N−i) subarrays</td>
+          <td class="c-day">d04/d05</td>
+        </tr>
+        <tr>
+          <td class="c-signal">Fixed-size window: find sum, average, or condition for every window of size K</td>
+          <td class="c-reach">Sliding Window — add incoming element, remove outgoing element</td>
+          <td class="c-day">d05</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</main>
+
+</body>
+</html>
