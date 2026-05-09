@@ -27,46 +27,134 @@
 <main>
   <div class="page-title">Approach Picker</div>
   <div class="page-sub">Part 2 · Days 21–31</div>
-  <div class="note">One row per recognizable problem pattern. The signal is what you read in the question — the reach is what you write in code.</div>
-  <div class="tbl-wrap">
-    <table>
-      <thead>
-        <tr><th>When the question feels like…</th><th>Reach for…</th><th>Days</th></tr>
-      </thead>
-      <tbody>
+  <div class="note">Left = what you read in the question. Right = what you code. Scan until the signal matches, then look right.</div>
 
-        <!-- Binary Search on Array -->
-        <tr><td class="c-signal">Array is sorted; find a target, its first/last occurrence, or where it should be inserted</td><td class="c-reach">Binary Search — <code>low=0, high=N-1</code>, shrink by ±1 each step, save mid on match and keep going for boundary</td><td class="c-day">d21</td></tr>
-        <tr><td class="c-signal">Sorted array; "first position ≥ X" or "last position ≤ X" (lower_bound / upper_bound)</td><td class="c-reach">lower_bound — save mid when <code>a[mid] >= target</code>, move <code>high = mid-1</code>; then check both <code>lb</code> and <code>lb-1</code> for closest</td><td class="c-day">d21</td></tr>
-        <tr><td class="c-signal">Sorted array has one duplicate-free element; all others appear in pairs</td><td class="c-reach">Binary Search on even/odd index parity — the single element is where the pair pattern breaks</td><td class="c-day">d21</td></tr>
-        <tr><td class="c-signal">Find peak element — greater than both neighbours — in O(log N)</td><td class="c-reach">Binary Search — if <code>a[mid] &lt; a[mid+1]</code> peak is to the right, else to the left or at mid</td><td class="c-day">d21</td></tr>
-        <tr><td class="c-signal">Array is rotated but was sorted; search for a target</td><td class="c-reach">Binary Search on rotated array — identify which half is fully sorted in O(1), check if target is in that half, else search the other half</td><td class="c-day">d22</td></tr>
-        <tr><td class="c-signal">Find median of a sorted matrix (each row sorted) in O(N log M log max)</td><td class="c-reach">Binary Search on value space — for each candidate value, count elements ≤ it across all rows using binary search; answer is first value where count > N×M/2</td><td class="c-day">d22</td></tr>
+  <!-- ── Binary Search on Array ── -->
+  <div class="ap-group bs">
+    <div class="ap-group-hdr">Binary Search on Array <span class="ap-day">d21, d22</span></div>
 
-        <!-- Binary Search on Answer Space -->
-        <tr><td class="c-signal">Distribute N tasks among K workers — minimize the maximum any single worker handles</td><td class="c-reach">BS on answer space <code>[max_task, total_sum]</code> — feasibility check: greedy left-to-right, start new worker when sum exceeds mid; check painters-exceed inside loop for early exit</td><td class="c-day">d23</td></tr>
-        <tr><td class="c-signal">Place K elements in sorted positions — maximize the minimum gap between any two</td><td class="c-reach">BS on answer space <code>[1, positions_range]</code> — feasibility check: greedy left-to-right, place next element only when gap ≥ mid; return true inside loop when all K placed</td><td class="c-day">d23</td></tr>
-        <tr><td class="c-signal">Find the longest subarray/window of length K where no window of size K has sum exceeding B</td><td class="c-reach">BS on answer space <code>[0, N]</code> — feasibility check: sliding window of size mid, return false the moment any window sum &gt; B</td><td class="c-day">d23</td></tr>
-
-        <!-- Linked List basics -->
-        <tr><td class="c-signal">Walk a linked list and insert or delete — head might change</td><td class="c-reach">Dummy node before real head — all operations including head-delete become uniform; return <code>dummy.next</code></td><td class="c-day">d24, d25</td></tr>
-        <tr><td class="c-signal">Reverse an entire linked list in-place in O(N) O(1)</td><td class="c-reach">3-pointer reverse — <code>next = curr.next → curr.next = prev → prev = curr → curr = next</code>; loop until curr is null, return prev</td><td class="c-day">d25</td></tr>
-        <tr><td class="c-signal">Delete a node when you only have access to that node, not its predecessor</td><td class="c-reach">Copy-next trick — copy <code>node.next.val</code> into node, then skip <code>node.next</code> via <code>node.next = node.next.next</code></td><td class="c-day">d25</td></tr>
-        <tr><td class="c-signal">Clone a linked list where each node also has a random pointer to any node</td><td class="c-reach">2-pass HashMap — Pass 1: create all clones (label only); Pass 2: wire <code>clone.next</code> and <code>clone.random</code> via map lookups (null-key-safe)</td><td class="c-day">d25</td></tr>
-        <tr><td class="c-signal">Remove the Nth node from the end without a second pass</td><td class="c-reach">Two-pointer gap-of-N — fast starts N steps ahead; both advance until fast.next is null; slow.next is the node to delete</td><td class="c-day">d25</td></tr>
-        <tr><td class="c-signal">Reverse only nodes between positions B and C inside the list</td><td class="c-reach">Dummy node → walk to B-1 (prevNode) → reverse C-B+1 nodes with standard 3-pointer → connect: <code>prevNode.next.next = curr</code> THEN <code>prevNode.next = prev</code></td><td class="c-day">d25</td></tr>
-        <tr><td class="c-signal">Reverse every group of K nodes, leave the tail as-is if fewer than K remain</td><td class="c-reach">reverseKGroup recursion — count K nodes (return as-is if fewer) → reverse K → connect old-head (now tail) to <code>reverseKGroup(curr, k)</code> → return prev</td><td class="c-day">d25</td></tr>
-
-        <!-- Stack / Monotonic Stack / Queue / Trees / BST -->
-        <tr><td class="c-signal">Match open-close pairs, evaluate postfix, or cancel adjacent duplicates</td><td class="c-reach">Stack — push on opening/value, pop and process on closing/operator; check isEmpty before every pop</td><td class="c-day">d26</td></tr>
-        <tr><td class="c-signal">For each element: find the nearest element to its left/right that is smaller or greater</td><td class="c-reach">Monotonic Stack of indices — pop while stack top violates the order you want; each popped index just found its answer (current i)</td><td class="c-day">d27</td></tr>
-        <tr><td class="c-signal">Sliding window maximum/minimum, or track first-in-first-out among active elements</td><td class="c-reach">Deque — remove back when current is better (smaller for max), remove front when outside window; front is always the answer</td><td class="c-day">d28</td></tr>
-        <tr><td class="c-signal">Hierarchical structure; same logic applies at every subtree; answer = combine(left, right, node)</td><td class="c-reach">Tree DFS recursion — base case: null → neutral value; recursive case: get left+right results, combine, return upward</td><td class="c-day">d29, d30</td></tr>
-        <tr><td class="c-signal">Tree has left &lt; root &lt; right ordering; search, validate, or build balanced structure</td><td class="c-reach">BST — search: go left/right by comparison; validate: pass (min, max) bounds down; build from sorted: always mid as root</td><td class="c-day">d31</td></tr>
-
-      </tbody>
-    </table>
+    <div class="ap-row">
+      <div class="ap-signal">Sorted array — find target, first/last occurrence, or insert position</div>
+      <div class="ap-reach">Binary Search — <code>low=0, high=N-1</code>; on match save mid + keep going left/right for boundary</div>
+    </div>
+    <div class="ap-row">
+      <div class="ap-signal">Sorted array — "first index ≥ X" or "closest value to X"</div>
+      <div class="ap-reach">lower_bound — save mid when <code>a[mid] &gt;= target</code>, move <code>high=mid-1</code>; check both <code>lb</code> and <code>lb-1</code> at end</div>
+    </div>
+    <div class="ap-row">
+      <div class="ap-signal">Sorted array, all values paired except one — find the solo element in O(log N)</div>
+      <div class="ap-reach">Parity BS — if <code>a[mid]==a[mid+1]</code> and mid is even → single is right; else left; force mid to even index</div>
+    </div>
+    <div class="ap-row">
+      <div class="ap-signal">Find peak element (greater than both neighbours) in O(log N)</div>
+      <div class="ap-reach">Peak BS — if <code>a[mid] &lt; a[mid+1]</code> peak is right (<code>low=mid+1</code>); else peak is at mid or left (<code>high=mid-1</code>, save mid)</div>
+    </div>
+    <div class="ap-row">
+      <div class="ap-signal">Array was sorted then rotated — search for target in O(log N)</div>
+      <div class="ap-reach">Rotated BS — check which half is fully sorted via <code>a[low]&lt;=a[mid]</code>; if target in that half search there, else other half</div>
+    </div>
+    <div class="ap-row">
+      <div class="ap-signal">Matrix where every row is sorted — find the median in O(N log M log max)</div>
+      <div class="ap-reach">Value-space BS — binary search [0, 1B]; count elements ≤ mid per row with lower_bound; answer is first mid where count &gt; N×M/2</div>
+    </div>
   </div>
+
+  <!-- ── Binary Search on Answer Space ── -->
+  <div class="ap-group ans">
+    <div class="ap-group-hdr">Binary Search on Answer Space <span class="ap-day">d23</span></div>
+
+    <div class="ap-row">
+      <div class="ap-signal">Distribute N items among K workers — minimize the maximum any single worker handles</div>
+      <div class="ap-reach">BS on <code>[maxItem, totalSum]</code> — feasibility: greedy left-to-right, new worker when sum &gt; mid; early-exit inside loop when workers exceeded</div>
+    </div>
+    <div class="ap-row">
+      <div class="ap-signal">Place K elements in sorted positions — maximize the minimum gap between any two</div>
+      <div class="ap-reach">BS on <code>[1, range]</code> — feasibility: greedy, place next when gap ≥ mid; return true inside loop when all K placed; go right on success</div>
+    </div>
+    <div class="ap-row">
+      <div class="ap-signal">Find longest window of size K such that no window sum exceeds B</div>
+      <div class="ap-reach">BS on <code>[0, N]</code> — feasibility: sliding window of size mid; return false the moment any window sum &gt; B; go right on success</div>
+    </div>
+  </div>
+
+  <!-- ── Linked List ── -->
+  <div class="ap-group ll">
+    <div class="ap-group-hdr">Linked List <span class="ap-day">d24, d25</span></div>
+
+    <div class="ap-row">
+      <div class="ap-signal">Insert or delete nodes — head might change, want uniform code for head and mid</div>
+      <div class="ap-reach">Dummy node — <code>dummy.next = head</code>; all ops including head-delete become <code>prev.next = curr.next</code>; return <code>dummy.next</code></div>
+    </div>
+    <div class="ap-row">
+      <div class="ap-signal">Reverse entire linked list in-place in O(N) O(1)</div>
+      <div class="ap-reach">3-pointer reverse — <code>save → flip → slide prev → slide curr</code>; <code>next=curr.next, curr.next=prev, prev=curr, curr=next</code>; return prev</div>
+    </div>
+    <div class="ap-row">
+      <div class="ap-signal">Delete a specific node — only the node itself is given, no predecessor</div>
+      <div class="ap-reach">Copy-next trick — <code>node.val = node.next.val</code>; <code>node.next = node.next.next</code>; works only if node is not the tail</div>
+    </div>
+    <div class="ap-row">
+      <div class="ap-signal">Deep-clone a list where each node has a random pointer to any node</div>
+      <div class="ap-reach">2-pass HashMap — Pass 1: create all clones; Pass 2: <code>clone.next = map.get(curr.next)</code>, <code>clone.random = map.get(curr.random)</code> (null-key safe)</div>
+    </div>
+    <div class="ap-row">
+      <div class="ap-signal">Remove the Nth node from the end in one pass</div>
+      <div class="ap-reach">Two-pointer gap — fast starts N ahead; both move until <code>fast.next==null</code>; <code>slow.next = slow.next.next</code></div>
+    </div>
+    <div class="ap-row">
+      <div class="ap-signal">Reverse only nodes between positions B and C</div>
+      <div class="ap-reach">Dummy + reverseBetween — walk to B-1 (prevNode); reverse C-B+1 nodes; reconnect: <strong>tail first</strong> <code>prevNode.next.next=curr</code>, then <code>prevNode.next=prev</code></div>
+    </div>
+    <div class="ap-row">
+      <div class="ap-signal">Reverse every K nodes; leave the tail as-is if fewer than K remain</div>
+      <div class="ap-reach">reverseKGroup recursion — count K (return as-is if fewer); reverse K; <code>head.next = reverseKGroup(curr,k)</code>; return prev</div>
+    </div>
+  </div>
+
+  <!-- ── Stack / Deque ── -->
+  <div class="ap-group stk">
+    <div class="ap-group-hdr">Stack / Monotonic Stack / Deque <span class="ap-day">d26, d27, d28</span></div>
+
+    <div class="ap-row">
+      <div class="ap-signal">Match open-close pairs, evaluate postfix, or cancel adjacent duplicates</div>
+      <div class="ap-reach">Stack — push on opening/value; pop and process on closing/operator; check isEmpty before every pop; empty stack at end = valid</div>
+    </div>
+    <div class="ap-row">
+      <div class="ap-signal">For each element find the nearest smaller/greater to its left or right</div>
+      <div class="ap-reach">Monotonic Stack of indices — pop while top violates order; each popped index just found its answer at current i; push indices not values</div>
+    </div>
+    <div class="ap-row">
+      <div class="ap-signal">Sliding window maximum (or minimum) as the window moves</div>
+      <div class="ap-reach">Deque of indices — remove back when current ≥ back (useless); remove front when outside window; front = window max</div>
+    </div>
+    <div class="ap-row">
+      <div class="ap-signal">Need oldest and newest element efficiently; FIFO queue using two stacks</div>
+      <div class="ap-reach">Two-stack queue — push to inStack; on dequeue if outStack empty, pour all from inStack; pop from outStack</div>
+    </div>
+  </div>
+
+  <!-- ── Trees / BST ── -->
+  <div class="ap-group tree">
+    <div class="ap-group-hdr">Trees / BST <span class="ap-day">d29, d30, d31</span></div>
+
+    <div class="ap-row">
+      <div class="ap-signal">Hierarchical structure — same logic at every subtree; answer = combine(left, right, node)</div>
+      <div class="ap-reach">Tree DFS — base: null → neutral; recurse left+right; check failure sentinel before combining; return result upward</div>
+    </div>
+    <div class="ap-row">
+      <div class="ap-signal">Process nodes level by level; left view, level order, or width</div>
+      <div class="ap-reach">BFS queue — enqueue root; each iteration dequeue node, process, enqueue children; track level by queue size snapshot</div>
+    </div>
+    <div class="ap-row">
+      <div class="ap-signal">Rebuild tree from two traversals (inorder + pre/postorder)</div>
+      <div class="ap-reach">Root from pre[0] or post[last]; find root in inorder → left count; split both arrays by left count; recurse</div>
+    </div>
+    <div class="ap-row">
+      <div class="ap-signal">Tree with left &lt; root &lt; right — search, validate ordering, or build balanced</div>
+      <div class="ap-reach">BST — search: go left/right by compare; validate: pass (long min, long max) bounds down; build from sorted: always pick mid as root</div>
+    </div>
+  </div>
+
 </main>
 </body>
 </html>

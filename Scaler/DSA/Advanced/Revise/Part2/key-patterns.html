@@ -30,348 +30,519 @@
 <main>
   <div class="page-title">Key Patterns</div>
   <div class="page-sub">Part 2 · Days 21–31</div>
+  <div class="note">Left = signals that trigger this pattern. Right = skeleton to write. All cards always open — no clicking.</div>
 
-  <div class="note">Each accordion: signals → skeleton → critical details. Expand, read, close. Move on.</div>
-
-  <!-- ───────── Binary Search on Sorted Array ───────── -->
-  <div class="acc open">
-    <div class="acc-hdr" onclick="this.parentElement.classList.toggle('open')">
-      <span>Binary Search on a Sorted Array <span class="acc-day">d21, d22</span></span>
-      <span class="acc-arrow">▼</span>
+  <!-- ─── Binary Search on Sorted Array ─── -->
+  <div class="pat-card">
+    <div class="pat-hdr">
+      <div class="pat-hdr-name">Binary Search on Sorted Array</div>
+      <div class="pat-day">d21, d22</div>
     </div>
-    <div class="acc-body">
-      <div class="sub-label">Signals</div>
-      <p>Array is sorted. Find a position, boundary, target, or a value that could be inserted. Brute O(N) is possible but hint says O(log N). Key test: for any mid, can you discard one half in O(1)?</p>
-
-      <div class="sub-label">Standard skeleton</div>
-      <pre><code>low = 0; high = N - 1; ans = -1;
+    <div class="pat-body">
+      <div class="pat-cols">
+        <div>
+          <span class="sig-label">Signals</span>
+          <ul class="sig-list">
+            <li>Array is sorted; find target, position, or boundary</li>
+            <li>O(log N) required; brute O(N) scan is obvious</li>
+            <li>At any mid: can you tell the answer is left or right in O(1)?</li>
+            <li>Rotated sorted array; peak element; single in paired array</li>
+          </ul>
+        </div>
+        <div>
+          <span class="ske-label">Core Skeleton</span>
+<pre><code>low = 0; high = N - 1; ans = -1;
 while (low &lt;= high) {
     mid = low + (high - low) / 2;
-    if (a[mid] == target)  { ans = mid; break; }     // or: save + keep going
-    else if (a[mid] &lt; target) low  = mid + 1;
-    else                      high = mid - 1;
-}</code></pre>
-
-      <div class="sub-label">Variants and their twists</div>
-      <p><strong>First/last occurrence:</strong> on match, save mid and keep going. For first: <code>high = mid - 1</code>. For last: <code>low = mid + 1</code>. Never return on first match.</p>
-      <p><strong>lower_bound (first index ≥ value):</strong> save mid when <code>a[mid] &gt;= target</code> and move <code>high = mid - 1</code>. At end, check both <code>lb</code> and <code>lb - 1</code> for the closest absolute value.</p>
-      <p><strong>Peak element:</strong> if <code>a[mid] &lt; a[mid+1]</code>, peak is to the right — move <code>low = mid + 1</code>. Otherwise peak is at mid or left — move <code>high = mid - 1</code>, record mid as candidate.</p>
-      <p><strong>Single element in sorted array:</strong> all pairs break pattern at the single. Even index: pair is (i, i+1). If <code>a[mid] == a[mid+1]</code>, single is to the right — <code>low = mid + 2</code>. If <code>a[mid] == a[mid-1]</code>, single is to the left — <code>high = mid - 2</code>. Force mid to be even: adjust if mid is odd.</p>
-      <p><strong>Rotated sorted array:</strong> first determine which half is fully sorted (<code>a[low] &lt;= a[mid]</code> → left is sorted). Check if target is inside that sorted half. If yes, narrow there. If no, search the other half.</p>
-      <p><strong>Matrix median (value-space BS):</strong> search space is [min element, max element]. For each candidate mid, count elements ≤ mid across all rows using binary search per row. Answer is the first candidate where count &gt; N×M/2.</p>
+    if (a[mid] == target)       { ans = mid; break; }
+    else if (a[mid] &lt; target)   low  = mid + 1;
+    else                        high = mid - 1;
+}
+// For FIRST occurrence: on match → ans=mid; high=mid-1  (keep going left)
+// For LAST occurrence:  on match → ans=mid; low=mid+1   (keep going right)</code></pre>
+          <span class="ske-label" style="margin-top:14px;">lower_bound variant</span>
+<pre><code>// First index &gt;= target
+lb = N;
+while (low &lt;= high) {
+    mid = low + (high - low) / 2;
+    if (a[mid] &gt;= target) { lb = mid; high = mid - 1; }
+    else                    low  = mid + 1;
+}
+// Closest value: compare a[lb] and a[lb-1], take smaller |diff|</code></pre>
+        </div>
+      </div>
+      <div class="pat-note">Critical: always <code>low + (high-low)/2</code> not <code>(low+high)/2</code>. Always <code>low &lt;= high</code> not <code>&lt;</code>. Always ±1 on boundaries — never <code>low=mid</code> or <code>high=mid</code>.</div>
     </div>
   </div>
 
-  <!-- ───────── Binary Search on Answer Space ───────── -->
-  <div class="acc">
-    <div class="acc-hdr" onclick="this.parentElement.classList.toggle('open')">
-      <span>Binary Search on Answer Space <span class="acc-day">d23</span></span>
-      <span class="acc-arrow">▼</span>
+  <!-- ─── Binary Search on Answer Space ─── -->
+  <div class="pat-card">
+    <div class="pat-hdr">
+      <div class="pat-hdr-name">Binary Search on Answer Space</div>
+      <div class="pat-day">d23</div>
     </div>
-    <div class="acc-body">
-      <div class="sub-label">Signals</div>
-      <p>"Minimize the maximum" or "maximize the minimum." The answer is a single number (time, cost, distance, length). You can write a yes/no feasibility check for any candidate in O(N). Direct formula doesn't exist — but you can binary search the answer range.</p>
-
-      <div class="sub-label">3 questions to ask before coding</div>
-      <p>
-        1. <strong>What is the search range?</strong> — low = smallest possibly valid answer, high = worst-case valid answer.<br>
-        2. <strong>What does the feasibility check test?</strong> — "Given this candidate, can I satisfy all constraints with the resources allowed?"<br>
-        3. <strong>Which direction do I keep when check passes?</strong> — Minimize-max: go left (try smaller). Maximize-min: go right (try larger).
-      </p>
-
-      <div class="sub-label">Standard skeleton</div>
-      <pre><code>low = min_valid;  high = max_valid;  ans = high;   // or ans = -1 for maximize-min
+    <div class="pat-body">
+      <div class="pat-cols">
+        <div>
+          <span class="sig-label">Signals</span>
+          <ul class="sig-list">
+            <li>"Minimize the maximum" — painters, books, partitions</li>
+            <li>"Maximize the minimum" — aggressive cows, distance</li>
+            <li>The answer is a single number with a known min and max</li>
+            <li>You can write a yes/no check for any candidate in O(N)</li>
+          </ul>
+          <span class="sig-label" style="margin-top:14px;">3 questions to ask</span>
+          <ul class="sig-list">
+            <li><strong>Range?</strong> low = smallest valid answer, high = worst-case answer</li>
+            <li><strong>Feasible returns?</strong> true = candidate works with given resources</li>
+            <li><strong>Direction on success?</strong> minimize-max → go left; maximize-min → go right</li>
+          </ul>
+        </div>
+        <div>
+          <span class="ske-label">Minimize-max Skeleton (painters, books)</span>
+<pre><code>low = max(single element);  // never go below largest item
+high = sum(all elements);   // 1 worker takes everything
+ans = high;
 while (low &lt;= high) {
     mid = low + (high - low) / 2;
-    if (feasible(mid)) {
-        ans  = mid;
-        high = mid - 1;   // minimize-max: try smaller
-        // OR: ans = mid; low = mid + 1;  // maximize-min: try larger
-    } else {
-        low = mid + 1;    // minimize-max: mid too small → go right
-        // OR: high = mid - 1;            // maximize-min: mid too large → go left
-    }
+    if (feasible(mid)) { ans = mid; high = mid - 1; } // try smaller
+    else               { low = mid + 1; }
 }
 return ans;</code></pre>
-
-      <div class="sub-label">Feasibility check skeleton (greedy left-to-right)</div>
-      <pre><code>boolean feasible(int[] items, int workers, long mid) {
+          <span class="ske-label" style="margin-top:14px;">Feasibility Check (greedy)</span>
+<pre><code>boolean feasible(int[] items, int workers, long mid) {
     int used = 1;
-    long current = 0;
+    long curr = 0;
     for (int x : items) {
-        if (current + x &gt; mid) {
-            used++;          // start new worker
-            current = x;
-            if (used &gt; workers) return false;   // early exit INSIDE loop
+        if (curr + x &gt; mid) {
+            used++;              // new worker
+            curr = x;
+            if (used &gt; workers) return false;  // early exit INSIDE loop
         } else {
-            current += x;
+            curr += x;
         }
     }
     return true;
 }</code></pre>
-
-      <div class="sub-label">Per-problem search ranges</div>
-      <p>
-        <strong>Painters partition / Book allocation:</strong> low = max(single element), high = totalSum. Use <code>long</code> for low/high/mid/currentSum.<br>
-        <strong>Aggressive cows (maximize min-gap):</strong> low = 1, high = stalls[last] − stalls[first] (after sort). Feasibility: place next cow only when gap ≥ mid; return true inside loop when all K placed.<br>
-        <strong>maxSubArrayFactor (longest valid window):</strong> low = 0, high = N. Feasibility: sliding window of size mid; return false the moment any window sum &gt; B. On true: ans = mid, go right.
-      </p>
+          <div class="pat-note" style="margin-top:8px;">Maximize-min (cows): on <code>feasible(mid)</code> true → <code>ans=mid; low=mid+1</code>. On false → <code>high=mid-1</code>. Opposite direction from minimize-max.</div>
+        </div>
+      </div>
     </div>
   </div>
 
-  <!-- ───────── Linked List Core ───────── -->
-  <div class="acc">
-    <div class="acc-hdr" onclick="this.parentElement.classList.toggle('open')">
-      <span>Linked List — Dummy Node, Reverse, Delete <span class="acc-day">d24, d25</span></span>
-      <span class="acc-arrow">▼</span>
+  <!-- ─── 3-Pointer Reverse ─── -->
+  <div class="pat-card">
+    <div class="pat-hdr">
+      <div class="pat-hdr-name">Linked List — 3-Pointer Reverse</div>
+      <div class="pat-day">d25</div>
     </div>
-    <div class="acc-body">
-      <div class="sub-label">Dummy node — when and why</div>
-      <p>Use a dummy whenever the head can change (insert at head, delete head, reverse). <code>dummy.next = head</code> makes head-ops identical to mid-list-ops. Return <code>dummy.next</code> as the new head. Never special-case head deletion.</p>
-
-      <div class="sub-label">3-pointer reverse (reverseALinkedListInPlaceInOneIteration)</div>
-      <pre><code>prev = null;  curr = head;  next = null;
+    <div class="pat-body">
+      <div class="pat-cols">
+        <div>
+          <span class="sig-label">Signals</span>
+          <ul class="sig-list">
+            <li>Reverse a linked list in-place, O(1) space</li>
+            <li>Reverse a segment between positions B and C</li>
+            <li>Reverse every K nodes</li>
+          </ul>
+          <span class="sig-label" style="margin-top:14px;">Mental model</span>
+          <ul class="sig-list">
+            <li><strong>save</strong> — capture curr.next before breaking</li>
+            <li><strong>flip</strong> — point curr backward at prev</li>
+            <li><strong>slide prev</strong> — prev advances to curr</li>
+            <li><strong>slide curr</strong> — curr advances to saved next</li>
+            <li>Loop ends when curr is null; prev is new head</li>
+          </ul>
+        </div>
+        <div>
+          <span class="ske-label">Full Reverse</span>
+<pre><code>prev = null;  curr = head;
 while (curr != null) {
-    next      = curr.next;   // 1. save forward link FIRST
-    curr.next = prev;        // 2. flip pointer backward
-    prev      = curr;        // 3. advance prev
-    curr      = next;        // 4. advance curr
+    next      = curr.next;  // 1. SAVE
+    curr.next = prev;       // 2. FLIP
+    prev      = curr;       // 3. SLIDE prev
+    curr      = next;       // 4. SLIDE curr
 }
-return prev;   // new head</code></pre>
-      <p>Memory hook: <strong>save → flip → slide prev → slide curr</strong>. When the loop ends, prev is the new head and curr is null.</p>
-
-      <div class="sub-label">reverseBetween — 4-step process</div>
-      <p>Reverse only nodes at 1-indexed positions B through C.</p>
-      <pre><code>// Step 1: create dummy, walk to node just BEFORE B
-dummy.next = head;
+return prev;  // new head</code></pre>
+          <span class="ske-label" style="margin-top:14px;">reverseBetween (positions B to C)</span>
+<pre><code>dummy.next = head;
 prevNode = dummy;
-for (i = 1; i &lt; B; i++) prevNode = prevNode.next;
+for (i = 1; i &lt; B; i++) prevNode = prevNode.next; // stop at B-1
 
-// Step 2: standard 3-pointer reverse for (C - B + 1) nodes
-curr = prevNode.next;   // node at B
-prev = null;
-for (i = 0; i &lt;= C - B; i++) {
-    next = curr.next;
-    curr.next = prev;
-    prev = curr;
-    curr = next;
+curr = prevNode.next;  prev = null;
+for (i = 0; i &lt;= C - B; i++) {   // reverse C-B+1 nodes
+    next = curr.next; curr.next = prev; prev = curr; curr = next;
 }
-// After loop: prev = node at C (new head), curr = node after C (tail's next)
-
-// Step 3: reconnect — ORDER MATTERS
-prevNode.next.next = curr;   // old B (now tail) → node after C
-prevNode.next = prev;        // node before B → old C (now head)
-
+// ORDER MATTERS: tail first, then head
+prevNode.next.next = curr;   // old-B (tail) → node after C
+prevNode.next      = prev;   // node before B → old-C (new head)
 return dummy.next;</code></pre>
-      <p><strong>Critical order:</strong> tail first, then head. <code>prevNode.next</code> still points to old B (the tail) at step 3a. Once step 3b runs, that reference is overwritten — so if you do 3b first, you lose the tail pointer forever.</p>
-
-      <div class="sub-label">reverseKGroup — recursive structure</div>
-      <pre><code>ListNode reverseKGroup(ListNode head, int k) {
-    // 1. Count k nodes — return as-is if fewer than k remain
+          <span class="ske-label" style="margin-top:14px;">reverseKGroup</span>
+<pre><code>ListNode reverseKGroup(ListNode head, int k) {
     check = head;  count = 0;
-    while (check != null &amp;&amp; count &lt; k) { check = check.next; count++; }
-    if (count &lt; k) return head;
+    while (check != null &amp;&amp; count &lt; k) { check=check.next; count++; }
+    if (count &lt; k) return head;    // &lt; k nodes left → return as-is
 
-    // 2. Reverse exactly k nodes (standard 3-pointer)
     curr = head;  prev = null;
     for (i = 0; i &lt; k; i++) {
-        next = curr.next;  curr.next = prev;  prev = curr;  curr = next;
+        next=curr.next; curr.next=prev; prev=curr; curr=next;
     }
-    // 3. head is now the tail of the reversed segment
-    //    curr is the first node of the remaining list
-    head.next = reverseKGroup(curr, k);   // connect tail to next reversed group
-    return prev;                           // prev is the new head
+    head.next = reverseKGroup(curr, k);  // head is now tail
+    return prev;                          // prev is new head
 }</code></pre>
+        </div>
+      </div>
+    </div>
+  </div>
 
-      <div class="sub-label">deleteNode — copy-next trick (no predecessor available)</div>
-      <pre><code>node.val  = node.next.val;        // copy value from the next node
-node.next = node.next.next;       // skip the next node</code></pre>
-      <p>This effectively "erases" node.next by overwriting node's value. Works only if node is not the tail. Creating a new node and swapping references won't work — external pointers still hold the old node's address.</p>
-
-      <div class="sub-label">removeNthFromEnd — two-pointer gap pattern (optimal)</div>
-      <pre><code>// Optimal O(N) single-pass:
-dummy.next = head;
-fast = dummy;  slow = dummy;
-for (i = 0; i &lt; N; i++) fast = fast.next;   // advance fast N steps
-while (fast.next != null) { fast = fast.next; slow = slow.next; }
-slow.next = slow.next.next;   // delete Nth from end
+  <!-- ─── Linked List Utilities ─── -->
+  <div class="pat-card">
+    <div class="pat-hdr">
+      <div class="pat-hdr-name">Linked List — Dummy Node, Delete, Remove-Nth</div>
+      <div class="pat-day">d24, d25</div>
+    </div>
+    <div class="pat-body">
+      <div class="pat-cols">
+        <div>
+          <span class="sig-label">Dummy Node</span>
+          <ul class="sig-list">
+            <li>Head might change (insert at head, delete head)</li>
+            <li>Makes head ops identical to mid-list ops</li>
+            <li>Always return <code>dummy.next</code> — never return original head</li>
+          </ul>
+          <span class="sig-label" style="margin-top:14px;">deleteNode (no predecessor)</span>
+          <ul class="sig-list">
+            <li>Copy next node's value into this node</li>
+            <li>Skip next node via <code>node.next = node.next.next</code></li>
+            <li>Works only if node is not the tail</li>
+          </ul>
+          <span class="sig-label" style="margin-top:14px;">removeNthFromEnd</span>
+          <ul class="sig-list">
+            <li>Fast starts N steps ahead of slow</li>
+            <li>Both advance until <code>fast.next == null</code></li>
+            <li>Slow is now at the predecessor — skip next</li>
+          </ul>
+        </div>
+        <div>
+          <span class="ske-label">Dummy Node Pattern</span>
+<pre><code>dummy.next = head;
+prev = dummy;  curr = head;
+while (curr != null) {
+    if (shouldDelete(curr)) prev.next = curr.next;
+    else                    prev = curr;
+    curr = curr.next;
+}
 return dummy.next;</code></pre>
-      <p>When fast reaches the last node, slow is exactly N steps behind — pointing to the predecessor of the node to delete.</p>
-
-      <div class="sub-label">deleteDuplicates — in-place vs new list</div>
-      <p>In-place (O(1) space): when <code>curr.val == curr.next.val</code>, do <code>curr.next = curr.next.next</code>. Do NOT advance curr — the new next might also be a duplicate. Advance curr only when the value changes.</p>
+          <span class="ske-label" style="margin-top:14px;">deleteNode trick</span>
+<pre><code>node.val  = node.next.val;       // overwrite with next's value
+node.next = node.next.next;      // skip next node</code></pre>
+          <span class="ske-label" style="margin-top:14px;">removeNthFromEnd — two-pointer</span>
+<pre><code>dummy.next = head;
+fast = dummy;  slow = dummy;
+for (i = 0; i &lt; n; i++) fast = fast.next;  // gap of N
+while (fast.next != null) {
+    fast = fast.next;
+    slow = slow.next;
+}
+slow.next = slow.next.next;  // delete N-th from end
+return dummy.next;</code></pre>
+        </div>
+      </div>
     </div>
   </div>
 
-  <!-- ───────── Copy List with Random Pointer ───────── -->
-  <div class="acc">
-    <div class="acc-hdr" onclick="this.parentElement.classList.toggle('open')">
-      <span>Clone List with Random Pointer — 2-Pass HashMap <span class="acc-day">d25</span></span>
-      <span class="acc-arrow">▼</span>
+  <!-- ─── Clone Random List ─── -->
+  <div class="pat-card">
+    <div class="pat-hdr">
+      <div class="pat-hdr-name">Clone List with Random Pointer — 2-Pass HashMap</div>
+      <div class="pat-day">d25</div>
     </div>
-    <div class="acc-body">
-      <div class="sub-label">Why a HashMap</div>
-      <p>The random pointer can target any node anywhere in the list. When wiring the clone's random pointer, you need instant access to the clone of an arbitrary original node. HashMap gives O(1) lookup: <code>original → clone</code>.</p>
-
-      <div class="sub-label">Skeleton</div>
-      <pre><code>// Pass 1: create all clones, build map (values only — no links yet)
-Map&lt;Node, Node&gt; store = new HashMap&lt;&gt;();
+    <div class="pat-body">
+      <div class="pat-cols">
+        <div>
+          <span class="sig-label">Signals</span>
+          <ul class="sig-list">
+            <li>Deep-clone a list where each node has a random pointer to any node</li>
+            <li>Random pointer can target any position — can't wire in one pass</li>
+          </ul>
+          <span class="sig-label" style="margin-top:14px;">Why 2 passes</span>
+          <ul class="sig-list">
+            <li>Pass 1: create all clones (values only, no links yet)</li>
+            <li>Pass 2: wire next and random using map lookups</li>
+            <li><code>map.get(null)</code> returns null — no null checks needed</li>
+            <li>Never write <code>clone.next = curr.next</code> — that points to the original</li>
+          </ul>
+        </div>
+        <div>
+          <span class="ske-label">Skeleton</span>
+<pre><code>// Pass 1: build original → clone map
+Map&lt;Node, Node&gt; map = new HashMap&lt;&gt;();
 curr = head;
 while (curr != null) {
-    store.put(curr, new Node(curr.val));
+    map.put(curr, new Node(curr.val));
     curr = curr.next;
 }
-
-// Pass 2: wire next and random using map lookups
+// Pass 2: wire links through the map
 curr = head;
 while (curr != null) {
-    store.get(curr).next   = store.get(curr.next);    // null-key safe
-    store.get(curr).random = store.get(curr.random);  // null-key safe
+    map.get(curr).next   = map.get(curr.next);    // null-safe
+    map.get(curr).random = map.get(curr.random);  // null-safe
     curr = curr.next;
 }
-return store.get(head);</code></pre>
-      <p><strong>Null-safe:</strong> <code>HashMap.get(null)</code> returns null (does not throw). So <code>store.get(curr.next)</code> when curr.next is null safely returns null — no explicit null check needed.</p>
-      <p><strong>Wrong pattern:</strong> <code>clone.next = curr.next</code> points the clone's next to the <em>original</em> node, not another clone. Always go through the map.</p>
+return map.get(head);</code></pre>
+        </div>
+      </div>
     </div>
   </div>
 
-  <!-- ───────── Stack ───────── -->
-  <div class="acc">
-    <div class="acc-hdr" onclick="this.parentElement.classList.toggle('open')">
-      <span>Stack — Matching, Evaluation, Cancellation <span class="acc-day">d26</span></span>
-      <span class="acc-arrow">▼</span>
+  <!-- ─── Stack ─── -->
+  <div class="pat-card">
+    <div class="pat-hdr">
+      <div class="pat-hdr-name">Stack — Match, Evaluate, Cancel</div>
+      <div class="pat-day">d26</div>
     </div>
-    <div class="acc-body">
-      <div class="sub-label">Signals</div>
-      <p>Pairs that must open and close in order (brackets). Postfix expression evaluation. Adjacent elements that cancel (double char trouble). You need the most recently seen unprocessed item.</p>
-
-      <div class="sub-label">Skeleton</div>
-      <p>Walk left to right. On opening/value → push. On closing/operator → pop and process. After the full pass, an empty stack means everything balanced. Always check <code>isEmpty()</code> before pop/peek. For postfix: pop two operands, apply operator, push result back.</p>
-
-      <div class="sub-label">Redundant braces variant</div>
-      <p>Push all characters. On <code>)</code>: pop until <code>(</code>; track whether any operator (+−×÷) was seen among the popped items. No operator found → those braces are redundant. Track the flag <em>inside</em> the pop loop.</p>
+    <div class="pat-body">
+      <div class="pat-cols">
+        <div>
+          <span class="sig-label">Signals</span>
+          <ul class="sig-list">
+            <li>Open-close pairs must match in order (brackets, braces)</li>
+            <li>Postfix expression — operands come before operators</li>
+            <li>Adjacent identical elements cancel each other</li>
+            <li>Need the most recently seen unprocessed item</li>
+          </ul>
+          <span class="sig-label" style="margin-top:14px;">Rules</span>
+          <ul class="sig-list">
+            <li>Check <code>isEmpty()</code> before every pop and peek — always</li>
+            <li>Postfix order: pop b first, then a; apply <code>a op b</code></li>
+            <li>Empty stack at end = valid / fully matched</li>
+          </ul>
+        </div>
+        <div>
+          <span class="ske-label">Balanced Parentheses</span>
+<pre><code>for (char c : s.toCharArray()) {
+    if (isOpen(c))  stack.push(c);
+    else {
+        if (stack.isEmpty()) return false;   // no match
+        if (stack.pop() != matchOf(c)) return false;
+    }
+}
+return stack.isEmpty();</code></pre>
+          <span class="ske-label" style="margin-top:14px;">Postfix Evaluation</span>
+<pre><code>for (String token : tokens) {
+    if (isOperator(token)) {
+        int b = stack.pop(), a = stack.pop();
+        stack.push(apply(a, b, token));   // a op b, not b op a
+    } else {
+        stack.push(Integer.parseInt(token));
+    }
+}
+return stack.pop();</code></pre>
+          <span class="ske-label" style="margin-top:14px;">Redundant Braces</span>
+<pre><code>for (char c : s.toCharArray()) {
+    if (c == ')') {
+        boolean hasOp = false;
+        while (stack.peek() != '(') {
+            hasOp |= isOperator(stack.peek());
+            stack.pop();
+        }
+        stack.pop();   // remove '('
+        if (!hasOp) return true;  // redundant
+    } else stack.push(c);
+}</code></pre>
+        </div>
+      </div>
     </div>
   </div>
 
-  <!-- ───────── Monotonic Stack ───────── -->
-  <div class="acc">
-    <div class="acc-hdr" onclick="this.parentElement.classList.toggle('open')">
-      <span>Monotonic Stack — Nearest Smaller / Greater <span class="acc-day">d27</span></span>
-      <span class="acc-arrow">▼</span>
+  <!-- ─── Monotonic Stack ─── -->
+  <div class="pat-card">
+    <div class="pat-hdr">
+      <div class="pat-hdr-name">Monotonic Stack — Nearest Smaller / Greater</div>
+      <div class="pat-day">d27</div>
     </div>
-    <div class="acc-body">
-      <div class="sub-label">Signals</div>
-      <p>"For each element, find the nearest to its left/right that is smaller/greater." Rectangle areas or contributions bounded by the nearest boundary element. The answer for each index depends on the first element that breaks a monotone order.</p>
-
-      <div class="sub-label">Skeleton — next smaller to the right</div>
-      <pre><code>Deque&lt;Integer&gt; stack = new ArrayDeque&lt;&gt;();   // stores indices
-int[] result = new int[N];
-Arrays.fill(result, -1);    // default: no smaller to the right
-
+    <div class="pat-body">
+      <div class="pat-cols">
+        <div>
+          <span class="sig-label">Signals</span>
+          <ul class="sig-list">
+            <li>"For each element, nearest smaller/greater to left or right"</li>
+            <li>Rectangle areas; contribution bounded by nearest boundary</li>
+            <li>Answer for each index depends on first element that breaks order</li>
+          </ul>
+          <span class="sig-label" style="margin-top:14px;">Key rules</span>
+          <ul class="sig-list">
+            <li>Push <strong>indices</strong> not values — need distance, not just value</li>
+            <li>Pop while top violates the order you want to maintain</li>
+            <li>Each popped index found its answer: the current element i</li>
+            <li>Remaining in stack at end → no answer on that side (use 0 or N)</li>
+          </ul>
+        </div>
+        <div>
+          <span class="ske-label">Next Smaller to the Right</span>
+<pre><code>int[] nsr = new int[N];
+Arrays.fill(nsr, N);          // default: no smaller to right
+Deque&lt;Integer&gt; stack = new ArrayDeque&lt;&gt;();
 for (int i = 0; i &lt; N; i++) {
     while (!stack.isEmpty() &amp;&amp; a[stack.peek()] &gt; a[i]) {
-        result[stack.pop()] = i;   // i is the next smaller for that index
+        nsr[stack.pop()] = i; // i is the next smaller for that index
     }
     stack.push(i);
-}
-// stack still has indices with no smaller to the right → result stays -1</code></pre>
-      <p>Push <strong>indices</strong>, not values. The value at popped index j found its answer at i. Distance = i − j if needed.</p>
-
-      <div class="sub-label">Largest rectangle in histogram</div>
-      <p>For each bar, find NSL (next smaller left) and NSR (next smaller right) using monotonic stack. Width = NSR[i] − NSL[i] − 1. Area = height[i] × width. Track max.</p>
-    </div>
-  </div>
-
-  <!-- ───────── Deque Sliding Window ───────── -->
-  <div class="acc">
-    <div class="acc-hdr" onclick="this.parentElement.classList.toggle('open')">
-      <span>Queue / Deque — Sliding Window Max <span class="acc-day">d28</span></span>
-      <span class="acc-arrow">▼</span>
-    </div>
-    <div class="acc-body">
-      <div class="sub-label">Signals</div>
-      <p>Fixed-size window slides across an array. Need max or min at each position. Elements expire after a fixed number of steps.</p>
-
-      <div class="sub-label">Skeleton — sliding window maximum</div>
-      <pre><code>Deque&lt;Integer&gt; dq = new ArrayDeque&lt;&gt;();   // stores indices, front = current max index
-for (int i = 0; i &lt; N; i++) {
-    // remove back while current element is ≥ back (back is useless)
-    while (!dq.isEmpty() &amp;&amp; a[dq.peekLast()] &lt;= a[i]) dq.pollLast();
-    dq.addLast(i);
-    // remove front if it's outside the window
-    if (dq.peekFirst() &lt; i - K + 1) dq.pollFirst();
-    // front is the window's max
-    if (i &gt;= K - 1) result[i - K + 1] = a[dq.peekFirst()];
 }</code></pre>
-      <p>Deque stores indices in decreasing order of their values. Front is always the maximum of the current window.</p>
+          <span class="ske-label" style="margin-top:14px;">Largest Rectangle in Histogram</span>
+<pre><code>// Find NSL and NSR for each bar using two monotonic stack passes
+// Width = nsr[i] - nsl[i] - 1
+// Area  = height[i] * width
+// Track max area across all bars</code></pre>
+          <div class="pat-note" style="margin-top:8px;">For NSL (prev smaller left): iterate right-to-left, or iterate left-to-right and pop while top ≥ current — the element remaining in stack is the answer for each index.</div>
+        </div>
+      </div>
     </div>
   </div>
 
-  <!-- ───────── Tree Recursion / DFS ───────── -->
-  <div class="acc">
-    <div class="acc-hdr" onclick="this.parentElement.classList.toggle('open')">
-      <span>Tree Recursion / DFS <span class="acc-day">d29, d30</span></span>
-      <span class="acc-arrow">▼</span>
+  <!-- ─── Deque Sliding Window ─── -->
+  <div class="pat-card">
+    <div class="pat-hdr">
+      <div class="pat-hdr-name">Deque — Sliding Window Maximum</div>
+      <div class="pat-day">d28</div>
     </div>
-    <div class="acc-body">
-      <div class="sub-label">Signals</div>
-      <p>Same logic applies at every subtree. Answer = combine(left result, right result, current node). Path problems, subtree sums, structural checks (balanced, symmetric, equal partition).</p>
+    <div class="pat-body">
+      <div class="pat-cols">
+        <div>
+          <span class="sig-label">Signals</span>
+          <ul class="sig-list">
+            <li>Fixed-size window slides; need max (or min) at each position</li>
+            <li>Elements expire after K steps; need oldest/best efficiently</li>
+          </ul>
+          <span class="sig-label" style="margin-top:14px;">Invariant</span>
+          <ul class="sig-list">
+            <li>Deque stores indices in decreasing order of their values</li>
+            <li>Front = index of window maximum</li>
+            <li>Remove back when current ≥ back (back is useless — current is better and lasts longer)</li>
+            <li>Remove front when its index is outside the window</li>
+          </ul>
+        </div>
+        <div>
+          <span class="ske-label">Sliding Window Maximum</span>
+<pre><code>Deque&lt;Integer&gt; dq = new ArrayDeque&lt;&gt;();
+int[] result = new int[N - K + 1];
+for (int i = 0; i &lt; N; i++) {
+    // remove back while current is &gt;= back (useless)
+    while (!dq.isEmpty() &amp;&amp; a[dq.peekLast()] &lt;= a[i])
+        dq.pollLast();
+    dq.addLast(i);
+    // expire front if outside window
+    if (dq.peekFirst() &lt; i - K + 1)
+        dq.pollFirst();
+    // record result once first full window is formed
+    if (i &gt;= K - 1)
+        result[i - K + 1] = a[dq.peekFirst()];
+}</code></pre>
+        </div>
+      </div>
+    </div>
+  </div>
 
-      <div class="sub-label">Standard skeleton</div>
-      <pre><code>int solve(TreeNode node) {
-    if (node == null) return NEUTRAL;   // 0 for sums, true for checks, etc.
+  <!-- ─── Tree DFS ─── -->
+  <div class="pat-card">
+    <div class="pat-hdr">
+      <div class="pat-hdr-name">Tree Recursion / DFS</div>
+      <div class="pat-day">d29, d30</div>
+    </div>
+    <div class="pat-body">
+      <div class="pat-cols">
+        <div>
+          <span class="sig-label">Signals</span>
+          <ul class="sig-list">
+            <li>Same logic applies at every subtree</li>
+            <li>answer = combine(left result, right result, node)</li>
+            <li>Path sums, subtree sums, structural checks (balanced, equal partition)</li>
+          </ul>
+          <span class="sig-label" style="margin-top:14px;">Sentinel pattern (isBalanced)</span>
+          <ul class="sig-list">
+            <li>Return actual height normally; return -1 on unbalanced</li>
+            <li>Every call checks <code>if (left == -1 || right == -1) return -1</code> before computing own height</li>
+            <li>Never use the value if it is the sentinel</li>
+          </ul>
+        </div>
+        <div>
+          <span class="ske-label">Standard DFS Skeleton</span>
+<pre><code>int solve(TreeNode node) {
+    if (node == null) return NEUTRAL;    // 0 for sum, true for checks
     int left  = solve(node.left);
     int right = solve(node.right);
-    // check for failure sentinel before combining (e.g. isBalanced returns -1)
+    // check sentinel BEFORE combining
     if (left == SENTINEL || right == SENTINEL) return SENTINEL;
     return combine(left, right, node.val);
 }</code></pre>
-
-      <div class="sub-label">isBalanced — sentinel pattern</div>
-      <p>Return actual height normally. Return -1 when unbalanced. Every recursive call checks: <code>if (left == -1 || right == -1) return -1</code> before computing own height. Do NOT check the sentinel after the fact — check before using the value.</p>
-
-      <div class="sub-label">Build tree from inorder + pre/postorder</div>
-      <p>Preorder[0] (or postorder[last]) is always the root. Find that root in inorder — everything to its left is the left subtree, everything to its right is the right subtree. The count of elements in the left subtree from inorder controls <em>all</em> index slicing for the recursive calls.</p>
+          <span class="ske-label" style="margin-top:14px;">Build Tree from Inorder + Preorder</span>
+<pre><code>TreeNode build(int[] pre, int ps, int pe,
+               int[] in,  int is, int ie,
+               Map&lt;Integer,Integer&gt; inMap) {
+    if (ps &gt; pe) return null;
+    int rootVal = pre[ps];
+    int k = inMap.get(rootVal);       // root position in inorder
+    int leftCount = k - is;
+    TreeNode root = new TreeNode(rootVal);
+    root.left  = build(pre, ps+1,          ps+leftCount,  in, is,   k-1, inMap);
+    root.right = build(pre, ps+leftCount+1, pe,           in, k+1,  ie,  inMap);
+    return root;
+}</code></pre>
+        </div>
+      </div>
     </div>
   </div>
 
-  <!-- ───────── BST ───────── -->
-  <div class="acc">
-    <div class="acc-hdr" onclick="this.parentElement.classList.toggle('open')">
-      <span>BST — Search, Validate, Build <span class="acc-day">d31</span></span>
-      <span class="acc-arrow">▼</span>
+  <!-- ─── BST ─── -->
+  <div class="pat-card">
+    <div class="pat-hdr">
+      <div class="pat-hdr-name">BST — Search, Validate, Build</div>
+      <div class="pat-day">d31</div>
     </div>
-    <div class="acc-body">
-      <div class="sub-label">Signals</div>
-      <p>Tree has left &lt; root &lt; right ordering. Search in O(log N) average. Validate ordering. Build balanced structure from sorted input.</p>
-
-      <div class="sub-label">Search</div>
-      <pre><code>TreeNode search(TreeNode root, int val) {
+    <div class="pat-body">
+      <div class="pat-cols">
+        <div>
+          <span class="sig-label">Signals</span>
+          <ul class="sig-list">
+            <li>Tree with left &lt; root &lt; right property</li>
+            <li>Search in O(log N) average — discard half at each level</li>
+            <li>Validate BST ordering; build balanced from sorted array</li>
+          </ul>
+          <span class="sig-label" style="margin-top:14px;">Key points</span>
+          <ul class="sig-list">
+            <li>Validate with <code>long</code> bounds — nodes can hold Integer.MIN/MAX_VALUE</li>
+            <li>Build: always mid as root → guarantees balanced height</li>
+            <li>Inorder of valid BST = sorted ascending — use this as a check</li>
+          </ul>
+        </div>
+        <div>
+          <span class="ske-label">Search</span>
+<pre><code>TreeNode search(TreeNode root, int val) {
     if (root == null || root.val == val) return root;
-    return val &lt; root.val ? search(root.left, val) : search(root.right, val);
+    return val &lt; root.val
+        ? search(root.left, val)
+        : search(root.right, val);
 }</code></pre>
-
-      <div class="sub-label">Validate — bound propagation</div>
-      <pre><code>boolean isValid(TreeNode node, long min, long max) {
+          <span class="ske-label" style="margin-top:14px;">Validate — Bound Propagation</span>
+<pre><code>boolean isValid(TreeNode node, long min, long max) {
     if (node == null) return true;
     if (node.val &lt;= min || node.val &gt;= max) return false;
-    return isValid(node.left, min, node.val)
+    return isValid(node.left,  min,      node.val)
         &amp;&amp; isValid(node.right, node.val, max);
 }
-// initial call: isValid(root, Long.MIN_VALUE, Long.MAX_VALUE)</code></pre>
-      <p>Use <code>long</code> bounds — nodes can hold <code>Integer.MIN/MAX_VALUE</code>, and int bounds cannot express "less than MIN" or "greater than MAX".</p>
-
-      <div class="sub-label">Build balanced BST from sorted array</div>
-      <pre><code>TreeNode convert(int[] a, int lo, int hi) {
+// call: isValid(root, Long.MIN_VALUE, Long.MAX_VALUE)</code></pre>
+          <span class="ske-label" style="margin-top:14px;">Build Balanced BST from Sorted Array</span>
+<pre><code>TreeNode convert(int[] a, int lo, int hi) {
     if (lo &gt; hi) return null;
     int mid = lo + (hi - lo) / 2;
     TreeNode root = new TreeNode(a[mid]);
-    root.left  = convert(a, lo, mid - 1);
-    root.right = convert(a, mid + 1, hi);
+    root.left  = convert(a, lo,    mid - 1);
+    root.right = convert(a, mid+1, hi);
     return root;
 }
-// initial call: convert(a, 0, a.length - 1)</code></pre>
-      <p>Always pick mid as root. This ensures left and right subtrees differ in size by at most 1, keeping the tree balanced.</p>
+// call: convert(a, 0, a.length - 1)</code></pre>
+        </div>
+      </div>
     </div>
   </div>
 
