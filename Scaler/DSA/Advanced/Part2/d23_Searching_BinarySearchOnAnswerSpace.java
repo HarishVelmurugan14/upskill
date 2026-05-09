@@ -20,22 +20,22 @@ public class d23_Searching_BinarySearchOnAnswerSpace {
 
         // Call Stack
         d23_Searching_BinarySearchOnAnswerSpace d23SearchingBinarySearchOnAnswerSpace = new d23_Searching_BinarySearchOnAnswerSpace();
-//        int[] boards = {3, 5, 1, 7, 8, 2, 5, 3};
-//        int paintersAvailable = 3;
-//        int timeTakenForOneUnit = 2;
-//        d23SearchingBinarySearchOnAnswerSpace.paintersPartitionMinimumTimeToPaint(paintersAvailable, timeTakenForOneUnit, boards); // Q1
-//        d23SearchingBinarySearchOnAnswerSpace.isPaintingCompletionPossible(boards, 23, paintersAvailable);
-//
-//        int[] cowStalls = {2, 6, 11, 14, 19, 25, 30, 39, 43};
-//        int cows = 4;
-//
-//        d23SearchingBinarySearchOnAnswerSpace.aggressiveCowsLargestMinDistance(cowStalls, cows); //Q2
-//        d23SearchingBinarySearchOnAnswerSpace.canPlaceCows(cowStalls, cows, 8);
-//
-//        int[] books = new int[]{12, 34, 67, 90};
-//        int students = 2;
-//
-//        d23SearchingBinarySearchOnAnswerSpace.minimumDifferenceBetweenBooksAllotted(books, students); // AQ1
+        int[] boards = {3, 5, 1, 7, 8, 2, 5, 3};
+        int paintersAvailable = 3;
+        int timeTakenForOneUnit = 2;
+        d23SearchingBinarySearchOnAnswerSpace.paintersPartitionMinimumTimeToPaint(paintersAvailable, timeTakenForOneUnit, boards); // Q1
+        d23SearchingBinarySearchOnAnswerSpace.isPaintingCompletionPossible(boards, 23, paintersAvailable);
+
+        int[] cowStalls = {2, 6, 11, 14, 19, 25, 30, 39, 43};
+        int cows = 4;
+
+        d23SearchingBinarySearchOnAnswerSpace.aggressiveCowsLargestMinDistance(cowStalls, cows); //Q2
+        d23SearchingBinarySearchOnAnswerSpace.canPlaceCows(cowStalls, cows, 8);
+
+        int[] books = new int[]{12, 34, 67, 90};
+        int students = 2;
+
+        d23SearchingBinarySearchOnAnswerSpace.minimumDifferenceBetweenBooksAllotted(books, students); // AQ1
 
         int[] nums = new int[]{5, 17, 100, 11};
         int sum = 130;
