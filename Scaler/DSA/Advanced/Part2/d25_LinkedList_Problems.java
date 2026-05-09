@@ -23,6 +23,7 @@ public class d25_LinkedList_Problems {
 
 
         // Call Stack
+        d24_ClassesObjects_LinkedLists d24_classesObjects_linkedLists = new d24_ClassesObjects_LinkedLists();
         d25_LinkedList_Problems d25_linkedList_problems = new d25_LinkedList_Problems();
         ListNode head = d25_linkedList_problems.insertAtHead(null, 7);
         head = d25_linkedList_problems.insertAtHead(head, 7);
@@ -47,6 +48,10 @@ public class d25_LinkedList_Problems {
         d25_linkedList_problems.deleteAtPosition(head, 5); // Q4
 
         d25_linkedList_problems.removeElements(head, 7); // LC203
+
+
+        ListNode headA = d24_classesObjects_linkedLists.createList(new int[]{1, 1, 1, 2, 3, 3, 4, 5, 5, 5, 5, 6});
+        d24_classesObjects_linkedLists.printList(d25_linkedList_problems.deleteDuplicates(headA));
     }
 
     /* Section : ----------------------------------- [ Problems ] ------------------------------------ */
@@ -209,6 +214,39 @@ public class d25_LinkedList_Problems {
             ans.random = newRand;
             current = current.next;
             ans = ans.next;
+        }
+        return res;
+    }
+
+    public ListNode deleteDuplicates(ListNode head) {
+        /*
+         * DELETE DUPLICATES - New list approach (sorted input)
+         *
+         * STRATEGY: Build new list, skip node if val == prevElement
+         *
+         * 1→1→2→3→3→null
+         *   ↓
+         * 1→2→3→null
+         *
+         * prevElement tracks last added val → O(1) duplicate check (works only on sorted list)
+         * resWorker   tracks tail of new list for O(1) append
+         *
+         * NOTE: in-place alternative → curr.next = curr.next.next (no extra space)
+         *
+         * Time: O(N)  Space: O(N)
+         */
+        ListNode res = new ListNode(head.val);
+        ListNode resWorker = res;
+        int prevElement = head.val;
+        head = head.next;
+
+        while (head != null) {
+            if (head.val != prevElement) {
+                prevElement = head.val;
+                resWorker.next = new ListNode(head.val);
+                resWorker = resWorker.next;
+            }
+            head = head.next;
         }
         return res;
     }
