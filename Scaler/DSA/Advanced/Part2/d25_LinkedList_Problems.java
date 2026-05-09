@@ -36,31 +36,37 @@ public class d25_LinkedList_Problems {
         head = d25_linkedList_problems.insertAtHead(head, 6);
 
         d25_linkedList_problems.printALinkedList(head);
-        d25_linkedList_problems.reverseALinkedListInPlaceInOneIteration(head); // Q1
+        d25_linkedList_problems.reverseALinkedListInPlaceInOneIteration(head); // Q1 // LC206
 
         RandomListNode head1 = d25_linkedList_problems.createList(new int[]{1, 2, 3, 4, 5});
         d25_linkedList_problems.setRandomPointers(head1, new int[]{2, 0, 4, -1, 1});
         d25_linkedList_problems.printList(head1);
-        RandomListNode cloned = d25_linkedList_problems.copyRandomList(head1); //Q2
+        RandomListNode cloned = d25_linkedList_problems.copyRandomList(head1); //Q2 // LC138
         d25_linkedList_problems.printList(cloned);
 
         d25_linkedList_problems.insertAtPosition(head, 3, 5); // Q3
         d25_linkedList_problems.deleteAtPosition(head, 5); // Q4
 
         d25_linkedList_problems.removeElements(head, 7); // LC203
+        d25_linkedList_problems.deleteNode(head); // LC237
 
 
         ListNode headA = d24_classesObjects_linkedLists.createList(new int[]{1, 1, 1, 2, 3, 3, 4, 5, 5, 5, 5, 6});
-        d25_linkedList_problems.deleteDuplicates(headA); // AQ1
+        d25_linkedList_problems.deleteDuplicates(headA); // AQ1 // LC83
 
         ListNode headB = d24_classesObjects_linkedLists.createList(new int[]{1, 1, 1, 2, 3, 3, 4, 5, 5, 5, 5, 6, 7, 9, 11});
-        d25_linkedList_problems.removeNthFromEnd(headB, 4); // AQ2
+        d25_linkedList_problems.removeNthFromEnd(headB, 4); // AQ2 // LC19
 
-        d25_linkedList_problems.reverseBetween(head, 2, 4); // AQ3
-        d25_linkedList_problems.reverseList(head, 2); // AQ4
+        d25_linkedList_problems.reverseBetween(head, 2, 4); // AQ3 // LC92
+        d25_linkedList_problems.reverseKGroup(head, 2); // AQ4 // LC25
     }
 
     /* Section : ----------------------------------- [ Problems ] ------------------------------------ */
+
+    public void deleteNode(ListNode node) {
+        node.val = node.next.val;
+        node.next = node.next.next;
+    }
 
     public static void printALinkedList(ListNode head) {
         ListNode temp = head;
@@ -241,6 +247,8 @@ public class d25_LinkedList_Problems {
          *
          * Time: O(N)  Space: O(N)
          */
+
+        if (head == null) return null;
         ListNode res = new ListNode(head.val);
         ListNode resWorker = res;
         int prevElement = head.val;
@@ -365,43 +373,31 @@ public class d25_LinkedList_Problems {
         return dummy.next;
     }
 
-    public ListNode reverseList(ListNode A, int B) {
+    public ListNode reverseKGroup(ListNode head, int k) {
+        if (head == null) return null;
 
-        /*
-         * REVERSE LINKED LIST IN K-GROUPS - Recursive
-         *
-         * STRATEGY: reverse B nodes, recurse on remaining
-         *
-         * EXAMPLE: 1→2→3→4→5, B=2
-         *   reverse [1,2] → 2→1, A(tail)=1
-         *   recurse  [3,4,5] → reverse [3,4] → 4→3, recurse [5] → 5
-         *   1.next = 4→3→5
-         *   result: 2→1→4→3→5
-         *
-         * POINTERS:
-         *   prev = new head of reversed group
-         *   A    = tail of reversed group → connects to next recursion
-         *   curr = start of next group
-         *
-         * Time: O(N)  Space: O(N/B) recursion stack
-         */
-        if (A == null) return null;
-
-        ListNode curr = A;
-        ListNode prev = null;
+        // check if k nodes exist
+        ListNode check = head;
         int count = 0;
+        while (check != null && count < k) {
+            check = check.next;
+            count++;
+        }
+        if (count < k) return head; // ✅ less than k nodes, return as is
 
-        // reverse B nodes
-        while (curr != null && count < B) {
+        // reverse k nodes
+        ListNode curr = head;
+        ListNode prev = null;
+
+        for (int i = 0; i < k; i++) {
             ListNode next = curr.next;
             curr.next = prev;
             prev = curr;
             curr = next;
-            count++;
         }
 
-        // A is now tail, connect to rest
-        A.next = reverseList(curr, B);
+        // head is now tail, connect to rest
+        head.next = reverseKGroup(curr, k);
 
         // prev is new head
         return prev;
