@@ -142,6 +142,26 @@ public class d23_Searching_BinarySearchOnAnswerSpace {
     public int aggressiveCowsLargestMinDistance(int[] A, int B) {
         Arrays.sort(A); // Step 1: Sort stall locations
 
+        /*
+         * AGGRESSIVE COWS - Binary search on answer
+         *
+         * GOAL: Place B cows in stalls such that minimum distance between any two cows is maximized.
+         *
+         * SEARCH SPACE:
+         *   left  = 1                    → minimum possible distance
+         *   right = A[last] - A[first]   → maximum possible distance (after sorting)
+         *
+         * BINARY SEARCH:
+         *   mid = candidate minDistance
+         *   canPlaceCows(mid) → true  : store result, try larger → left  = mid+1
+         *                     → false : too large, shrink        → right = mid-1
+         *
+         * canPlaceCows: greedy left-to-right, place cow when gap >= minDist
+         *               count == B inside loop → early exit
+         *
+         * Time: O(N log(max-min))  Space: O(1)
+         */
+
         int left = 1, right = A[A.length - 1] - A[0], result = 0;
 
         while (left <= right) {
