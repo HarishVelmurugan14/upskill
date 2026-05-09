@@ -27,9 +27,9 @@ public class d26_Stacks1_BasicProblems {
 
         ArrayList<String> A = new ArrayList<>(Arrays.asList("2", "1", "+", "3", "*"));
         d26_Stacks1_BasicProblems.postFixExpression(A); // Q1 // LC150
-        d26_Stacks1_BasicProblems.balancedParenthesis("{()()()}({");
-        d26_Stacks1_BasicProblems.doubleCharacterTrouble("abccbc");
-        d26_Stacks1_BasicProblems.passingGameOfBall(10, 48, new int[]{4, 0, 30, 0, 41, 28, 50, 2, 47, 39});
+        d26_Stacks1_BasicProblems.balancedParenthesis("{()()()}({"); // Q2 // LC20
+        d26_Stacks1_BasicProblems.doubleCharacterTrouble("abccbc"); // Q3 // LC1047
+        d26_Stacks1_BasicProblems.passingGameOfBall(10, 48, new int[]{4, 0, 30, 0, 41, 28, 50, 2, 47, 39}); // Q4 // LC1472 Similar leetcode
 
     }
 
@@ -123,6 +123,27 @@ public class d26_Stacks1_BasicProblems {
         Refer to the examples for more clarity.
         */
 
+        /*
+         * BALANCED PARENTHESIS - Stack
+         *
+         * STRATEGY: open bracket → push | close bracket → pop and check match
+         *           mismatch or empty stack on close → invalid
+         *           stack not empty at end → invalid
+         *
+         * EXAMPLE: "{[()]}"
+         *   push {  → [{]
+         *   push [  → [{,[]
+         *   push (  → [{,[,(]
+         *   )  → pop ( → match ✓
+         *   ]  → pop [ → match ✓
+         *   }  → pop { → match ✓
+         *   stack empty → return 1
+         *
+         * PAIRS: ( ) | [ ] | { }
+         *
+         * Time: O(N)  Space: O(N)
+         */
+
         char[] array = A.toCharArray();
         int N = array.length;
         if ((N & 1) != 0) {
@@ -180,18 +201,34 @@ public class d26_Stacks1_BasicProblems {
         Return the ID of the player who currently possesses the ball.
           */
 
+        /*
+         * FOOTBALL PASSING - Stack
+         *
+         * STRATEGY: forward pass → push to stack | back pass(0) → pop from stack
+         *
+         * EXAMPLE: start=1, passes=[2,3,0,4]
+         *   push 2 → [1,2]   (1 passed to 2)
+         *   push 3 → [1,2,3] (2 passed to 3)
+         *   0      → pop 3   [1,2]  (3 passes back to 2)
+         *   push 4 → [1,2,4] (2 passed to 4)
+         *   return stack.peek() = 4
+         *
+         * INIT: push starting player id before processing passes
+         * BACK PASS: stack.pop() removes current, peek() gives previous holder
+         *
+         * Time: O(N)  Space: O(N)
+         */
         Stack<Integer> stack = new Stack<>();
-        int currentPlayer = B;
         stack.push(B);
+        int currentPlayer = B;
+
         for (int i = 0; i < A; i++) {
-            int newPlayer = C[i];
-            if (newPlayer == 0) {
-                stack.pop();
-                currentPlayer = stack.pop();
-                stack.push(currentPlayer);
+            if (C[i] == 0) {
+                stack.pop();                  // current leaves
+                currentPlayer = stack.peek(); // previous resumes
             } else {
-                currentPlayer = newPlayer;
-                stack.push(newPlayer);
+                currentPlayer = C[i];
+                stack.push(C[i]);            // new player takes over
             }
         }
         return currentPlayer;

@@ -151,15 +151,20 @@
     <div class="sec-title">d26 — Stacks Basics</div>
     <div class="tbl-wrap">
       <table>
-        <thead><tr><th>Operation</th><th>Time</th><th>Space</th></tr></thead>
+        <thead><tr><th>Method</th><th>Time</th><th>Space</th></tr></thead>
         <tbody>
-          <tr><td>all stack-based methods</td><td class="c-time">O(N)</td><td class="c-space">O(N)</td></tr>
+          <tr><td><code>postFixExpression</code></td><td class="c-time">O(N)</td><td class="c-space">O(N)</td></tr>
+          <tr><td><code>balancedParenthesis</code></td><td class="c-time">O(N)</td><td class="c-space">O(N)</td></tr>
+          <tr><td><code>doubleCharacterTrouble</code></td><td class="c-time">O(N)</td><td class="c-space">O(N)</td></tr>
+          <tr><td><code>passingGameOfBall</code></td><td class="c-time">O(A)</td><td class="c-space">O(A)</td></tr>
+          <tr><td><code>redundantBracesUnecessaryBraces</code></td><td class="c-time">O(N)</td><td class="c-space">O(N)</td></tr>
+          <tr><td><code>minAddToMakeParanthesisValid</code></td><td class="c-time">O(N)</td><td class="c-space">O(N)</td></tr>
         </tbody>
       </table>
     </div>
     <div class="why-box">
-      <div class="why-label">Why O(N) time and O(N) space</div>
-      <p>Every element enters the stack at most once and leaves at most once — two events per element across N elements = O(N) work. The stack can hold all N elements at once in the worst case (e.g. all open brackets with no closes yet), so space is O(N).</p>
+      <div class="why-label">Why O(N) time and O(N) space for all stack methods</div>
+      <p>Every element enters the stack at most once and leaves at most once — two events per element across N elements = O(N) work. The stack can hold all N elements at once in the worst case (e.g. all opening brackets before any closing bracket), so space is O(N). <code>passingGameOfBall</code> uses A passes and C array of length A, so its bounds are written in terms of A.</p>
     </div>
   </div>
 
