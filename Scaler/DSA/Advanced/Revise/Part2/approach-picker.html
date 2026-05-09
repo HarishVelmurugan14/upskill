@@ -7,7 +7,6 @@
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
-
 <header>
   <a class="logo" href="../../../../../index.html">upskill</a>
   <nav class="breadcrumb">
@@ -17,7 +16,6 @@
     <span class="cur">Approach Picker</span>
   </nav>
 </header>
-
 <div class="sec-nav">
   <a class="pill blue current"  href="approach-picker.html">Approach Picker</a>
   <a class="pill red"           href="common-mistakes.html">Common Mistakes</a>
@@ -26,67 +24,49 @@
   <a class="pill amber"         href="revision-tags.html">Revision Tags</a>
   <a class="pill orange"        href="leetcode-references.html">LeetCode Refs</a>
 </div>
-
 <main>
   <div class="page-title">Approach Picker</div>
   <div class="page-sub">Part 2 · Days 21–31</div>
-
-  <div class="note">One row per chapter topic. The signal is generic — not a specific problem.</div>
-
+  <div class="note">One row per recognizable problem pattern. The signal is what you read in the question — the reach is what you write in code.</div>
   <div class="tbl-wrap">
     <table>
       <thead>
-        <tr>
-          <th>When the question feels like…</th>
-          <th>Reach for…</th>
-          <th>Days</th>
-        </tr>
+        <tr><th>When the question feels like…</th><th>Reach for…</th><th>Days</th></tr>
       </thead>
       <tbody>
-        <tr>
-          <td class="c-signal">The data is sorted and you need to locate something without scanning every element</td>
-          <td class="c-reach">Binary Search on the Array</td>
-          <td class="c-day">d21, d22</td>
-        </tr>
-        <tr>
-          <td class="c-signal">The answer is a number in a range and you can check whether a given number works</td>
-          <td class="c-reach">Binary Search on Answer Space</td>
-          <td class="c-day">d23</td>
-        </tr>
-        <tr>
-          <td class="c-signal">You need to walk, insert, or delete in a chain where index-based access doesn't apply</td>
-          <td class="c-reach">Linked List pointer manipulation</td>
-          <td class="c-day">d24, d25</td>
-        </tr>
-        <tr>
-          <td class="c-signal">You need to remember what came before and process it in reverse, or match open-close pairs</td>
-          <td class="c-reach">Stack</td>
-          <td class="c-day">d26</td>
-        </tr>
-        <tr>
-          <td class="c-signal">You need the nearest smaller or greater element to the left or right of each position</td>
-          <td class="c-reach">Monotonic Stack</td>
-          <td class="c-day">d27</td>
-        </tr>
-        <tr>
-          <td class="c-signal">A window slides across the array and you need a running max/min, or order of arrival matters</td>
-          <td class="c-reach">Queue / Deque</td>
-          <td class="c-day">d28</td>
-        </tr>
-        <tr>
-          <td class="c-signal">The structure is hierarchical and the same logic applies at every subtree</td>
-          <td class="c-reach">Tree recursion / DFS</td>
-          <td class="c-day">d29, d30</td>
-        </tr>
-        <tr>
-          <td class="c-signal">The tree has an ordering property — left smaller, right greater — and you want to search or validate</td>
-          <td class="c-reach">BST</td>
-          <td class="c-day">d31</td>
-        </tr>
+
+        <!-- Binary Search on Array -->
+        <tr><td class="c-signal">Array is sorted; find a target, its first/last occurrence, or where it should be inserted</td><td class="c-reach">Binary Search — <code>low=0, high=N-1</code>, shrink by ±1 each step, save mid on match and keep going for boundary</td><td class="c-day">d21</td></tr>
+        <tr><td class="c-signal">Sorted array; "first position ≥ X" or "last position ≤ X" (lower_bound / upper_bound)</td><td class="c-reach">lower_bound — save mid when <code>a[mid] >= target</code>, move <code>high = mid-1</code>; then check both <code>lb</code> and <code>lb-1</code> for closest</td><td class="c-day">d21</td></tr>
+        <tr><td class="c-signal">Sorted array has one duplicate-free element; all others appear in pairs</td><td class="c-reach">Binary Search on even/odd index parity — the single element is where the pair pattern breaks</td><td class="c-day">d21</td></tr>
+        <tr><td class="c-signal">Find peak element — greater than both neighbours — in O(log N)</td><td class="c-reach">Binary Search — if <code>a[mid] &lt; a[mid+1]</code> peak is to the right, else to the left or at mid</td><td class="c-day">d21</td></tr>
+        <tr><td class="c-signal">Array is rotated but was sorted; search for a target</td><td class="c-reach">Binary Search on rotated array — identify which half is fully sorted in O(1), check if target is in that half, else search the other half</td><td class="c-day">d22</td></tr>
+        <tr><td class="c-signal">Find median of a sorted matrix (each row sorted) in O(N log M log max)</td><td class="c-reach">Binary Search on value space — for each candidate value, count elements ≤ it across all rows using binary search; answer is first value where count > N×M/2</td><td class="c-day">d22</td></tr>
+
+        <!-- Binary Search on Answer Space -->
+        <tr><td class="c-signal">Distribute N tasks among K workers — minimize the maximum any single worker handles</td><td class="c-reach">BS on answer space <code>[max_task, total_sum]</code> — feasibility check: greedy left-to-right, start new worker when sum exceeds mid; check painters-exceed inside loop for early exit</td><td class="c-day">d23</td></tr>
+        <tr><td class="c-signal">Place K elements in sorted positions — maximize the minimum gap between any two</td><td class="c-reach">BS on answer space <code>[1, positions_range]</code> — feasibility check: greedy left-to-right, place next element only when gap ≥ mid; return true inside loop when all K placed</td><td class="c-day">d23</td></tr>
+        <tr><td class="c-signal">Find the longest subarray/window of length K where no window of size K has sum exceeding B</td><td class="c-reach">BS on answer space <code>[0, N]</code> — feasibility check: sliding window of size mid, return false the moment any window sum &gt; B</td><td class="c-day">d23</td></tr>
+
+        <!-- Linked List basics -->
+        <tr><td class="c-signal">Walk a linked list and insert or delete — head might change</td><td class="c-reach">Dummy node before real head — all operations including head-delete become uniform; return <code>dummy.next</code></td><td class="c-day">d24, d25</td></tr>
+        <tr><td class="c-signal">Reverse an entire linked list in-place in O(N) O(1)</td><td class="c-reach">3-pointer reverse — <code>next = curr.next → curr.next = prev → prev = curr → curr = next</code>; loop until curr is null, return prev</td><td class="c-day">d25</td></tr>
+        <tr><td class="c-signal">Delete a node when you only have access to that node, not its predecessor</td><td class="c-reach">Copy-next trick — copy <code>node.next.val</code> into node, then skip <code>node.next</code> via <code>node.next = node.next.next</code></td><td class="c-day">d25</td></tr>
+        <tr><td class="c-signal">Clone a linked list where each node also has a random pointer to any node</td><td class="c-reach">2-pass HashMap — Pass 1: create all clones (label only); Pass 2: wire <code>clone.next</code> and <code>clone.random</code> via map lookups (null-key-safe)</td><td class="c-day">d25</td></tr>
+        <tr><td class="c-signal">Remove the Nth node from the end without a second pass</td><td class="c-reach">Two-pointer gap-of-N — fast starts N steps ahead; both advance until fast.next is null; slow.next is the node to delete</td><td class="c-day">d25</td></tr>
+        <tr><td class="c-signal">Reverse only nodes between positions B and C inside the list</td><td class="c-reach">Dummy node → walk to B-1 (prevNode) → reverse C-B+1 nodes with standard 3-pointer → connect: <code>prevNode.next.next = curr</code> THEN <code>prevNode.next = prev</code></td><td class="c-day">d25</td></tr>
+        <tr><td class="c-signal">Reverse every group of K nodes, leave the tail as-is if fewer than K remain</td><td class="c-reach">reverseKGroup recursion — count K nodes (return as-is if fewer) → reverse K → connect old-head (now tail) to <code>reverseKGroup(curr, k)</code> → return prev</td><td class="c-day">d25</td></tr>
+
+        <!-- Stack / Monotonic Stack / Queue / Trees / BST -->
+        <tr><td class="c-signal">Match open-close pairs, evaluate postfix, or cancel adjacent duplicates</td><td class="c-reach">Stack — push on opening/value, pop and process on closing/operator; check isEmpty before every pop</td><td class="c-day">d26</td></tr>
+        <tr><td class="c-signal">For each element: find the nearest element to its left/right that is smaller or greater</td><td class="c-reach">Monotonic Stack of indices — pop while stack top violates the order you want; each popped index just found its answer (current i)</td><td class="c-day">d27</td></tr>
+        <tr><td class="c-signal">Sliding window maximum/minimum, or track first-in-first-out among active elements</td><td class="c-reach">Deque — remove back when current is better (smaller for max), remove front when outside window; front is always the answer</td><td class="c-day">d28</td></tr>
+        <tr><td class="c-signal">Hierarchical structure; same logic applies at every subtree; answer = combine(left, right, node)</td><td class="c-reach">Tree DFS recursion — base case: null → neutral value; recursive case: get left+right results, combine, return upward</td><td class="c-day">d29, d30</td></tr>
+        <tr><td class="c-signal">Tree has left &lt; root &lt; right ordering; search, validate, or build balanced structure</td><td class="c-reach">BST — search: go left/right by comparison; validate: pass (min, max) bounds down; build from sorted: always mid as root</td><td class="c-day">d31</td></tr>
+
       </tbody>
     </table>
   </div>
 </main>
-
 </body>
 </html>
