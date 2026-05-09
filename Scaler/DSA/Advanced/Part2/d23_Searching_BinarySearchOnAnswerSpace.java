@@ -39,7 +39,7 @@ public class d23_Searching_BinarySearchOnAnswerSpace {
 
         int[] nums = new int[]{5, 17, 100, 11};
         int sum = 130;
-        d23SearchingBinarySearchOnAnswerSpace.maxSubArrayFactorLessThanB(nums, sum);
+        d23SearchingBinarySearchOnAnswerSpace.maxSubArrayFactorLessThanB(nums, sum); // AQ2
 
     }
 
