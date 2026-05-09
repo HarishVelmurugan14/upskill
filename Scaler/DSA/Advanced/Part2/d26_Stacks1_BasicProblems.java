@@ -26,7 +26,7 @@ public class d26_Stacks1_BasicProblems {
         d26_Stacks1_BasicProblems d26_Stacks1_BasicProblems = new d26_Stacks1_BasicProblems();
 
         ArrayList<String> A = new ArrayList<>(Arrays.asList("2", "1", "+", "3", "*"));
-        d26_Stacks1_BasicProblems.postFixExpression(A);
+        d26_Stacks1_BasicProblems.postFixExpression(A); // Q1 // LC150
         d26_Stacks1_BasicProblems.balancedParenthesis("{()()()}({");
         d26_Stacks1_BasicProblems.doubleCharacterTrouble("abccbc");
         d26_Stacks1_BasicProblems.passingGameOfBall(10, 48, new int[]{4, 0, 30, 0, 41, 28, 50, 2, 47, 39});
@@ -56,6 +56,24 @@ public class d26_Stacks1_BasicProblems {
         Valid operators are +, -, *, /. Each string may be an integer or an operator.
         Reverse Polish Notation is equivalent to Postfix Expression, where operators are written after their operands.
         */
+
+        /*
+         * POSTFIX EXPRESSION EVALUATOR - Stack
+         *
+         * STRATEGY: number → push | operator → pop two, apply, push result
+         *
+         * EXAMPLE: ["2","1","+","3","*"]
+         *   push 2 → [2]
+         *   push 1 → [2,1]
+         *   +      → pop b=1, a=2 → push 3     [3]
+         *   push 3 → [3,3]
+         *   *      → pop b=3, a=3 → push 9     [9]
+         *   return 9
+         *
+         * ORDER: b=pop, a=pop → apply (a op b) not (b op a) (matters for - and /)
+         *
+         * Time: O(N)  Space: O(N)
+         */
 
 
         Stack<Integer> stack = new Stack<>();
@@ -251,10 +269,10 @@ public class d26_Stacks1_BasicProblems {
 
         Stack<Character> stack = new Stack<>();
 
-        for(char x : s.toCharArray()){
-            if(!stack.isEmpty()){
-                if(x == ')'){
-                    if(stack.peek() == '('){
+        for (char x : s.toCharArray()) {
+            if (!stack.isEmpty()) {
+                if (x == ')') {
+                    if (stack.peek() == '(') {
                         stack.pop();
                         continue;
                     }
