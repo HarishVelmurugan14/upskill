@@ -18,28 +18,28 @@ public class d23_Searching_BinarySearchOnAnswerSpace {
 
         // Inputs
 
-        if (true) {
-            return;
-        }
-
         // Call Stack
         d23_Searching_BinarySearchOnAnswerSpace d23SearchingBinarySearchOnAnswerSpace = new d23_Searching_BinarySearchOnAnswerSpace();
-        int[] boards = {3, 5, 1, 7, 8, 2, 5, 3};
-        int paintersAvailable = 3;
-        int timeTakenForOneUnit = 2;
-        d23SearchingBinarySearchOnAnswerSpace.paintersPartitionMinimumTimeToPaint(paintersAvailable, timeTakenForOneUnit, boards); // Q1
-        d23SearchingBinarySearchOnAnswerSpace.isPaintingCompletionPossible(boards, 23, paintersAvailable);
+//        int[] boards = {3, 5, 1, 7, 8, 2, 5, 3};
+//        int paintersAvailable = 3;
+//        int timeTakenForOneUnit = 2;
+//        d23SearchingBinarySearchOnAnswerSpace.paintersPartitionMinimumTimeToPaint(paintersAvailable, timeTakenForOneUnit, boards); // Q1
+//        d23SearchingBinarySearchOnAnswerSpace.isPaintingCompletionPossible(boards, 23, paintersAvailable);
+//
+//        int[] cowStalls = {2, 6, 11, 14, 19, 25, 30, 39, 43};
+//        int cows = 4;
+//
+//        d23SearchingBinarySearchOnAnswerSpace.aggressiveCowsLargestMinDistance(cowStalls, cows); //Q2
+//        d23SearchingBinarySearchOnAnswerSpace.canPlaceCows(cowStalls, cows, 8);
+//
+//        int[] books = new int[]{12, 34, 67, 90};
+//        int students = 2;
+//
+//        d23SearchingBinarySearchOnAnswerSpace.minimumDifferenceBetweenBooksAllotted(books, students); // AQ1
 
-        int[] cowStalls = {2, 6, 11, 14, 19, 25, 30, 39, 43};
-        int cows = 4;
-
-        d23SearchingBinarySearchOnAnswerSpace.aggressiveCowsLargestMinDistance(cowStalls, cows); //Q2
-        d23SearchingBinarySearchOnAnswerSpace.canPlaceCows(cowStalls, cows, 8);
-
-        int[] books = new int[]{12, 34, 67, 90};
-        int students = 2;
-
-        d23SearchingBinarySearchOnAnswerSpace.minimumDifferenceBetweenBooksAllotted(books, students); // AQ1
+        int[] nums = new int[]{5, 17, 100, 11};
+        int sum = 130;
+        d23SearchingBinarySearchOnAnswerSpace.maxSubArrayFactorLessThanB(nums, sum);
 
     }
 
@@ -254,6 +254,70 @@ public class d23_Searching_BinarySearchOnAnswerSpace {
         }
         return true;
     }
+
+
+    public int maxSubArrayFactorLessThanB(int[] nums, int sum) {
+
+        /*
+         * SPECIAL INTEGER - Binary search on answer
+         *
+         * GOAL: Find max subarray length K such that NO subarray of size K has sum > B.
+         *
+         * SEARCH SPACE:
+         *   low  = 0            → minimum possible length
+         *   high = nums.length  → maximum possible length
+         *
+         * BINARY SEARCH:
+         *   mid = candidate length
+         *   check(mid) → true  : no window exceeds B, try larger → low  = mid+1, store K
+         *              → false : some window exceeds B, shrink   → high = mid-1
+         *
+         * check: sliding window of size guessLength
+         *   guessLength == 0 → always true (empty window)
+         *   any window sum > B → return false (this length is invalid)
+         *
+         * EXAMPLES:
+         *   A=[1,2,3,4,5], B=10 → K=3 ([1,2,3]=6, [2,3,4]=9, [3,4,5]=12 > 10 → K=3 invalid → K=2? )
+         *   A=[5,17,100,11], B=130 → K=3 ([5,17,100]=122, [17,100,11]=128, both <=130 → valid)
+         *
+         * Time: O(N log(N))  Space: O(1)
+         */
+
+        int low = 0;
+        int high = nums.length;
+        int K = -1;
+
+        while (low <= high) {
+            int mid = low + (high - low) / 2;
+            if (subArrayWithLengthLContainSumGreaterThanK(nums, sum, mid)) {
+                K = mid;
+                low = mid + 1;
+            } else {
+                high = mid - 1;
+            }
+        }
+        System.out.println(K);
+        return K;
+    }
+
+    boolean subArrayWithLengthLContainSumGreaterThanK(int[] nums, int sum, int guessLength) {
+        if (guessLength == 0) return true;
+
+        long windowSum = 0;
+
+        for (int i = 0; i < guessLength; i++) {
+            windowSum += nums[i];
+        }
+        if (windowSum > sum) return false;
+
+        for (int i = guessLength; i < nums.length; i++) {
+            windowSum += nums[i];
+            windowSum -= nums[i - guessLength];
+            if (windowSum > sum) return false;
+        }
+        return true;
+    }
+
 
 
     /* Section : ------------------------------- [ Specific Utilities ] ------------------------------- */
