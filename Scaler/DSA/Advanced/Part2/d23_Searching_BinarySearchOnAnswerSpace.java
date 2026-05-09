@@ -38,6 +38,17 @@ public class d23_Searching_BinarySearchOnAnswerSpace {
     /* Section : ----------------------------------- [ Approaches ] ------------------------------------ */
 
     private boolean isPaintingCompletionPossible(int[] C, int A, long maxTime) {
+        /*
+         * GREEDY CHECK: Can A painters finish all boards within maxTime?
+         *
+         * Strategy: Assign boards left-to-right to current painter.
+         *           If adding next board exceeds maxTime → new painter takes it.
+         *           If painters needed > A → impossible, return false.
+         *
+         * painters > A check is INSIDE the loop (early exit, not after)
+         *
+         * Time: O(N)  Space: O(1)
+         */
         int painters = 1;
         long currentSum = 0;
 
@@ -68,6 +79,25 @@ public class d23_Searching_BinarySearchOnAnswerSpace {
         Return the ans % 10000003
         */
 
+        /*
+         * PAINTERS PARTITION - Binary search on answer
+         *
+         * SEARCH SPACE:
+         *   low  = maxBoard  → guessTime below maxBoard always fails
+         *   high = totalSum  → 1 painter does everything
+         *
+         * BINARY SEARCH:
+         *   guessTime = candidate maxTime
+         *   canPaint(guessTime) → true  : store bestTime, try smaller → high = guessTime-1
+         *                       → false : need more time             → low  = guessTime+1
+         *
+         * canPaint: greedy left-to-right, new painter when sum exceeds guessTime
+         *           painter > noPainter inside loop → early exit
+         *
+         * FINAL: bestTime * B (board units → actual time)
+         *
+         * Time: O(N log(sum))  Space: O(1)
+         */
         int MOD = 10000003;
         if (C.length == 0) return 0;
         if (A > C.length) A = C.length; // If more painters than boards, reduce A to C.length
