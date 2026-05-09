@@ -101,6 +101,34 @@
     </div>
   </div>
 
+  <!-- d23 -->
+  <div class="sec">
+    <div class="sec-title">d23 — Binary Search on Answer Space</div>
+    <div class="tbl-wrap">
+      <table>
+        <thead><tr><th>Method</th><th>Time</th><th>Space</th></tr></thead>
+        <tbody>
+          <tr><td><code>paintersPartitionMinimumTimeToPaint</code></td><td class="c-time">O(N log(sum))</td><td class="c-space">O(1)</td></tr>
+          <tr><td><code>aggressiveCowsLargestMinDistance</code></td><td class="c-time">O(N log(max−min))</td><td class="c-space">O(1)</td></tr>
+          <tr><td><code>minimumDifferenceBetweenBooksAllotted</code></td><td class="c-time">O(N log(sum))</td><td class="c-space">O(1)</td></tr>
+          <tr><td><code>maxSubArrayFactorLessThanB</code></td><td class="c-time">O(N log N)</td><td class="c-space">O(1)</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="why-box">
+      <div class="why-label">Why O(N log(sum)) — painters partition &amp; book allocation</div>
+      <p>Binary search runs on the answer space [maxElement, totalSum] — that is log(sum) outer iterations. For each candidate mid, the greedy feasibility check walks all N elements once — O(N). Total: O(N log(sum)). No auxiliary storage is needed so space is O(1).</p>
+    </div>
+    <div class="why-box">
+      <div class="why-label">Why O(N log(max−min)) — aggressive cows</div>
+      <p>Binary search runs on the distance space [1, A[last]−A[first]] — width is (max−min), so log(max−min) iterations. For each candidate distance, the greedy cow-placement check walks all N stalls once — O(N). Total: O(N log(max−min)).</p>
+    </div>
+    <div class="why-box">
+      <div class="why-label">Why O(N log N) — maxSubArrayFactorLessThanB</div>
+      <p>Binary search on the answer space [0, N] — O(log N) outer iterations. For each candidate length K, the sliding window check scans all N elements once — O(N). Total: O(N log N). The check uses a fixed-size window so no extra storage is needed.</p>
+    </div>
+  </div>
+
   <!-- d24-25 -->
   <div class="sec">
     <div class="sec-title">d24–25 — Linked Lists</div>
