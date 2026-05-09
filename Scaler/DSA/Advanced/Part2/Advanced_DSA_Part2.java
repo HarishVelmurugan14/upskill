@@ -21,7 +21,7 @@ public class Advanced_DSA_Part2 {
         d21SearchingBinarySearchOnArray.peakElement(); // Q4
 
         d21SearchingBinarySearchOnArray.searhAMatrix(); // AQ1
-        // AQ2
+        d21SearchingBinarySearchOnArray.minimumCostToBuildAnArray(3, 2, new int[][]{{7, 3}, {2, 1}, {4, 9}}); // AQ2
         d21SearchingBinarySearchOnArray.maximumHeightOfAStaircase(20); // AQ3
 
 
@@ -30,41 +30,60 @@ public class Advanced_DSA_Part2 {
 
         d22Searching2BinarySearchProblems.squareRootOfANumber(4); // Q1 // LC69
         d22Searching2BinarySearchProblems.rotatedSortedArraySearch(); // Q2
-        d22Searching2BinarySearchProblems.findMedianInSortedArrays(new int[]{}, new int[]{}); // Q3
+        d22Searching2BinarySearchProblems.rotatedSortedArraySearch_myversion(new int[]{4, 5, 6, 7, 0, 1, 2}, 0); // Q2 alt
+        d22Searching2BinarySearchProblems.findMedianInSortedArrays(new int[]{1, 2, 7, 9, 11, 13}, new int[]{1, 3, 4, 5, 8, 10}); // Q3
 
-        // AQ1
-        // AQ2
-        // AQ3
-        // AQ4
+        d22Searching2BinarySearchProblems.findMatrixMedian(null); // AQ1
+        d22Searching2BinarySearchProblems.addOrNot(null, 0); // AQ2
+        d22Searching2BinarySearchProblems.athMagicalNumber(0, 0, 0); // AQ3
+        d22Searching2BinarySearchProblems.BthSmallestTripletSum(null, 0); // AQ4
 
-        d22Searching2BinarySearchProblems.rotationFactor(new int[]{});
+        d22Searching2BinarySearchProblems.rotationFactor(new int[]{9, 10, 3, 5, 6, 8}); // utility
 
         /* ------------------------- Day 23 - DSA: Searching 3: Binary Search on Answer ------------------------------*/
 
         d23_Searching_BinarySearchOnAnswerSpace d23SearchingBinarySearchOnAnswerSpace = new d23_Searching_BinarySearchOnAnswerSpace();
 
-        d23SearchingBinarySearchOnAnswerSpace.paintersPartitionMinimumTimeToPaint(3, 2, null); //Q1
-        d23SearchingBinarySearchOnAnswerSpace.aggressiveCowsLargestMinDistance(null, 4); //Q2
+        d23SearchingBinarySearchOnAnswerSpace.paintersPartitionMinimumTimeToPaint(3, 2, new int[]{3, 5, 1, 7, 8, 2, 5, 3}); // Q1
+        d23SearchingBinarySearchOnAnswerSpace.aggressiveCowsLargestMinDistance(new int[]{2, 6, 11, 14, 19, 25, 30, 39, 43}, 4); // Q2
 
-        // AQ1
-        // AQ2
+        d23SearchingBinarySearchOnAnswerSpace.minimumDifferenceBetweenBooksAllotted(new int[]{12, 34, 67, 90}, 2); // AQ1
+        d23SearchingBinarySearchOnAnswerSpace.maxSubArrayFactorLessThanB(new int[]{5, 17, 100, 11}, 130); // AQ2
     }
 
     private void LinkedList() {
         /* ------------------------- Day 24 - DSA: Classes, Objects & Linked Lists -----------------------------------*/
 
+        d24_ClassesObjects_LinkedLists d24_classesObjects_linkedLists = new d24_ClassesObjects_LinkedLists();
+
+        ListNode list = d24_classesObjects_linkedLists.createList(new int[]{3, 5, 1, 7, 8, 2, 5, 3});
+        d24_ClassesObjects_LinkedLists.printList(list);
+        d24_ClassesObjects_LinkedLists.insertAtLast(list);
+        d24_ClassesObjects_LinkedLists.insertAtIndex(list, 3, 100); // insertAtIndex
+        d24_ClassesObjects_LinkedLists.deleteAtIndex(list, 1);      // deleteAtIndex
 
         /* ------------------------- Day 25 - DSA: Linked List Problems ----------------------------------------------*/
 
         d25_LinkedList_Problems d25_linkedList_problems = new d25_LinkedList_Problems();
 
-        d25_linkedList_problems.printALinkedList(null); // Prev Q1
-        // Q1
-        // Q2
-        d25_linkedList_problems.insertAtPosition(null, 3, 7); // Q3
-        d25_linkedList_problems.deleteAtPosition(null, 5); // Q4
+        ListNode head = d25_linkedList_problems.insertAtHead(null, 6);
+        head = d25_linkedList_problems.insertAtHead(head, 3);
+        head = d25_linkedList_problems.insertAtHead(head, 3);
+        head = d25_linkedList_problems.insertAtHead(head, 6);
 
-        d25_linkedList_problems.removeElements(null, 7); // LC203
+        d25_linkedList_problems.printALinkedList(head);
+
+        d25_linkedList_problems.reverseALinkedListInPlaceInOneIteration(head); // Q1 // LC206
+        d25_linkedList_problems.copyRandomList(null);                          // Q2 // LC138
+        d25_linkedList_problems.insertAtPosition(head, 3, 5);                  // Q3
+        d25_linkedList_problems.deleteAtPosition(head, 5);                     // Q4
+
+        d25_linkedList_problems.removeElements(head, 7);    // LC203
+        d25_linkedList_problems.deleteNode(head);            // LC237
+        d25_linkedList_problems.deleteDuplicates(head);      // AQ1 // LC83
+        d25_linkedList_problems.removeNthFromEnd(head, 4);   // AQ2 // LC19
+        d25_linkedList_problems.reverseBetween(head, 2, 4);  // AQ3 // LC92
+        d25_linkedList_problems.reverseKGroup(head, 2);      // AQ4 // LC25
 
     }
 
@@ -73,17 +92,14 @@ public class Advanced_DSA_Part2 {
 
         d26_Stacks1_BasicProblems d26_Stacks1_BasicProblems = new d26_Stacks1_BasicProblems();
 
-        d26_Stacks1_BasicProblems.postFixExpression(null); // Q1
-        d26_Stacks1_BasicProblems.balancedParenthesis("{()()()}({"); // Q2
-        d26_Stacks1_BasicProblems.doubleCharacterTrouble("abccbc"); // Q3
-        d26_Stacks1_BasicProblems.passingGameOfBall(10, 48, new int[]{4, 0, 30, 0, 41, 28, 50, 2, 47, 39}); // Q4
+        d26_Stacks1_BasicProblems.postFixExpression(null);                                                      // Q1 // LC150
+        d26_Stacks1_BasicProblems.balancedParenthesis("{()()()}({");                                             // Q2 // LC20
+        d26_Stacks1_BasicProblems.doubleCharacterTrouble("abccbc");                                              // Q3 // LC1047
+        d26_Stacks1_BasicProblems.passingGameOfBall(10, 48, new int[]{4, 0, 30, 0, 41, 28, 50, 2, 47, 39});    // Q4 // ~LC1472
 
-        // AQ1
         d26_Stacks1_BasicProblems.redundantBracesUnecessaryBraces("(a+(a+b))"); // AQ2
-        // AQ3
-        // AQ4
 
-        d26_Stacks1_BasicProblems.minAddToMakeParanthesisValid("((("); //LC921
+        d26_Stacks1_BasicProblems.minAddToMakeParanthesisValid("((("); // LC921
 
         d27_Stack2_NearestSmallGreatElements d27_Stack2_NearestSmallGreatElements = new d27_Stack2_NearestSmallGreatElements();
 

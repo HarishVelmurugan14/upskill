@@ -31,6 +31,8 @@ public class d26_Stacks1_BasicProblems {
         d26_Stacks1_BasicProblems.doubleCharacterTrouble("abccbc"); // Q3 // LC1047
         d26_Stacks1_BasicProblems.passingGameOfBall(10, 48, new int[]{4, 0, 30, 0, 41, 28, 50, 2, 47, 39}); // Q4 // LC1472 Similar leetcode
 
+        d26_Stacks1_BasicProblems.redundantBracesUnecessaryBraces("(a+(a+b))"); // AQ2
+
     }
 
     /* Section : ----------------------------------- [ Approaches ] ------------------------------------ */
