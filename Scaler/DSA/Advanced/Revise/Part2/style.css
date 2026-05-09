@@ -198,54 +198,65 @@ strong { font-weight: 600; color: var(--text); }
    APPROACH PICKER — grouped cheat sheet
    ────────────────────────────────────────────────── */
 .ap-group {
-  margin-bottom: 24px;
+  margin-bottom: 28px;
   border-radius: 10px;
   overflow: hidden;
   border: 1px solid var(--border);
 }
+
 .ap-group-hdr {
-  padding: 10px 18px;
-  font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 1.3px;
+  padding: 14px 20px;
+  font-size: 13px; font-weight: 700; letter-spacing: 0.2px;
   display: flex; align-items: center;
+  border-left: 4px solid currentColor;
 }
 .ap-group-hdr .ap-day {
   margin-left: auto;
   font-family: 'JetBrains Mono', monospace;
-  font-size: 11px; font-weight: 400;
-  text-transform: none; letter-spacing: 0; opacity: 0.8;
+  font-size: 11px; font-weight: 400; opacity: 0.7;
 }
-.ap-group.bs   .ap-group-hdr { color: var(--teal);   background: rgba(121,192,255,0.07); border-bottom: 1px solid rgba(121,192,255,0.15); }
-.ap-group.ans  .ap-group-hdr { color: var(--amber);  background: rgba(210,153,34,0.07);  border-bottom: 1px solid rgba(210,153,34,0.15); }
-.ap-group.ll   .ap-group-hdr { color: var(--green);  background: rgba(63,185,80,0.07);   border-bottom: 1px solid rgba(63,185,80,0.15); }
-.ap-group.stk  .ap-group-hdr { color: var(--purple); background: rgba(188,140,255,0.07); border-bottom: 1px solid rgba(188,140,255,0.15); }
-.ap-group.tree .ap-group-hdr { color: var(--orange); background: rgba(255,123,114,0.07); border-bottom: 1px solid rgba(255,123,114,0.15); }
+
+.ap-group.bs   .ap-group-hdr { color: var(--teal);   background: rgba(121,192,255,0.06); border-bottom: 1px solid rgba(121,192,255,0.15); }
+.ap-group.ans  .ap-group-hdr { color: var(--amber);  background: rgba(210,153,34,0.06);  border-bottom: 1px solid rgba(210,153,34,0.15); }
+.ap-group.ll   .ap-group-hdr { color: var(--green);  background: rgba(63,185,80,0.06);   border-bottom: 1px solid rgba(63,185,80,0.15); }
+.ap-group.stk  .ap-group-hdr { color: var(--purple); background: rgba(188,140,255,0.06); border-bottom: 1px solid rgba(188,140,255,0.15); }
+.ap-group.tree .ap-group-hdr { color: var(--orange); background: rgba(255,123,114,0.06); border-bottom: 1px solid rgba(255,123,114,0.15); }
 
 .ap-row {
   display: grid;
-  grid-template-columns: 1fr 1.3fr;
-  border-bottom: 1px solid rgba(48,54,61,0.45);
+  grid-template-columns: 1fr 1.25fr;
+  border-bottom: 1px solid rgba(48,54,61,0.4);
 }
 .ap-row:last-child { border-bottom: none; }
-.ap-row:hover { background: var(--bg-card-hover); }
+.ap-row:hover .ap-signal { background: rgba(33,38,45,0.6); }
+.ap-row:hover .ap-reach  { background: rgba(33,38,45,0.3); }
 
 .ap-signal {
-  padding: 11px 16px;
-  color: var(--text-body);
-  font-size: 13px; line-height: 1.55;
-  border-right: 1px solid rgba(48,54,61,0.45);
+  padding: 13px 18px;
+  color: var(--text-muted);
+  font-size: 12.5px; line-height: 1.6;
+  border-right: 1px solid rgba(48,54,61,0.4);
+  font-style: italic;
 }
-.ap-reach {
-  padding: 11px 16px;
-  font-size: 13px; line-height: 1.55; font-weight: 500;
-}
-.ap-reach code { font-size: 11px; }
 
-/* color reach text per group */
-.ap-group.bs   .ap-reach { color: var(--teal); }
-.ap-group.ans  .ap-reach { color: var(--amber); }
-.ap-group.ll   .ap-reach { color: var(--green); }
-.ap-group.stk  .ap-reach { color: var(--purple); }
-.ap-group.tree .ap-reach { color: var(--orange); }
+.ap-reach {
+  padding: 13px 18px;
+  display: flex; flex-direction: column; gap: 4px;
+}
+.ap-technique {
+  font-size: 13px; font-weight: 700; line-height: 1.3;
+}
+.ap-hint {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11.5px; color: var(--text-muted); line-height: 1.55;
+}
+.ap-hint code { font-size: 11px; color: var(--orange); }
+
+.ap-group.bs   .ap-technique { color: var(--teal); }
+.ap-group.ans  .ap-technique { color: var(--amber); }
+.ap-group.ll   .ap-technique { color: var(--green); }
+.ap-group.stk  .ap-technique { color: var(--purple); }
+.ap-group.tree .ap-technique { color: var(--orange); }
 
 /* ──────────────────────────────────────────────────
    KEY PATTERNS — always-open 2-column cards
@@ -299,6 +310,76 @@ strong { font-weight: 600; color: var(--text); }
   font-size: 12.5px; color: var(--text-muted); line-height: 1.65;
   margin-top: 14px; padding: 10px 14px;
   background: rgba(139,148,158,0.05); border-radius: 6px; border-left: 3px solid var(--border);
+}
+
+/* ──────────────────────────────────────────────────
+   COMPLEXITIES — card + grid layout
+   ────────────────────────────────────────────────── */
+.cx-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  margin-bottom: 24px;
+  overflow: hidden;
+}
+.cx-card-hdr {
+  padding: 12px 20px;
+  background: var(--bg-elevated);
+  border-bottom: 1px solid var(--border);
+  display: flex; align-items: center; justify-content: space-between;
+  border-left: 4px solid;
+}
+.cx-card-hdr-name { font-size: 13px; font-weight: 700; }
+.cx-card-day {
+  font-size: 11px; font-family: 'JetBrains Mono', monospace;
+  color: var(--text-muted); opacity: 0.8;
+}
+
+.cx-card.bs   .cx-card-hdr { border-color: var(--teal);   }
+.cx-card.ans  .cx-card-hdr { border-color: var(--amber);  }
+.cx-card.ll   .cx-card-hdr { border-color: var(--green);  }
+.cx-card.stk  .cx-card-hdr { border-color: var(--purple); }
+.cx-card.tree .cx-card-hdr { border-color: var(--orange); }
+.cx-card.q    .cx-card-hdr { border-color: var(--blue);   }
+
+.cx-card.bs   .cx-card-hdr-name { color: var(--teal);   }
+.cx-card.ans  .cx-card-hdr-name { color: var(--amber);  }
+.cx-card.ll   .cx-card-hdr-name { color: var(--green);  }
+.cx-card.stk  .cx-card-hdr-name { color: var(--purple); }
+.cx-card.tree .cx-card-hdr-name { color: var(--orange); }
+.cx-card.q    .cx-card-hdr-name { color: var(--blue);   }
+
+.cx-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 0;
+  border-bottom: 1px solid var(--border);
+}
+.cx-item {
+  padding: 14px 18px;
+  border-right: 1px solid rgba(48,54,61,0.5);
+  border-bottom: 1px solid rgba(48,54,61,0.5);
+  transition: background 0.1s;
+}
+.cx-item:hover { background: rgba(33,38,45,0.5); }
+.cx-method-name {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11.5px; color: var(--text);
+  margin-bottom: 8px;
+  word-break: break-word;
+}
+.cx-badges { display: flex; gap: 6px; align-items: center; margin-bottom: 6px; flex-wrap: wrap; }
+.cx-why-text { font-size: 11.5px; color: var(--text-muted); line-height: 1.5; }
+
+.cx-insight {
+  padding: 14px 20px;
+  font-size: 13px; color: var(--text-body); line-height: 1.7;
+}
+.cx-insight strong { color: var(--text); }
+.cx-insight-label {
+  font-size: 10px; font-weight: 700; letter-spacing: 1.3px;
+  text-transform: uppercase; margin-bottom: 6px; display: block;
+  color: var(--green);
 }
 
 /* accordion still used by other parts */

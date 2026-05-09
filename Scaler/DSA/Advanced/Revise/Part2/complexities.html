@@ -30,395 +30,347 @@
 <main>
   <div class="page-title">Complexities</div>
   <div class="page-sub">Part 2 · Days 21–31</div>
-  <div class="note">Color key: <span class="badge b-1">O(1)</span> · <span class="badge b-log">O(log N)</span> · <span class="badge b-n">O(N)</span> · <span class="badge b-nlog">O(N log N)</span> · <span class="badge b-n2">O(N²)</span> · <span class="badge b-nm">compound</span></div>
+  <div class="note">
+    <span class="badge b-1">O(1)</span>&nbsp;
+    <span class="badge b-log">O(log N)</span>&nbsp;
+    <span class="badge b-n">O(N)</span>&nbsp;
+    <span class="badge b-nlog">O(N log N)</span>&nbsp;
+    <span class="badge b-n2">O(N²)</span>&nbsp;
+    <span class="badge b-nm">compound</span>
+    &nbsp;&nbsp;·&nbsp;&nbsp;Each tile: method → time · space · one-line why.
+  </div>
 
-  <!-- d21 -->
-  <div class="sec">
-    <div class="sec-title">d21 — Binary Search on Array</div>
-    <div class="tbl-wrap">
-      <table>
-        <thead><tr><th>Method</th><th>Time</th><th>Space</th><th>Why</th></tr></thead>
-        <tbody>
-          <tr>
-            <td><code>searchForStartAndEndIndexOfAnElementInAnArray</code></td>
-            <td class="c-time"><span class="badge b-log">O(log N)</span></td>
-            <td class="c-space"><span class="badge b-1">O(1)</span></td>
-            <td class="cx-why">Two independent binary searches; range halves each step</td>
-          </tr>
-          <tr>
-            <td><code>positionWhereTargetIsPresentOrShouldBeInserted</code></td>
-            <td class="c-time"><span class="badge b-log">O(log N)</span></td>
-            <td class="c-space"><span class="badge b-1">O(1)</span></td>
-            <td class="cx-why">Standard lower_bound binary search</td>
-          </tr>
-          <tr>
-            <td><code>singleElementInASortedArray</code></td>
-            <td class="c-time"><span class="badge b-log">O(log N)</span></td>
-            <td class="c-space"><span class="badge b-1">O(1)</span></td>
-            <td class="cx-why">Parity check at mid eliminates half the range each step</td>
-          </tr>
-          <tr>
-            <td><code>peakElement</code></td>
-            <td class="c-time"><span class="badge b-log">O(log N)</span></td>
-            <td class="c-space"><span class="badge b-1">O(1)</span></td>
-            <td class="cx-why">Slope direction at mid tells which half must contain a peak</td>
-          </tr>
-          <tr>
-            <td><code>searhAMatrix</code></td>
-            <td class="c-time"><span class="badge b-log">O(log N·M)</span></td>
-            <td class="c-space"><span class="badge b-1">O(1)</span></td>
-            <td class="cx-why">Treat N×M matrix as a flat array of size N·M; one binary search</td>
-          </tr>
-          <tr>
-            <td><code>maximumHeightOfAStaircase</code></td>
-            <td class="c-time"><span class="badge b-log">O(√N)</span></td>
-            <td class="c-space"><span class="badge b-1">O(1)</span></td>
-            <td class="cx-why">Sum 1+2+…+k = k(k+1)/2 ≈ N → k ≈ √2N; linear scan stops at ~√N</td>
-          </tr>
-          <tr>
-            <td><code>minimumCostToBuildAnArray</code></td>
-            <td class="c-time"><span class="badge b-nm">O(A·B·log B)</span></td>
-            <td class="c-space"><span class="badge b-1">O(1)</span></td>
-            <td class="cx-why">Sort each of A rows — B log B per row = A·B log B; then for each row pair: B elements × log B lower_bound = same order</td>
-          </tr>
-        </tbody>
-      </table>
+  <!-- ── d21 Binary Search on Array ── -->
+  <div class="cx-card bs">
+    <div class="cx-card-hdr">
+      <span class="cx-card-hdr-name">Binary Search on Array</span>
+      <span class="cx-card-day">d21</span>
+    </div>
+    <div class="cx-grid">
+      <div class="cx-item">
+        <div class="cx-method-name">searchForStartAndEndIndex</div>
+        <div class="cx-badges"><span class="badge b-log">O(log N)</span><span class="badge b-1">O(1)</span></div>
+        <div class="cx-why-text">Two separate binary searches; range halves each step</div>
+      </div>
+      <div class="cx-item">
+        <div class="cx-method-name">positionWhereTargetPresentOrInserted</div>
+        <div class="cx-badges"><span class="badge b-log">O(log N)</span><span class="badge b-1">O(1)</span></div>
+        <div class="cx-why-text">Standard lower_bound — each step halves the search range</div>
+      </div>
+      <div class="cx-item">
+        <div class="cx-method-name">singleElementInASortedArray</div>
+        <div class="cx-badges"><span class="badge b-log">O(log N)</span><span class="badge b-1">O(1)</span></div>
+        <div class="cx-why-text">Even/odd parity check at mid eliminates half the array</div>
+      </div>
+      <div class="cx-item">
+        <div class="cx-method-name">peakElement</div>
+        <div class="cx-badges"><span class="badge b-log">O(log N)</span><span class="badge b-1">O(1)</span></div>
+        <div class="cx-why-text">Slope direction at mid tells which half must contain a peak</div>
+      </div>
+      <div class="cx-item">
+        <div class="cx-method-name">searhAMatrix</div>
+        <div class="cx-badges"><span class="badge b-log">O(log N·M)</span><span class="badge b-1">O(1)</span></div>
+        <div class="cx-why-text">Treat N×M matrix as flat array of size N·M; one binary search</div>
+      </div>
+      <div class="cx-item">
+        <div class="cx-method-name">maximumHeightOfAStaircase</div>
+        <div class="cx-badges"><span class="badge b-log">O(√N)</span><span class="badge b-1">O(1)</span></div>
+        <div class="cx-why-text">Sum 1+2+…+k ≈ N → k ≈ √2N; linear scan stops at ~√N steps</div>
+      </div>
+      <div class="cx-item">
+        <div class="cx-method-name">minimumCostToBuildAnArray</div>
+        <div class="cx-badges"><span class="badge b-nm">O(A·B·log B)</span><span class="badge b-1">O(1)</span></div>
+        <div class="cx-why-text">Sort A rows (B log B each) + B×lower_bound per adjacent row pair</div>
+      </div>
+    </div>
+    <div class="cx-insight">
+      <span class="cx-insight-label">Pattern</span>
+      Every binary search on a sorted array is <strong>O(log N)</strong> — the range halves each step. Exceptions only appear when the problem adds work <em>per step</em> (matrix median: N·log M per check → N·log M·log max total) or changes the search space (staircase: the answer grows as √N, not log N).
     </div>
   </div>
 
-  <!-- d22 -->
-  <div class="sec">
-    <div class="sec-title">d22 — More Binary Search</div>
-    <div class="tbl-wrap">
-      <table>
-        <thead><tr><th>Method</th><th>Time</th><th>Space</th><th>Why</th></tr></thead>
-        <tbody>
-          <tr>
-            <td><code>squareRootOfANumber</code></td>
-            <td class="c-time"><span class="badge b-log">O(log N)</span></td>
-            <td class="c-space"><span class="badge b-1">O(1)</span></td>
-            <td class="cx-why">Binary search on [1, N/2]; mid² compared to N</td>
-          </tr>
-          <tr>
-            <td><code>rotatedSortedArraySearch</code></td>
-            <td class="c-time"><span class="badge b-log">O(log N)</span></td>
-            <td class="c-space"><span class="badge b-1">O(1)</span></td>
-            <td class="cx-why">One sorted half is always identifiable in O(1); discard half each step</td>
-          </tr>
-          <tr>
-            <td><code>rotationFactor</code></td>
-            <td class="c-time"><span class="badge b-log">O(log N)</span></td>
-            <td class="c-space"><span class="badge b-1">O(1)</span></td>
-            <td class="cx-why">Find first index where a[mid] &lt; a[0]; standard binary search</td>
-          </tr>
-          <tr>
-            <td><code>findMedianInSortedArrays</code></td>
-            <td class="c-time"><span class="badge b-log">O(log min(N,M))</span></td>
-            <td class="c-space"><span class="badge b-1">O(1)</span></td>
-            <td class="cx-why">Binary search on partition of the smaller array only; larger array partition is derived</td>
-          </tr>
-          <tr>
-            <td><code>findMatrixMedian</code></td>
-            <td class="c-time"><span class="badge b-nm">O(N·log M·log max)</span></td>
-            <td class="c-space"><span class="badge b-1">O(1)</span></td>
-            <td class="cx-why">log(max) outer steps × N rows × log M lower_bound per row</td>
-          </tr>
-          <tr>
-            <td><code>addOrNot</code></td>
-            <td class="c-time"><span class="badge b-nlog">O(N log N)</span></td>
-            <td class="c-space"><span class="badge b-n">O(N)</span></td>
-            <td class="cx-why">Sort O(N log N) + prefix sum O(N) + for each element binary search for best window O(N log N)</td>
-          </tr>
-          <tr>
-            <td><code>athMagicalNumber</code></td>
-            <td class="c-time"><span class="badge b-log">O(log(A·min(B,C)))</span></td>
-            <td class="c-space"><span class="badge b-1">O(1)</span></td>
-            <td class="cx-why">Search range is [2, A·min(B,C)]; count magical ≤ mid using inclusion-exclusion in O(1) per check</td>
-          </tr>
-          <tr>
-            <td><code>BthSmallestTripletSum</code></td>
-            <td class="c-time"><span class="badge b-nm">O(N²·log max_sum)</span></td>
-            <td class="c-space"><span class="badge b-1">O(1)</span></td>
-            <td class="cx-why">log(max_sum) outer steps × O(N²) two-pointer count of triplets &lt; mid per check</td>
-          </tr>
-        </tbody>
-      </table>
+  <!-- ── d22 More Binary Search ── -->
+  <div class="cx-card bs">
+    <div class="cx-card-hdr">
+      <span class="cx-card-hdr-name">More Binary Search</span>
+      <span class="cx-card-day">d22</span>
+    </div>
+    <div class="cx-grid">
+      <div class="cx-item">
+        <div class="cx-method-name">squareRootOfANumber</div>
+        <div class="cx-badges"><span class="badge b-log">O(log N)</span><span class="badge b-1">O(1)</span></div>
+        <div class="cx-why-text">Binary search on [1, N/2]; compare mid² to N each step</div>
+      </div>
+      <div class="cx-item">
+        <div class="cx-method-name">rotatedSortedArraySearch</div>
+        <div class="cx-badges"><span class="badge b-log">O(log N)</span><span class="badge b-1">O(1)</span></div>
+        <div class="cx-why-text">One sorted half always identifiable in O(1); discard half each step</div>
+      </div>
+      <div class="cx-item">
+        <div class="cx-method-name">rotationFactor</div>
+        <div class="cx-badges"><span class="badge b-log">O(log N)</span><span class="badge b-1">O(1)</span></div>
+        <div class="cx-why-text">Find first index where a[mid] &lt; a[0]; standard BS</div>
+      </div>
+      <div class="cx-item">
+        <div class="cx-method-name">findMedianInSortedArrays</div>
+        <div class="cx-badges"><span class="badge b-log">O(log min(N,M))</span><span class="badge b-1">O(1)</span></div>
+        <div class="cx-why-text">BS on partition of the smaller array only; derived for the larger</div>
+      </div>
+      <div class="cx-item">
+        <div class="cx-method-name">findMatrixMedian</div>
+        <div class="cx-badges"><span class="badge b-nm">O(N·log M·log max)</span><span class="badge b-1">O(1)</span></div>
+        <div class="cx-why-text">log(max) outer steps × N rows × log M lower_bound per row</div>
+      </div>
+      <div class="cx-item">
+        <div class="cx-method-name">addOrNot</div>
+        <div class="cx-badges"><span class="badge b-nlog">O(N log N)</span><span class="badge b-n">O(N)</span></div>
+        <div class="cx-why-text">Sort + prefix sum; binary search for best window per element</div>
+      </div>
+      <div class="cx-item">
+        <div class="cx-method-name">athMagicalNumber</div>
+        <div class="cx-badges"><span class="badge b-log">O(log(A·min(B,C)))</span><span class="badge b-1">O(1)</span></div>
+        <div class="cx-why-text">Range [2, A·min(B,C)]; count via inclusion-exclusion O(1) per step</div>
+      </div>
+      <div class="cx-item">
+        <div class="cx-method-name">BthSmallestTripletSum</div>
+        <div class="cx-badges"><span class="badge b-nm">O(N²·log max_sum)</span><span class="badge b-1">O(1)</span></div>
+        <div class="cx-why-text">log(max_sum) outer steps × O(N²) two-pointer count per step</div>
+      </div>
     </div>
   </div>
 
-  <!-- d23 -->
-  <div class="sec">
-    <div class="sec-title">d23 — Binary Search on Answer Space</div>
-    <div class="tbl-wrap">
-      <table>
-        <thead><tr><th>Method</th><th>Time</th><th>Space</th><th>Why</th></tr></thead>
-        <tbody>
-          <tr>
-            <td><code>paintersPartitionMinimumTimeToPaint</code></td>
-            <td class="c-time"><span class="badge b-nlog">O(N log sum)</span></td>
-            <td class="c-space"><span class="badge b-1">O(1)</span></td>
-            <td class="cx-why">Search range [maxBoard, totalSum] = log(sum) steps; greedy feasibility check = O(N) per step</td>
-          </tr>
-          <tr>
-            <td><code>aggressiveCowsLargestMinDistance</code></td>
-            <td class="c-time"><span class="badge b-nlog">O(N log(max−min))</span></td>
-            <td class="c-space"><span class="badge b-1">O(1)</span></td>
-            <td class="cx-why">Search range [1, stalls[last]−stalls[0]] = log(max−min) steps; greedy placement = O(N) per step</td>
-          </tr>
-          <tr>
-            <td><code>minimumDifferenceBetweenBooksAllotted</code></td>
-            <td class="c-time"><span class="badge b-nlog">O(N log sum)</span></td>
-            <td class="c-space"><span class="badge b-1">O(1)</span></td>
-            <td class="cx-why">Same structure as painters; search [maxBook, totalPages]; O(N) greedy check per step</td>
-          </tr>
-          <tr>
-            <td><code>maxSubArrayFactorLessThanB</code></td>
-            <td class="c-time"><span class="badge b-nlog">O(N log N)</span></td>
-            <td class="c-space"><span class="badge b-1">O(1)</span></td>
-            <td class="cx-why">Search range [0, N] = log N steps; sliding window feasibility check = O(N) per step</td>
-          </tr>
-        </tbody>
-      </table>
+  <!-- ── d23 BS on Answer Space ── -->
+  <div class="cx-card ans">
+    <div class="cx-card-hdr">
+      <span class="cx-card-hdr-name">Binary Search on Answer Space</span>
+      <span class="cx-card-day">d23</span>
     </div>
-    <div class="why-box">
-      <div class="why-label">Why all answer-space searches are O(N · log range)</div>
-      <p>The outer binary search runs log(range) times. At each step a greedy scan touches every element once — O(N). Total = O(N log range). The range varies: sum of elements for partition problems, positional spread for cows, N itself for the window problem.</p>
+    <div class="cx-grid">
+      <div class="cx-item">
+        <div class="cx-method-name">paintersPartitionMinimumTimeToPaint</div>
+        <div class="cx-badges"><span class="badge b-nlog">O(N log sum)</span><span class="badge b-1">O(1)</span></div>
+        <div class="cx-why-text">log(sum) BS steps × O(N) greedy feasibility check per step</div>
+      </div>
+      <div class="cx-item">
+        <div class="cx-method-name">aggressiveCowsLargestMinDistance</div>
+        <div class="cx-badges"><span class="badge b-nlog">O(N log(max−min))</span><span class="badge b-1">O(1)</span></div>
+        <div class="cx-why-text">log(range) BS steps × O(N) greedy cow-placement per step</div>
+      </div>
+      <div class="cx-item">
+        <div class="cx-method-name">minimumDifferenceBetweenBooksAllotted</div>
+        <div class="cx-badges"><span class="badge b-nlog">O(N log sum)</span><span class="badge b-1">O(1)</span></div>
+        <div class="cx-why-text">Same as painters; search [maxBook, totalPages]</div>
+      </div>
+      <div class="cx-item">
+        <div class="cx-method-name">maxSubArrayFactorLessThanB</div>
+        <div class="cx-badges"><span class="badge b-nlog">O(N log N)</span><span class="badge b-1">O(1)</span></div>
+        <div class="cx-why-text">log(N) BS steps × O(N) sliding window feasibility per step</div>
+      </div>
+    </div>
+    <div class="cx-insight">
+      <span class="cx-insight-label">Pattern — all answer-space searches</span>
+      <strong>O(N · log range)</strong> every time. The outer binary search runs log(range) times. At each step a greedy scan touches every element once — O(N). They only differ in what "range" means: sum of elements (painters/books), positional spread (cows), or N itself (window length).
     </div>
   </div>
 
-  <!-- d24-25 -->
-  <div class="sec">
-    <div class="sec-title">d24–25 — Linked Lists</div>
-    <div class="tbl-wrap">
-      <table>
-        <thead><tr><th>Method</th><th>Time</th><th>Space</th><th>Why</th></tr></thead>
-        <tbody>
-          <tr>
-            <td><code>reverseALinkedListInPlaceInOneIteration</code></td>
-            <td class="c-time"><span class="badge b-n">O(N)</span></td>
-            <td class="c-space"><span class="badge b-1">O(1)</span></td>
-            <td class="cx-why">Single pass, 3 pointer variables only</td>
-          </tr>
-          <tr>
-            <td><code>copyRandomList</code></td>
-            <td class="c-time"><span class="badge b-n">O(N)</span></td>
-            <td class="c-space"><span class="badge b-n">O(N)</span></td>
-            <td class="cx-why">Two passes over N nodes; HashMap stores N node mappings</td>
-          </tr>
-          <tr>
-            <td><code>deleteDuplicates</code></td>
-            <td class="c-time"><span class="badge b-n">O(N)</span></td>
-            <td class="c-space"><span class="badge b-1">O(1)</span></td>
-            <td class="cx-why">Single pass; in-place pointer skip requires no extra storage</td>
-          </tr>
-          <tr>
-            <td><code>removeNthFromEnd</code></td>
-            <td class="c-time"><span class="badge b-n">O(N)</span></td>
-            <td class="c-space"><span class="badge b-1">O(1)</span></td>
-            <td class="cx-why">Two-pointer single pass; fast pointer leads by N, both move until fast hits end</td>
-          </tr>
-          <tr>
-            <td><code>reverseBetween</code></td>
-            <td class="c-time"><span class="badge b-n">O(N)</span></td>
-            <td class="c-space"><span class="badge b-1">O(1)</span></td>
-            <td class="cx-why">Walk to position B (O(B)), reverse C-B+1 nodes, reconnect — total linear</td>
-          </tr>
-          <tr>
-            <td><code>reverseKGroup</code></td>
-            <td class="c-time"><span class="badge b-n">O(N)</span></td>
-            <td class="c-space"><span class="badge b-log">O(N/K)</span></td>
-            <td class="cx-why">Every node reversed exactly once; recursion depth = N/K groups</td>
-          </tr>
-          <tr>
-            <td>insert / delete at position</td>
-            <td class="c-time"><span class="badge b-n">O(N)</span></td>
-            <td class="c-space"><span class="badge b-1">O(1)</span></td>
-            <td class="cx-why">Must walk to the target position — no random access</td>
-          </tr>
-        </tbody>
-      </table>
+  <!-- ── d24-25 Linked List ── -->
+  <div class="cx-card ll">
+    <div class="cx-card-hdr">
+      <span class="cx-card-hdr-name">Linked Lists</span>
+      <span class="cx-card-day">d24, d25</span>
+    </div>
+    <div class="cx-grid">
+      <div class="cx-item">
+        <div class="cx-method-name">reverseALinkedList</div>
+        <div class="cx-badges"><span class="badge b-n">O(N)</span><span class="badge b-1">O(1)</span></div>
+        <div class="cx-why-text">Single pass; 3 pointer variables only, no extra storage</div>
+      </div>
+      <div class="cx-item">
+        <div class="cx-method-name">copyRandomList</div>
+        <div class="cx-badges"><span class="badge b-n">O(N)</span><span class="badge b-n">O(N)</span></div>
+        <div class="cx-why-text">Two passes over N nodes; HashMap stores N mappings</div>
+      </div>
+      <div class="cx-item">
+        <div class="cx-method-name">deleteDuplicates</div>
+        <div class="cx-badges"><span class="badge b-n">O(N)</span><span class="badge b-1">O(1)</span></div>
+        <div class="cx-why-text">Single pass; in-place pointer skip, no allocation</div>
+      </div>
+      <div class="cx-item">
+        <div class="cx-method-name">removeNthFromEnd</div>
+        <div class="cx-badges"><span class="badge b-n">O(N)</span><span class="badge b-1">O(1)</span></div>
+        <div class="cx-why-text">Two-pointer single pass; fast leads by N steps</div>
+      </div>
+      <div class="cx-item">
+        <div class="cx-method-name">reverseBetween</div>
+        <div class="cx-badges"><span class="badge b-n">O(N)</span><span class="badge b-1">O(1)</span></div>
+        <div class="cx-why-text">Walk to B, reverse C-B+1 nodes, reconnect — total linear</div>
+      </div>
+      <div class="cx-item">
+        <div class="cx-method-name">reverseKGroup</div>
+        <div class="cx-badges"><span class="badge b-n">O(N)</span><span class="badge b-log">O(N/K)</span></div>
+        <div class="cx-why-text">Every node reversed exactly once; recursion depth = N/K groups</div>
+      </div>
+    </div>
+    <div class="cx-insight">
+      <span class="cx-insight-label">Pattern</span>
+      All linked list operations are <strong>O(N) time</strong> — there is no random access, so reaching any node costs a walk. Space is <strong>O(1)</strong> for all in-place operations (reverse, delete, remove-nth) and <strong>O(N)</strong> only when you must allocate (copyRandomList HashMap).
     </div>
   </div>
 
-  <!-- d26 -->
-  <div class="sec">
-    <div class="sec-title">d26 — Stacks: Basic Problems</div>
-    <div class="tbl-wrap">
-      <table>
-        <thead><tr><th>Method</th><th>Time</th><th>Space</th><th>Why</th></tr></thead>
-        <tbody>
-          <tr>
-            <td><code>postFixExpression</code></td>
-            <td class="c-time"><span class="badge b-n">O(N)</span></td>
-            <td class="c-space"><span class="badge b-n">O(N)</span></td>
-            <td class="cx-why">Each token processed once; stack holds operands (at most N/2)</td>
-          </tr>
-          <tr>
-            <td><code>balancedParenthesis</code></td>
-            <td class="c-time"><span class="badge b-n">O(N)</span></td>
-            <td class="c-space"><span class="badge b-n">O(N)</span></td>
-            <td class="cx-why">Each character pushed at most once; worst case all opening brackets</td>
-          </tr>
-          <tr>
-            <td><code>doubleCharacterTrouble</code></td>
-            <td class="c-time"><span class="badge b-n">O(N)</span></td>
-            <td class="c-space"><span class="badge b-n">O(N)</span></td>
-            <td class="cx-why">Each char pushed and popped at most once; result built in O(N)</td>
-          </tr>
-          <tr>
-            <td><code>passingGameOfBall</code></td>
-            <td class="c-time"><span class="badge b-n">O(A)</span></td>
-            <td class="c-space"><span class="badge b-n">O(A)</span></td>
-            <td class="cx-why">A passes processed linearly; stack depth = forward-pass chain length ≤ A</td>
-          </tr>
-          <tr>
-            <td><code>redundantBracesUnecessaryBraces</code></td>
-            <td class="c-time"><span class="badge b-n">O(N)</span></td>
-            <td class="c-space"><span class="badge b-n">O(N)</span></td>
-            <td class="cx-why">Push all, pop to matching ( on each ); flag operator inside pop loop</td>
-          </tr>
-          <tr>
-            <td><code>minAddToMakeParanthesisValid</code></td>
-            <td class="c-time"><span class="badge b-n">O(N)</span></td>
-            <td class="c-space"><span class="badge b-n">O(N)</span></td>
-            <td class="cx-why">Single pass; unmatched brackets remain on stack — size = answer</td>
-          </tr>
-        </tbody>
-      </table>
+  <!-- ── d26 Stacks ── -->
+  <div class="cx-card stk">
+    <div class="cx-card-hdr">
+      <span class="cx-card-hdr-name">Stacks: Basic Problems</span>
+      <span class="cx-card-day">d26</span>
     </div>
-    <div class="why-box">
-      <div class="why-label">Why all stack methods are O(N) time and O(N) space</div>
-      <p>Every element enters the stack at most once and leaves at most once — two events per element = O(N) total work regardless of any inner pop loop. Space is O(N) because the worst case (all opening brackets, no closing) fills the stack with every element.</p>
+    <div class="cx-grid">
+      <div class="cx-item">
+        <div class="cx-method-name">postFixExpression</div>
+        <div class="cx-badges"><span class="badge b-n">O(N)</span><span class="badge b-n">O(N)</span></div>
+        <div class="cx-why-text">Each token processed once; stack holds at most N/2 operands</div>
+      </div>
+      <div class="cx-item">
+        <div class="cx-method-name">balancedParenthesis</div>
+        <div class="cx-badges"><span class="badge b-n">O(N)</span><span class="badge b-n">O(N)</span></div>
+        <div class="cx-why-text">Each char pushed once; worst case all openers fill the stack</div>
+      </div>
+      <div class="cx-item">
+        <div class="cx-method-name">doubleCharacterTrouble</div>
+        <div class="cx-badges"><span class="badge b-n">O(N)</span><span class="badge b-n">O(N)</span></div>
+        <div class="cx-why-text">Each char pushed and popped at most once total</div>
+      </div>
+      <div class="cx-item">
+        <div class="cx-method-name">passingGameOfBall</div>
+        <div class="cx-badges"><span class="badge b-n">O(A)</span><span class="badge b-n">O(A)</span></div>
+        <div class="cx-why-text">A passes processed linearly; stack depth ≤ A forward passes</div>
+      </div>
+      <div class="cx-item">
+        <div class="cx-method-name">redundantBracesUnecessaryBraces</div>
+        <div class="cx-badges"><span class="badge b-n">O(N)</span><span class="badge b-n">O(N)</span></div>
+        <div class="cx-why-text">Push all, pop to ( on each ); operator flag checked inside pop loop</div>
+      </div>
+      <div class="cx-item">
+        <div class="cx-method-name">minAddToMakeParanthesisValid</div>
+        <div class="cx-badges"><span class="badge b-n">O(N)</span><span class="badge b-n">O(N)</span></div>
+        <div class="cx-why-text">Single pass; unmatched brackets stay on stack — size = answer</div>
+      </div>
+    </div>
+    <div class="cx-insight">
+      <span class="cx-insight-label">Pattern</span>
+      Every stack method is <strong>O(N) time, O(N) space</strong>. Each element enters the stack at most once and exits at most once — two events across N elements regardless of any inner pop loop. Space is O(N) because the worst case fills the stack (all opening brackets before any closing).
     </div>
   </div>
 
-  <!-- d27 -->
-  <div class="sec">
-    <div class="sec-title">d27 — Monotonic Stack</div>
-    <div class="tbl-wrap">
-      <table>
-        <thead><tr><th>Method</th><th>Time</th><th>Space</th><th>Why</th></tr></thead>
-        <tbody>
-          <tr>
-            <td><code>largestRectangleInAHistogram</code></td>
-            <td class="c-time"><span class="badge b-n">O(N)</span></td>
-            <td class="c-space"><span class="badge b-n">O(N)</span></td>
-            <td class="cx-why">Each bar pushed once, popped once; inner while pops are amortized O(1) per element</td>
-          </tr>
-          <tr>
-            <td><code>identifyMaximumMinusMinimumInAllPossibleSubArrays</code></td>
-            <td class="c-time"><span class="badge b-n">O(N)</span></td>
-            <td class="c-space"><span class="badge b-n">O(N)</span></td>
-            <td class="cx-why">Two monotonic stack passes (NSL + NSR); O(N) each; contribution formula is O(1) per element</td>
-          </tr>
-          <tr>
-            <td><code>nextGreaterValues / prevSmallerValuesInAnArray</code></td>
-            <td class="c-time"><span class="badge b-n">O(N)</span></td>
-            <td class="c-space"><span class="badge b-n">O(N)</span></td>
-            <td class="cx-why">Single pass; each element pushed and popped at most once across the entire pass</td>
-          </tr>
-          <tr>
-            <td><code>nextGreaterElementForSubsetQueriesInADistinctArrays</code></td>
-            <td class="c-time"><span class="badge b-n">O(N+M)</span></td>
-            <td class="c-space"><span class="badge b-n">O(N)</span></td>
-            <td class="cx-why">Build NGE map for array2 in O(N); answer each of M queries via hashmap lookup O(1)</td>
-          </tr>
-        </tbody>
-      </table>
+  <!-- ── d27 Monotonic Stack ── -->
+  <div class="cx-card stk">
+    <div class="cx-card-hdr">
+      <span class="cx-card-hdr-name">Monotonic Stack</span>
+      <span class="cx-card-day">d27</span>
     </div>
-    <div class="why-box">
-      <div class="why-label">Why O(N) despite the inner pop loop</div>
-      <p>Each element is pushed exactly once and popped at most once. Total push + pop events = 2N. Even with a <code>while</code> inside a <code>for</code>, the combined pop count across the entire execution is bounded by N — you cannot pop what you haven't pushed. This is the standard amortized argument for monotonic stacks.</p>
+    <div class="cx-grid">
+      <div class="cx-item">
+        <div class="cx-method-name">largestRectangleInAHistogram</div>
+        <div class="cx-badges"><span class="badge b-n">O(N)</span><span class="badge b-n">O(N)</span></div>
+        <div class="cx-why-text">Each bar pushed once, popped once — inner while is amortized O(1)</div>
+      </div>
+      <div class="cx-item">
+        <div class="cx-method-name">identifyMaxMinusMinInAllSubArrays</div>
+        <div class="cx-badges"><span class="badge b-n">O(N)</span><span class="badge b-n">O(N)</span></div>
+        <div class="cx-why-text">Two mono-stack passes (NSL + NSR) O(N) each; contribution O(1) per element</div>
+      </div>
+      <div class="cx-item">
+        <div class="cx-method-name">nextGreaterValues / prevSmallerValues</div>
+        <div class="cx-badges"><span class="badge b-n">O(N)</span><span class="badge b-n">O(N)</span></div>
+        <div class="cx-why-text">Single pass; each element pushed and popped at most once total</div>
+      </div>
+      <div class="cx-item">
+        <div class="cx-method-name">nextGreaterElementForSubsetQueries</div>
+        <div class="cx-badges"><span class="badge b-n">O(N+M)</span><span class="badge b-n">O(N)</span></div>
+        <div class="cx-why-text">Build NGE map O(N); answer M queries via hashmap O(1) each</div>
+      </div>
+    </div>
+    <div class="cx-insight">
+      <span class="cx-insight-label">Key insight — why the inner while doesn't make it O(N²)</span>
+      Each element is pushed <em>exactly once</em> and popped <em>at most once</em>. Total push + pop operations = 2N across the entire pass. It doesn't matter how many times the inner <code>while</code> runs on any given iteration — the <em>aggregate</em> across all iterations is bounded by N.
     </div>
   </div>
 
-  <!-- d28 -->
-  <div class="sec">
-    <div class="sec-title">d28 — Queues</div>
-    <div class="tbl-wrap">
-      <table>
-        <thead><tr><th>Method</th><th>Time</th><th>Space</th><th>Why</th></tr></thead>
-        <tbody>
-          <tr>
-            <td><code>maximumInAFixedSlidingWindow</code></td>
-            <td class="c-time"><span class="badge b-n">O(N)</span></td>
-            <td class="c-space"><span class="badge b-log">O(K)</span></td>
-            <td class="cx-why">Each index added and removed from deque at most once; deque never holds more than K indices</td>
-          </tr>
-          <tr>
-            <td><code>firstUniqueCharacterInAString</code></td>
-            <td class="c-time"><span class="badge b-n">O(N)</span></td>
-            <td class="c-space"><span class="badge b-1">O(1)</span></td>
-            <td class="cx-why">Frequency map over 26 chars (O(1) space); single pass to find first with count=1</td>
-          </tr>
-          <tr>
-            <td><code>parkingIceCreamTruck</code></td>
-            <td class="c-time"><span class="badge b-n">O(N)</span></td>
-            <td class="c-space"><span class="badge b-log">O(K)</span></td>
-            <td class="cx-why">Deque-based sliding window; same amortized argument as maximumInAFixedSlidingWindow</td>
-          </tr>
-          <tr>
-            <td><code>implementQueuesUsingStack</code></td>
-            <td class="c-time"><span class="badge b-n">O(1) amortized</span></td>
-            <td class="c-space"><span class="badge b-n">O(N)</span></td>
-            <td class="cx-why">Each element transferred from inStack to outStack exactly once; amortized O(1) per dequeue</td>
-          </tr>
-        </tbody>
-      </table>
+  <!-- ── d28 Queues ── -->
+  <div class="cx-card q">
+    <div class="cx-card-hdr">
+      <span class="cx-card-hdr-name">Queues</span>
+      <span class="cx-card-day">d28</span>
+    </div>
+    <div class="cx-grid">
+      <div class="cx-item">
+        <div class="cx-method-name">maximumInAFixedSlidingWindow</div>
+        <div class="cx-badges"><span class="badge b-n">O(N)</span><span class="badge b-log">O(K)</span></div>
+        <div class="cx-why-text">Each index added and removed from deque at most once; deque ≤ K indices</div>
+      </div>
+      <div class="cx-item">
+        <div class="cx-method-name">firstUniqueCharacterInAString</div>
+        <div class="cx-badges"><span class="badge b-n">O(N)</span><span class="badge b-1">O(1)</span></div>
+        <div class="cx-why-text">Frequency map over 26 chars (O(1) space); single scan to find first with count=1</div>
+      </div>
+      <div class="cx-item">
+        <div class="cx-method-name">parkingIceCreamTruck</div>
+        <div class="cx-badges"><span class="badge b-n">O(N)</span><span class="badge b-log">O(K)</span></div>
+        <div class="cx-why-text">Same amortized argument as sliding window max</div>
+      </div>
+      <div class="cx-item">
+        <div class="cx-method-name">implementQueuesUsingStack</div>
+        <div class="cx-badges"><span class="badge b-n">O(1) amortized</span><span class="badge b-n">O(N)</span></div>
+        <div class="cx-why-text">Each element moved from inStack to outStack exactly once total</div>
+      </div>
     </div>
   </div>
 
-  <!-- d29-31 -->
-  <div class="sec">
-    <div class="sec-title">d29–31 — Trees and BST</div>
-    <div class="tbl-wrap">
-      <table>
-        <thead><tr><th>Operation</th><th>Time</th><th>Space</th><th>Why</th></tr></thead>
-        <tbody>
-          <tr>
-            <td>DFS traversals (inorder, preorder, postorder)</td>
-            <td class="c-time"><span class="badge b-n">O(N)</span></td>
-            <td class="c-space"><span class="badge b-log">O(H)</span></td>
-            <td class="cx-why">Every node visited once; recursion stack depth = tree height H</td>
-          </tr>
-          <tr>
-            <td><code>levelOrderTraversal</code> (BFS)</td>
-            <td class="c-time"><span class="badge b-n">O(N)</span></td>
-            <td class="c-space"><span class="badge b-n">O(W)</span></td>
-            <td class="cx-why">Every node enqueued/dequeued once; queue holds at most one full level (width W)</td>
-          </tr>
-          <tr>
-            <td><code>isBalanced</code></td>
-            <td class="c-time"><span class="badge b-n">O(N)</span></td>
-            <td class="c-space"><span class="badge b-log">O(H)</span></td>
-            <td class="cx-why">Returns height or -1 in a single DFS; no node visited twice</td>
-          </tr>
-          <tr>
-            <td><code>buildTreeWithInOrderAndPreOrder</code></td>
-            <td class="c-time"><span class="badge b-n2">O(N²) naive · O(N) with map</span></td>
-            <td class="c-space"><span class="badge b-n">O(N)</span></td>
-            <td class="cx-why">Without HashMap: linear search in inorder per node = O(N²). With HashMap: O(1) root lookup = O(N) total</td>
-          </tr>
-          <tr>
-            <td><code>isValidBST</code></td>
-            <td class="c-time"><span class="badge b-n">O(N)</span></td>
-            <td class="c-space"><span class="badge b-log">O(H)</span></td>
-            <td class="cx-why">Single DFS passing (min, max) bounds; every node visited once</td>
-          </tr>
-          <tr>
-            <td><code>sortedArrayToBST</code></td>
-            <td class="c-time"><span class="badge b-n">O(N)</span></td>
-            <td class="c-space"><span class="badge b-n">O(N)</span></td>
-            <td class="cx-why">N nodes created; recursion depth = O(log N) (balanced); output tree itself is O(N)</td>
-          </tr>
-          <tr>
-            <td>BST search / insert</td>
-            <td class="c-time"><span class="badge b-log">O(H)</span></td>
-            <td class="c-space"><span class="badge b-log">O(H)</span></td>
-            <td class="cx-why">Follow left/right at each level; H = O(log N) balanced, O(N) degenerate (sorted input)</td>
-          </tr>
-        </tbody>
-      </table>
+  <!-- ── d29-31 Trees ── -->
+  <div class="cx-card tree">
+    <div class="cx-card-hdr">
+      <span class="cx-card-hdr-name">Trees and BST</span>
+      <span class="cx-card-day">d29, d30, d31</span>
+    </div>
+    <div class="cx-grid">
+      <div class="cx-item">
+        <div class="cx-method-name">DFS traversals (in/pre/post-order)</div>
+        <div class="cx-badges"><span class="badge b-n">O(N)</span><span class="badge b-log">O(H)</span></div>
+        <div class="cx-why-text">Every node visited once; recursion stack depth = tree height H</div>
+      </div>
+      <div class="cx-item">
+        <div class="cx-method-name">levelOrderTraversal (BFS)</div>
+        <div class="cx-badges"><span class="badge b-n">O(N)</span><span class="badge b-n">O(W)</span></div>
+        <div class="cx-why-text">Every node enqueued once; queue holds at most one full level (width W)</div>
+      </div>
+      <div class="cx-item">
+        <div class="cx-method-name">isBalanced</div>
+        <div class="cx-badges"><span class="badge b-n">O(N)</span><span class="badge b-log">O(H)</span></div>
+        <div class="cx-why-text">Returns height or sentinel -1 in one DFS; no node visited twice</div>
+      </div>
+      <div class="cx-item">
+        <div class="cx-method-name">buildTreeWithInOrderAndPreOrder</div>
+        <div class="cx-badges"><span class="badge b-n">O(N) with map</span><span class="badge b-n">O(N)</span></div>
+        <div class="cx-why-text">HashMap gives O(1) root lookup; without it linear search → O(N²)</div>
+      </div>
+      <div class="cx-item">
+        <div class="cx-method-name">isValidBST</div>
+        <div class="cx-badges"><span class="badge b-n">O(N)</span><span class="badge b-log">O(H)</span></div>
+        <div class="cx-why-text">Single DFS passing (long min, long max) bounds; every node once</div>
+      </div>
+      <div class="cx-item">
+        <div class="cx-method-name">sortedArrayToBST</div>
+        <div class="cx-badges"><span class="badge b-n">O(N)</span><span class="badge b-n">O(N)</span></div>
+        <div class="cx-why-text">N nodes created; recursion depth O(log N); output tree is O(N)</div>
+      </div>
+      <div class="cx-item">
+        <div class="cx-method-name">BST search / insert</div>
+        <div class="cx-badges"><span class="badge b-log">O(H)</span><span class="badge b-log">O(H)</span></div>
+        <div class="cx-why-text">One decision per level; H = log N balanced, N degenerate (sorted input)</div>
+      </div>
+    </div>
+    <div class="cx-insight">
+      <span class="cx-insight-label">Pattern</span>
+      Tree DFS is always <strong>O(N) time</strong> — every node is visited exactly once. Space is <strong>O(H)</strong> for the call stack (H = log N balanced, N worst case). BST operations are <strong>O(H)</strong> not O(N) because you discard one subtree at each node — the same reasoning as binary search.
     </div>
   </div>
 
