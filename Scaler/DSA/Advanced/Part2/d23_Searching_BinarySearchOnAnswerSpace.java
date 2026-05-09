@@ -18,6 +18,9 @@ public class d23_Searching_BinarySearchOnAnswerSpace {
 
         // Inputs
 
+        if (true) {
+            return;
+        }
 
         // Call Stack
         d23_Searching_BinarySearchOnAnswerSpace d23SearchingBinarySearchOnAnswerSpace = new d23_Searching_BinarySearchOnAnswerSpace();
@@ -32,6 +35,11 @@ public class d23_Searching_BinarySearchOnAnswerSpace {
 
         d23SearchingBinarySearchOnAnswerSpace.aggressiveCowsLargestMinDistance(cowStalls, cows); //Q2
         d23SearchingBinarySearchOnAnswerSpace.canPlaceCows(cowStalls, cows, 8);
+
+        int[] books = new int[]{12, 34, 67, 90};
+        int students = 2;
+
+        d23SearchingBinarySearchOnAnswerSpace.minimumDifferenceBetweenBooksAllotted(books, students); // AQ1
 
     }
 
@@ -175,6 +183,78 @@ public class d23_Searching_BinarySearchOnAnswerSpace {
         }
         return result;
     }
+
+
+    public int minimumDifferenceBetweenBooksAllotted(int[] books, int students) {
+
+        /*
+         * BOOK ALLOCATION - Binary search on answer
+         *
+         * GOAL: Allocate contiguous books to students minimizing maximum pages any student reads.
+         *
+         * EDGE CASES: null/empty books → -1, students <= 0 → -1, students > books → -1
+         *
+         * SEARCH SPACE:
+         *   low  = max(1, minPage) → handles 0-page books, minimum possible max
+         *   high = totalPages      → 1 student reads everything
+         *
+         * BINARY SEARCH:
+         *   mid = candidate maxPages
+         *   canBeAllotted(mid) → true  : store ans, try smaller → high = mid-1
+         *                      → false : need more pages        → low  = mid+1
+         *
+         * canBeAllotted: greedy left-to-right, new student when sum exceeds maxPages
+         *                studentAllotted > students inside loop → early exit
+         *
+         * Time: O(N log(sum))  Space: O(1)
+         */
+
+        // Edge cases
+        if (books == null || books.length == 0) return -1;
+        if (students <= 0) return -1;
+        if (students > books.length) return -1;
+
+        int maxPage = 0;
+        int maxSingleBook = 0;
+        for (int x : books) {
+            maxPage += x;
+            maxSingleBook = Math.max(x, maxSingleBook);
+        }
+
+        int low = Math.max(1, maxSingleBook); // handles 0-page books
+        int high = maxPage;
+        int ans = high;
+
+        while (low <= high) {
+            int mid = low + (high - low) / 2;
+            if (canBeAllotted(books, students, mid)) {
+                ans = mid;
+                high = mid - 1;
+            } else {
+                low = mid + 1;
+            }
+        }
+        System.out.println(ans);
+        return ans;
+    }
+
+    private boolean canBeAllotted(int[] books, int students, int maxPages) {
+        int studentAllotted = 1;
+        int pagesForCurrentStudent = 0;
+
+        for (int pages : books) {
+            pagesForCurrentStudent += pages;
+            if (pagesForCurrentStudent > maxPages) {
+                studentAllotted++;
+                pagesForCurrentStudent = pages;
+            }
+            if (studentAllotted > students) {
+                return false;
+            }
+        }
+        return true;
+    }
+
 
     /* Section : ------------------------------- [ Specific Utilities ] ------------------------------- */
 
