@@ -51,7 +51,10 @@ public class d25_LinkedList_Problems {
 
 
         ListNode headA = d24_classesObjects_linkedLists.createList(new int[]{1, 1, 1, 2, 3, 3, 4, 5, 5, 5, 5, 6});
-        d24_classesObjects_linkedLists.printList(d25_linkedList_problems.deleteDuplicates(headA));
+        d25_linkedList_problems.deleteDuplicates(headA); // AQ1
+
+        ListNode headB = d24_classesObjects_linkedLists.createList(new int[]{1, 1, 1, 2, 3, 3, 4, 5, 5, 5, 5, 6, 7, 9, 11});
+        d25_linkedList_problems.removeNthFromEnd(headB, 4); // AQ2
     }
 
     /* Section : ----------------------------------- [ Problems ] ------------------------------------ */
@@ -249,6 +252,63 @@ public class d25_LinkedList_Problems {
             head = head.next;
         }
         return res;
+    }
+
+    public ListNode removeNthFromEnd(ListNode A, int B) {
+        /*
+         * REMOVE NTH FROM END - Two pass approach
+         *
+         * STRATEGY: convert "from end" → "from start" index
+         *   deleteIndex = length - B
+         *   deleteIndex < 0 → clamp to 0 (remove head)
+         *
+         * EXAMPLE: 1→2→3→4→5, B=2
+         *   length=5, deleteIndex=5-2=3 → delete node(4) → 1→2→3→5
+         *
+         * deleteAtIndex: traverse to index-1, skip node via curr.next = curr.next.next
+         *
+         * NOTE: optimal approach → two pointer (fast/slow), fast starts B ahead
+         *       when fast reaches end, slow is at index-1 → O(N) one pass
+         *
+         * Time: O(N)  Space: O(1)
+         */
+
+        int count = length(A);
+        int deleteIndex = count - B;
+        if (deleteIndex < 0) {
+            deleteIndex = 0;
+        }
+        return deleteAtIndex(A, deleteIndex);
+    }
+
+    public int length(ListNode head) {
+        int count = 0;
+        while (head != null) {
+            count++;
+            head = head.next;
+        }
+        return count;
+    }
+
+    public ListNode deleteAtIndex(ListNode head, int index) {
+        if (head == null) return null;
+        if (index < 0 || index >= length(head)) {
+            System.out.println("Index out of bounds");
+            return head;
+        }
+        if (index == 0) return head.next;
+
+        ListNode current = head;
+        int pos = 0;
+        while (current != null) {
+            if (pos == index - 1) {
+                current.next = current.next.next;
+                return head;
+            }
+            pos++;
+            current = current.next;
+        }
+        return head;
     }
 
 
