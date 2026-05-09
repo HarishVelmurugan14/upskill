@@ -311,6 +311,57 @@ public class d25_LinkedList_Problems {
         return head;
     }
 
+    public static ListNode reverseBetween(ListNode head, int B, int C) {
+
+        /*
+         * REVERSE LINKED LIST BETWEEN B and C - Dummy node approach
+         *
+         * STRATEGY: 3 steps
+         *   1. reach node just before B (prevNode)
+         *   2. reverse B to C (standard 3-pointer reverse)
+         *   3. reconnect both ends
+         *
+         * EXAMPLE: 1→2→3→4→5, B=2, C=4
+         *   prevNode=1, reverse [2,3,4] → 4→3→2
+         *   prevNode.next.next = curr   → 2(tail) → 5
+         *   prevNode.next = prev        → 1 → 4(head)
+         *   result: 1→4→3→2→5
+         *
+         * WHY DUMMY: handles edge case where B=1 (no real node before head)
+         *            prevNode = dummy → dummy.next = prev works uniformly
+         *
+         * Time: O(N)  Space: O(1)
+         */
+        if (head == null || B == C) return head;
+
+        ListNode dummy = new ListNode(0);
+        dummy.next = head;
+        ListNode prevNode = dummy; // node just before position B
+
+        // step 1: reach node just before B
+        for (int i = 1; i < B; i++) {
+            prevNode = prevNode.next;
+        }
+
+        // step 2: reverse from B to C
+        ListNode curr = prevNode.next; // node at position B
+        ListNode prev = null;
+        ListNode next = null;
+
+        for (int i = 0; i <= C - B; i++) {
+            next = curr.next;
+            curr.next = prev;
+            prev = curr;
+            curr = next;
+        }
+
+        // step 3: connect back
+        prevNode.next.next = curr; // B (now tail) -> node after C
+        prevNode.next = prev;      // node before B -> C (now head)
+
+        return dummy.next;
+    }
+
 
     public RandomListNode createList(int[] values) {
         if (values == null || values.length == 0) return null;
