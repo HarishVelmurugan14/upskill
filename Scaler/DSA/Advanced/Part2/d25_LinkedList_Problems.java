@@ -55,6 +55,9 @@ public class d25_LinkedList_Problems {
 
         ListNode headB = d24_classesObjects_linkedLists.createList(new int[]{1, 1, 1, 2, 3, 3, 4, 5, 5, 5, 5, 6, 7, 9, 11});
         d25_linkedList_problems.removeNthFromEnd(headB, 4); // AQ2
+
+        d25_linkedList_problems.reverseBetween(head, 2, 4); // AQ3
+        d25_linkedList_problems.reverseList(head, 2); // AQ4
     }
 
     /* Section : ----------------------------------- [ Problems ] ------------------------------------ */
@@ -311,7 +314,7 @@ public class d25_LinkedList_Problems {
         return head;
     }
 
-    public static ListNode reverseBetween(ListNode head, int B, int C) {
+    public ListNode reverseBetween(ListNode head, int B, int C) {
 
         /*
          * REVERSE LINKED LIST BETWEEN B and C - Dummy node approach
@@ -360,6 +363,48 @@ public class d25_LinkedList_Problems {
         prevNode.next = prev;      // node before B -> C (now head)
 
         return dummy.next;
+    }
+
+    public ListNode reverseList(ListNode A, int B) {
+
+        /*
+         * REVERSE LINKED LIST IN K-GROUPS - Recursive
+         *
+         * STRATEGY: reverse B nodes, recurse on remaining
+         *
+         * EXAMPLE: 1→2→3→4→5, B=2
+         *   reverse [1,2] → 2→1, A(tail)=1
+         *   recurse  [3,4,5] → reverse [3,4] → 4→3, recurse [5] → 5
+         *   1.next = 4→3→5
+         *   result: 2→1→4→3→5
+         *
+         * POINTERS:
+         *   prev = new head of reversed group
+         *   A    = tail of reversed group → connects to next recursion
+         *   curr = start of next group
+         *
+         * Time: O(N)  Space: O(N/B) recursion stack
+         */
+        if (A == null) return null;
+
+        ListNode curr = A;
+        ListNode prev = null;
+        int count = 0;
+
+        // reverse B nodes
+        while (curr != null && count < B) {
+            ListNode next = curr.next;
+            curr.next = prev;
+            prev = curr;
+            curr = next;
+            count++;
+        }
+
+        // A is now tail, connect to rest
+        A.next = reverseList(curr, B);
+
+        // prev is new head
+        return prev;
     }
 
 
