@@ -21,7 +21,7 @@ public class d22_Searching2_BinarySearchProblems {
 
         // Call Stack
         d22_Searching2_BinarySearchProblems d22Searching2BinarySearchProblems = new d22_Searching2_BinarySearchProblems();
-//        d22Searching2BinarySearchProblems.squareRootOfANumber(4); // Q1
+        d22Searching2BinarySearchProblems.squareRootOfANumber(4); // Q1
         d22Searching2BinarySearchProblems.rotatedSortedArraySearch();
 
         int[] A = {1, 2, 7, 9, 11, 13};
@@ -198,6 +198,32 @@ public class d22_Searching2_BinarySearchProblems {
     }
 
     public int findMedianInSortedArrays(int[] A, int[] B) {
+
+
+        /*
+         * MEDIAN OF TWO SORTED ARRAYS - Binary search on partition
+         *
+         * GOAL: Find partition in both arrays such that all(left) <= all(right)
+         * without merging.
+         *
+         * WHY A smaller: ensures partitionY = leftCount - partitionX stays non-negative (no index crash)
+         * WHY +1: (n+m+1)/2 gives left side the extra element on odd totals → median = max(leftSide)
+         *
+         * 4 boundary values at any partition:
+         *   maxLeftX | minRightX   (edges of A's cut)
+         *   maxLeftY | minRightY   (edges of B's cut)
+         *
+         * VALID partition: maxLeftX <= minRightY && maxLeftY <= minRightX
+         *   → even : (max(maxLeftX, maxLeftY) + min(minRightX, minRightY)) / 2
+         *   → odd  : max(maxLeftX, maxLeftY)
+         *
+         * MOVE: maxLeftX > minRightY → high = mid-1 (A left too big)
+         *       else                 → low  = mid+1 (A left too small)
+         *
+         * Time: O(log(min(n,m)))  Space: O(1)
+         */
+
+
         if (A.length > B.length) {
             return findMedianInSortedArrays(B, A); // Ensure A is the smaller array
         }
