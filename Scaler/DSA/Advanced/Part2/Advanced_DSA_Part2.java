@@ -112,7 +112,7 @@ public class Advanced_DSA_Part2 {
         d27_Stack2_NearestSmallGreatElements.prevSmallerValuesInAnArray(null); // Q2
         d27_Stack2_NearestSmallGreatElements.identifyMaximumMinusMinimumInAllPossibleSubArrays(new int[]{4, 7, 3, 8}); // Q3
 
-        d27_Stack2_NearestSmallGreatElements.nextGreaterValues(null); // AQ2
+        d27_Stack2_NearestSmallGreatElements.nextGreaterValues(null); // AQ2 // LC739
 
         d27_Stack2_NearestSmallGreatElements.nextGreaterElementForSubsetQueriesInADistinctArrays
                 (new int[]{4, 1, 2}, new int[]{1, 3, 4, 2}); // LC496

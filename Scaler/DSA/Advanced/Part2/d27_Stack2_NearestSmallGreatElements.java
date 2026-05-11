@@ -25,20 +25,18 @@ public class d27_Stack2_NearestSmallGreatElements {
         d27_Stack2_NearestSmallGreatElements d27_Stack2_NearestSmallGreatElements = new d27_Stack2_NearestSmallGreatElements();
 
         int[] A = {8, 2, 4, 9, 7, 5, 3, 10};
-//        d27_Stack2_NearestSmallGreatElements.print("", A);
-//        d27_Stack2_NearestSmallGreatElements.nearestSmallerElementsToTheLeft(A);
-//        d27_Stack2_NearestSmallGreatElements.nearestGreaterElementsToTheRight(A);
-//        d27_Stack2_NearestSmallGreatElements.nearestSmallerElementsToTheRight(A);
-//        d27_Stack2_NearestSmallGreatElements.nearestGreaterElementsToTheRight(A);
-//
-//        d27_Stack2_NearestSmallGreatElements.largestRectangleInAHistogram(new int[]{2, 1, 5, 6, 2, 3}); // Q1
-//        d27_Stack2_NearestSmallGreatElements.prevSmallerValuesInAnArray(new int[]{4, 5, 2, 10, 8}); // Q2
-        d27_Stack2_NearestSmallGreatElements.identifyMaximumMinusMinimumInAllPossibleSubArrays(new int[]{1,3,3});
+        d27_Stack2_NearestSmallGreatElements.print("", A);
+        d27_Stack2_NearestSmallGreatElements.nearestSmallerElementsToTheLeft(A);
+        d27_Stack2_NearestSmallGreatElements.nearestGreaterElementsToTheRight(A);
+        d27_Stack2_NearestSmallGreatElements.nearestSmallerElementsToTheRight(A);
+        d27_Stack2_NearestSmallGreatElements.nearestGreaterElementsToTheRight(A);
 
-//        d27_Stack2_NearestSmallGreatElements.nextGreaterValues(new int[]{4, 5, 2, 10, 8}); // AQ2
-//
-//        d27_Stack2_NearestSmallGreatElements.nextGreaterElementForSubsetQueriesInADistinctArrays
-//                (new int[]{4, 1, 2}, new int[]{1, 3, 4, 2}); // LC496
+        d27_Stack2_NearestSmallGreatElements.largestRectangleInAHistogram(new int[]{2, 1, 5, 6, 2, 3}); // Q1
+        d27_Stack2_NearestSmallGreatElements.prevSmallerValuesInAnArray(new int[]{4, 5, 2, 10, 8}); // Q2
+        d27_Stack2_NearestSmallGreatElements.identifyMaximumMinusMinimumInAllPossibleSubArrays(new int[]{1,3,3}); // Q3
+
+        d27_Stack2_NearestSmallGreatElements.nextGreaterValues(new int[]{4, 5, 2, 10, 8}); // AQ2 // LC739
+        d27_Stack2_NearestSmallGreatElements.nextGreaterElementForSubsetQueriesInADistinctArrays(new int[]{4, 1, 2}, new int[]{1, 3, 4, 2}); // LC496
     }
 
     /* Section : ----------------------------------- [ Problems ] ------------------------------------ */
