@@ -30,186 +30,529 @@
 <main>
   <div class="page-title">Common Mistakes</div>
   <div class="page-sub">Part 2 · Days 21–31</div>
+  <div class="note">❌ what you wrote &nbsp;·&nbsp; ✅ what you should write &nbsp;·&nbsp; and why it matters.</div>
 
-  <div class="note">Generic pitfalls by technique — not edge cases per problem.</div>
+  <!-- ══════════════════════════════════════════
+       BINARY SEARCH ON ARRAY
+  ══════════════════════════════════════════ -->
+  <div class="mk-group">
+    <div class="mk-group-hdr">Binary Search on Array <span class="mk-day">d21, d22</span></div>
 
-  <!-- ───────────────────── Binary Search on Array ───────────────────── -->
-  <div class="sec">
-    <div class="sec-title">Binary Search on Array (d21, d22)</div>
-
-    <div class="m-card">
-      <div class="m-title">Wrong mid calculation — integer overflow</div>
-      <div class="m-body"><code>(low + high) / 2</code> overflows when both are large. Write <code>low + (high - low) / 2</code> always.</div>
-    </div>
-
-    <div class="m-card">
-      <div class="m-title">Strict loop condition skips the last candidate</div>
-      <div class="m-body"><code>while (low &lt; high)</code> exits when low == high, missing the position where the answer lives. Use <code>while (low &lt;= high)</code>.</div>
-    </div>
-
-    <div class="m-card">
-      <div class="m-title">Not shrinking — infinite loop</div>
-      <div class="m-body"><code>low = mid</code> or <code>high = mid</code> without ±1 stalls when low and high are adjacent. Always write <code>low = mid + 1</code> or <code>high = mid - 1</code>.</div>
-    </div>
-
-    <div class="m-card">
-      <div class="m-title">Returning on first match — wrong for boundary search</div>
-      <div class="m-body">For leftmost occurrence: save mid, move <code>high = mid - 1</code>. For rightmost: save mid, move <code>low = mid + 1</code>. Never return immediately on a match.</div>
-    </div>
-
-    <div class="m-card">
-      <div class="m-title">lower_bound — checking only lb, not lb − 1</div>
-      <div class="m-body"><code>lower_bound</code> returns first index ≥ target. The closest value could be at <code>lb - 1</code>. Always compare both and take the smaller absolute difference.</div>
-    </div>
-
-    <div class="m-card">
-      <div class="m-title">Rotated array — assuming mid splits sorted/unsorted correctly</div>
-      <div class="m-body">First determine which half is <em>fully</em> sorted via <code>a[low] &lt;= a[mid]</code>. Then check if target falls inside that sorted half. Only then decide which side to eliminate. Don't guess the split point.</div>
-    </div>
-  </div>
-
-  <!-- ───────────────────── Binary Search on Answer Space ───────────────────── -->
-  <div class="sec">
-    <div class="sec-title">Binary Search on Answer Space (d23)</div>
-
-    <div class="m-card">
-      <div class="m-title">Wrong lower bound — starting at 0 or 1 instead of max single element</div>
-      <div class="m-body">In painters/books, any candidate below the largest single board/book is immediately infeasible — one painter must take that entire piece. Set <code>low = max(single elements)</code>, not 0 or 1. Using 0 wastes half the search space and risks passing an invalid candidate to the feasibility check.</div>
-    </div>
-
-    <div class="m-card">
-      <div class="m-title">Direction confusion — minimize-max vs maximize-min</div>
-      <div class="m-body">
-        These two problem types move in <em>opposite</em> directions when the feasibility check passes:<br>
-        <strong>Minimize the maximum</strong> (painters, books): check passes → record ans, go <em>left</em> (<code>high = mid - 1</code>). Check fails → go right (<code>low = mid + 1</code>).<br>
-        <strong>Maximize the minimum</strong> (aggressive cows): check passes → record ans, go <em>right</em> (<code>low = mid + 1</code>). Check fails → go left (<code>right = mid - 1</code>).<br>
-        Swapping the direction gives the worst valid answer instead of the best.
+    <div class="mk-card">
+      <div class="mk-title">mid calculation — integer overflow</div>
+      <div class="mk-split">
+        <div class="mk-wrong">
+          <div class="mk-lbl x">❌ overflows</div>
+<pre><code>mid = (low + high) / 2;</code></pre>
+        </div>
+        <div class="mk-right">
+          <div class="mk-lbl o">✅ safe always</div>
+<pre><code>mid = low + (high - low) / 2;</code></pre>
+        </div>
       </div>
+      <div class="mk-why">When low and high are both ~2 billion, their sum wraps to negative. The safe form never adds two large values together.</div>
     </div>
 
-    <div class="m-card">
-      <div class="m-title">Integer overflow in greedy feasibility sums</div>
-      <div class="m-body">Board lengths or page counts can be large. <code>currentSum + board</code> can exceed <code>Integer.MAX_VALUE</code> when mid is set near totalSum. Declare running sums as <code>long</code> inside the feasibility check, and use <code>long</code> for the search boundaries (low, high, mid) in painters/books.</div>
+    <div class="mk-card">
+      <div class="mk-title">Loop condition — skips the last candidate</div>
+      <div class="mk-split">
+        <div class="mk-wrong">
+          <div class="mk-lbl x">❌ exits too early</div>
+<pre><code>while (low &lt; high) { ... }</code></pre>
+        </div>
+        <div class="mk-right">
+          <div class="mk-lbl o">✅ checks every position</div>
+<pre><code>while (low &lt;= high) { ... }</code></pre>
+        </div>
+      </div>
+      <div class="mk-why">When low == high there is exactly one candidate left. Strict <code>&lt;</code> exits before checking it — the answer is silently missed.</div>
     </div>
 
-    <div class="m-card">
-      <div class="m-title">Early-exit check placed after the loop — too late</div>
-      <div class="m-body">In the feasibility greedy, the "too many workers" check must be <em>inside</em> the loop — the moment a new worker is spawned and the count exceeds the limit, return false immediately. Checking after the loop means you finish assigning all elements even though you already know it's impossible, wasting time and potentially producing wrong results on large inputs.</div>
+    <div class="mk-card">
+      <div class="mk-title">Boundary shrink — infinite loop</div>
+      <div class="mk-split">
+        <div class="mk-wrong">
+          <div class="mk-lbl x">❌ range never shrinks</div>
+<pre><code>low  = mid;    // stuck when low==mid
+high = mid;    // stuck when high==mid</code></pre>
+        </div>
+        <div class="mk-right">
+          <div class="mk-lbl o">✅ always makes progress</div>
+<pre><code>low  = mid + 1;
+high = mid - 1;</code></pre>
+        </div>
+      </div>
+      <div class="mk-why">When low and high are adjacent, <code>mid == low</code>. Setting <code>low = mid</code> leaves low unchanged — the loop spins forever.</div>
     </div>
 
-    <div class="m-card">
-      <div class="m-title">maxSubArrayFactor — check semantics reversed</div>
-      <div class="m-body">The feasibility function returns <code>true</code> when <em>no</em> window of the candidate length exceeds B (length is valid). On true: store K, move <code>low = mid + 1</code> (try longer). On false: move <code>high = mid - 1</code>. Getting this backwards maximizes rather than the longest valid length.</div>
+    <div class="mk-card">
+      <div class="mk-title">Boundary search — returning on first match</div>
+      <div class="mk-split">
+        <div class="mk-wrong">
+          <div class="mk-lbl x">❌ finds any occurrence</div>
+<pre><code>if (a[mid] == target) return mid;</code></pre>
+        </div>
+        <div class="mk-right">
+          <div class="mk-lbl o">✅ finds first / last</div>
+<pre><code>if (a[mid] == target) {
+    ans  = mid;
+    high = mid - 1; // leftmost
+ // low  = mid + 1; // rightmost
+}</code></pre>
+        </div>
+      </div>
+      <div class="mk-why">A match at mid might not be the leftmost/rightmost. Save mid and keep searching in the correct direction.</div>
     </div>
 
-    <div class="m-card">
-      <div class="m-title">Forgetting edge cases before the search: students &gt; books, empty input</div>
-      <div class="m-body">If there are more students than books, at least one student gets nothing — return -1. If the books array is empty or null, return -1. These checks must come before computing low/high, otherwise the computed bounds are meaningless.</div>
-    </div>
-  </div>
-
-  <!-- ───────────────────── Linked List ───────────────────── -->
-  <div class="sec">
-    <div class="sec-title">Linked List (d24, d25)</div>
-
-    <div class="m-card">
-      <div class="m-title">Not saving next before breaking the pointer — loses the rest of the list</div>
-      <div class="m-body">In 3-pointer reverse: <code>curr.next = prev</code> breaks the forward link. You must capture <code>next = curr.next</code> <em>first</em>. Order that works every time: <code>next = curr.next → curr.next = prev → prev = curr → curr = next</code>. Skipping the save loses everything after curr with no error — the list is just truncated.</div>
-    </div>
-
-    <div class="m-card">
-      <div class="m-title">Head deletion treated as a special case — use a dummy node instead</div>
-      <div class="m-body">Without a dummy, deleting the head forces an <code>if (head)</code> branch at the top of every function. With a dummy: <code>dummy.next = head</code>. Head deletion and middle deletion are identical: <code>prev.next = curr.next</code>. Return <code>dummy.next</code>. Never write special-case head logic when a dummy is available.</div>
+    <div class="mk-card">
+      <div class="mk-title">lower_bound — checking only lb, not lb − 1</div>
+      <div class="mk-split">
+        <div class="mk-wrong">
+          <div class="mk-lbl x">❌ misses the closer value</div>
+          <div class="mk-text">Return <code>a[lb]</code> directly as the closest.</div>
+        </div>
+        <div class="mk-right">
+          <div class="mk-lbl o">✅ compare both neighbours</div>
+<pre><code>if (lb &gt; 0 &amp;&amp; Math.abs(a[lb-1]-t)
+         &lt;= Math.abs(a[lb]-t))
+    return a[lb - 1];
+return a[lb];</code></pre>
+        </div>
+      </div>
+      <div class="mk-why"><code>lb</code> is the first index ≥ target. The closest value could be at <code>lb - 1</code>. Always check both.</div>
     </div>
 
-    <div class="m-card">
-      <div class="m-title">reverseBetween — wrong reconnection order: head before tail</div>
-      <div class="m-body">After reversing B..C, the original B-node is now the <em>tail</em> and prev is the new <em>head</em>. Reconnect in this exact order:<br>
-        1. <code>prevNode.next.next = curr</code> — tail → node after C (curr is the node just past C)<br>
-        2. <code>prevNode.next = prev</code> — node before B → new head<br>
-        Doing step 2 first overwrites <code>prevNode.next</code> (which still points to the old B / new tail), so the tail is disconnected from curr forever.</div>
-    </div>
-
-    <div class="m-card">
-      <div class="m-title">reverseBetween — off-by-one reaching prevNode</div>
-      <div class="m-body">prevNode must stop at the node <em>just before</em> position B (1-indexed). Loop <code>for (i = 1; i &lt; B; i++)</code> — runs B−1 times. Writing <code>i &lt;= B</code> or <code>i &lt; B - 1</code> puts prevNode one position off, causing the entire reconnection to land on the wrong nodes.</div>
-    </div>
-
-    <div class="m-card">
-      <div class="m-title">reverseKGroup — not counting K nodes before reversing</div>
-      <div class="m-body">Before reversing, walk forward K steps and count. If count &lt; K, the tail has fewer than K nodes — return it as-is (per the problem). Reversing without this check processes a partial group and produces a wrong output with no runtime error.</div>
-    </div>
-
-    <div class="m-card">
-      <div class="m-title">reverseKGroup — not connecting reversed group to the recursive result</div>
-      <div class="m-body">After the K-node reverse, <code>head</code> (original first node, now tail of the reversed segment) must point to <code>reverseKGroup(curr, k)</code>. Writing <code>head.next = curr</code> skips the recursive reversal — the rest of the list stays in original order.</div>
-    </div>
-
-    <div class="m-card">
-      <div class="m-title">deleteNode — creating a new node instead of copying the next value in-place</div>
-      <div class="m-body">You do not have the predecessor. The trick: copy <code>node.next.val</code> into <code>node.val</code>, then skip <code>node.next</code> via <code>node.next = node.next.next</code>. Creating a new node and trying to swap references fails because external references still point to the original node object.</div>
-    </div>
-
-    <div class="m-card">
-      <div class="m-title">copyRandomList — wiring original nodes into the clone's pointers</div>
-      <div class="m-body">In the 2-pass approach, Pass 1 builds the map <code>original → clone</code>. Pass 2 must use <code>store.get(current.next)</code> and <code>store.get(current.random)</code> to fetch the <em>clone</em> nodes. Writing <code>clone.next = current.next</code> wires the clone's next to the <em>original</em> list node — the clone chain is then entangled with the original instead of being independent.</div>
-    </div>
-
-    <div class="m-card">
-      <div class="m-title">removeNthFromEnd — negative deleteIndex when B &gt; length</div>
-      <div class="m-body">If B equals the list length, <code>deleteIndex = length - B = 0</code>, which correctly removes the head. If B &gt; length (invalid input), the index goes negative. Clamp: <code>if (deleteIndex &lt; 0) deleteIndex = 0</code>. Without the clamp, <code>deleteAtIndex</code> receives a negative index and may return without deleting anything.</div>
-    </div>
-  </div>
-
-  <!-- ───────────────────── Stack ───────────────────── -->
-  <div class="sec">
-    <div class="sec-title">Stack (d26, d27)</div>
-
-    <div class="m-card">
-      <div class="m-title">Pop or peek without isEmpty check</div>
-      <div class="m-body">An empty stack throws. Check <code>isEmpty()</code> before every pop and peek — without exception, even when you think the stack cannot be empty at that point.</div>
-    </div>
-
-    <div class="m-card">
-      <div class="m-title">Matching wrong bracket pair</div>
-      <div class="m-body">When a closing bracket arrives, the top must be the exact corresponding opener. Checking only that the stack is non-empty lets mismatched pairs (e.g. <code>[)</code>) pass silently.</div>
-    </div>
-
-    <div class="m-card">
-      <div class="m-title">Redundant braces — checking for operator after the loop instead of during pop</div>
-      <div class="m-body">When popping back to the matching <code>(</code>, track whether any operator was seen among the popped items. This check belongs <em>inside</em> the pop loop, not after it. Checking after loses the state once the loop ends.</div>
-    </div>
-
-    <div class="m-card">
-      <div class="m-title">Monotonic stack — storing values instead of indices</div>
-      <div class="m-body">You need the <em>position</em> of the nearest smaller/greater element, not just its value. Push indices. Access values as <code>a[stack.peek()]</code>. Storing values makes distance calculations impossible.</div>
+    <div class="mk-card">
+      <div class="mk-title">Rotated array — guessing which half contains target</div>
+      <div class="mk-split">
+        <div class="mk-wrong">
+          <div class="mk-lbl x">❌ guessing — wrong on edge cases</div>
+          <div class="mk-text">Directly comparing target to a[mid] without identifying the sorted half first.</div>
+        </div>
+        <div class="mk-right">
+          <div class="mk-lbl o">✅ identify sorted half first</div>
+<pre><code>if (a[low] &lt;= a[mid]) {            // left sorted
+    if (t &gt;= a[low] &amp;&amp; t &lt; a[mid])
+        high = mid - 1;
+    else low = mid + 1;
+} else {                            // right sorted
+    if (t &gt; a[mid] &amp;&amp; t &lt;= a[high])
+        low = mid + 1;
+    else high = mid - 1;
+}</code></pre>
+        </div>
+      </div>
+      <div class="mk-why">One half is always fully sorted. Identify it in O(1), then check if target belongs there. Only then decide which side to eliminate.</div>
     </div>
   </div>
 
-  <!-- ───────────────────── Trees / BST ───────────────────── -->
-  <div class="sec">
-    <div class="sec-title">Trees / BST (d29, d30, d31)</div>
+  <!-- ══════════════════════════════════════════
+       BINARY SEARCH ON ANSWER SPACE
+  ══════════════════════════════════════════ -->
+  <div class="mk-group">
+    <div class="mk-group-hdr">Binary Search on Answer Space <span class="mk-day">d23</span></div>
 
-    <div class="m-card">
-      <div class="m-title">Accessing a child without null check</div>
-      <div class="m-body"><code>node.left.val</code> without confirming <code>node.left != null</code> crashes. Handle null as the very first line of every recursive function.</div>
+    <div class="mk-card">
+      <div class="mk-title">Lower bound — starting at 0 instead of max(elements)</div>
+      <div class="mk-split">
+        <div class="mk-wrong">
+          <div class="mk-lbl x">❌ invalid start — wastes half the range</div>
+<pre><code>long low = 0, high = totalSum;</code></pre>
+        </div>
+        <div class="mk-right">
+          <div class="mk-lbl o">✅ smallest feasible value</div>
+<pre><code>long low = maxElement, high = totalSum;</code></pre>
+        </div>
+      </div>
+      <div class="mk-why">Any candidate below the largest single element is immediately infeasible — one worker must take that whole piece alone. Starting at 0 wastes ~log(maxElement) steps and can pass invalid values to the feasibility check.</div>
     </div>
 
-    <div class="m-card">
-      <div class="m-title">BST validation with int bounds — fails on MIN/MAX_VALUE nodes</div>
-      <div class="m-body">Passing <code>Integer.MIN_VALUE</code> / <code>Integer.MAX_VALUE</code> as initial bounds fails when a node holds exactly those values. Use <code>Long.MIN_VALUE</code> / <code>Long.MAX_VALUE</code>.</div>
+    <div class="mk-card">
+      <div class="mk-title">Direction confusion — minimize-max vs maximize-min</div>
+      <div class="mk-split">
+        <div class="mk-wrong">
+          <div class="mk-lbl x">❌ swapped — gives worst valid answer</div>
+<pre><code>// minimize-max (painters):
+if (feasible(mid)) low = mid + 1; // ← wrong dir
+// maximize-min (cows):
+if (feasible(mid)) high = mid - 1; // ← wrong dir</code></pre>
+        </div>
+        <div class="mk-right">
+          <div class="mk-lbl o">✅ correct directions</div>
+<pre><code>// minimize-max: pass → try smaller
+if (feasible(mid)) { ans=mid; high=mid-1; }
+else               { low=mid+1; }
+// maximize-min: pass → try larger
+if (feasible(mid)) { ans=mid; low=mid+1; }
+else               { high=mid-1; }</code></pre>
+        </div>
+      </div>
+      <div class="mk-why">These two problem types are mirror images. Minimize-max: when mid works, shrink the upper bound (try smaller). Maximize-min: when mid works, push the lower bound (try larger).</div>
     </div>
 
-    <div class="m-card">
-      <div class="m-title">Not propagating the failure sentinel — balanced tree check</div>
-      <div class="m-body">When a helper returns -1 to signal an unbalanced subtree, every parent call must check for -1 before computing its own height. Skipping the check produces a wrong "balanced" answer that bubbles up through all callers.</div>
+    <div class="mk-card">
+      <div class="mk-title">Feasibility sum — integer overflow</div>
+      <div class="mk-split">
+        <div class="mk-wrong">
+          <div class="mk-lbl x">❌ overflows silently</div>
+<pre><code>int currentSum = 0;
+if (currentSum + board &gt; mid) { ... }</code></pre>
+        </div>
+        <div class="mk-right">
+          <div class="mk-lbl o">✅ use long throughout</div>
+<pre><code>long currentSum = 0;
+long low = maxEl, high = totalSum;
+long mid = low + (high - low) / 2;
+if (currentSum + board &gt; mid) { ... }</code></pre>
+        </div>
+      </div>
+      <div class="mk-why">When mid is near totalSum (which itself can be N × 10⁹), <code>currentSum + board</code> overflows int. Declare all sums and boundaries as <code>long</code>.</div>
     </div>
 
-    <div class="m-card">
-      <div class="m-title">Off-by-one in tree construction from two traversals</div>
-      <div class="m-body">The number of nodes in the left subtree from inorder drives every index calculation. Being off by one silently builds the wrong tree — no error is thrown because the recursion still completes.</div>
+    <div class="mk-card">
+      <div class="mk-title">Feasibility check — early exit after the loop instead of inside</div>
+      <div class="mk-split">
+        <div class="mk-wrong">
+          <div class="mk-lbl x">❌ checks too late</div>
+<pre><code>for (int x : items) {
+    if (curr + x &gt; mid) { used++; curr = x; }
+    else curr += x;
+}
+if (used &gt; workers) return false; // too late</code></pre>
+        </div>
+        <div class="mk-right">
+          <div class="mk-lbl o">✅ exit the moment it's impossible</div>
+<pre><code>for (int x : items) {
+    if (curr + x &gt; mid) {
+        used++; curr = x;
+        if (used &gt; workers) return false; // inside
+    } else curr += x;
+}
+return true;</code></pre>
+        </div>
+      </div>
+      <div class="mk-why">Once workers exceed the limit you already know the answer. Finishing the loop wastes O(N) work and, on pathological inputs, can produce incorrect results if overflow occurs.</div>
     </div>
   </div>
+
+  <!-- ══════════════════════════════════════════
+       LINKED LIST
+  ══════════════════════════════════════════ -->
+  <div class="mk-group">
+    <div class="mk-group-hdr">Linked List <span class="mk-day">d24, d25</span></div>
+
+    <div class="mk-card">
+      <div class="mk-title">3-pointer reverse — not saving next before flipping</div>
+      <div class="mk-split">
+        <div class="mk-wrong">
+          <div class="mk-lbl x">❌ loses the rest of the list</div>
+<pre><code>curr.next = prev;  // forward link is gone
+prev = curr;
+curr = curr.next;  // curr.next is now prev!</code></pre>
+        </div>
+        <div class="mk-right">
+          <div class="mk-lbl o">✅ save → flip → slide → slide</div>
+<pre><code>next      = curr.next;  // 1. save first
+curr.next = prev;       // 2. flip
+prev      = curr;       // 3. slide prev
+curr      = next;       // 4. slide curr</code></pre>
+        </div>
+      </div>
+      <div class="mk-why">Once you flip <code>curr.next</code>, the only way forward is lost. You must save it before touching it. Order is non-negotiable.</div>
+    </div>
+
+    <div class="mk-card">
+      <div class="mk-title">Head deletion — special-casing instead of using dummy</div>
+      <div class="mk-split">
+        <div class="mk-wrong">
+          <div class="mk-lbl x">❌ branching code, easy to miss cases</div>
+<pre><code>if (head.val == val) return head.next;
+// ... different logic for middle nodes</code></pre>
+        </div>
+        <div class="mk-right">
+          <div class="mk-lbl o">✅ dummy makes all positions identical</div>
+<pre><code>dummy.next = head;
+// prev.next = curr.next  works for ALL positions
+return dummy.next;</code></pre>
+        </div>
+      </div>
+      <div class="mk-why">A dummy node before the real head means head deletion and mid-list deletion are the same operation. One code path, no edge cases.</div>
+    </div>
+
+    <div class="mk-card">
+      <div class="mk-title">reverseBetween — connecting head before tail</div>
+      <div class="mk-split">
+        <div class="mk-wrong">
+          <div class="mk-lbl x">❌ tail pointer is lost</div>
+<pre><code>prevNode.next = prev;        // head wired first
+prevNode.next.next = curr;   // prevNode.next now
+                             // points to prev, not old-B</code></pre>
+        </div>
+        <div class="mk-right">
+          <div class="mk-lbl o">✅ tail first, then head</div>
+<pre><code>prevNode.next.next = curr; // tail → after C  (1st)
+prevNode.next = prev;      // before-B → new head (2nd)</code></pre>
+        </div>
+      </div>
+      <div class="mk-why"><code>prevNode.next</code> still points to old-B (the new tail) at this moment. Wire the tail first. Once you wire the head (step 2), that reference is overwritten forever.</div>
+    </div>
+
+    <div class="mk-card">
+      <div class="mk-title">reverseBetween — off-by-one reaching prevNode</div>
+      <div class="mk-split">
+        <div class="mk-wrong">
+          <div class="mk-lbl x">❌ lands on wrong node</div>
+<pre><code>for (i = 1; i &lt;= B; i++)   // goes one too far
+    prevNode = prevNode.next;
+for (i = 1; i &lt; B - 1; i++) // stops one too early
+    prevNode = prevNode.next;</code></pre>
+        </div>
+        <div class="mk-right">
+          <div class="mk-lbl o">✅ stops at B−1 (just before B)</div>
+<pre><code>for (i = 1; i &lt; B; i++)    // runs B-1 times
+    prevNode = prevNode.next;</code></pre>
+        </div>
+      </div>
+      <div class="mk-why">prevNode must be the node immediately before position B so that <code>prevNode.next</code> is the first node to reverse. Off by one and the entire reconnection lands on wrong nodes.</div>
+    </div>
+
+    <div class="mk-card">
+      <div class="mk-title">reverseKGroup — not counting K before reversing</div>
+      <div class="mk-split">
+        <div class="mk-wrong">
+          <div class="mk-lbl x">❌ reverses partial tail group</div>
+<pre><code>// directly reverse without checking remaining count
+ListNode curr = head; ListNode prev = null;
+for (int i = 0; i &lt; k; i++) { ... } // crashes or wrong</code></pre>
+        </div>
+        <div class="mk-right">
+          <div class="mk-lbl o">✅ count K nodes first</div>
+<pre><code>ListNode check = head; int count = 0;
+while (check != null &amp;&amp; count &lt; k)
+    { check = check.next; count++; }
+if (count &lt; k) return head; // tail: return as-is</code></pre>
+        </div>
+      </div>
+      <div class="mk-why">The problem requires leaving the final group unchanged if it has fewer than K nodes. Without the count check you silently reverse a partial group.</div>
+    </div>
+
+    <div class="mk-card">
+      <div class="mk-title">reverseKGroup — head.next points to curr, not to recursive result</div>
+      <div class="mk-split">
+        <div class="mk-wrong">
+          <div class="mk-lbl x">❌ rest of list stays unreversed</div>
+<pre><code>head.next = curr; // skips recursive reversal</code></pre>
+        </div>
+        <div class="mk-right">
+          <div class="mk-lbl o">✅ tail connects to next reversed group</div>
+<pre><code>head.next = reverseKGroup(curr, k); // recurse</code></pre>
+        </div>
+      </div>
+      <div class="mk-why">After reversing K nodes, <code>head</code> is now the tail of this group. It must connect to the <em>result</em> of reversing the next group — not to curr directly.</div>
+    </div>
+
+    <div class="mk-card">
+      <div class="mk-title">deleteNode — creating a new node instead of mutating in place</div>
+      <div class="mk-split">
+        <div class="mk-wrong">
+          <div class="mk-lbl x">❌ external refs still point to original</div>
+          <div class="mk-text">Creating a new node and trying to swap references. External pointers still hold the original node's address — nothing changes for them.</div>
+        </div>
+        <div class="mk-right">
+          <div class="mk-lbl o">✅ copy-next trick</div>
+<pre><code>node.val  = node.next.val;
+node.next = node.next.next;</code></pre>
+        </div>
+      </div>
+      <div class="mk-why">You don't have the predecessor, so you can't unlink this node. Instead, disguise it as its successor by copying the next value in, then remove the successor.</div>
+    </div>
+
+    <div class="mk-card">
+      <div class="mk-title">copyRandomList — wiring originals instead of clones</div>
+      <div class="mk-split">
+        <div class="mk-wrong">
+          <div class="mk-lbl x">❌ clone entangled with original list</div>
+<pre><code>clone.next   = curr.next;    // points to original node
+clone.random = curr.random;  // points to original node</code></pre>
+        </div>
+        <div class="mk-right">
+          <div class="mk-lbl o">✅ always go through the map</div>
+<pre><code>clone.next   = map.get(curr.next);    // null-safe
+clone.random = map.get(curr.random);  // null-safe</code></pre>
+        </div>
+      </div>
+      <div class="mk-why"><code>map.get(null)</code> returns null — no null check needed. If you wire <code>curr.next</code> directly, the clone's chain points into the original list. Not a deep copy.</div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════════
+       STACK
+  ══════════════════════════════════════════ -->
+  <div class="mk-group">
+    <div class="mk-group-hdr">Stack / Monotonic Stack <span class="mk-day">d26, d27</span></div>
+
+    <div class="mk-card">
+      <div class="mk-title">Pop or peek without isEmpty check</div>
+      <div class="mk-split">
+        <div class="mk-wrong">
+          <div class="mk-lbl x">❌ throws on empty stack</div>
+<pre><code>char top = stack.pop(); // EmptyStackException</code></pre>
+        </div>
+        <div class="mk-right">
+          <div class="mk-lbl o">✅ always guard first</div>
+<pre><code>if (!stack.isEmpty()) {
+    char top = stack.pop();
+}</code></pre>
+        </div>
+      </div>
+      <div class="mk-why">Even when you're sure it can't be empty — check. The one time you're wrong causes a crash with no useful error message.</div>
+    </div>
+
+    <div class="mk-card">
+      <div class="mk-title">Bracket matching — checking non-empty instead of exact pair</div>
+      <div class="mk-split">
+        <div class="mk-wrong">
+          <div class="mk-lbl x">❌ lets mismatched pairs pass</div>
+<pre><code>if (!stack.isEmpty()) stack.pop(); // [) passes!</code></pre>
+        </div>
+        <div class="mk-right">
+          <div class="mk-lbl o">✅ verify exact counterpart</div>
+<pre><code>if (stack.isEmpty() || stack.pop() != matchOf(c))
+    return false;</code></pre>
+        </div>
+      </div>
+      <div class="mk-why">Non-empty only proves something is on the stack — not that it's the right thing. <code>[)</code> is invalid but passes the non-empty check.</div>
+    </div>
+
+    <div class="mk-card">
+      <div class="mk-title">Redundant braces — operator flag checked after the pop loop</div>
+      <div class="mk-split">
+        <div class="mk-wrong">
+          <div class="mk-lbl x">❌ flag state is lost after loop</div>
+<pre><code>while (stack.peek() != '(') stack.pop();
+stack.pop(); // remove '('
+if (!hasOp) return true; // hasOp never set</code></pre>
+        </div>
+        <div class="mk-right">
+          <div class="mk-lbl o">✅ track operator inside the loop</div>
+<pre><code>while (stack.peek() != '(') {
+    hasOp |= isOperator(stack.peek()); // inside
+    stack.pop();
+}
+stack.pop(); // remove '('
+if (!hasOp) return true;</code></pre>
+        </div>
+      </div>
+      <div class="mk-why">You must inspect each popped character <em>before</em> discarding it. After the loop the characters are gone.</div>
+    </div>
+
+    <div class="mk-card">
+      <div class="mk-title">Monotonic stack — pushing values instead of indices</div>
+      <div class="mk-split">
+        <div class="mk-wrong">
+          <div class="mk-lbl x">❌ can't compute distances</div>
+<pre><code>stack.push(a[i]); // value — position is lost</code></pre>
+        </div>
+        <div class="mk-right">
+          <div class="mk-lbl o">✅ push index, access value via a[i]</div>
+<pre><code>stack.push(i);                  // index
+// compare: a[stack.peek()] &gt; a[i]
+// answer:  nsr[stack.pop()] = i</code></pre>
+        </div>
+      </div>
+      <div class="mk-why">The answer for each element is its position, not its value. You need <code>i - stack.peek()</code> for distances or <code>nsr[popped] = i</code> for the next-smaller index. Values don't give you that.</div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════════
+       TREES / BST
+  ══════════════════════════════════════════ -->
+  <div class="mk-group">
+    <div class="mk-group-hdr">Trees / BST <span class="mk-day">d29, d30, d31</span></div>
+
+    <div class="mk-card">
+      <div class="mk-title">Accessing child without null check</div>
+      <div class="mk-split">
+        <div class="mk-wrong">
+          <div class="mk-lbl x">❌ NullPointerException on leaf nodes</div>
+<pre><code>int solve(TreeNode node) {
+    return node.left.val + solve(node.right);
+}</code></pre>
+        </div>
+        <div class="mk-right">
+          <div class="mk-lbl o">✅ null check is always line 1</div>
+<pre><code>int solve(TreeNode node) {
+    if (node == null) return NEUTRAL;
+    int left  = solve(node.left);
+    int right = solve(node.right);
+    return combine(left, right, node.val);
+}</code></pre>
+        </div>
+      </div>
+      <div class="mk-why">Every tree recursion must handle null first. Leaves have null children. There are no exceptions.</div>
+    </div>
+
+    <div class="mk-card">
+      <div class="mk-title">BST validation — int bounds fail on MIN/MAX_VALUE nodes</div>
+      <div class="mk-split">
+        <div class="mk-wrong">
+          <div class="mk-lbl x">❌ fails when node.val == Integer.MIN_VALUE</div>
+<pre><code>isValid(root, Integer.MIN_VALUE, Integer.MAX_VALUE)
+// node.val &lt;= min fails when val IS min</code></pre>
+        </div>
+        <div class="mk-right">
+          <div class="mk-lbl o">✅ long bounds have no overlap</div>
+<pre><code>isValid(root, Long.MIN_VALUE, Long.MAX_VALUE)
+// node.val (int) can never equal Long.MIN/MAX</code></pre>
+        </div>
+      </div>
+      <div class="mk-why">A node holding exactly <code>Integer.MIN_VALUE</code> must satisfy <code>val &gt; min_bound</code>. If min_bound is also <code>Integer.MIN_VALUE</code> the check <code>val &gt; min</code> is false even for a valid node.</div>
+    </div>
+
+    <div class="mk-card">
+      <div class="mk-title">isBalanced — not propagating the -1 sentinel upward</div>
+      <div class="mk-split">
+        <div class="mk-wrong">
+          <div class="mk-lbl x">❌ wrong answer bubbles up as a valid height</div>
+<pre><code>int left  = height(node.left);
+int right = height(node.right);
+// forgot to check if left or right == -1
+return 1 + Math.max(left, right);</code></pre>
+        </div>
+        <div class="mk-right">
+          <div class="mk-lbl o">✅ check sentinel before using the value</div>
+<pre><code>int left  = height(node.left);
+int right = height(node.right);
+if (left == -1 || right == -1) return -1;
+if (Math.abs(left - right) &gt; 1) return -1;
+return 1 + Math.max(left, right);</code></pre>
+        </div>
+      </div>
+      <div class="mk-why">Once any subtree returns -1 (unbalanced), every ancestor must pass -1 up immediately. Using -1 in a <code>Math.max</code> calculation silently produces a garbage height that looks valid.</div>
+    </div>
+
+    <div class="mk-card">
+      <div class="mk-title">Tree reconstruction — off-by-one in index slicing</div>
+      <div class="mk-split">
+        <div class="mk-wrong">
+          <div class="mk-lbl x">❌ wrong split — silent garbage tree</div>
+<pre><code>int k = inMap.get(pre[ps]);
+// left subtree preorder ends at ps + k (off by 1)
+root.left  = build(pre, ps+1, ps+k, ...);
+root.right = build(pre, ps+k, pe, ...);</code></pre>
+        </div>
+        <div class="mk-right">
+          <div class="mk-lbl o">✅ leftCount = k - inStart drives everything</div>
+<pre><code>int k = inMap.get(pre[ps]);
+int leftCount = k - is;    // nodes in left subtree
+root.left  = build(pre, ps+1,            ps+leftCount, in, is,  k-1, inMap);
+root.right = build(pre, ps+leftCount+1,  pe,           in, k+1, ie,  inMap);</code></pre>
+        </div>
+      </div>
+      <div class="mk-why">The number of nodes in the left subtree (<code>k - inStart</code>) is the single source of truth for all index arithmetic. Derive every slice from it — never guess.</div>
+    </div>
+  </div>
+
 </main>
 
 </body>
