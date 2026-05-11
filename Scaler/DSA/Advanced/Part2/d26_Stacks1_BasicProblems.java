@@ -16,6 +16,8 @@ public class d26_Stacks1_BasicProblems {
 
 
     private final PrintHelper printHelper = new PrintHelper();
+    Stack<Integer> stack;
+    Stack<Integer> minStack;
 
     public static void main(String[] args) {
 
@@ -31,7 +33,10 @@ public class d26_Stacks1_BasicProblems {
         d26_Stacks1_BasicProblems.doubleCharacterTrouble("abccbc"); // Q3 // LC1047
         d26_Stacks1_BasicProblems.passingGameOfBall(10, 48, new int[]{4, 0, 30, 0, 41, 28, 50, 2, 47, 39}); // Q4 // LC1472 Similar leetcode
 
+
+        d26_Stacks1_BasicProblems.minStackInit(); // AQ1 // LC155
         d26_Stacks1_BasicProblems.redundantBracesUnecessaryBraces("(a+(a+b))"); // AQ2
+        d26_Stacks1_BasicProblems.checkTwoBracketExpressions("-(a+b+c)", "-a-b-c"); // AQ3
         d26_Stacks1_BasicProblems.infixToPostfix("a+b*(c^d-e)^(f+g*h)-i"); // AQ4
 
     }
@@ -387,6 +392,76 @@ public class d26_Stacks1_BasicProblems {
         }
 
         return postfix.toString();
+    }
+
+    public void minStackInit() {
+        stack = new Stack<>();
+        minStack = new Stack<>();
+    }
+
+    public void push(int val) {
+        stack.push(val);
+        if (!minStack.isEmpty()) {
+            minStack.push(Math.min(val, minStack.peek()));
+        } else {
+            minStack.push(val);
+        }
+    }
+
+    public void pop() {
+        if (!stack.isEmpty()) {
+            stack.pop();
+            minStack.pop();
+        }
+    }
+
+    public int top() {
+        if (!stack.isEmpty()) {
+            return stack.peek();  // peek not pop
+        }
+        return -1;
+    }
+
+    public int getMin() {
+        if (!stack.isEmpty()) {
+            return minStack.peek();
+        }
+        return -1;
+    }
+
+    public int checkTwoBracketExpressions(String A, String B) {
+        int[] first = build(A);
+        int[] second = build(B);
+
+        for (int i = 0; i < 26; i++) {
+            if (first[i] != second[i]) {
+                return 0;
+            }
+        }
+        return 1;
+    }
+
+    public int[] build(String X) {
+        int[] sign = new int[26];
+        Stack<Integer> stack = new Stack<>();
+        int currentSign = 1;
+        stack.push(1);
+
+        for (char c : X.toCharArray()) {
+            if (c == '+') {
+                currentSign = 1;
+            } else if (c == '-') {
+                currentSign = -1;
+            } else if (c == '(') {
+                stack.push(stack.peek() * currentSign);
+                currentSign = 1;
+            } else if (c == ')') {
+                stack.pop();
+            } else {
+                sign[c - 'a'] = stack.peek() * currentSign;
+            }
+        }
+        return sign;
     }
 
     /* Section : ------------------------------- [ Leetcode ] ------------------------------- */
