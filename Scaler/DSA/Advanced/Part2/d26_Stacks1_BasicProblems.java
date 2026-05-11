@@ -32,6 +32,7 @@ public class d26_Stacks1_BasicProblems {
         d26_Stacks1_BasicProblems.passingGameOfBall(10, 48, new int[]{4, 0, 30, 0, 41, 28, 50, 2, 47, 39}); // Q4 // LC1472 Similar leetcode
 
         d26_Stacks1_BasicProblems.redundantBracesUnecessaryBraces("(a+(a+b))"); // AQ2
+        d26_Stacks1_BasicProblems.infixToPostfix("a+b*(c^d-e)^(f+g*h)-i"); // AQ4
 
     }
 
@@ -294,6 +295,98 @@ public class d26_Stacks1_BasicProblems {
             }
         }
         return 0;
+    }
+
+    private int precedence(char op) {
+        switch (op) {
+            case '^':
+                return 3;
+            case '*':
+            case '/':
+                return 2;
+            case '+':
+            case '-':
+                return 1;
+            default:
+                return 0;
+        }
+    }
+
+    public String infixToPostfix(String A) {
+        /*
+         * INFIX TO POSTFIX - Stack
+         *
+         * STRATEGY: operand → output | operator → pop >= precedence then push | brackets → scope control
+         *
+         * EXAMPLE: a+b*c-d
+         *   a        → output             output=[a]        stack=[]
+         *   +        → stack empty, push  output=[a]        stack=[+]
+         *   b        → output             output=[ab]       stack=[+]
+         *   *        → prec(+)<prec(*),   output=[ab]       stack=[+,*]
+         *              push
+         *   c        → output             output=[abc]      stack=[+,*]
+         *   -        → prec(*)>=prec(-),  output=[abc*]     stack=[+]
+         *              pop * then         output=[abc*+]    stack=[]
+         *              prec(+)>=prec(-),
+         *              pop + then push -  output=[abc*+]    stack=[-]
+         *   d        → output             output=[abc*+d]   stack=[-]
+         *   END      → pop all            output=[abc*+d-]  stack=[]
+         *
+         * OPERATOR RULE:
+         *   pop stack while → top != '('
+         *                   → top precedence >= current precedence
+         *   then push current
+         *
+         * BRACKET RULE:
+         *   '(' → push as wall, never pop past it
+         *   ')' → pop until '(' found, discard '('
+         *
+         * PRECEDENCE:  ^ = 3  |  * / = 2  |  + - = 1
+         * ASSOCIATIVE: all left-to-right → equal precedence always pops
+         *
+         * Time: O(N)  Space: O(N)
+         */
+
+        StringBuilder postfix = new StringBuilder();
+        Stack<Character> stk = new Stack<>();
+
+        for (char c : A.toCharArray()) {
+
+            // 1. Operand → directly to output
+            if (Character.isLetterOrDigit(c)) {
+                postfix.append(c);
+            }
+
+            // 2. '(' → push as wall
+            else if (c == '(') {
+                stk.push(c);
+            }
+
+            // 3. ')' → pop until matching '('
+            else if (c == ')') {
+                while (!stk.isEmpty() && stk.peek() != '(') {
+                    postfix.append(stk.pop());
+                }
+                stk.pop(); // discard '('
+            }
+
+            // 4. Operator → pop equal or higher precedence, then push
+            else {
+                while (!stk.isEmpty()
+                        && stk.peek() != '('
+                        && precedence(stk.peek()) >= precedence(c)) {
+                    postfix.append(stk.pop());
+                }
+                stk.push(c);
+            }
+        }
+
+        // 5. Pop all remaining operators
+        while (!stk.isEmpty()) {
+            postfix.append(stk.pop());
+        }
+
+        return postfix.toString();
     }
 
     /* Section : ------------------------------- [ Leetcode ] ------------------------------- */
