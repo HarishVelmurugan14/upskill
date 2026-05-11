@@ -108,11 +108,16 @@ public class Advanced_DSA_Part2 {
 
         d27_Stack2_NearestSmallGreatElements d27_Stack2_NearestSmallGreatElements = new d27_Stack2_NearestSmallGreatElements();
 
-        d27_Stack2_NearestSmallGreatElements.largestRectangleInAHistogram(null); // Q1 // LC84
-        d27_Stack2_NearestSmallGreatElements.prevSmallerValuesInAnArray(null); // Q2
-        d27_Stack2_NearestSmallGreatElements.identifyMaximumMinusMinimumInAllPossibleSubArrays(new int[]{4, 7, 3, 8}); // Q3
+        int[] hist = {8, 2, 4, 9, 7, 5, 3, 10};
+        d27_Stack2_NearestSmallGreatElements.nearestSmallerElementsToTheLeft(hist);  // util
+        d27_Stack2_NearestSmallGreatElements.nearestSmallerElementsToTheRight(hist); // util
+        d27_Stack2_NearestSmallGreatElements.nearestGreaterElementsToTheRight(hist); // util
 
-        d27_Stack2_NearestSmallGreatElements.nextGreaterValues(null); // AQ2 // LC739
+        d27_Stack2_NearestSmallGreatElements.largestRectangleInAHistogram(new int[]{2, 1, 5, 6, 2, 3});       // Q1 // LC84
+        d27_Stack2_NearestSmallGreatElements.prevSmallerValuesInAnArray(new int[]{4, 5, 2, 10, 8});            // Q2 // ~LC901
+        d27_Stack2_NearestSmallGreatElements.identifyMaximumMinusMinimumInAllPossibleSubArrays(new int[]{1, 3, 3}); // Q3
+
+        d27_Stack2_NearestSmallGreatElements.nextGreaterValues(new int[]{4, 5, 2, 10, 8});                    // AQ2 // LC739 LC503
 
         d27_Stack2_NearestSmallGreatElements.nextGreaterElementForSubsetQueriesInADistinctArrays
                 (new int[]{4, 1, 2}, new int[]{1, 3, 4, 2}); // LC496

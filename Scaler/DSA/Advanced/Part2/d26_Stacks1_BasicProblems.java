@@ -430,6 +430,31 @@ public class d26_Stacks1_BasicProblems {
     }
 
     public int checkTwoBracketExpressions(String A, String B) {
+
+        /*
+         * CHECK TWO BRACKET EXPRESSIONS - Stack sign tracking
+         *
+         * GOAL: check if two expressions evaluate to same result
+         *       by comparing net sign of each variable a-z
+         *
+         * STRATEGY: track effective sign of each variable considering nested brackets
+         *   stack stores cumulative sign of current bracket context
+         *   currentSign resets to +1 after each '('
+         *
+         * SIGN RULES:
+         *   '(' → push stack.peek() * currentSign (inherit outer context)
+         *   ')' → pop (exit bracket context)
+         *   '+' → currentSign = +1
+         *   '-' → currentSign = -1
+         *   'a'-'z' → sign[c] = stack.peek() * currentSign
+         *
+         * EXAMPLE: "a-(b+c)" vs "a-b-c"
+         *   a=+1, b=-1, c=-1  |  a=+1, b=-1, c=-1  → match → return 1
+         *
+         * COMPARE: sign arrays of both expressions, any mismatch → return 0
+         *
+         * Time: O(N)  Space: O(N)
+         */
         int[] first = build(A);
         int[] second = build(B);
 

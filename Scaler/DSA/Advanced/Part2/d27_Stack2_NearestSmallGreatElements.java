@@ -31,17 +31,47 @@ public class d27_Stack2_NearestSmallGreatElements {
         d27_Stack2_NearestSmallGreatElements.nearestSmallerElementsToTheRight(A);
         d27_Stack2_NearestSmallGreatElements.nearestGreaterElementsToTheRight(A);
 
-        d27_Stack2_NearestSmallGreatElements.largestRectangleInAHistogram(new int[]{2, 1, 5, 6, 2, 3}); // Q1
-        d27_Stack2_NearestSmallGreatElements.prevSmallerValuesInAnArray(new int[]{4, 5, 2, 10, 8}); // Q2
-        d27_Stack2_NearestSmallGreatElements.identifyMaximumMinusMinimumInAllPossibleSubArrays(new int[]{1,3,3}); // Q3
+        d27_Stack2_NearestSmallGreatElements.largestRectangleInAHistogram(new int[]{2, 1, 5, 6, 2, 3}); // Q1 // LC 84
+        d27_Stack2_NearestSmallGreatElements.prevSmallerValuesInAnArray(new int[]{4, 5, 2, 10, 8}); // Q2 // LC901
+        d27_Stack2_NearestSmallGreatElements.identifyMaximumMinusMinimumInAllPossibleSubArrays(new int[]{1, 3, 3}); // Q3
 
-        d27_Stack2_NearestSmallGreatElements.nextGreaterValues(new int[]{4, 5, 2, 10, 8}); // AQ2 // LC739
+        d27_Stack2_NearestSmallGreatElements.nextGreaterValues(new int[]{4, 5, 2, 10, 8}); // AQ2 // LC739 // LC503
         d27_Stack2_NearestSmallGreatElements.nextGreaterElementForSubsetQueriesInADistinctArrays(new int[]{4, 1, 2}, new int[]{1, 3, 4, 2}); // LC496
     }
 
     /* Section : ----------------------------------- [ Problems ] ------------------------------------ */
 
     public int identifyMaximumMinusMinimumInAllPossibleSubArrays(int[] A) {
+
+        /*
+         * SUM OF (MAX - MIN) FOR ALL SUBARRAYS - Monotonic stack x4
+         *
+         * GOAL: sum of (max - min) across all subarrays
+         *       = sum of contributions as MAX - sum of contributions as MIN
+         *
+         * CONTRIBUTION TRICK:
+         *   A[i] is MAX of subarrays where it is the greatest element
+         *   A[i] is MIN of subarrays where it is the smallest element
+         *
+         *   count as MAX = (i - prevGreater[i]) * (nextGreater[i] - i)
+         *   count as MIN = (i - prevSmaller[i]) * (nextSmaller[i] - i)
+         *
+         *   sum += A[i] * countAsMax - A[i] * countAsMin
+         *
+         * 4 ARRAYS:
+         *   prevSmaller[i] → index of nearest smaller to LEFT  (or -1)
+         *   nextSmaller[i] → index of nearest smaller to RIGHT (or N)
+         *   prevGreater[i] → index of nearest greater to LEFT  (or -1)
+         *   nextGreater[i] → index of nearest greater to RIGHT (or N)
+         *
+         * BOUNDARY DEFAULTS:
+         *   prev → -1 (no element to left)
+         *   next → N  (no element to right)
+         *
+         * NOTE: stack stores INDICES not values (unlike prevSmallerValues)
+         *
+         * Time: O(N)  Space: O(N)
+         */
         int N = A.length;
 //        print("Actual : ", A);
         int[] prevSmaller = new int[N];
@@ -137,6 +167,24 @@ public class d27_Stack2_NearestSmallGreatElements {
         A represents a histogram i.e A[i] denotes the height of the ith histogram's bar. Width of each bar is 1.
         Find the area of the largest rectangle formed by the histogram.
         */
+
+        /*
+         * LARGEST RECTANGLE IN HISTOGRAM - Stack (NSE left + right)
+         *
+         * STRATEGY: for each bar, find max width it can extend as the shortest bar
+         *   width = nextSmaller[i] - prevSmaller[i] - 1
+         *   area  = height * width
+         *
+         * EXAMPLE: A=[2,1,5,6,2,3]
+         *   i=2, h=5 → prevSmaller=1, nextSmaller=4 → width=4-1-1=2 → area=10
+         *   i=3, h=6 → prevSmaller=2, nextSmaller=4 → width=4-2-1=1 → area=6
+         *   maxArea=10
+         *
+         * prevSmaller[i] → index of nearest smaller to LEFT  (or -1 if none)
+         * nextSmaller[i] → index of nearest smaller to RIGHT (or N if none)
+         *
+         * Time: O(N)  Space: O(N)
+         */
         int N = A.length;
         int maxArea = -1;
         int[] prevSmallerElements = nearestSmallerElementsToTheLeft(A);
@@ -160,6 +208,26 @@ public class d27_Stack2_NearestSmallGreatElements {
         j < i AND
         A[j] < A[i]
         Elements for which no smaller element exist, consider the next smaller element as -1.
+         */
+
+        /*
+         * PREVIOUS SMALLER ELEMENT - Monotonic stack (increasing)
+         *
+         * STRATEGY: maintain stack of increasing values left to right
+         *   pop while stack.peek() >= A[i] (not smaller)
+         *   stack empty → no smaller exists → res[i] = -1
+         *   stack not empty → peek is nearest smaller → res[i] = peek
+         *   push A[i]
+         *
+         * EXAMPLE: A=[4,5,2,10,8]
+         *   i=0: res[0]=-1,  stack=[4]
+         *   i=1: peek=4<5  → res[1]=4,  stack=[4,5]
+         *   i=2: pop 5,4   → empty → res[2]=-1, stack=[2]
+         *   i=3: peek=2<10 → res[3]=2,  stack=[2,10]
+         *   i=4: pop 10    → peek=2<8  → res[4]=2,  stack=[2,8]
+         *   res=[-1,4,-1,2,2]
+         *
+         * Time: O(N)  Space: O(N)
          */
         int N = A.length;
         int[] res = new int[N];
@@ -216,6 +284,27 @@ public class d27_Stack2_NearestSmallGreatElements {
     }
 
     public int[] nextGreaterValues(int[] A) {
+        /*
+         * NEXT GREATER ELEMENT - Monotonic stack (decreasing), right to left
+         *
+         * STRATEGY: traverse right to left, maintain decreasing stack
+         *   pop while peek() <= A[i] (not greater)
+         *   stack empty → no greater exists → res[i] = -1
+         *   stack not empty → peek is next greater → res[i] = peek
+         *   push A[i]
+         *
+         * EXAMPLE: A=[4,5,2,10,8]
+         *   i=4: res[4]=-1,  stack=[8]
+         *   i=3: pop 8 → empty → res[3]=-1, stack=[10]
+         *   i=2: peek=10>2  → res[2]=10, stack=[10,2]  ← wait, push after
+         *   i=1: pop 2,10 → empty → res[1]=-1, stack=[5]
+         *   i=0: peek=5>4  → res[0]=5,  stack=[5,4]
+         *   res=[5,-1,10,-1,-1]
+         *
+         * NOTE: stores VALUES not indices (unlike contribution problems)
+         *
+         * Time: O(N)  Space: O(N)
+         */
         int N = A.length;
         int[] res = new int[N];
         Stack<Integer> stack = new Stack<>();
