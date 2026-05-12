@@ -31,13 +31,13 @@ public class d27_Stack2_NearestSmallGreatElements {
         d27_Stack2_NearestSmallGreatElements.nearestSmallerElementsToTheRight(A);
         d27_Stack2_NearestSmallGreatElements.nearestGreaterElementsToTheRight(A);
 
-        d27_Stack2_NearestSmallGreatElements.largestRectangleInAHistogram(new int[]{2, 1, 5, 6, 2, 3}); // Q1 // LC 84
-        d27_Stack2_NearestSmallGreatElements.prevSmallerValuesInAnArray(new int[]{4, 5, 2, 10, 8}); // Q2 // LC901
-        d27_Stack2_NearestSmallGreatElements.identifyMaximumMinusMinimumInAllPossibleSubArrays(new int[]{1, 3, 3}); // Q3
+        d27_Stack2_NearestSmallGreatElements.largestRectangleInAHistogram(new int[]{2, 1, 5, 6, 2, 3}); //#-scl-q1 // Q1 // LC 84
+        d27_Stack2_NearestSmallGreatElements.prevSmallerValuesInAnArray(new int[]{4, 5, 2, 10, 8}); //#-scl-q2 // Q2 // LC901
+        d27_Stack2_NearestSmallGreatElements.identifyMaximumMinusMinimumInAllPossibleSubArrays(new int[]{1, 3, 3}); //#-scl-q3 // Q3
 
-        d27_Stack2_NearestSmallGreatElements.nextGreaterValues(new int[]{4, 5, 2, 10, 8}); // AQ2 // LC739 // LC503
-        d27_Stack2_NearestSmallGreatElements.nextGreaterElementForSubsetQueriesInADistinctArrays(new int[]{4, 1, 2}, new int[]{1, 3, 4, 2}); // LC496
-        d27_Stack2_NearestSmallGreatElements.sortStackUsingAnotherStack(); // AQ3
+        d27_Stack2_NearestSmallGreatElements.nextGreaterValues(new int[]{4, 5, 2, 10, 8}); //#-scl-aq2 // AQ2 // LC739 // LC503
+        d27_Stack2_NearestSmallGreatElements.nextGreaterElementForSubsetQueriesInADistinctArrays(new int[]{4, 1, 2}, new int[]{1, 3, 4, 2}); //#-lc-1 // LC496
+        d27_Stack2_NearestSmallGreatElements.sortStackUsingAnotherStack(); //#-scl-aq3 // AQ3
     }
 
     /* Section : ----------------------------------- [ Problems ] ------------------------------------ */

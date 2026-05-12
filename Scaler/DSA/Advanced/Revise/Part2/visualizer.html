@@ -1,0 +1,745 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Visualizer — Part 2</title>
+  <link rel="stylesheet" href="style.css">
+  <style>
+    .pill.teal.current { color: var(--teal); border-color: var(--teal); background: rgba(121,192,255,0.08); }
+
+    /* ── Layout ── */
+    #viz-root { display: flex; gap: 1.5rem; align-items: flex-start; margin-top: 1rem; }
+    #problem-panel { width: 240px; flex-shrink: 0; }
+    #viz-panel { flex: 1; min-height: 320px; }
+    @media (max-width: 720px) { #viz-root { flex-direction: column; } #problem-panel { width: 100%; } }
+
+    /* ── Topic filter ── */
+    .topic-bar { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 1rem; }
+    .topic-pill { padding: 4px 14px; border-radius: 999px; font-size: 12px; cursor: pointer;
+                  border: 1px solid var(--border); background: transparent; color: var(--text-muted);
+                  font-family: inherit; transition: all 0.15s; }
+    .topic-pill:hover { color: var(--text); border-color: #484f58; }
+    .topic-pill.active { color: var(--teal); border-color: var(--teal); background: rgba(121,192,255,0.08); }
+
+    /* ── Problem cards ── */
+    .prob-card { padding: 10px 13px; border-radius: 8px; cursor: pointer; margin-bottom: 6px;
+                 border: 1px solid var(--border); background: var(--bg-card); transition: border-color 0.15s; }
+    .prob-card:hover { border-color: #484f58; }
+    .prob-card.selected { border-color: var(--teal); background: rgba(121,192,255,0.05); }
+    .prob-day  { font-size: 10px; font-weight: 700; color: var(--text-muted);
+                 font-family: 'JetBrains Mono', monospace; margin-bottom: 3px; }
+    .prob-name { font-size: 13px; font-weight: 600; color: var(--text); margin-bottom: 2px; }
+    .prob-meta { font-size: 11px; color: var(--text-muted); }
+
+    /* ── Data-structure cells ── */
+    .cell { width: 46px; height: 34px; border-radius: 6px; display: inline-flex; align-items: center;
+            justify-content: center; font-size: 13px; font-weight: 600; border: 1px solid;
+            transition: all 0.25s; font-family: 'JetBrains Mono', monospace; }
+    .c-input  { background: rgba(88,166,255,0.10);  color: var(--blue);        border-color: rgba(88,166,255,0.30); }
+    .c-result { background: rgba(63,185,80,0.10);   color: var(--green);       border-color: rgba(63,185,80,0.30); }
+    .c-active { background: rgba(210,153,34,0.18);  color: var(--amber);       border-color: rgba(210,153,34,0.45); }
+    .c-empty  { background: rgba(139,148,158,0.05); color: var(--text-muted);  border-color: rgba(139,148,158,0.18); border-style: dashed; }
+
+    /* ── DS layout helpers ── */
+    .ds-block { margin-bottom: 18px; }
+    .ds-label { font-size: 10px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase;
+                color: var(--text-muted); margin-bottom: 8px; }
+    .ds-row   { display: flex; gap: 6px; align-items: center; flex-wrap: wrap; }
+    .stack-top-lbl { font-size: 10px; color: var(--text-muted); margin-left: 6px; }
+
+    /* ── Histogram ── */
+    .hist-wrap { display: flex; gap: 4px; align-items: flex-end; }
+    .hist-bar-box { display: flex; flex-direction: column; align-items: center; gap: 4px; }
+    .hist-bar { width: 42px; border-radius: 4px 4px 0 0; display: flex; align-items: flex-end;
+                justify-content: center; padding-bottom: 4px; font-size: 12px; font-weight: 700;
+                transition: all 0.25s; font-family: 'JetBrains Mono', monospace; border: 1px solid; }
+    .hist-idx { font-size: 10px; color: var(--text-muted); font-family: 'JetBrains Mono', monospace; }
+    .hb-default { background: rgba(88,166,255,0.12);  color: var(--blue);   border-color: rgba(88,166,255,0.28); }
+    .hb-active  { background: rgba(210,153,34,0.22);  color: var(--amber);  border-color: rgba(210,153,34,0.50); }
+    .hb-marker  { background: rgba(248,81,73,0.14);   color: var(--red);    border-color: rgba(248,81,73,0.32); }
+    .hb-max     { background: rgba(63,185,80,0.18);   color: var(--green);  border-color: rgba(63,185,80,0.40); }
+
+    /* ── Controls ── */
+    #explanation { font-size: 13px; color: var(--text-muted); min-height: 42px;
+                   text-align: center; margin: 14px 0 6px; line-height: 1.6; }
+    #controls { display: flex; gap: 10px; justify-content: center; margin-top: 10px; }
+    #controls button { font-size: 12px; padding: 6px 16px; cursor: pointer;
+                       background: var(--bg-elevated); border: 1px solid var(--border);
+                       color: var(--text); border-radius: 6px; font-family: inherit; transition: all 0.15s; }
+    #controls button:hover:not(:disabled) { border-color: var(--teal); color: var(--teal); }
+    #controls button:disabled { opacity: 0.35; cursor: default; }
+    .complexity-footer { font-size: 11px; color: var(--text-muted); text-align: center;
+                         margin-top: 12px; font-family: 'JetBrains Mono', monospace; }
+    #viz-empty { color: var(--text-muted); font-size: 13px; padding: 3rem 0; text-align: center; }
+    #viz-panel .prob-sub { font-size: 13px; color: var(--text-muted); margin-bottom: 20px; }
+    .hist-legend { margin-top: 10px; font-size: 11px; color: var(--text-muted); display: flex; gap: 14px; flex-wrap: wrap; }
+    .hist-legend span { display: flex; align-items: center; gap: 5px; }
+    .leg-dot { width: 10px; height: 10px; border-radius: 3px; display: inline-block; }
+  </style>
+</head>
+<body>
+
+<header>
+  <a class="logo" href="../../../../../index.html">upskill</a>
+  <nav class="breadcrumb">
+    <a href="../../../../../index.html">Home</a><span class="sep">/</span>
+    <a href="../../../../../index.html">DSA</a><span class="sep">/</span>
+    <a href="../../../../../index.html">Part 2</a><span class="sep">/</span>
+    <span class="cur">Visualizer</span>
+  </nav>
+</header>
+
+<div class="sec-nav">
+  <a class="pill blue"         href="approach-picker.html">Approach Picker</a>
+  <a class="pill red"          href="common-mistakes.html">Common Mistakes</a>
+  <a class="pill green"        href="complexities.html">Complexities</a>
+  <a class="pill purple"       href="key-patterns.html">Key Patterns</a>
+  <a class="pill teal current" href="visualizer.html">Visualizer</a>
+  <a class="pill orange"       href="leetcode-references.html">LeetCode Refs</a>
+</div>
+
+<main>
+  <div class="page-title">Visualizer</div>
+  <div class="page-sub">Part 2 · Days 21–31 · Select a problem to step through it</div>
+
+  <div class="topic-bar" id="topic-bar"></div>
+
+  <div id="viz-root">
+    <div id="problem-panel">
+      <div id="prob-list"></div>
+    </div>
+    <div id="viz-panel">
+      <div id="viz-empty">← Select a problem to load its visualizer</div>
+    </div>
+  </div>
+</main>
+
+<script>
+// ─── Shared render helpers ────────────────────────────────────────────────────
+function cell(val, cls) {
+  return `<span class="cell ${cls}">${val === -1 ? '–' : val}</span>`;
+}
+function arrayRow(A, activeIdx) {
+  return A.map((v, i) => cell(v, i === activeIdx ? 'c-active' : 'c-input')).join('');
+}
+function resultRow(res, filledUpTo) {
+  return res.map((v, i) =>
+    i <= filledUpTo && v !== null
+      ? cell(v === -1 ? '–' : v, 'c-result')
+      : cell('?', 'c-empty')
+  ).join('');
+}
+function stackRow(st) {
+  if (!st.length) return '<span style="color:var(--text-muted);font-size:12px">(empty)</span>';
+  return st.map(v => cell(v, 'c-input')).join(' ')
+         + '<span class="stack-top-lbl">← top</span>';
+}
+
+// ─── PROBLEMS registry ────────────────────────────────────────────────────────
+const PROBLEMS = {
+
+  // ── 1 · Previous Smaller Values ─────────────────────────────────────────────
+  "d27_prevSmaller": {
+    title: "Prev Smaller Values",
+    day: "d27",
+    topic: "Monotonic Stack",
+    complexity: "O(N) time · O(N) space",
+    lc: "~LC 901",
+    initial: [4, 5, 2, 10, 8],
+
+    makeSteps(A) {
+      const N = A.length;
+      const res = new Array(N).fill(null);
+      const stk = [];
+      const steps = [];
+
+      // i = 0: always -1, push A[0]
+      stk.push(A[0]); res[0] = -1;
+      steps.push({ i: 0, stk: [...stk], res: [...res], filled: 0,
+        msg: `i=0: Stack is empty → res[0] = <b>–1</b>. Push <b>${A[0]}</b> onto stack.` });
+
+      for (let i = 1; i < N; i++) {
+        while (stk.length && stk[stk.length - 1] >= A[i]) {
+          const popped = stk.pop();
+          steps.push({ i, stk: [...stk], res: [...res], filled: i - 1,
+            msg: `i=${i}: peek <b>${popped}</b> ≥ <b>${A[i]}</b> → not a smaller neighbour, pop it.` });
+        }
+        if (stk.length) {
+          res[i] = stk[stk.length - 1];
+          steps.push({ i, stk: [...stk], res: [...res], filled: i,
+            msg: `i=${i}: peek <b>${stk[stk.length-1]}</b> < <b>${A[i]}</b> → res[${i}] = <b>${res[i]}</b>. Push <b>${A[i]}</b>.` });
+        } else {
+          res[i] = -1;
+          steps.push({ i, stk: [...stk], res: [...res], filled: i,
+            msg: `i=${i}: Stack empty → no smaller to the left → res[${i}] = <b>–1</b>. Push <b>${A[i]}</b>.` });
+        }
+        stk.push(A[i]);
+      }
+
+      steps.push({ i: -1, stk: [...stk], res: [...res], filled: N - 1, type: 'done',
+        msg: `✓ Done. Result: [${res.map(v => v === -1 ? '–1' : v).join(', ')}]` });
+      return steps;
+    },
+
+    render(canvas, s) {
+      const A = [4, 5, 2, 10, 8];
+      canvas.innerHTML = `
+        <div class="ds-block">
+          <div class="ds-label">Input Array</div>
+          <div class="ds-row">${arrayRow(A, s.i)}</div>
+        </div>
+        <div class="ds-block">
+          <div class="ds-label">Stack &nbsp;(values, top is rightmost)</div>
+          <div class="ds-row">${stackRow(s.stk)}</div>
+        </div>
+        <div class="ds-block">
+          <div class="ds-label">Result &nbsp;(nearest smaller to left)</div>
+          <div class="ds-row">${resultRow(s.res, s.filled)}</div>
+        </div>`;
+    }
+  },
+
+  // ── 2 · Next Greater Values ──────────────────────────────────────────────────
+  "d27_nextGreater": {
+    title: "Next Greater Values",
+    day: "d27",
+    topic: "Monotonic Stack",
+    complexity: "O(N) time · O(N) space",
+    lc: "LC 739 / LC 503",
+    initial: [4, 5, 2, 10, 8],
+
+    makeSteps(A) {
+      const N = A.length;
+      const res = new Array(N).fill(null);
+      const stk = [];
+      const steps = [];
+
+      // Start from the right: push last element
+      stk.push(A[N - 1]); res[N - 1] = -1;
+      steps.push({ i: N - 1, stk: [...stk], res: [...res],
+        msg: `Start from right. i=${N-1}: nothing to the right → res[${N-1}] = <b>–1</b>. Push <b>${A[N-1]}</b>.` });
+
+      for (let i = N - 2; i >= 0; i--) {
+        while (stk.length && stk[stk.length - 1] <= A[i]) {
+          const popped = stk.pop();
+          steps.push({ i, stk: [...stk], res: [...res],
+            msg: `i=${i}: peek <b>${popped}</b> ≤ <b>${A[i]}</b> → not greater, pop it.` });
+        }
+        if (stk.length) {
+          res[i] = stk[stk.length - 1];
+          steps.push({ i, stk: [...stk], res: [...res],
+            msg: `i=${i}: peek <b>${stk[stk.length-1]}</b> > <b>${A[i]}</b> → res[${i}] = <b>${res[i]}</b>. Push <b>${A[i]}</b>.` });
+        } else {
+          res[i] = -1;
+          steps.push({ i, stk: [...stk], res: [...res],
+            msg: `i=${i}: Stack empty → no greater to the right → res[${i}] = <b>–1</b>. Push <b>${A[i]}</b>.` });
+        }
+        stk.push(A[i]);
+      }
+
+      steps.push({ i: -1, stk: [...stk], res: [...res], type: 'done',
+        msg: `✓ Done. Result: [${res.map(v => v === -1 ? '–1' : v).join(', ')}]` });
+      return steps;
+    },
+
+    render(canvas, s) {
+      const A = [4, 5, 2, 10, 8];
+      // result: filled = any index where res[i] !== null
+      const resHtml = s.res.map((v, i) =>
+        v !== null ? cell(v === -1 ? '–' : v, 'c-result') : cell('?', 'c-empty')
+      ).join('');
+      canvas.innerHTML = `
+        <div class="ds-block">
+          <div class="ds-label">Input Array &nbsp;(processing right → left)</div>
+          <div class="ds-row">${arrayRow(A, s.i)}</div>
+        </div>
+        <div class="ds-block">
+          <div class="ds-label">Stack &nbsp;(values, top is rightmost)</div>
+          <div class="ds-row">${stackRow(s.stk)}</div>
+        </div>
+        <div class="ds-block">
+          <div class="ds-label">Result &nbsp;(next greater to the right)</div>
+          <div class="ds-row">${resHtml}</div>
+        </div>`;
+    }
+  },
+
+  // ── 3 · Next Greater Element for Subset Queries (//#-lc-1 · LC496) ────────────
+  "d27_nextGreaterSubset": {
+    title: "Next Greater — Subset Queries",
+    day: "d27",
+    topic: "Monotonic Stack",
+    complexity: "O(N+M) time · O(N) space",
+    lc: "LC 496",
+    initial: { nums2: [1, 3, 4, 2], nums1: [4, 1, 2] },
+
+    makeSteps({ nums2, nums1 }) {
+      const N = nums2.length, M = nums1.length;
+      const steps = [];
+      const stk = [], map = {};
+
+      steps.push({ phase: 'build', i: -1, stk: [], map: {}, qi: -1, res: new Array(M).fill(null),
+        msg: `Phase 1: build NGE map for nums2 = [${nums2.join(', ')}] traversing right → left.` });
+
+      stk.push(nums2[N - 1]); map[nums2[N - 1]] = -1;
+      steps.push({ phase: 'build', i: N - 1, stk: [...stk], map: { ...map }, qi: -1, res: new Array(M).fill(null),
+        msg: `i=${N-1}: rightmost element <b>${nums2[N-1]}</b> — nothing to its right → map[${nums2[N-1]}] = <b>–1</b>. Push.` });
+
+      for (let i = N - 2; i >= 0; i--) {
+        const v = nums2[i];
+        while (stk.length && stk[stk.length - 1] <= v) {
+          const p = stk.pop();
+          steps.push({ phase: 'build', i, stk: [...stk], map: { ...map }, qi: -1, res: new Array(M).fill(null),
+            msg: `i=${i}: peek <b>${p}</b> ≤ <b>${v}</b> → not a next greater, pop.` });
+        }
+        map[v] = stk.length ? stk[stk.length - 1] : -1;
+        steps.push({ phase: 'build', i, stk: [...stk], map: { ...map }, qi: -1, res: new Array(M).fill(null),
+          msg: `i=${i}: map[<b>${v}</b>] = <b>${map[v] === -1 ? '–1' : map[v]}</b>. Push <b>${v}</b>.` });
+        stk.push(v);
+      }
+
+      const res = new Array(M).fill(null);
+      steps.push({ phase: 'query', i: -1, stk: [], map: { ...map }, qi: -1, res: [...res],
+        msg: `Phase 2: answer queries for nums1 = [${nums1.join(', ')}] using the map.` });
+
+      for (let qi = 0; qi < M; qi++) {
+        res[qi] = map[nums1[qi]];
+        steps.push({ phase: 'query', i: -1, stk: [], map: { ...map }, qi, res: [...res],
+          msg: `nums1[${qi}] = <b>${nums1[qi]}</b> → map[${nums1[qi]}] = <b>${res[qi] === -1 ? '–1' : res[qi]}</b>` });
+      }
+
+      steps.push({ phase: 'done', i: -1, stk: [], map: { ...map }, qi: -1, res: [...res], type: 'done',
+        msg: `✓ Done. Result: [${res.map(v => v === -1 ? '–1' : v).join(', ')}]` });
+      return steps;
+    },
+
+    render(canvas, s) {
+      const nums2 = [1, 3, 4, 2], nums1 = [4, 1, 2];
+      const N = nums2.length, M = nums1.length;
+
+      // nums2 array (dictionary)
+      const n2Html = nums2.map((v, i) =>
+        cell(v, i === s.i ? 'c-active' : 'c-input')
+      ).join('');
+
+      // map entries
+      const mapHtml = Object.entries(s.map).map(([k, v]) =>
+        `<span style="font-family:'JetBrains Mono',monospace;font-size:12px;
+          color:var(--text-muted);background:var(--bg-card);border:1px solid var(--border);
+          border-radius:5px;padding:3px 9px;margin:2px">${k}→<b style="color:var(--teal)">${v === -1 ? '–1' : v}</b></span>`
+      ).join('');
+
+      // result row
+      const resHtml = s.res.map((v, i) =>
+        v !== null ? cell(v === -1 ? '–' : v, 'c-result') : cell('?', 'c-empty')
+      ).join('');
+
+      // nums1 row (highlight current query)
+      const n1Html = nums1.map((v, i) =>
+        cell(v, i === s.qi ? 'c-active' : 'c-input')
+      ).join('');
+
+      const stkHtml = stackRow(s.stk);
+      const showQuery = s.phase === 'query' || s.phase === 'done';
+
+      canvas.innerHTML = `
+        <div class="ds-block">
+          <div class="ds-label">nums2 &nbsp;(build NGE map, right → left)</div>
+          <div class="ds-row">${n2Html}</div>
+        </div>
+        <div class="ds-block">
+          <div class="ds-label">Stack</div>
+          <div class="ds-row">${stkHtml}</div>
+        </div>
+        <div class="ds-block">
+          <div class="ds-label">NGE Map</div>
+          <div style="display:flex;flex-wrap:wrap;gap:4px">${mapHtml || '<span style="color:var(--text-muted);font-size:12px">(empty)</span>'}</div>
+        </div>
+        ${showQuery ? `
+        <div class="ds-block">
+          <div class="ds-label">nums1 &nbsp;(queries)</div>
+          <div class="ds-row">${n1Html}</div>
+        </div>
+        <div class="ds-block">
+          <div class="ds-label">Result</div>
+          <div class="ds-row">${resHtml}</div>
+        </div>` : ''}`;
+    }
+  },
+
+  // ── 4 · Sort Stack Using Another Stack (//#-scl-aq3) ────────────────────────
+  "d27_sortStack": {
+    title: "Sort Stack Using Another Stack",
+    day: "d27",
+    topic: "Stacks",
+    complexity: "O(N²) time · O(N) space",
+    lc: "",
+    initial: [5, 17, 100, 11],
+
+    makeSteps(A) {
+      const steps = [];
+      const inp = [...A].reverse(); // push order: 5,17,100,11 → top=11
+      const srt = [];
+
+      steps.push({ inp: [...inp], srt: [], temp: null,
+        msg: `Push all elements onto input stack. Top = <b>${inp[inp.length-1]}</b>.` });
+
+      while (inp.length) {
+        const x = inp.pop();
+        steps.push({ inp: [...inp], srt: [...srt], temp: x,
+          msg: `Pop <b>${x}</b> from input stack.` });
+
+        if (!srt.length) {
+          srt.push(x);
+          steps.push({ inp: [...inp], srt: [...srt], temp: null,
+            msg: `Sorted stack empty → push <b>${x}</b> directly.` });
+        } else if (srt[srt.length - 1] <= x) {
+          srt.push(x);
+          steps.push({ inp: [...inp], srt: [...srt], temp: null,
+            msg: `Sorted top <b>${srt[srt.length-2]}</b> ≤ <b>${x}</b> → push <b>${x}</b> directly (maintains order).` });
+        } else {
+          let count = 0;
+          while (srt.length && srt[srt.length - 1] >= x) {
+            const mv = srt.pop();
+            inp.push(mv);
+            count++;
+            steps.push({ inp: [...inp], srt: [...srt], temp: x,
+              msg: `Sorted top <b>${mv}</b> ≥ <b>${x}</b> → move <b>${mv}</b> back to input to make room.` });
+          }
+          srt.push(x);
+          steps.push({ inp: [...inp], srt: [...srt], temp: null,
+            msg: `Push <b>${x}</b> onto sorted stack (correct position found).` });
+          let pushed = 0;
+          while (pushed < count) {
+            const mv = inp.pop();
+            srt.push(mv);
+            pushed++;
+            steps.push({ inp: [...inp], srt: [...srt], temp: null,
+              msg: `Restore <b>${mv}</b> back to sorted stack (${pushed}/${count}).` });
+          }
+        }
+      }
+
+      steps.push({ inp: [], srt: [...srt], temp: null, type: 'done',
+        msg: `✓ Done. Sorted (top → bottom): [${[...srt].reverse().join(', ')}] &nbsp;·&nbsp; smallest on top.` });
+      return steps;
+    },
+
+    render(canvas, s) {
+      function vstack(arr, label) {
+        const cells = [...arr].map(v => `<div class="cell c-input" style="width:52px">${v}</div>`);
+        // stack: bottom is index 0, top is last. Display top at top visually.
+        const inner = cells.length
+          ? cells.reverse().join('')
+          : `<span style="color:var(--text-muted);font-size:12px">(empty)</span>`;
+        return `<div style="display:flex;flex-direction:column;align-items:center;gap:4px;min-width:80px">
+          <div style="font-size:10px;font-weight:700;letter-spacing:1px;text-transform:uppercase;
+            color:var(--text-muted);margin-bottom:6px">${label}</div>
+          <div style="display:flex;flex-direction:column;gap:4px;min-height:120px;justify-content:flex-end">
+            ${inner}
+          </div>
+          <div style="font-size:10px;color:var(--text-muted);margin-top:4px">↑ top</div>
+        </div>`;
+      }
+
+      const tempHtml = s.temp !== null
+        ? `<div style="display:flex;flex-direction:column;align-items:center;gap:4px;min-width:80px">
+            <div style="font-size:10px;font-weight:700;letter-spacing:1px;text-transform:uppercase;
+              color:var(--text-muted);margin-bottom:6px">placing</div>
+            <div class="cell c-active" style="width:52px">${s.temp}</div>
+          </div>`
+        : `<div style="min-width:80px"></div>`;
+
+      canvas.innerHTML = `
+        <div class="ds-block">
+          <div style="display:flex;gap:32px;align-items:flex-end;flex-wrap:wrap">
+            ${vstack(s.inp, 'Input')}
+            ${tempHtml}
+            ${vstack(s.srt, 'Sorted')}
+          </div>
+        </div>`;
+    }
+  },
+
+  // ── 5 · Sum of (Max − Min) for All Subarrays (//#-scl-q3) ──────────────────
+  "d27_maxMinSubarrays": {
+    title: "Sum of (Max − Min) All Subarrays",
+    day: "d27",
+    topic: "Monotonic Stack",
+    complexity: "O(N) time · O(N) space",
+    lc: "",
+    initial: [1, 3, 3],
+
+    makeSteps(A) {
+      const N = A.length, steps = [];
+
+      // Precompute all 4 arrays
+      const ps = new Array(N), pg = new Array(N), ns = new Array(N), ng = new Array(N);
+      { const st = []; ps[0] = -1; st.push(0);
+        for (let i = 1; i < N; i++) { while (st.length && A[st[st.length-1]] >= A[i]) st.pop(); ps[i] = st.length ? st[st.length-1] : -1; st.push(i); } }
+      { const st = []; pg[0] = -1; st.push(0);
+        for (let i = 1; i < N; i++) { while (st.length && A[st[st.length-1]] <= A[i]) st.pop(); pg[i] = st.length ? st[st.length-1] : -1; st.push(i); } }
+      { const st = [];
+        for (let i = N-1; i >= 0; i--) { while (st.length && A[st[st.length-1]] > A[i]) st.pop(); ns[i] = st.length ? st[st.length-1] : N; st.push(i); } }
+      { const st = [];
+        for (let i = N-1; i >= 0; i--) { while (st.length && A[st[st.length-1]] < A[i]) st.pop(); ng[i] = st.length ? st[st.length-1] : N; st.push(i); } }
+
+      steps.push({ phase: 'intro', ci: -1, ps, pg, ns, ng, sum: 0, contrib: null,
+        msg: `A = [${A.join(', ')}]. Key idea: A[i]'s contribution as MAX minus as MIN across all subarrays it dominates — computed in O(1) per element using 4 monotonic stack passes.` });
+
+      steps.push({ phase: 'arrays', ci: -1, ps, pg, ns, ng, sum: 0, contrib: null,
+        msg: `4 boundary arrays precomputed.<br>
+          <b>prevSmaller</b> [${ps.map(v=>v===-1?'–1':v)}] &nbsp; <b>nextSmaller</b> [${ns.map(v=>v===N?'N':v)}]<br>
+          <b>prevGreater</b> [${pg.map(v=>v===-1?'–1':v)}] &nbsp; <b>nextGreater</b> [${ng.map(v=>v===N?'N':v)}]` });
+
+      let sum = 0;
+      for (let i = 0; i < N; i++) {
+        const cMax = (i - pg[i]) * (ng[i] - i);
+        const cMin = (i - ps[i]) * (ns[i] - i);
+        const contrib = A[i] * cMax - A[i] * cMin;
+        sum += contrib;
+        steps.push({ phase: 'element', ci: i, ps, pg, ns, ng, sum, cMax, cMin, contrib,
+          msg: `A[${i}]=${A[i]}: countAsMax=(${i}−${pg[i]})×(${ng[i]}−${i})=<b>${cMax}</b>, countAsMin=(${i}−${ps[i]})×(${ns[i]}−${i})=<b>${cMin}</b> → contrib = ${A[i]}×${cMax} − ${A[i]}×${cMin} = <b>${contrib}</b> &nbsp;·&nbsp; sum = <b>${sum}</b>` });
+      }
+
+      steps.push({ phase: 'done', ci: -1, ps, pg, ns, ng, sum, contrib: null, type: 'done',
+        msg: `✓ Done. sum of (max−min) across all subarrays = <b>${sum}</b>` });
+      return steps;
+    },
+
+    render(canvas, s) {
+      const A = [1, 3, 3], N = A.length;
+      const arrHtml = A.map((v, i) => cell(v, i === s.ci ? 'c-active' : 'c-input')).join('');
+
+      let detailHtml = '';
+      if (s.phase === 'element') {
+        const i = s.ci;
+        detailHtml = `
+          <div style="margin-top:14px;background:var(--bg-card);border:1px solid var(--border);
+            border-radius:8px;padding:14px 16px;font-size:12px;line-height:2">
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px 24px">
+              <div><span style="color:var(--text-muted)">prevGreater[${i}]</span> = <b>${s.pg[i]===-1?'–1':s.pg[i]}</b></div>
+              <div><span style="color:var(--text-muted)">nextGreater[${i}]</span> = <b>${s.ng[i]===N?'N':s.ng[i]}</b></div>
+              <div><span style="color:var(--text-muted)">prevSmaller[${i}]</span> = <b>${s.ps[i]===-1?'–1':s.ps[i]}</b></div>
+              <div><span style="color:var(--text-muted)">nextSmaller[${i}]</span> = <b>${s.ns[i]===N?'N':s.ns[i]}</b></div>
+            </div>
+            <div style="margin-top:10px;border-top:1px solid var(--border);padding-top:10px">
+              <span style="color:var(--green)">countAsMax</span> = (${i}−${s.pg[i]}) × (${s.ng[i]}−${i}) = <b>${s.cMax}</b><br>
+              <span style="color:var(--red)">countAsMin</span> = (${i}−${s.ps[i]}) × (${s.ns[i]}−${i}) = <b>${s.cMin}</b><br>
+              contribution = ${A[i]}×${s.cMax} − ${A[i]}×${s.cMin} = <b style="color:var(--amber)">${s.contrib}</b>
+            </div>
+          </div>`;
+      }
+
+      const sumColor = s.phase === 'done' ? 'var(--green)' : 'var(--text)';
+      canvas.innerHTML = `
+        <div class="ds-block">
+          <div class="ds-label">Array A</div>
+          <div class="ds-row">${arrHtml}</div>
+          ${detailHtml}
+        </div>
+        <div style="font-size:12px;color:var(--text-muted);margin-top:8px;font-family:'JetBrains Mono',monospace">
+          Running sum = <b style="color:${sumColor};font-size:14px">${s.sum}</b>
+        </div>`;
+    }
+  },
+
+  // ── 6 · Largest Rectangle in Histogram ──────────────────────────────────────
+  "d27_histogram": {
+    title: "Largest Rectangle in Histogram",
+    day: "d27",
+    topic: "Monotonic Stack",
+    complexity: "O(N) time · O(N) space",
+    lc: "LC 84",
+    initial: [2, 1, 5, 6, 2, 3],
+
+    makeSteps(A) {
+      const N = A.length;
+      const steps = [];
+
+      // Pre-compute prevSmaller (indices, left to right)
+      const ps = new Array(N).fill(-1);
+      { const stk = []; ps[0] = -1; stk.push(0);
+        for (let i = 1; i < N; i++) {
+          while (stk.length && A[stk[stk.length-1]] >= A[i]) stk.pop();
+          ps[i] = stk.length ? stk[stk.length-1] : -1;
+          stk.push(i);
+        }
+      }
+
+      // Pre-compute nextSmaller (indices, right to left)
+      const ns = new Array(N).fill(N);
+      { const stk = [];
+        for (let i = N-1; i >= 0; i--) {
+          while (stk.length && A[stk[stk.length-1]] >= A[i]) stk.pop();
+          ns[i] = stk.length ? stk[stk.length-1] : N;
+          stk.push(i);
+        }
+      }
+
+      steps.push({ phase: 'intro', active: -1, ps: [...ps], ns: [...ns],
+        maxArea: 0, curArea: 0, maxIdx: -1,
+        msg: `A = [${A.join(', ')}]. Precomputed prevSmaller and nextSmaller with two monotonic-stack passes. Now compute area per bar.` });
+
+      let maxArea = 0, maxIdx = -1;
+      for (let i = 0; i < N; i++) {
+        const w = ns[i] - ps[i] - 1;
+        const area = A[i] * w;
+        if (area > maxArea) { maxArea = area; maxIdx = i; }
+        steps.push({ phase: 'bar', active: i, ps: [...ps], ns: [...ns],
+          maxArea, curArea: area, maxIdx,
+          msg: `Bar ${i} (h=<b>${A[i]}</b>): prevSmaller=${ps[i]===-1?'–1':ps[i]}, nextSmaller=${ns[i]===N?'N':ns[i]} → width = ${ns[i]}${ns[i]===N?'(N)':''} – ${ps[i]===-1?'(–1)':ps[i]} – 1 = <b>${w}</b> → area = ${A[i]} × ${w} = <b>${area}</b>${area===maxArea?' 🏆 new max':''}` });
+      }
+
+      steps.push({ phase: 'done', active: -1, ps, ns,
+        maxArea, curArea: maxArea, maxIdx, type: 'done',
+        msg: `✓ Max area = <b>${maxArea}</b> &nbsp;(bar ${maxIdx}, height=${A[maxIdx]}, width=${ns[maxIdx]-ps[maxIdx]-1})` });
+      return steps;
+    },
+
+    render(canvas, s) {
+      const A = [2, 1, 5, 6, 2, 3];
+      const N = A.length;
+      const UNIT = 26; // px per unit of height
+
+      let barsHtml = '';
+      for (let i = 0; i < N; i++) {
+        let cls = 'hb-default';
+        if (s.type === 'done' && i === s.maxIdx) {
+          cls = 'hb-max';
+        } else if (s.phase === 'bar') {
+          if (i === s.active) cls = 'hb-active';
+          else if (i === s.ps[s.active] || i === s.ns[s.active]) cls = 'hb-marker';
+        }
+        const h = A[i] * UNIT;
+        barsHtml += `<div class="hist-bar-box">
+          <div class="hist-bar ${cls}" style="height:${h}px">${A[i]}</div>
+          <div class="hist-idx">[${i}]</div>
+        </div>`;
+      }
+
+      let infoHtml = '';
+      if (s.phase === 'bar' && s.active >= 0) {
+        const i = s.active, w = s.ns[i] - s.ps[i] - 1;
+        infoHtml = `<div style="margin-top:10px;font-size:12px;color:var(--text-muted)">
+          width = nextSmaller(${s.ns[i]===N?'N':s.ns[i]}) − prevSmaller(${s.ps[i]===-1?'–1':s.ps[i]}) − 1 = <b style="color:var(--text)">${w}</b>
+          &nbsp;·&nbsp; area = ${A[i]} × ${w} = <b style="color:var(--amber)">${s.curArea}</b>
+        </div>`;
+      } else if (s.type === 'done') {
+        infoHtml = `<div style="margin-top:10px;font-size:13px;color:var(--green);font-weight:600">
+          Max Area = ${s.maxArea}
+        </div>`;
+      }
+
+      const maxH = Math.max(...A) * UNIT;
+      canvas.innerHTML = `
+        <div class="ds-block">
+          <div class="ds-label">Histogram</div>
+          <div class="hist-wrap" style="height:${maxH + 4}px">${barsHtml}</div>
+          <div class="hist-legend">
+            <span><span class="leg-dot" style="background:rgba(210,153,34,0.35)"></span>active bar</span>
+            <span><span class="leg-dot" style="background:rgba(248,81,73,0.25)"></span>prevSmaller / nextSmaller boundary</span>
+            <span><span class="leg-dot" style="background:rgba(63,185,80,0.30)"></span>max area bar</span>
+          </div>
+          ${infoHtml}
+        </div>
+        <div style="font-size:11px;color:var(--text-muted);font-family:'JetBrains Mono',monospace;margin-top:6px">
+          prevSmaller: [${s.ps.map(v=>v===-1?'–1':v).join(', ')}]
+          &nbsp;·&nbsp;
+          nextSmaller: [${s.ns.map(v=>v===N?'N':v).join(', ')}]
+        </div>`;
+    }
+  }
+
+};
+
+// ─── Shell ────────────────────────────────────────────────────────────────────
+let currentKey = null, steps = [], stepIdx = 0;
+
+function allTopics() {
+  const s = new Set(['All']);
+  Object.values(PROBLEMS).forEach(p => s.add(p.topic));
+  return [...s];
+}
+
+function renderTopicBar(active) {
+  const bar = document.getElementById('topic-bar');
+  bar.innerHTML = '';
+  allTopics().forEach(t => {
+    const btn = document.createElement('button');
+    btn.className = 'topic-pill' + (t === active ? ' active' : '');
+    btn.textContent = t;
+    btn.onclick = () => renderProblemList(t);
+    bar.appendChild(btn);
+  });
+}
+
+function renderProblemList(topic) {
+  renderTopicBar(topic);
+  const list = document.getElementById('prob-list');
+  list.innerHTML = '';
+  Object.entries(PROBLEMS)
+    .filter(([, p]) => topic === 'All' || p.topic === topic)
+    .forEach(([key, p]) => {
+      const card = document.createElement('div');
+      card.className = 'prob-card' + (key === currentKey ? ' selected' : '');
+      card.innerHTML = `
+        <div class="prob-day">${p.day} &nbsp;·&nbsp; ${p.lc}</div>
+        <div class="prob-name">${p.title}</div>
+        <div class="prob-meta">${p.topic} · ${p.complexity.split('·')[0].trim()}</div>`;
+      card.onclick = function() { loadProblem(key, this); };
+      list.appendChild(card);
+    });
+}
+
+function loadProblem(key, cardEl) {
+  currentKey = key;
+  const p = PROBLEMS[key];
+  steps = p.makeSteps(p.initial);
+  stepIdx = 0;
+
+  const panel = document.getElementById('viz-panel');
+  panel.innerHTML = `
+    <div class="prob-sub">${p.title} &nbsp;·&nbsp; ${p.day} &nbsp;·&nbsp; ${p.lc}</div>
+    <div id="viz-canvas"></div>
+    <div id="explanation">Press <strong>Start</strong> to begin.</div>
+    <div id="controls">
+      <button id="btn-start">▶ Start</button>
+      <button id="btn-step" disabled>Step →</button>
+      <button id="btn-reset">↺ Reset</button>
+    </div>
+    <div class="complexity-footer">${p.complexity}</div>`;
+
+  document.getElementById('btn-start').onclick = () => {
+    document.getElementById('btn-start').disabled = true;
+    document.getElementById('btn-step').disabled = false;
+    applyStep(steps[stepIdx++]);
+  };
+  document.getElementById('btn-step').onclick = () => {
+    if (stepIdx < steps.length) applyStep(steps[stepIdx++]);
+    if (stepIdx >= steps.length) document.getElementById('btn-step').disabled = true;
+  };
+  document.getElementById('btn-reset').onclick = () => {
+    steps = p.makeSteps(p.initial); stepIdx = 0;
+    document.getElementById('btn-start').disabled = false;
+    document.getElementById('btn-step').disabled = true;
+    document.getElementById('viz-canvas').innerHTML = '';
+    document.getElementById('explanation').innerHTML = 'Press <strong>Start</strong> to begin.';
+  };
+
+  document.querySelectorAll('.prob-card').forEach(c => c.classList.remove('selected'));
+  if (cardEl) cardEl.classList.add('selected');
+}
+
+function applyStep(s) {
+  PROBLEMS[currentKey].render(document.getElementById('viz-canvas'), s);
+  document.getElementById('explanation').innerHTML = s.msg;
+}
+
+// ── Boot ──────────────────────────────────────────────────────────────────────
+renderTopicBar('All');
+renderProblemList('All');
+</script>
+</body>
+</html>
