@@ -37,6 +37,7 @@ public class d27_Stack2_NearestSmallGreatElements {
 
         d27_Stack2_NearestSmallGreatElements.nextGreaterValues(new int[]{4, 5, 2, 10, 8}); // AQ2 // LC739 // LC503
         d27_Stack2_NearestSmallGreatElements.nextGreaterElementForSubsetQueriesInADistinctArrays(new int[]{4, 1, 2}, new int[]{1, 3, 4, 2}); // LC496
+        d27_Stack2_NearestSmallGreatElements.sortStackUsingAnotherStack(); // AQ3
     }
 
     /* Section : ----------------------------------- [ Problems ] ------------------------------------ */
@@ -402,6 +403,45 @@ public class d27_Stack2_NearestSmallGreatElements {
 
         print("", res);
         return res;
+    }
+
+    public void sortStackUsingAnotherStack() {
+        int[] A = new int[]{5, 17, 100, 11};
+        int n = A.length;
+        Stack<Integer> stack = new Stack<>();
+        Stack<Integer> sorted = new Stack<>();
+        for (int x : A) {
+            stack.push(x);
+        }
+
+        while (!stack.isEmpty()) {
+            int x = stack.pop();
+            if (sorted.isEmpty()) {
+                sorted.push(x);
+            } else if (sorted.peek() <= x) {
+                sorted.push(x);
+            } else {
+                int count = 0;
+                while (!sorted.isEmpty() && sorted.peek() >= x) {
+                    count++;
+                    stack.push(sorted.pop());
+                }
+                sorted.push(x);
+                while (count != 0) {
+                    sorted.push(stack.pop());
+                    count--;
+                }
+            }
+        }
+
+        int[] ans = new int[n];
+        for (int i = n - 1; i >= 0; i--) {
+            ans[i] = sorted.pop();
+        }
+
+        for (int x : ans) {
+            System.out.println(x);
+        }
     }
 
     /* Section : ------------------------------- [ Generic Utilities ] ------------------------------- */
