@@ -122,7 +122,7 @@ public class Advanced_DSA_Part2 {
         d27_Stack2_NearestSmallGreatElements.nextGreaterElementForSubsetQueriesInADistinctArrays
                 (new int[]{4, 1, 2}, new int[]{1, 3, 4, 2}); // LC496
 
-//        Dequeue
+        d27_Stack2_NearestSmallGreatElements.sortStackUsingAnotherStack(); // AQ3
     }
 
     private void Queues() {
@@ -132,7 +132,9 @@ public class Advanced_DSA_Part2 {
 
         d28_queue_implementationAndProblems.implementQueuesUsingStack(); // Q1
         d28_queue_implementationAndProblems.parkingIceCreamTruck(new int[]{1, 3, -1, -3, 5, 3, 6, 7}, 3); // Q2
+        d28_queue_implementationAndProblems.nIntegersContaining123(8); // AQ1
         d28_queue_implementationAndProblems.uniqueLetterInGrowthOfAString("ababdc"); // AQ2 // Similar to LC1429
+        d28_queue_implementationAndProblems.sumOfMinAndMax(new int[]{2, 1, 5, 3}, 2); // AQ3 // LC1438
 
         d28_queue_implementationAndProblems.maximumInAFixedSlidingWindow(new int[]{1, 3, -1, -3, 5, 3, 6, 7}, 3); // LC239
         d28_queue_implementationAndProblems.firstUniqueCharacterInAString("leetcode"); // LC387

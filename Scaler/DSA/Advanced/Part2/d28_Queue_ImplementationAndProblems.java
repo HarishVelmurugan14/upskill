@@ -30,7 +30,7 @@ public class d28_Queue_ImplementationAndProblems {
                 "uuwooupcyxwgl"); // AQ2 //##
         d28_queue_implementationAndProblems.sumOfMinAndMax(null, 2); // AQ3 // LC1438 //##
 
-        d28_queue_implementationAndProblems.maximumInAFixedSlidingWindow(new int[]{1, 3, -1, -3, 5, 3, 6, 7}, 3); // LC239 //##
+        d28_queue_implementationAndProblems.maximumInAFixedSlidingWindow(new int[]{1, 3, -1, -3, 5, 3, 6, 7}, 3); // LC239 //## // parking icecream
 
 
     }
@@ -169,7 +169,7 @@ public class d28_Queue_ImplementationAndProblems {
 
         for (int i = 0; i < A; i++) {
             long num = queue.poll();
-            result[i] = (int) num;
+            result[i] = (int) num; // not i the number itself
             queue.add(num * 10 + 1);
             queue.add(num * 10 + 2);
             queue.add(num * 10 + 3);
@@ -197,16 +197,17 @@ public class d28_Queue_ImplementationAndProblems {
                 minDeque.pollLast();
             minDeque.addLast(i);
 
-            // remove elements outside window
-            if (maxDeque.peekFirst() < i - B + 1) maxDeque.pollFirst();
-            if (minDeque.peekFirst() < i - B + 1) minDeque.pollFirst();
+            // Fix: use while instead of if (multiple elements may be out of window)
+            while (maxDeque.peekFirst() < i - B + 1) maxDeque.pollFirst();
+            while (minDeque.peekFirst() < i - B + 1) minDeque.pollFirst();
 
-            // start collecting once first window is complete
             if (i >= B - 1) {
                 sum = (sum + A[maxDeque.peekFirst()] + A[minDeque.peekFirst()]) % MOD;
             }
         }
 
+        // Fix: handle negative sum (when all values are negative, mod can go negative)
+        sum = (sum + MOD) % MOD;
         return (int) sum;
     }
 
