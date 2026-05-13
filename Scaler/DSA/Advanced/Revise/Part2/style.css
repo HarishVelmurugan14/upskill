@@ -76,6 +76,7 @@ header {
 .pill.purple.current { color: var(--purple);  border-color: var(--purple); background: rgba(188,140,255,0.08); }
 .pill.amber.current  { color: var(--amber);   border-color: var(--amber);  background: rgba(210,153,34,0.08); }
 .pill.orange.current { color: var(--orange);  border-color: var(--orange); background: rgba(255,123,114,0.08); }
+.pill.teal.current   { color: var(--teal);    border-color: var(--teal);   background: rgba(121,192,255,0.08); }
 
 /* ── MAIN ── */
 main {

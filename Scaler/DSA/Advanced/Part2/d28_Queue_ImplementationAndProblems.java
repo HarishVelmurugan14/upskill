@@ -2,10 +2,7 @@ package DSA.Advanced.Part2;
 
 import Resources.Utilities.PrintHelper;
 
-import java.util.Deque;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.Stack;
+import java.util.*;
 
 /**
  * @author Harish Velmurugan
@@ -25,13 +22,15 @@ public class d28_Queue_ImplementationAndProblems {
 
         // Call Stack
         d28_Queue_ImplementationAndProblems d28_queue_implementationAndProblems = new d28_Queue_ImplementationAndProblems();
-        d28_queue_implementationAndProblems.implementQueuesUsingStack(); // Q1
-        d28_queue_implementationAndProblems.parkingIceCreamTruck(new int[]{1, 3, -1, -3, 5, 3, 6, 7}, 3); // Q2
+        d28_queue_implementationAndProblems.implementQueuesUsingStack(); // Q1 //##
+        d28_queue_implementationAndProblems.parkingIceCreamTruck(new int[]{1, 3, -1, -3, 5, 3, 6, 7}, 3); // Q2 //##
 
+        d28_queue_implementationAndProblems.nIntegersContaining123(8); // AQ1 //##
         d28_queue_implementationAndProblems.uniqueLetterInGrowthOfAString("jyhrcwuengcbnuchctluxjgtxqtfvrebveewgasl" +
-                "uuwooupcyxwgl"); // AQ2
+                "uuwooupcyxwgl"); // AQ2 //##
+        d28_queue_implementationAndProblems.sumOfMinAndMax(null, 2); // AQ3 // LC1438 //##
 
-        d28_queue_implementationAndProblems.maximumInAFixedSlidingWindow(new int[]{1, 3, -1, -3, 5, 3, 6, 7}, 3); // LC239
+        d28_queue_implementationAndProblems.maximumInAFixedSlidingWindow(new int[]{1, 3, -1, -3, 5, 3, 6, 7}, 3); // LC239 //##
 
 
     }
@@ -160,6 +159,56 @@ public class d28_Queue_ImplementationAndProblems {
         }
         return res.toString();
     }
+
+    public int[] nIntegersContaining123(int A) {
+    int[] result = new int[A];
+    Queue<Long> queue = new LinkedList<>();
+    queue.add(1L);
+    queue.add(2L);
+    queue.add(3L);
+
+    for (int i = 0; i < A; i++) {
+        long num = queue.poll();
+        result[i] = (int) num;
+        queue.add(num * 10 + 1);
+        queue.add(num * 10 + 2);
+        queue.add(num * 10 + 3);
+    }
+
+    return result;
+}
+
+public int sumOfMinAndMax(int[] A, int B) {
+    int n = A.length;
+    long MOD = 1_000_000_007L;
+    long sum = 0;
+
+    Deque<Integer> maxDeque = new ArrayDeque<>(); // decreasing
+    Deque<Integer> minDeque = new ArrayDeque<>(); // increasing
+
+    for (int i = 0; i < n; i++) {
+        // maintain decreasing deque for max
+        while (!maxDeque.isEmpty() && A[maxDeque.peekLast()] <= A[i])
+            maxDeque.pollLast();
+        maxDeque.addLast(i);
+
+        // maintain increasing deque for min
+        while (!minDeque.isEmpty() && A[minDeque.peekLast()] >= A[i])
+            minDeque.pollLast();
+        minDeque.addLast(i);
+
+        // remove elements outside window
+        if (maxDeque.peekFirst() < i - B + 1) maxDeque.pollFirst();
+        if (minDeque.peekFirst() < i - B + 1) minDeque.pollFirst();
+
+        // start collecting once first window is complete
+        if (i >= B - 1) {
+            sum = (sum + A[maxDeque.peekFirst()] + A[minDeque.peekFirst()]) % MOD;
+        }
+    }
+
+    return (int) sum;
+}
 
     public void implementQueuesUsingStack() {
         UserQueue userQueue = new UserQueue();

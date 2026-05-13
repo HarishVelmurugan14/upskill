@@ -6,8 +6,6 @@
   <title>Visualizer — Part 2</title>
   <link rel="stylesheet" href="style.css">
   <style>
-    .pill.teal.current { color: var(--teal); border-color: var(--teal); background: rgba(121,192,255,0.08); }
-
     /* ── Layout ── */
     #viz-root { display: flex; gap: 1.5rem; align-items: flex-start; margin-top: 1rem; }
     #problem-panel { width: 240px; flex-shrink: 0; }
@@ -649,6 +647,349 @@ const PROBLEMS = {
           &nbsp;·&nbsp;
           nextSmaller: [${s.ns.map(v=>v===N?'N':v).join(', ')}]
         </div>`;
+    }
+  },
+
+  // ── d28 Q1 · Implement Queue Using Two Stacks (/##) ─────────────────────────
+  "d28_implementQueuesUsingStack": {
+    title: "Implement Queue Using Stacks",
+    day: "d28",
+    topic: "Queues",
+    complexity: "O(1) amortized · O(N) space",
+    lc: "LC 232",
+    initial: null,
+
+    makeSteps(_) {
+      const steps = [];
+      let inp = [], out = [];
+
+      steps.push({ inp: [], out: [], hl: null,
+        msg: `Two stacks simulate a queue. <b>inputStack</b> receives all pushes. <b>outputStack</b> serves pop/peek — lazy transfer only when outputStack is empty.` });
+
+      for (const v of [3, 4, 5, 6]) {
+        inp = [...inp, v];
+        steps.push({ inp: [...inp], out: [...out], hl: { s: 'in', v },
+          msg: `enqueue(<b>${v}</b>) → push onto inputStack. outputStack untouched.` });
+      }
+
+      steps.push({ inp: [...inp], out: [...out], hl: null,
+        msg: `peek() called — outputStack is empty → transfer all from inputStack (lazy reversal).` });
+
+      while (inp.length) {
+        const v = inp[inp.length - 1];
+        inp = inp.slice(0, -1);
+        out = [...out, v];
+        steps.push({ inp: [...inp], out: [...out], hl: { s: 'out', v },
+          msg: `Transfer: pop <b>${v}</b> from inputStack → push onto outputStack. Reversal restores FIFO order.` });
+      }
+
+      steps.push({ inp: [...inp], out: [...out], hl: { s: 'out', v: out[out.length - 1] },
+        msg: `peek() = outputStack.top = <b>${out[out.length - 1]}</b> (first element ever enqueued). ✓` });
+
+      const popped = out[out.length - 1];
+      out = out.slice(0, -1);
+      steps.push({ inp: [...inp], out: [...out], hl: null,
+        msg: `dequeue() → pop outputStack.top = <b>${popped}</b>. inputStack untouched.` });
+
+      inp = [...inp, 7];
+      steps.push({ inp: [...inp], out: [...out], hl: { s: 'in', v: 7 },
+        msg: `enqueue(<b>7</b>) → inputStack. outputStack still has leftover elements — no transfer needed.` });
+
+      steps.push({ inp: [...inp], out: [...out], hl: { s: 'out', v: out[out.length - 1] },
+        msg: `peek() → outputStack not empty, top = <b>${out[out.length - 1]}</b>. No transfer needed.` });
+
+      steps.push({ inp: [...inp], out: [...out], hl: null, type: 'done',
+        msg: `✓ Each element crosses stacks <b>exactly once</b> total → amortized O(1) per operation.` });
+      return steps;
+    },
+
+    render(canvas, s) {
+      function vstk(arr, label, hlVal) {
+        const cells = arr.length
+          ? [...arr].reverse().map((v, i) =>
+              `<div class="cell ${i === 0 && hlVal === v ? 'c-active' : 'c-input'}" style="width:50px">${v}</div>`
+            ).join('')
+          : `<span style="color:var(--text-muted);font-size:11px;padding:8px 0">(empty)</span>`;
+        return `<div style="display:flex;flex-direction:column;align-items:center;gap:0;min-width:90px">
+          <div class="ds-label">${label}</div>
+          <div style="display:flex;flex-direction:column;gap:4px;min-height:160px;justify-content:flex-end">${cells}</div>
+          <div style="font-size:10px;color:var(--text-muted);margin-top:6px">↑ top</div>
+        </div>`;
+      }
+      const inHl = s.hl && s.hl.s === 'in'  ? s.hl.v : null;
+      const outHl = s.hl && s.hl.s === 'out' ? s.hl.v : null;
+      canvas.innerHTML = `<div class="ds-block">
+        <div style="display:flex;gap:48px;align-items:flex-end;flex-wrap:wrap">
+          ${vstk(s.inp, 'inputStack', inHl)}
+          ${vstk(s.out, 'outputStack', outHl)}
+        </div>
+      </div>`;
+    }
+  },
+
+  // ── d28 Q2 · Parking Ice Cream Truck — Sliding Window Max (/##) ─────────────
+  "d28_parkingIceCreamTruck": {
+    title: "Parking Ice Cream Truck",
+    day: "d28",
+    topic: "Queues",
+    complexity: "O(N) time · O(K) space",
+    lc: "",
+    initial: { A: [3, 1, 2, 5, 4], k: 2 },
+
+    makeSteps({ A, k }) {
+      const N = A.length, steps = [], dq = [], res = [];
+      steps.push({ dq: [], res: [], ci: -1, win: [-1, -1],
+        msg: `A=[${A}], K=${k}. Monotonic deque stores indices of potential window-max candidates (values decrease front→back).` });
+      for (let i = 0; i < N; i++) {
+        while (dq.length && A[i] >= A[dq[dq.length - 1]]) {
+          const p = dq.pop();
+          steps.push({ dq: [...dq], res: [...res], ci: i, win: [Math.max(0, i - k + 1), i],
+            msg: `i=${i}: A[${p}]=${A[p]} ≤ A[${i}]=${A[i]} — will never be max while ${A[i]} is in window → pop index ${p}.` });
+        }
+        dq.push(i);
+        if (dq[0] < i - k + 1) {
+          const ev = dq.shift();
+          steps.push({ dq: [...dq], res: [...res], ci: i, win: [Math.max(0, i - k + 1), i],
+            msg: `Index ${ev} is outside window [${i - k + 1}, ${i}] → evict from front.` });
+        }
+        if (i >= k - 1) {
+          res.push(A[dq[0]]);
+          steps.push({ dq: [...dq], res: [...res], ci: i, win: [i - k + 1, i],
+            msg: `Window [${i-k+1}..${i}] = [${A.slice(i-k+1, i+1)}]. Front of deque → max = <b>${A[dq[0]]}</b>` });
+        } else {
+          steps.push({ dq: [...dq], res: [...res], ci: i, win: [-1, -1],
+            msg: `i=${i}: deque=[${dq.map(x => A[x])}]. Window not yet full.` });
+        }
+      }
+      steps.push({ dq: [...dq], res: [...res], ci: -1, win: [-1, -1], type: 'done',
+        msg: `✓ Result: [${res}]` });
+      return steps;
+    },
+
+    render(canvas, s) {
+      const A = [3, 1, 2, 5, 4];
+      const arrH = A.map((v, i) => {
+        if (i === s.ci) return cell(v, 'c-active');
+        if (s.win[0] >= 0 && i >= s.win[0] && i <= s.win[1]) return cell(v, 'c-result');
+        return cell(v, 'c-input');
+      }).join('');
+      const dqH = s.dq.length
+        ? s.dq.map(idx => `<span class="cell c-input" style="width:46px" title="idx ${idx}">${A[idx]}</span>`).join('')
+        : `<span style="color:var(--text-muted);font-size:12px">(empty)</span>`;
+      const resH = s.res.map(v => cell(v, 'c-result')).join('') || `<span style="color:var(--text-muted);font-size:12px">—</span>`;
+      canvas.innerHTML = `
+        <div class="ds-block"><div class="ds-label">Array &nbsp;(amber=current · green=window)</div><div class="ds-row">${arrH}</div></div>
+        <div class="ds-block"><div class="ds-label">Deque &nbsp;(front→back, values decreasing)</div><div class="ds-row">${dqH}</div></div>
+        <div class="ds-block"><div class="ds-label">Result</div><div class="ds-row">${resH}</div></div>`;
+    }
+  },
+
+  // ── d28 AQ1 · N Integers Containing Only 1 2 3 (/##) ────────────────────────
+  "d28_nIntegersContaining123": {
+    title: "N Integers Containing 1, 2, 3",
+    day: "d28",
+    topic: "Queues",
+    complexity: "O(N) time · O(N) space",
+    lc: "",
+    initial: 6,
+
+    makeSteps(A) {
+      const steps = [], queue = [1, 2, 3], res = [];
+      steps.push({ queue: [...queue], res: [], cur: null,
+        msg: `Seed queue with [1, 2, 3]. BFS: each dequeued number n spawns children n×10+1, n×10+2, n×10+3.` });
+      for (let i = 0; i < A; i++) {
+        const num = queue.shift();
+        res.push(num);
+        queue.push(num * 10 + 1, num * 10 + 2, num * 10 + 3);
+        steps.push({ queue: [...queue], res: [...res], cur: num,
+          msg: `Poll <b>${num}</b> → result[${i}]=${num}. Enqueue <b>${num*10+1}</b>, <b>${num*10+2}</b>, <b>${num*10+3}</b>.` });
+      }
+      steps.push({ queue: [...queue], res: [...res], cur: null, type: 'done',
+        msg: `✓ First ${A} numbers using digits {1,2,3}: [${res.join(', ')}]` });
+      return steps;
+    },
+
+    render(canvas, s) {
+      const vis = s.queue.slice(0, 7);
+      const more = s.queue.length > 7 ? `<span style="color:var(--text-muted);font-size:12px;margin-left:6px">+${s.queue.length - 7} more</span>` : '';
+      const qH = vis.map(v => cell(v, 'c-input')).join('') + more || `<span style="color:var(--text-muted);font-size:12px">(empty)</span>`;
+      const curH = s.cur !== null ? cell(s.cur, 'c-active') : '';
+      const resH = s.res.map(v => cell(v, 'c-result')).join('') || `<span style="color:var(--text-muted);font-size:12px">—</span>`;
+      canvas.innerHTML = `
+        <div class="ds-block"><div class="ds-label">Queue &nbsp;(front is leftmost)</div><div class="ds-row">${qH}</div></div>
+        ${s.cur !== null ? `<div class="ds-block"><div class="ds-label">Polled</div><div class="ds-row">${curH}</div></div>` : ''}
+        <div class="ds-block"><div class="ds-label">Result</div><div class="ds-row">${resH}</div></div>`;
+    }
+  },
+
+  // ── d28 AQ2 · Unique Letter in Growth of String (/##) ───────────────────────
+  "d28_uniqueLetterInGrowthOfAString": {
+    title: "Unique Letter in String Growth",
+    day: "d28",
+    topic: "Queues",
+    complexity: "O(N) time · O(1) space",
+    lc: "~LC 1429",
+    initial: "ababc",
+
+    makeSteps(A) {
+      const steps = [], map = {}, deq = [];
+      let board = '';
+      steps.push({ ci: -1, deq: [], map: {}, board: '', char: null,
+        msg: `Input: "<b>${A}</b>". Deque holds characters seen exactly once, in order. Evict from front when count > 1.` });
+      for (let i = 0; i < A.length; i++) {
+        const x = A[i];
+        if (!map[x]) { deq.push(x); map[x] = 0; }
+        map[x]++;
+        while (deq.length && map[deq[0]] > 1) deq.shift();
+        const ch = deq.length ? deq[0] : '#';
+        board += ch;
+        steps.push({ ci: i, deq: [...deq], map: { ...map }, board, char: x,
+          msg: `See '<b>${x}</b>' (count=${map[x]}).${map[x] > 1 ? ` '${x}' no longer unique → evict from deque.` : ''} First unique = <b>'${ch}'</b> → board: "<b>${board}</b>"` });
+      }
+      steps.push({ ci: -1, deq: [...deq], map: { ...map }, board, char: null, type: 'done',
+        msg: `✓ Board: "<b>${board}</b>"` });
+      return steps;
+    },
+
+    render(canvas, s) {
+      const A = 'ababc';
+      const strH = A.split('').map((c, i) =>
+        `<span class="cell ${i === s.ci ? 'c-active' : 'c-input'}" style="width:36px">${c}</span>`
+      ).join('');
+      const dqH = s.deq.length
+        ? s.deq.map(c => `<span class="cell c-result" style="width:36px">${c}</span>`).join('')
+        : `<span style="color:var(--text-muted);font-size:12px">(empty → next char is '#')</span>`;
+      const mapH = Object.entries(s.map).map(([c, n]) =>
+        `<span style="font-family:'JetBrains Mono',monospace;font-size:12px;padding:3px 9px;margin:2px;
+          border-radius:5px;border:1px solid var(--border);background:var(--bg-card);
+          color:${n === 1 ? 'var(--green)' : 'var(--red)'}">${c}:${n}</span>`
+      ).join('');
+      const boardH = s.board
+        ? `<span style="font-family:'JetBrains Mono',monospace;font-size:15px;letter-spacing:2px;color:var(--text)">"${s.board}"</span>`
+        : `<span style="color:var(--text-muted);font-size:12px">—</span>`;
+      canvas.innerHTML = `
+        <div class="ds-block"><div class="ds-label">Input String</div><div class="ds-row">${strH}</div></div>
+        <div class="ds-block"><div class="ds-label">Unique-letter Deque &nbsp;(front = current answer)</div><div class="ds-row">${dqH}</div></div>
+        <div class="ds-block"><div class="ds-label">Counts &nbsp;<span style="color:var(--green)">green=1</span> <span style="color:var(--red)">red=dup</span></div><div style="display:flex;flex-wrap:wrap;gap:4px">${mapH}</div></div>
+        <div class="ds-block"><div class="ds-label">Board</div>${boardH}</div>`;
+    }
+  },
+
+  // ── d28 AQ3 · Sum of Min and Max in All Windows (/## · LC1438) ───────────────
+  "d28_sumOfMinAndMax": {
+    title: "Sum of Min + Max (All Windows)",
+    day: "d28",
+    topic: "Queues",
+    complexity: "O(N) time · O(K) space",
+    lc: "LC 1438",
+    initial: { A: [2, 1, 5, 3], B: 2 },
+
+    makeSteps({ A, B }) {
+      const N = A.length, steps = [], maxD = [], minD = [];
+      let sum = 0;
+      steps.push({ maxD: [], minD: [], ci: -1, win: [-1, -1], sum: 0, wMax: null, wMin: null,
+        msg: `A=[${A}], B=${B}. Two deques: <b>maxD</b> (decreasing → front=window max), <b>minD</b> (increasing → front=window min). Sum += max+min each window.` });
+      for (let i = 0; i < N; i++) {
+        while (maxD.length && A[maxD[maxD.length - 1]] <= A[i]) maxD.pop();
+        maxD.push(i);
+        while (minD.length && A[minD[minD.length - 1]] >= A[i]) minD.pop();
+        minD.push(i);
+        if (maxD[0] < i - B + 1) maxD.shift();
+        if (minD[0] < i - B + 1) minD.shift();
+        if (i >= B - 1) {
+          const wMax = A[maxD[0]], wMin = A[minD[0]];
+          sum += wMax + wMin;
+          steps.push({ maxD: [...maxD], minD: [...minD], ci: i, win: [i - B + 1, i], sum, wMax, wMin,
+            msg: `Window [${i-B+1}..${i}]: max=<b>${wMax}</b>, min=<b>${wMin}</b>. sum += ${wMax}+${wMin} → sum = <b>${sum}</b>` });
+        } else {
+          steps.push({ maxD: [...maxD], minD: [...minD], ci: i, win: [-1, -1], sum, wMax: null, wMin: null,
+            msg: `i=${i}: maxD=[${maxD.map(x => A[x])}], minD=[${minD.map(x => A[x])}]. Window not full yet.` });
+        }
+      }
+      steps.push({ maxD: [...maxD], minD: [...minD], ci: -1, win: [-1, -1], sum, wMax: null, wMin: null, type: 'done',
+        msg: `✓ Total = <b>${sum}</b>` });
+      return steps;
+    },
+
+    render(canvas, s) {
+      const A = [2, 1, 5, 3];
+      const arrH = A.map((v, i) => {
+        if (s.win[0] >= 0 && i >= s.win[0] && i <= s.win[1]) return cell(v, i === s.ci ? 'c-active' : 'c-result');
+        return cell(v, 'c-input');
+      }).join('');
+      function deqRow(dq, lbl, cls) {
+        const h = dq.length
+          ? dq.map(idx => `<span class="cell ${cls}" style="width:46px">${A[idx]}</span>`).join('')
+          : `<span style="color:var(--text-muted);font-size:12px">(empty)</span>`;
+        return `<div class="ds-block"><div class="ds-label">${lbl}</div><div class="ds-row">${h}</div></div>`;
+      }
+      const winInfo = s.wMax !== null
+        ? `<div style="font-size:12px;color:var(--text-muted);margin-top:4px">max=<b style="color:var(--green)">${s.wMax}</b> · min=<b style="color:var(--red)">${s.wMin}</b></div>` : '';
+      canvas.innerHTML = `
+        <div class="ds-block"><div class="ds-label">Array &nbsp;(green=window · amber=current)</div><div class="ds-row">${arrH}</div></div>
+        ${deqRow(s.maxD, 'maxDeque (front = window max, values decreasing)', 'c-result')}
+        ${deqRow(s.minD, 'minDeque (front = window min, values increasing)', 'c-active')}
+        ${winInfo}
+        <div style="font-size:12px;color:var(--text-muted);margin-top:8px;font-family:'JetBrains Mono',monospace">
+          Running sum = <b style="color:${s.type === 'done' ? 'var(--green)' : 'var(--text)'}">${s.sum}</b>
+        </div>`;
+    }
+  },
+
+  // ── d28 LC239 · Maximum in Fixed Sliding Window (/##) ───────────────────────
+  "d28_maximumInAFixedSlidingWindow": {
+    title: "Maximum in Fixed Sliding Window",
+    day: "d28",
+    topic: "Queues",
+    complexity: "O(N) time · O(K) space",
+    lc: "LC 239",
+    initial: { A: [1, 3, -1, -3, 5, 3, 6, 7], k: 3 },
+
+    makeSteps({ A, k }) {
+      const N = A.length, steps = [], dq = [], res = [];
+      steps.push({ dq: [], res: [], ci: -1, win: [-1, -1],
+        msg: `A=[${A}], K=${k}. Classic LC239. Deque stores indices; front always holds index of window maximum.` });
+      for (let i = 0; i < N; i++) {
+        while (dq.length && A[i] >= A[dq[dq.length - 1]]) {
+          const p = dq.pop();
+          steps.push({ dq: [...dq], res: [...res], ci: i, win: [Math.max(0, i - k + 1), i],
+            msg: `i=${i}: A[${p}]=${A[p]} ≤ ${A[i]} → can never be max while ${A[i]} present → pop ${p}.` });
+        }
+        dq.push(i);
+        if (dq[0] < i - k + 1) {
+          const ev = dq.shift();
+          steps.push({ dq: [...dq], res: [...res], ci: i, win: [Math.max(0, i - k + 1), i],
+            msg: `Index ${ev} fell outside window [${i-k+1}, ${i}] → evict from front.` });
+        }
+        if (i >= k - 1) {
+          res.push(A[dq[0]]);
+          steps.push({ dq: [...dq], res: [...res], ci: i, win: [i - k + 1, i],
+            msg: `Window [${i-k+1}..${i}] = [${A.slice(i-k+1, i+1)}]. Max = <b>${A[dq[0]]}</b>` });
+        } else {
+          steps.push({ dq: [...dq], res: [...res], ci: i, win: [-1, -1],
+            msg: `i=${i}: deque=[${dq.map(x => A[x])}]. Filling first window.` });
+        }
+      }
+      steps.push({ dq: [...dq], res: [...res], ci: -1, win: [-1, -1], type: 'done',
+        msg: `✓ Result: [${res}]` });
+      return steps;
+    },
+
+    render(canvas, s) {
+      const A = [1, 3, -1, -3, 5, 3, 6, 7];
+      const arrH = A.map((v, i) => {
+        if (i === s.ci) return cell(v, 'c-active');
+        if (s.win[0] >= 0 && i >= s.win[0] && i <= s.win[1]) return cell(v, 'c-result');
+        return cell(v, 'c-input');
+      }).join('');
+      const dqH = s.dq.length
+        ? s.dq.map(idx => `<span class="cell c-input" style="width:46px" title="idx ${idx}">${A[idx]}</span>`).join('')
+        : `<span style="color:var(--text-muted);font-size:12px">(empty)</span>`;
+      const resH = s.res.map(v => cell(v, 'c-result')).join('') || `<span style="color:var(--text-muted);font-size:12px">—</span>`;
+      canvas.innerHTML = `
+        <div class="ds-block"><div class="ds-label">Array &nbsp;(amber=current · green=window)</div><div class="ds-row">${arrH}</div></div>
+        <div class="ds-block"><div class="ds-label">Deque &nbsp;(indices, values shown; front=max)</div><div class="ds-row">${dqH}</div></div>
+        <div class="ds-block"><div class="ds-label">Result</div><div class="ds-row">${resH}</div></div>`;
     }
   }
 

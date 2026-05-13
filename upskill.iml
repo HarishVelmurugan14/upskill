@@ -8,6 +8,10 @@
       <sourceFolder url="file://$MODULE_DIR$/Coursera" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/TakeUForward" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/Udemy" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/Dependency" isTestSource="false" />
+      <excludeFolder url="file://$MODULE_DIR$/Scaler/DSA/Advanced/Revise" />
+      <excludeFolder url="file://$MODULE_DIR$/Scaler/LLD" />
+      <excludeFolder url="file://$MODULE_DIR$/Scaler/LLD/Part2" />
     </content>
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
