@@ -161,54 +161,54 @@ public class d28_Queue_ImplementationAndProblems {
     }
 
     public int[] nIntegersContaining123(int A) {
-    int[] result = new int[A];
-    Queue<Long> queue = new LinkedList<>();
-    queue.add(1L);
-    queue.add(2L);
-    queue.add(3L);
+        int[] result = new int[A];
+        Queue<Long> queue = new LinkedList<>();
+        queue.add(1L);
+        queue.add(2L);
+        queue.add(3L);
 
-    for (int i = 0; i < A; i++) {
-        long num = queue.poll();
-        result[i] = (int) num;
-        queue.add(num * 10 + 1);
-        queue.add(num * 10 + 2);
-        queue.add(num * 10 + 3);
-    }
-
-    return result;
-}
-
-public int sumOfMinAndMax(int[] A, int B) {
-    int n = A.length;
-    long MOD = 1_000_000_007L;
-    long sum = 0;
-
-    Deque<Integer> maxDeque = new ArrayDeque<>(); // decreasing
-    Deque<Integer> minDeque = new ArrayDeque<>(); // increasing
-
-    for (int i = 0; i < n; i++) {
-        // maintain decreasing deque for max
-        while (!maxDeque.isEmpty() && A[maxDeque.peekLast()] <= A[i])
-            maxDeque.pollLast();
-        maxDeque.addLast(i);
-
-        // maintain increasing deque for min
-        while (!minDeque.isEmpty() && A[minDeque.peekLast()] >= A[i])
-            minDeque.pollLast();
-        minDeque.addLast(i);
-
-        // remove elements outside window
-        if (maxDeque.peekFirst() < i - B + 1) maxDeque.pollFirst();
-        if (minDeque.peekFirst() < i - B + 1) minDeque.pollFirst();
-
-        // start collecting once first window is complete
-        if (i >= B - 1) {
-            sum = (sum + A[maxDeque.peekFirst()] + A[minDeque.peekFirst()]) % MOD;
+        for (int i = 0; i < A; i++) {
+            long num = queue.poll();
+            result[i] = (int) num;
+            queue.add(num * 10 + 1);
+            queue.add(num * 10 + 2);
+            queue.add(num * 10 + 3);
         }
+
+        return result;
     }
 
-    return (int) sum;
-}
+    public int sumOfMinAndMax(int[] A, int B) {
+        int n = A.length;
+        long MOD = 1_000_000_007L;
+        long sum = 0;
+
+        Deque<Integer> maxDeque = new ArrayDeque<>(); // decreasing
+        Deque<Integer> minDeque = new ArrayDeque<>(); // increasing
+
+        for (int i = 0; i < n; i++) {
+            // maintain decreasing deque for max
+            while (!maxDeque.isEmpty() && A[maxDeque.peekLast()] <= A[i])
+                maxDeque.pollLast();
+            maxDeque.addLast(i);
+
+            // maintain increasing deque for min
+            while (!minDeque.isEmpty() && A[minDeque.peekLast()] >= A[i])
+                minDeque.pollLast();
+            minDeque.addLast(i);
+
+            // remove elements outside window
+            if (maxDeque.peekFirst() < i - B + 1) maxDeque.pollFirst();
+            if (minDeque.peekFirst() < i - B + 1) minDeque.pollFirst();
+
+            // start collecting once first window is complete
+            if (i >= B - 1) {
+                sum = (sum + A[maxDeque.peekFirst()] + A[minDeque.peekFirst()]) % MOD;
+            }
+        }
+
+        return (int) sum;
+    }
 
     public void implementQueuesUsingStack() {
         UserQueue userQueue = new UserQueue();
