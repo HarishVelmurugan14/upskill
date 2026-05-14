@@ -24,7 +24,7 @@ public class d29_Trees1_StructureAndTraversal {
         System.out.println(d29_trees1_structureAndTraversal.getSize(basicInput(), 0));
         d29_trees1_structureAndTraversal.inorderTraversal(basicInput()); // Q1
         d29_trees1_structureAndTraversal.preOrderTraversal(basicInput()); // Q2
-        d29_trees1_structureAndTraversal.hasPathSum(hasPathSumInput(), 22, "Pre"); // Q3
+        d29_trees1_structureAndTraversal.hasPathSum(hasPathSumInput(), 22, 0); // Q3
         d29_trees1_structureAndTraversal.equalTreePartition(equalTreePartitionInput()); // Q4
         d29_trees1_structureAndTraversal.postOrderTraversal(basicInput()); // AQ1
         d29_trees1_structureAndTraversal.sumBinaryTreeOrNotMain(sumBinaryTreeInput()); // AQ2
@@ -146,6 +146,66 @@ public class d29_Trees1_StructureAndTraversal {
 
         System.out.println((lst == 1 || rst == 1) ? 1 : 0);
         return (lst == 1 || rst == 1) ? 1 : 0;
+    }
+
+    public boolean hasPathSum(TreeNode node, int targetSum, int currentSum) {
+
+        /*
+         * HAS PATH SUM - Root to Leaf
+         *
+         * GOAL: check if any root-to-leaf path exists
+         *       where sum of nodes equals targetSum
+         *
+         * STRATEGY: preorder traversal accumulating sum top-down
+         *   at each node add its value to currentSum
+         *   at leaf check if currentSum matches targetSum
+         *
+         * TRAVERSAL RULES:
+         *   null node              → return false (empty path)
+         *   leaf node              → return currentSum == targetSum
+         *   internal node          → check left || right (short-circuit)
+         *
+         * EXAMPLE: targetSum = 10
+         *        5
+         *       / \
+         *      4   2
+         *     / \ / \
+         *    1  6 9  11
+         *
+         *   5→4→1 = 10 ✅ found! right side never checked (short-circuit)
+         *   5→4→6 = 15 ❌
+         *   5→2→9 = 16 ❌
+         *   5→2→11= 18 ❌
+         *
+         * WHY LEAF NOT NULL:
+         *   path ends at leaf (no children), not at null
+         *   checking at null causes double counting
+         *
+         * WHY BOOLEAN NOT INT:
+         *   answer is yes/no — boolean is self explanatory
+         *   int 0/1 adds unnecessary ambiguity
+         *
+         * WHY || NOT if(x!=1):
+         *   || short-circuits naturally — if left true, right never checked
+         *   same behaviour, cleaner code
+         *
+         * Time: O(N)  Space: O(H)  ← H = height of tree (recursive stack)
+         */
+
+        // step 1 — empty node, nothing to check
+        if (node == null) return false;
+
+        // step 2 — add current node value to running sum
+        currentSum += node.val;
+
+        // step 3 — reached a leaf! check if sum matches
+        if (node.left == null && node.right == null) {
+            return currentSum == targetSum;
+        }
+
+        // step 4 — not a leaf, keep going left or right
+        return hasPathSum(node.left, targetSum, currentSum) ||
+                hasPathSum(node.right, targetSum, currentSum);
     }
 
     /* Section : ------------------------------- [ Specific Utilities ] ------------------------------- */
