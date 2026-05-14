@@ -4,6 +4,7 @@ import Resources.Utilities.PrintHelper;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 
 /**
  * @author Harish Velmurugan
@@ -28,6 +29,8 @@ public class d29_Trees1_StructureAndTraversal {
         d29_trees1_structureAndTraversal.equalTreePartition(equalTreePartitionInput()); // Q4
         d29_trees1_structureAndTraversal.postOrderTraversal(basicInput()); // AQ1
         d29_trees1_structureAndTraversal.sumBinaryTreeOrNotMain(sumBinaryTreeInput()); // AQ2
+
+        d29_trees1_structureAndTraversal.pathSumII(hasPathSumInput(), 22); // LC113
     }
 
     /* Section : ----------------------------------- [ Inputs ] ------------------------------------ */
@@ -358,6 +361,79 @@ public class d29_Trees1_StructureAndTraversal {
         res = postOrderTraversal(A.right, res);
         res.add(A.val);
         return res;
+    }
+
+    public List<List<Integer>> pathSumII(TreeNode node, int targetSum) {
+        List<List<Integer>> result = new ArrayList<>();
+        pathSumII(node, targetSum, 0, new ArrayList<>(), result);
+        return result;
+    }
+
+    private void pathSumII(TreeNode node, int targetSum, int currentSum,
+                                  List<Integer> path, List<List<Integer>> result) {
+
+
+        /*
+         * PATH SUM II - Collect All Root to Leaf Paths
+         *
+         * GOAL: find all root-to-leaf paths where
+         *       sum of nodes equals targetSum
+         *
+         * STRATEGY: preorder traversal tracking current path
+         *   add node to path going down
+         *   at leaf save a copy if sum matches
+         *   remove node from path going up (backtrack)
+         *
+         * TRAVERSAL RULES:
+         *   null node              → return (empty path)
+         *   every node             → add to path, add to currentSum
+         *   leaf node              → if sum matches, save copy of path
+         *   after recursion        → remove last node (backtrack)
+         *
+         * EXAMPLE: targetSum = 10
+         *        5
+         *       / \
+         *      4   2
+         *     / \ / \
+         *    1  6 9  11
+         *
+         *   5→4→1 = 10 ✅ saved!
+         *   5→4→6 = 15 ❌
+         *   5→2→9 = 16 ❌
+         *   5→2→11= 18 ❌
+         *   result = [[5, 4, 1]]
+         *
+         * WHY COPY PATH:
+         *   path is shared across recursion
+         *   result.add(path) adds reference — path changes later ❌
+         *   result.add(new ArrayList<>(path)) saves snapshot ✅
+         *
+         * WHY BACKTRACK:
+         *   after exploring a node we undo adding it
+         *   so path is clean for next branch
+         *   without it path keeps growing with wrong nodes ❌
+         *
+         * WHY VOID NOT BOOLEAN:
+         *   not looking for yes/no anymore
+         *   collecting all paths so no early exit needed
+         *
+         * Time: O(N)  Space: O(H)  ← H = height of tree (recursive stack)
+         */
+        if (node == null) return;
+
+        currentSum += node.val;
+        path.add(node.val);                         // add to path
+
+        if (node.left == null && node.right == null) {
+            if (currentSum == targetSum) {
+                result.add(new ArrayList<>(path));  // save a COPY of path ✅
+            }
+        }
+
+        pathSumII(node.left, targetSum, currentSum, path, result);
+        pathSumII(node.right, targetSum, currentSum, path, result);
+
+        path.remove(path.size() - 1);              // undo adding current node before going back up ✅
     }
 
     public int getSize(TreeNode A, int i) {
