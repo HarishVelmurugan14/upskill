@@ -151,6 +151,41 @@ public class d29_Trees1_StructureAndTraversal {
     /* Section : ------------------------------- [ Specific Utilities ] ------------------------------- */
 
     public ArrayList<Integer> inorderTraversal(TreeNode A) {
+        /*
+         * INORDER TRAVERSAL - Left → Root → Right
+         *
+         * GOAL: collect all node values in inorder sequence
+         *       into a result list
+         *
+         * STRATEGY: recursively visit left subtree first, then root, then right
+         *   res list accumulates values in traversal order
+         *   helper isolates recursion from public API
+         *
+         * TRAVERSAL RULES:
+         *   null node    → base case, return
+         *   node.left    → recurse left subtree
+         *   root         → add node.val to res
+         *   node.right   → recurse right subtree
+         *
+         * EXAMPLE:
+         *        5
+         *       / \
+         *      4   2
+         *     / \ / \
+         *    1  6 9  11
+         *
+         *   visit 1 → visit 4 → visit 6 → visit 5 → visit 9 → visit 2 → visit 11
+         *   result = [1, 4, 6, 5, 9, 2, 11]
+         *
+         * APPROACHES:
+         *   helper method  → single shared list passed through recursion     ✅ efficient   O(N) time O(H) space
+         *   addAll         → new list created at each node, merged upward    ⚠️ overhead   O(N²) time O(N) space
+         *
+         * NOTE: inorder of a BST always gives sorted ascending order
+         *
+         * Time: O(N)  Space: O(H)  ← H = height of tree (recursive stack)
+         */
+
         return inorderTraversal(A, new ArrayList<>(), "IN");
     }
 
@@ -168,7 +203,41 @@ public class d29_Trees1_StructureAndTraversal {
     }
 
     public ArrayList<Integer> preOrderTraversal(TreeNode A) {
-        return preOrderTraversal(A, new ArrayList<>());
+        /*
+         * PREORDER TRAVERSAL - Root → Left → Right
+         *
+         * GOAL: collect all node values in preorder sequence
+         *       into a result list
+         *
+         * STRATEGY: recursively visit root first, then left subtree, then right
+         *   res list accumulates values in traversal order
+         *   helper isolates recursion from public API
+         *
+         * TRAVERSAL RULES:
+         *   null node    → base case, return
+         *   root         → add node.val to res
+         *   node.left    → recurse left subtree
+         *   node.right   → recurse right subtree
+         *
+         * EXAMPLE:
+         *        5
+         *       / \
+         *      4   2
+         *     / \ / \
+         *    1  6 9  11
+         *
+         *   visit 5 → visit 4 → visit 1 → visit 6 → visit 2 → visit 9 → visit 11
+         *   result = [5, 4, 1, 6, 2, 9, 11]
+         *
+         * APPROACHES:
+         *   helper method  → single shared list passed through recursion     ✅ efficient   O(N) time O(H) space
+         *   addAll         → new list created at each node, merged upward    ⚠️ overhead   O(N²) time O(N) space
+         *
+         * Time: O(N)  Space: O(H)  ← H = height of tree (recursive stack)
+         */
+        ArrayList<Integer> res = new ArrayList<>();
+        preOrderTraversal(A, res);
+        return res;
     }
 
     public ArrayList<Integer> preOrderTraversal(TreeNode A, ArrayList<Integer> res) {
@@ -184,6 +253,40 @@ public class d29_Trees1_StructureAndTraversal {
     }
 
     public ArrayList<Integer> postOrderTraversal(TreeNode A) {
+        /*
+         * POSTORDER TRAVERSAL - Left → Right → Root
+         *
+         * GOAL: collect all node values in postorder sequence
+         *       into a result list
+         *
+         * STRATEGY: recursively visit left subtree, then right subtree, then root
+         *   res list accumulates values in traversal order
+         *   helper isolates recursion from public API
+         *
+         * TRAVERSAL RULES:
+         *   null node    → base case, return
+         *   node.left    → recurse left subtree
+         *   node.right   → recurse right subtree
+         *   root         → add node.val to res
+         *
+         * EXAMPLE:
+         *        5
+         *       / \
+         *      4   2
+         *     / \ / \
+         *    1  6 9  11
+         *
+         *   visit 1 → visit 6 → visit 4 → visit 9 → visit 11 → visit 2 → visit 5
+         *   result = [1, 6, 4, 9, 11, 2, 5]
+         *
+         * APPROACHES:
+         *   helper method  → single shared list passed through recursion     ✅ efficient   O(N) time O(H) space
+         *   addAll         → new list created at each node, merged upward    ⚠️ overhead   O(N²) time O(N) space
+         *
+         * NOTE: postorder commonly used for deletion — children deleted before parent
+         *
+         * Time: O(N)  Space: O(H)  ← H = height of tree (recursive stack)
+         */
         return postOrderTraversal(A, new ArrayList<>());
     }
 
@@ -221,16 +324,16 @@ public class d29_Trees1_StructureAndTraversal {
 
     private void definitions() {
         /*
-        * Notebook_06012025: Page No : 144
-        * */
+         * Notebook_06012025: Page No : 144
+         * */
     }
 
     /* Section : ------------------------------- [ Generic Utilities ] ------------------------------- */
 
     private void links() {
         /*
-        * /academy/mentee-dashboard/class/345259/assignment/problems?navref=cl_tb_br
-        * */
+         * /academy/mentee-dashboard/class/345259/assignment/problems?navref=cl_tb_br
+         * */
     }
 
     /* Section : ------------------------------- [ Definition Resources ] ---------------------------- */
