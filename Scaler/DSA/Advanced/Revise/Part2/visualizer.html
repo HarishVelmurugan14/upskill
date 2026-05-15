@@ -1298,6 +1298,250 @@ const PROBLEMS = {
         <div class="ds-block"><div class="ds-label">Binary Tree &nbsp;(check: node.val == leftSum + rightSum)</div>${treeH}</div>
         <div style="margin-top:10px;text-align:center">${result}</div>`;
     }
+  },
+
+  // ── d30 Q1 · Level Order Traversal (/##) ────────────────────────────────────
+  "d30_levelOrderTraversal": {
+    title: "Level Order Traversal",
+    day: "d30",
+    topic: "Trees",
+    complexity: "O(N) time · O(N) space",
+    lc: "LC 102",
+    initial: null,
+
+    makeSteps(_) {
+      const nodes = {
+        0:{val:3,left:1,right:2}, 1:{val:9,left:null,right:3},
+        2:{val:20,left:4,right:5}, 3:{val:68,left:null,right:null},
+        4:{val:15,left:null,right:null}, 5:{val:7,left:null,right:null}
+      };
+      const valOf = id => nodes[id].val;
+      const steps = [], queue = [0], result = [];
+      steps.push({activeId:-1, queueIds:[...queue], result:[], lvl:[],
+        msg:`BFS level-order. Enqueue root <b>3</b>. Process level by level, recording each level's values.`});
+      while (queue.length) {
+        const levelSize = queue.length, lvl = [];
+        for (let i = 0; i < levelSize; i++) {
+          const id = queue.shift(), n = nodes[id];
+          lvl.push(n.val);
+          const kids = [];
+          if (n.left  !== null) { queue.push(n.left);  kids.push(valOf(n.left)); }
+          if (n.right !== null) { queue.push(n.right); kids.push(valOf(n.right)); }
+          steps.push({activeId:id, queueIds:[...queue], result:[...result], lvl:[...lvl],
+            msg:`Dequeue <b>${n.val}</b>.${kids.length ? ' Enqueue children: <b>' + kids.join(', ') + '</b>.' : ' No children.'}`});
+        }
+        result.push([...lvl]);
+        steps.push({activeId:-1, queueIds:[...queue], result:[...result], lvl:[],
+          msg:`Level complete → [<b>${lvl.join(', ')}</b>]. Levels so far: ${result.map(l=>'['+l.join(',')+']').join(' · ')}`});
+      }
+      steps.push({activeId:-1, queueIds:[], result:[...result], lvl:[], type:'done',
+        msg:`✓ Result: ${result.map(l=>'['+l.join(',')+']').join(', ')}`});
+      return steps;
+    },
+
+    render(canvas, s) {
+      const root = mkTree([3, 0, [9, 1, null, [68, 3]], [20, 2, [15, 4], [7, 5]]]);
+      const nodeVals = {0:3,1:9,2:20,3:68,4:15,5:7};
+      const treeH = renderTree(root, s.activeId, []);
+      const qH = s.queueIds.length
+        ? s.queueIds.map(id => `<span class="cell c-input" style="width:42px">${nodeVals[id]}</span>`).join('')
+        : '<span style="color:var(--text-muted);font-size:12px">(empty)</span>';
+      const resH = s.result.map((lvl, i) =>
+        `<div style="display:flex;align-items:center;gap:6px;margin-bottom:4px">
+          <span style="font-size:10px;color:var(--text-muted);min-width:26px">L${i}:</span>
+          ${lvl.map(v => `<span class="cell c-result" style="width:38px">${v}</span>`).join('')}
+        </div>`
+      ).join('') || '<span style="color:var(--text-muted);font-size:12px">(none yet)</span>';
+      canvas.innerHTML = `
+        <div class="ds-block"><div class="ds-label">Tree &nbsp;(amber = current node)</div>${treeH}</div>
+        <div class="ds-block"><div class="ds-label">Queue &nbsp;(front is leftmost)</div><div class="ds-row">${qH}</div></div>
+        <div class="ds-block"><div class="ds-label">Result (completed levels)</div>${resH}</div>`;
+    }
+  },
+
+  // ── d30 Q2 · Build Tree — InOrder + PreOrder (/##) ──────────────────────────
+  "d30_buildTreeWithInOrderAndPreOrder": {
+    title: "Build Tree: Inorder + Preorder",
+    day: "d30",
+    topic: "Trees",
+    complexity: "O(N²) time · O(N) space",
+    lc: "LC 105",
+    initial: null,
+
+    makeSteps(_) {
+      // pre=[1,2,3,4,5]  in=[3,2,4,1,5]  → tree: 1(root), left=2(left:3,right:4), right=5
+      return [
+        { built:[], active:-1, callInfo:null,
+          msg:'Build from <b>pre=[1,2,3,4,5]</b> and <b>in=[3,2,4,1,5]</b>. pre[pre_s] is root of the current subtree.' },
+        { built:[], active:0, callInfo:{rootVal:1, preR:'[0..4]', inR:'[0..4]', inIdx:3, r:3},
+          msg:'Call(pre[0..4], in[0..4]): root = pre[0] = <b>1</b>. Find 1 in in[] at index 3. r=3−0+0=<b>3</b>. LST: pre[1..3], in[0..2]. RST: pre[4..4], in[4..4].' },
+        { built:[0], active:1, callInfo:{rootVal:2, preR:'[1..3]', inR:'[0..2]', inIdx:1, r:2},
+          msg:'Recurse LST → Call(pre[1..3], in[0..2]): root = <b>2</b>. Find 2 at in-index 1. r=<b>2</b>. LST: pre[2..2],in[0..0]. RST: pre[3..3],in[2..2].' },
+        { built:[0,1], active:2, callInfo:{rootVal:3, preR:'[2..2]', inR:'[0..0]', inIdx:0, r:2},
+          msg:'Recurse LST of 2 → root = <b>3</b>. in_s==in_e and no children remain → leaf node <b>3</b> created.' },
+        { built:[0,1,2], active:3, callInfo:{rootVal:4, preR:'[3..3]', inR:'[2..2]', inIdx:2, r:3},
+          msg:'Recurse RST of 2 → root = <b>4</b>. Leaf created. Node <b>2</b> complete: left=3, right=4.' },
+        { built:[0,1,2,3], active:4, callInfo:{rootVal:5, preR:'[4..4]', inR:'[4..4]', inIdx:4, r:4},
+          msg:'Recurse RST of root 1 → root = <b>5</b>. Leaf. Root <b>1</b> complete: left subtree=2, right=5.' },
+        { built:[0,1,2,3,4], active:-1, callInfo:null, type:'done',
+          msg:'✓ Tree built. Key invariant: pre gives the root; in splits left (in_s..inIdx-1) from right (inIdx+1..in_e) subtrees.' }
+      ];
+    },
+
+    render(canvas, s) {
+      const root = mkTree([1, 0, [2, 1, [3, 2], [4, 3]], [5, 4]]);
+      const preArr = [1,2,3,4,5], inArr = [3,2,4,1,5];
+      const treeH = renderTree(root, s.active, s.built);
+      let callHtml = '';
+      if (s.callInfo) {
+        const {rootVal, preR, inR, inIdx, r} = s.callInfo;
+        callHtml = `
+          <div style="margin-top:10px;background:var(--bg-card);border:1px solid var(--border);
+            border-radius:8px;padding:12px 16px;font-size:12px;line-height:2;font-family:'JetBrains Mono',monospace">
+            <div>Call: pre<b>${preR}</b>, in<b>${inR}</b></div>
+            <div>root = <b style="color:var(--amber)">${rootVal}</b> &nbsp;·&nbsp; found at in[${inIdx}] &nbsp;·&nbsp; r=${r}</div>
+            <div style="color:var(--text-muted)">pre=[${preArr}] &nbsp;·&nbsp; in=[${inArr}]</div>
+          </div>`;
+      }
+      canvas.innerHTML = `
+        <div class="ds-block">
+          <div class="ds-label">Tree Being Built &nbsp;(green=done · amber=current root)</div>
+          ${treeH}${callHtml}
+        </div>`;
+    }
+  },
+
+  // ── d30 Q3 · Is Balanced (/##) ───────────────────────────────────────────────
+  "d30_isBalanced": {
+    title: "Is Balanced Binary Tree",
+    day: "d30",
+    topic: "Trees",
+    complexity: "O(N) time · O(H) space",
+    lc: "LC 110",
+    initial: null,
+
+    makeSteps(_) {
+      // Tree: 1(id=0), left=2(id=1), right=3(id=2)
+      return [
+        { activeId:-1, labels:{}, result:null,
+          msg:`Post-order height check. Returns <b>-1</b> for null, <b>height≥0</b> if balanced, <b>-2</b> if unbalanced (propagates up immediately).` },
+        { activeId:1, labels:{}, result:null,
+          msg:`Visit node <b>2</b>. left=null→-1, right=null→-1. |(-1)−(−1)|=0 ≤ 1 ✓. Height = max(-1,-1)+1 = <b>0</b>.` },
+        { activeId:1, labels:{1:'h=0'}, result:null,
+          msg:`Node <b>2</b> returns height <b>0</b>.` },
+        { activeId:2, labels:{1:'h=0'}, result:null,
+          msg:`Visit node <b>3</b>. left=null→-1, right=null→-1. Height = <b>0</b>.` },
+        { activeId:2, labels:{1:'h=0',2:'h=0'}, result:null,
+          msg:`Node <b>3</b> returns height <b>0</b>.` },
+        { activeId:0, labels:{1:'h=0',2:'h=0'}, result:null,
+          msg:`Visit root <b>1</b>. leftHeight=0, rightHeight=0. |0−0|=0 ≤ 1 ✓. Height = max(0,0)+1 = <b>1</b>.` },
+        { activeId:-1, labels:{1:'h=0',2:'h=0',0:'h=1'}, result:1, type:'done',
+          msg:`✓ isBalanced() = <b>1</b>. Positive → balanced. (Any subtree with |left−right| > 1 would return −2, short-circuiting.)` }
+      ];
+    },
+
+    render(canvas, s) {
+      const root = mkTree([1, 0, [2, 1], [3, 2]]);
+      const treeH = renderTree(root, s.activeId, [], null, s.labels);
+      const badge = s.result !== null
+        ? `<div style="margin-top:10px;font-size:14px;font-weight:700;color:var(--green)">✓ Balanced — returned height = ${s.result}</div>`
+        : `<div style="font-size:12px;color:var(--text-muted);margin-top:8px">Post-order traversal in progress…</div>`;
+      canvas.innerHTML = `
+        <div class="ds-block">
+          <div class="ds-label">Tree &nbsp;(labels = returned height)</div>
+          ${treeH}${badge}
+        </div>
+        <div style="margin-top:10px;font-size:11px;color:var(--text-muted);background:var(--bg-card);
+          border:1px solid var(--border);border-radius:6px;padding:10px 14px;
+          font-family:'JetBrains Mono',monospace;line-height:1.8">
+          -1 = null &nbsp;·&nbsp; ≥0 = height (balanced) &nbsp;·&nbsp; -2 = unbalanced (short-circuits)
+        </div>`;
+    }
+  },
+
+  // ── d30 Q4 · Left View of Binary Tree (/##) ─────────────────────────────────
+  "d30_leftViewOfABinaryTree": {
+    title: "Left View of Binary Tree",
+    day: "d30",
+    topic: "Trees",
+    complexity: "O(N) time · O(N) space",
+    lc: "",
+    initial: null,
+
+    makeSteps(_) {
+      // Tree: 3(0), left=9(1), right=20(2), 9.right=68(3), 20.left=15(4), 20.right=7(5)
+      const nodes = {
+        0:{val:3,left:1,right:2}, 1:{val:9,left:null,right:3},
+        2:{val:20,left:4,right:5}, 3:{val:68,left:null,right:null},
+        4:{val:15,left:null,right:null}, 5:{val:7,left:null,right:null}
+      };
+      const valOf = id => nodes[id].val;
+      const steps = [], queue = [0], result = [3];
+      steps.push({activeId:-1, queueIds:[...queue], result:[...result], flag:false, levelNum:0,
+        msg:`Root <b>3</b> always visible → add to result. Queue=[3]. BFS: per level, add the first child seen.`});
+      let levelNum = 0;
+      while (queue.length) {
+        const levelSize = queue.length;
+        let flag = false;
+        levelNum++;
+        for (let i = 0; i < levelSize; i++) {
+          const id = queue.shift(), n = nodes[id];
+          if (n.left !== null) {
+            if (!flag) {
+              result.push(valOf(n.left)); flag = true; queue.push(n.left);
+              steps.push({activeId:n.left, queueIds:[...queue], result:[...result], flag, levelNum,
+                msg:`Level ${levelNum}: first child found → <b>${valOf(n.left)}</b> (left of ${n.val}). Add to result. Set flag.`});
+            } else {
+              queue.push(n.left);
+              steps.push({activeId:id, queueIds:[...queue], result:[...result], flag, levelNum,
+                msg:`Left child <b>${valOf(n.left)}</b> of ${n.val}: flag set → enqueue only, skip result.`});
+            }
+          }
+          if (n.right !== null) {
+            if (!flag) {
+              result.push(valOf(n.right)); flag = true; queue.push(n.right);
+              steps.push({activeId:n.right, queueIds:[...queue], result:[...result], flag, levelNum,
+                msg:`Level ${levelNum}: no left child yet → right child <b>${valOf(n.right)}</b> is leftmost. Add to result.`});
+            } else {
+              queue.push(n.right);
+              steps.push({activeId:id, queueIds:[...queue], result:[...result], flag, levelNum,
+                msg:`Right child <b>${valOf(n.right)}</b> of ${n.val}: flag set → enqueue only.`});
+            }
+          }
+          if (n.left === null && n.right === null) {
+            steps.push({activeId:id, queueIds:[...queue], result:[...result], flag, levelNum,
+              msg:`Node <b>${n.val}</b> is a leaf — no children.`});
+          }
+        }
+        if (queue.length > 0) {
+          steps.push({activeId:-1, queueIds:[...queue], result:[...result], flag, levelNum,
+            msg:`Level ${levelNum} done. Next queue: [${queue.map(id=>valOf(id)).join(', ')}]. Result: [${result.join(', ')}]`});
+        }
+      }
+      steps.push({activeId:-1, queueIds:[], result:[...result], flag:false, levelNum, type:'done',
+        msg:`✓ Left view: [<b>${result.join(', ')}</b>] — one node per level, leftmost visible from left.`});
+      return steps;
+    },
+
+    render(canvas, s) {
+      const root = mkTree([3, 0, [9, 1, null, [68, 3]], [20, 2, [15, 4], [7, 5]]]);
+      const nodeVals = {0:3,1:9,2:20,3:68,4:15,5:7};
+      const treeH = renderTree(root, s.activeId, []);
+      const qH = s.queueIds.length
+        ? s.queueIds.map(id => `<span class="cell c-input" style="width:42px">${nodeVals[id]}</span>`).join('')
+        : '<span style="color:var(--text-muted);font-size:12px">(empty)</span>';
+      const resH = s.result.map(v => `<span class="cell c-result" style="width:42px">${v}</span>`).join('');
+      const flagH = s.levelNum > 0
+        ? (s.flag
+            ? `<span style="color:var(--green);font-size:12px">✓ leftmost for level ${s.levelNum} found</span>`
+            : `<span style="color:var(--text-muted);font-size:12px">scanning level ${s.levelNum}…</span>`)
+        : '';
+      canvas.innerHTML = `
+        <div class="ds-block"><div class="ds-label">Tree &nbsp;(amber = node added to result)</div>${treeH}</div>
+        <div class="ds-block"><div class="ds-label">Queue</div><div class="ds-row">${qH}</div></div>
+        ${flagH ? `<div class="ds-block"><div class="ds-label">Level flag</div>${flagH}</div>` : ''}
+        <div class="ds-block"><div class="ds-label">Left View Result</div><div class="ds-row">${resH || '<span style="color:var(--text-muted);font-size:12px">—</span>'}</div></div>`;
+    }
   }
 
 };
