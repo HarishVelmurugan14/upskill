@@ -40,6 +40,10 @@
     &nbsp;&nbsp;·&nbsp;&nbsp;Each tile: method → time · space · one-line why.
   </div>
 
+  <!-- ════ Searching ════ -->
+  <div class="sec">
+  <div class="sec-title">Searching · d21–d23</div>
+
   <!-- ── d21 Binary Search on Array ── -->
   <div class="cx-card bs">
     <div class="cx-card-hdr">
@@ -171,7 +175,12 @@
       <span class="cx-insight-label">Pattern — all answer-space searches</span>
       <strong>O(N · log range)</strong> every time. The outer binary search runs log(range) times. At each step a greedy scan touches every element once — O(N). They only differ in what "range" means: sum of elements (painters/books), positional spread (cows), or N itself (window length).
     </div>
-  </div>
+  </div><!-- /.cx-card.ans -->
+  </div><!-- /.sec Searching -->
+
+  <!-- ════ Linked List ════ -->
+  <div class="sec">
+  <div class="sec-title">Linked List · d24–d25</div>
 
   <!-- ── d24-25 Linked List ── -->
   <div class="cx-card ll">
@@ -215,7 +224,12 @@
       <span class="cx-insight-label">Pattern</span>
       All linked list operations are <strong>O(N) time</strong> — there is no random access, so reaching any node costs a walk. Space is <strong>O(1)</strong> for all in-place operations (reverse, delete, remove-nth) and <strong>O(N)</strong> only when you must allocate (copyRandomList HashMap).
     </div>
-  </div>
+  </div><!-- /.cx-card.ll -->
+  </div><!-- /.sec Linked List -->
+
+  <!-- ════ Stack ════ -->
+  <div class="sec">
+  <div class="sec-title">Stack · d26–d27</div>
 
   <!-- ── d26 Stacks ── -->
   <div class="cx-card stk">
@@ -293,7 +307,12 @@
       <span class="cx-insight-label">Key insight — why the inner while doesn't make it O(N²)</span>
       Each element is pushed <em>exactly once</em> and popped <em>at most once</em>. Total push + pop operations = 2N across the entire pass. It doesn't matter how many times the inner <code>while</code> runs on any given iteration — the <em>aggregate</em> across all iterations is bounded by N.
     </div>
-  </div>
+  </div><!-- /.cx-card.stk d27 -->
+  </div><!-- /.sec Stack -->
+
+  <!-- ════ Queue ════ -->
+  <div class="sec">
+  <div class="sec-title">Queue · d28</div>
 
   <!-- ── d28 Queues ── -->
   <div class="cx-card q">
@@ -323,7 +342,12 @@
         <div class="cx-why-text">Each element moved from inStack to outStack exactly once total</div>
       </div>
     </div>
-  </div>
+  </div><!-- /.cx-card.q -->
+  </div><!-- /.sec Queue -->
+
+  <!-- ════ Tree ════ -->
+  <div class="sec">
+  <div class="sec-title">Tree · d29–d31</div>
 
   <!-- ── d29-31 Trees ── -->
   <div class="cx-card tree">
@@ -372,7 +396,8 @@
       <span class="cx-insight-label">Pattern</span>
       Tree DFS is always <strong>O(N) time</strong> — every node is visited exactly once. Space is <strong>O(H)</strong> for the call stack (H = log N balanced, N worst case). BST operations are <strong>O(H)</strong> not O(N) because you discard one subtree at each node — the same reasoning as binary search.
     </div>
-  </div>
+  </div><!-- /.cx-card.tree -->
+  </div><!-- /.sec Tree -->
 
 </main>
 

@@ -5,6 +5,9 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Approach Picker — Part 2</title>
   <link rel="stylesheet" href="style.css">
+  <style>
+    .ap-group.q .ap-group-hdr { background: #0d9488; }
+  </style>
 </head>
 <body>
 <header>
@@ -28,6 +31,10 @@
   <div class="page-title">Approach Picker</div>
   <div class="page-sub">Part 2 · Days 21–31</div>
   <div class="note"><em>Left</em> — what the question feels like. &nbsp;<em>Right</em> — technique name + the one line of code that makes it click.</div>
+
+  <!-- ════ Searching ════ -->
+  <div class="sec">
+  <div class="sec-title">Searching · d21–d23</div>
 
   <!-- ── Binary Search on Array ── -->
   <div class="ap-group bs">
@@ -102,7 +109,12 @@
         <span class="ap-hint">feasibility: sliding window of size mid, return false moment any window sum > B · on pass → low=mid+1</span>
       </div>
     </div>
-  </div>
+  </div><!-- /.ap-group.ans -->
+  </div><!-- /.sec Searching -->
+
+  <!-- ════ Linked List ════ -->
+  <div class="sec">
+  <div class="sec-title">Linked List · d24–d25</div>
 
   <!-- ── Linked List ── -->
   <div class="ap-group ll">
@@ -157,11 +169,16 @@
         <span class="ap-hint">count K (return if fewer) · reverse K · head.next = reverseKGroup(curr, k) · return prev</span>
       </div>
     </div>
-  </div>
+  </div><!-- /.ap-group.ll -->
+  </div><!-- /.sec Linked List -->
 
-  <!-- ── Stack / Deque ── -->
+  <!-- ════ Stack ════ -->
+  <div class="sec">
+  <div class="sec-title">Stack · d26–d27</div>
+
+  <!-- ── Stack Basics ── -->
   <div class="ap-group stk">
-    <div class="ap-group-hdr">Stack / Monotonic Stack / Deque <span class="ap-day">d26, d27, d28</span></div>
+    <div class="ap-group-hdr">Stack Basics <span class="ap-day">d26</span></div>
 
     <div class="ap-row">
       <div class="ap-signal">Match open-close pairs, evaluate postfix, cancel adjacent duplicates</div>
@@ -170,6 +187,12 @@
         <span class="ap-hint">push on open/value · pop+process on close/operator · isEmpty() before every pop · empty at end = valid</span>
       </div>
     </div>
+  </div>
+
+  <!-- ── Nearest Smaller / Greater Elements ── -->
+  <div class="ap-group stk">
+    <div class="ap-group-hdr">Nearest Smaller / Greater Elements <span class="ap-day">d27</span></div>
+
     <div class="ap-row">
       <div class="ap-signal">For each element, nearest smaller/greater to its left or right</div>
       <div class="ap-reach">
@@ -177,6 +200,17 @@
         <span class="ap-hint">pop while top violates order · popped index found its answer at current i · push indices not values</span>
       </div>
     </div>
+  </div>
+  </div><!-- /.sec Stack -->
+
+  <!-- ════ Queue ════ -->
+  <div class="sec">
+  <div class="sec-title">Queue · d28</div>
+
+  <!-- ── Queue / Deque ── -->
+  <div class="ap-group q">
+    <div class="ap-group-hdr">Queue / Deque <span class="ap-day">d28</span></div>
+
     <div class="ap-row">
       <div class="ap-signal">Sliding window maximum (or minimum) as window moves</div>
       <div class="ap-reach">
@@ -185,6 +219,11 @@
       </div>
     </div>
   </div>
+  </div><!-- /.sec Queue -->
+
+  <!-- ════ Tree ════ -->
+  <div class="sec">
+  <div class="sec-title">Tree · d29–d31</div>
 
   <!-- ── Trees / BST ── -->
   <div class="ap-group tree">
@@ -218,7 +257,8 @@
         <span class="ap-hint">search: compare + go left/right · validate: pass (long min, long max) bounds down · build from sorted: mid as root</span>
       </div>
     </div>
-  </div>
+  </div><!-- /.ap-group.tree -->
+  </div><!-- /.sec Tree -->
 
 </main>
 </body>

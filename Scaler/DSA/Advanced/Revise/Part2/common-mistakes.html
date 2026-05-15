@@ -32,6 +32,10 @@
   <div class="page-sub">Part 2 · Days 21–31</div>
   <div class="note">❌ what you wrote &nbsp;·&nbsp; ✅ what you should write &nbsp;·&nbsp; and why it matters.</div>
 
+  <!-- ════ Searching ════ -->
+  <div class="sec">
+  <div class="sec-title">Searching · d21–d23</div>
+
   <!-- ══════════════════════════════════════════
        BINARY SEARCH ON ARRAY
   ══════════════════════════════════════════ -->
@@ -233,7 +237,12 @@ return true;</code></pre>
       </div>
       <div class="mk-why">Once workers exceed the limit you already know the answer. Finishing the loop wastes O(N) work and, on pathological inputs, can produce incorrect results if overflow occurs.</div>
     </div>
-  </div>
+  </div><!-- /.mk-group BS Answer Space -->
+  </div><!-- /.sec Searching -->
+
+  <!-- ════ Linked List ════ -->
+  <div class="sec">
+  <div class="sec-title">Linked List · d24–d25</div>
 
   <!-- ══════════════════════════════════════════
        LINKED LIST
@@ -383,7 +392,12 @@ clone.random = map.get(curr.random);  // null-safe</code></pre>
       </div>
       <div class="mk-why"><code>map.get(null)</code> returns null — no null check needed. If you wire <code>curr.next</code> directly, the clone's chain points into the original list. Not a deep copy.</div>
     </div>
-  </div>
+  </div><!-- /.mk-group Linked List -->
+  </div><!-- /.sec Linked List -->
+
+  <!-- ════ Stack ════ -->
+  <div class="sec">
+  <div class="sec-title">Stack · d26–d27</div>
 
   <!-- ══════════════════════════════════════════
        STACK
@@ -462,7 +476,12 @@ if (!hasOp) return true;</code></pre>
       </div>
       <div class="mk-why">The answer for each element is its position, not its value. You need <code>i - stack.peek()</code> for distances or <code>nsr[popped] = i</code> for the next-smaller index. Values don't give you that.</div>
     </div>
-  </div>
+  </div><!-- /.mk-group Stack -->
+  </div><!-- /.sec Stack -->
+
+  <!-- ════ Tree ════ -->
+  <div class="sec">
+  <div class="sec-title">Tree · d29–d31</div>
 
   <!-- ══════════════════════════════════════════
        TREES / BST
@@ -551,7 +570,8 @@ root.right = build(pre, ps+leftCount+1,  pe,           in, k+1, ie,  inMap);</co
       </div>
       <div class="mk-why">The number of nodes in the left subtree (<code>k - inStart</code>) is the single source of truth for all index arithmetic. Derive every slice from it — never guess.</div>
     </div>
-  </div>
+  </div><!-- /.mk-group Trees/BST -->
+  </div><!-- /.sec Tree -->
 
 </main>
 
