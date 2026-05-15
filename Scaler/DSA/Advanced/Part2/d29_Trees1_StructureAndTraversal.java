@@ -5,6 +5,7 @@ import Resources.Utilities.PrintHelper;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * @author Harish Velmurugan
@@ -27,6 +28,7 @@ public class d29_Trees1_StructureAndTraversal {
         d29_trees1_structureAndTraversal.preOrderTraversal(basicInput()); // Q2
         d29_trees1_structureAndTraversal.hasPathSum(hasPathSumInput(), 22, 0); // Q3
         d29_trees1_structureAndTraversal.equalTreePartition(equalTreePartitionInput()); // Q4
+        d29_trees1_structureAndTraversal.equalTreePartitionReturnSubtree(equalTreePartitionInput()); //Q4 Advanced Good one // LC663 Premium
         d29_trees1_structureAndTraversal.postOrderTraversal(basicInput()); // AQ1
         d29_trees1_structureAndTraversal.sumBinaryTreeOrNotMain(sumBinaryTreeInput()); // AQ2
 
@@ -86,6 +88,59 @@ public class d29_Trees1_StructureAndTraversal {
     /* Section : ----------------------------------- [ Problems ] ------------------------------------ */
 
     public int sumBinaryTreeOrNotMain(TreeNode A) {
+        /*
+         * SUM BINARY TREE CHECK - Post-order Validation
+         *
+         * GOAL: check if every node's value equals the sum of
+         *       its left and right subtree values (Sum Tree property)
+         *
+         * STRATEGY: recursively validate bottom-up
+         *   each node returns its subtree sum if valid, -1 if invalid
+         *   parent uses returned sums to validate itself
+         *
+         * TRAVERSAL RULES:
+         *   null node        → base case, return 0
+         *   leaf node        → always valid, return A.val
+         *   leftSum == -1    → subtree already broken, bubble up -1
+         *   rightSum == -1   → subtree already broken, bubble up -1
+         *   leftSum +
+         *   rightSum==A.val  → valid node, return leftSum + rightSum + A.val
+         *   otherwise        → invalid, return -1
+         *
+         * EXAMPLE:
+         *        26
+         *       /  \
+         *      10   3
+         *     /  \   \
+         *    4    6   3
+         *
+         *   visit 4(leaf)  → return 4
+         *   visit 6(leaf)  → return 6
+         *   visit 10       → 4+6==10 ✓  return 4+6+10=20
+         *   visit 3(leaf)  → return 3
+         *   visit 3(right) → 0+3==3 ✓   return 0+3+3=6
+         *   visit 26       → 20+6==26 ✓ return 20+6+26=52
+         *   result = 1 (valid Sum Tree)
+         *
+         * INVALID EXAMPLE:
+         *        10
+         *       /  \
+         *      4    6
+         *     / \
+         *    1   5
+         *
+         *   visit 1(leaf)  → return 1
+         *   visit 5(leaf)  → return 5
+         *   visit 4        → 1+5==4? ✗  return -1
+         *   -1 bubbles up  → return -1
+         *   result = 0 (not a valid Sum Tree)
+         *
+         * NOTE: -1 is used as a sentinel for invalid
+         *       leaf nodes skip the leftSum+rightSum check
+         *       since they have no children to sum
+         *
+         * Time: O(N)  Space: O(H)  ← H = height of tree (recursive stack)
+         */
         return (sumBinaryTreeOrNot(A) == -1) ? 0 : 1;
     }
 
@@ -131,6 +186,98 @@ public class d29_Trees1_StructureAndTraversal {
         long rightSum = sumOfSubTree(A.right, map);
         long sum = leftSum + rightSum + A.val;
         map.put(sum, map.getOrDefault(sum, 0) + 1);
+        return sum;
+    }
+
+
+    public TreeNode[] equalTreePartitionReturnSubtree(TreeNode root) {
+        /*
+         * EQUAL TREE PARTITION - Post-order Subtree Sum + HashMap
+         *
+         * GOAL: check if removing one edge splits the tree into
+         *       two subtrees with equal sum
+         *
+         * STRATEGY: compute subtree sum at every node bottom-up
+         *   store each subtree sum in a HashMap
+         *   check if halfSum exists in the map after full traversal
+         *
+         * TRAVERSAL RULES:
+         *   null node    → base case, return 0
+         *   node.left    → recurse left subtree, get leftSum
+         *   node.right   → recurse right subtree, get rightSum
+         *   root         → sum = leftSum + rightSum + node.val, store in map
+         *
+         * EXAMPLE:
+         *        4
+         *       / \
+         *      3   6
+         *     / \
+         *    4   3
+         *
+         *   visit 4(leaf) → sum=4   map={4}
+         *   visit 3(leaf) → sum=3   map={4,3}
+         *   visit 3(left) → sum=10  map={4,3,10}
+         *   visit 6(leaf) → sum=6   map={4,3,10,6}
+         *   visit 4(root) → sum=20  map={4,3,10,6,20}
+         *
+         *   totalSum=20  halfSum=10  map.contains(10) → true → return 1
+         *
+         * APPROACHES:
+         *   HashMap<Long, Node>  → store node itself, enables returning cut node   ✅ efficient   O(N) time O(N) space
+         *   HashMap<Long, Int>   → store count only, handles duplicate sums safely ✅ efficient   O(N) time O(N) space
+         *
+         * NOTE: use Long not Int — summing many nodes can overflow int range
+         *       remove root entry from map before querying to avoid false positive
+         *
+         * Time: O(N)  Space: O(N)  ← storing sum for every node
+         */
+        HashMap<Long, TreeNode> map = new HashMap<>();
+        long totalSum = sumOfSubTreeState(root, map);
+
+        if (totalSum % 2 != 0) return null;
+
+        long halfSum = totalSum / 2;
+
+        if (!map.containsKey(halfSum)) return null;
+
+        TreeNode cutRoot = map.get(halfSum);
+        // now detach it from the original tree
+        detach(root, cutRoot);
+
+        return new TreeNode[]{root, cutRoot};
+    }
+
+    public long sumOfSubTreeState(TreeNode A, HashMap<Long, TreeNode> map) {
+        if (A == null) return 0;
+        long left = sumOfSubTreeState(A.left, map);
+        long right = sumOfSubTreeState(A.right, map);
+        long sum = left + right + A.val;
+        map.put(sum, A); // store the node, not a count
+        return sum;
+    }
+
+    public void detach(TreeNode root, TreeNode target) {
+        if (root == null) return;
+        if (root.left == target) {
+            root.left = null;
+            return;
+        }
+        if (root.right == target) {
+            root.right = null;
+            return;
+        }
+        detach(root.left, target);
+        detach(root.right, target);
+    }
+
+    public int subTreeSum(TreeNode A, Map<Integer, TreeNode> map, int sum) {
+        if (A == null) {
+            return 0;
+        }
+        int leftSum = subTreeSum(A.left, map, sum);
+        int rightSum = subTreeSum(A.right, map, sum);
+        sum = leftSum + rightSum + A.val;
+        map.put(sum, A);
         return sum;
     }
 
@@ -370,7 +517,7 @@ public class d29_Trees1_StructureAndTraversal {
     }
 
     private void pathSumII(TreeNode node, int targetSum, int currentSum,
-                                  List<Integer> path, List<List<Integer>> result) {
+                           List<Integer> path, List<List<Integer>> result) {
 
 
         /*
