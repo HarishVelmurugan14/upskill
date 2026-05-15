@@ -25,12 +25,12 @@ public class d30_Trees2_ViewsAndTypes {
         // Call Stack
         d30_Trees2_ViewsAndTypes d30_trees2_viewsAndTypes = new d30_Trees2_ViewsAndTypes();
 
-        d30_trees2_viewsAndTypes.levelOrderTraversal(input()); // Q1
-        d30_trees2_viewsAndTypes.buildTreeWithInOrderAndPreOrder(null, null);
+        d30_trees2_viewsAndTypes.levelOrderTraversal(input()); // Q1 //##
+        d30_trees2_viewsAndTypes.buildTreeWithInOrderAndPreOrder(null, null); //Q2 //##
         d30_trees2_viewsAndTypes.buildTreeWithInOrderAndPostOrder(null, null);
-        int x = d30_trees2_viewsAndTypes.isBalanced(isBalancedInput()); // Q3
+        int x = d30_trees2_viewsAndTypes.isBalanced(isBalancedInput()); // Q3 //##
         System.out.println(x);
-        d30_trees2_viewsAndTypes.leftViewOfABinaryTree(input()); // Q4
+        d30_trees2_viewsAndTypes.leftViewOfABinaryTree(input()); // Q4 //##
 
     }
 
