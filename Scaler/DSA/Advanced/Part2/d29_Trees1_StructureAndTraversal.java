@@ -24,15 +24,15 @@ public class d29_Trees1_StructureAndTraversal {
         d29_Trees1_StructureAndTraversal d29_trees1_structureAndTraversal = new d29_Trees1_StructureAndTraversal();
 
         System.out.println(d29_trees1_structureAndTraversal.getSize(basicInput(), 0));
-        d29_trees1_structureAndTraversal.inorderTraversal(basicInput()); // Q1
-        d29_trees1_structureAndTraversal.preOrderTraversal(basicInput()); // Q2
-        d29_trees1_structureAndTraversal.hasPathSum(hasPathSumInput(), 22, 0); // Q3
-        d29_trees1_structureAndTraversal.equalTreePartition(equalTreePartitionInput()); // Q4
-        d29_trees1_structureAndTraversal.equalTreePartitionReturnSubtree(equalTreePartitionInput()); //Q4 Advanced Good one // LC663 Premium
-        d29_trees1_structureAndTraversal.postOrderTraversal(basicInput()); // AQ1
-        d29_trees1_structureAndTraversal.sumBinaryTreeOrNotMain(sumBinaryTreeInput()); // AQ2
+        d29_trees1_structureAndTraversal.inorderTraversal(basicInput()); // Q1 //##
+        d29_trees1_structureAndTraversal.preOrderTraversal(basicInput()); // Q2 //##
+        d29_trees1_structureAndTraversal.hasPathSum(hasPathSumInput(), 22, 0); // Q3 //##
+        d29_trees1_structureAndTraversal.equalTreePartition(equalTreePartitionInput()); // Q4 //##
+        d29_trees1_structureAndTraversal.equalTreePartitionReturnSubtree(equalTreePartitionInput()); //Q4 Advanced Good one // LC663 Premium //##
+        d29_trees1_structureAndTraversal.postOrderTraversal(basicInput()); // AQ1 //##
+        d29_trees1_structureAndTraversal.sumBinaryTreeOrNotMain(sumBinaryTreeInput()); // AQ2 //##
 
-        d29_trees1_structureAndTraversal.pathSumII(hasPathSumInput(), 22); // LC113
+        d29_trees1_structureAndTraversal.pathSumII(hasPathSumInput(), 22); // LC113 //##
     }
 
     /* Section : ----------------------------------- [ Inputs ] ------------------------------------ */

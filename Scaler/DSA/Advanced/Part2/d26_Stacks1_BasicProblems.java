@@ -28,16 +28,16 @@ public class d26_Stacks1_BasicProblems {
         d26_Stacks1_BasicProblems d26_Stacks1_BasicProblems = new d26_Stacks1_BasicProblems();
 
         ArrayList<String> A = new ArrayList<>(Arrays.asList("2", "1", "+", "3", "*"));
-        d26_Stacks1_BasicProblems.postFixExpression(A); // Q1 // LC150
-        d26_Stacks1_BasicProblems.balancedParenthesis("{()()()}({"); // Q2 // LC20
-        d26_Stacks1_BasicProblems.doubleCharacterTrouble("abccbc"); // Q3 // LC1047
+        d26_Stacks1_BasicProblems.postFixExpression(A); // Q1 // LC150 //##
+        d26_Stacks1_BasicProblems.balancedParenthesis("{()()()}({"); // Q2 // LC20 //##
+        d26_Stacks1_BasicProblems.doubleCharacterTrouble("abccbc"); // Q3 // LC1047 //##
         d26_Stacks1_BasicProblems.passingGameOfBall(10, 48, new int[]{4, 0, 30, 0, 41, 28, 50, 2, 47, 39}); // Q4 // LC1472 Similar leetcode
 
 
-        d26_Stacks1_BasicProblems.minStackInit(); // AQ1 // LC155
-        d26_Stacks1_BasicProblems.redundantBracesUnecessaryBraces("(a+(a+b))"); // AQ2
-        d26_Stacks1_BasicProblems.checkTwoBracketExpressions("-(a+b+c)", "-a-b-c"); // AQ3
-        d26_Stacks1_BasicProblems.infixToPostfix("a+b*(c^d-e)^(f+g*h)-i"); // AQ4
+        d26_Stacks1_BasicProblems.minStackInit(); // AQ1 // LC155 //##
+        d26_Stacks1_BasicProblems.redundantBracesUnecessaryBraces("(a+(a+b))"); // AQ2 //##
+        d26_Stacks1_BasicProblems.checkTwoBracketExpressions("-(a+b+c)", "-a-b-c"); // AQ3 //##
+        d26_Stacks1_BasicProblems.infixToPostfix("a+b*(c^d-e)^(f+g*h)-i"); // AQ4 //##
 
     }
 

@@ -21,17 +21,17 @@ public class d22_Searching2_BinarySearchProblems {
 
         // Call Stack
         d22_Searching2_BinarySearchProblems d22Searching2BinarySearchProblems = new d22_Searching2_BinarySearchProblems();
-        d22Searching2BinarySearchProblems.squareRootOfANumber(4); // Q1
-        d22Searching2BinarySearchProblems.rotatedSortedArraySearch();
+        d22Searching2BinarySearchProblems.squareRootOfANumber(4); // Q1 //##
+        d22Searching2BinarySearchProblems.rotatedSortedArraySearch(); // Q2 //##
 
         int[] A = {1, 2, 7, 9, 11, 13};
         int[] B = {1, 3, 4, 5, 8, 10};
-        d22Searching2BinarySearchProblems.findMedianInSortedArrays(A, B);
+        d22Searching2BinarySearchProblems.findMedianInSortedArrays(A, B); // Q3 //##
 
-        d22Searching2BinarySearchProblems.findMatrixMedian(null); //AQ1
-        d22Searching2BinarySearchProblems.addOrNot(null, 0); //AQ2
-        d22Searching2BinarySearchProblems.athMagicalNumber(0, 0, 0); //AQ3
-        d22Searching2BinarySearchProblems.BthSmallestTripletSum(null, 0); //AQ4
+        d22Searching2BinarySearchProblems.findMatrixMedian(null); //AQ1 //##
+        d22Searching2BinarySearchProblems.addOrNot(null, 0); //AQ2 //##
+        d22Searching2BinarySearchProblems.athMagicalNumber(0, 0, 0); //AQ3 //##
+        d22Searching2BinarySearchProblems.BthSmallestTripletSum(null, 0); //AQ4 //##
 
     }
 

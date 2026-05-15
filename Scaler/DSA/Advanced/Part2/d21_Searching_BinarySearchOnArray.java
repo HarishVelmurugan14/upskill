@@ -22,14 +22,14 @@ public class d21_Searching_BinarySearchOnArray {
 
         // Call Stack
         d21_Searching_BinarySearchOnArray d21SearchingBinarySearchOnArray = new d21_Searching_BinarySearchOnArray();
-        d21SearchingBinarySearchOnArray.searchForStartAndEndIndexOfAnElementInAnArray(); // Q1
-        d21SearchingBinarySearchOnArray.positionWhereTargetIsPresentOrShouldBeInserted(); // Q2
-        d21SearchingBinarySearchOnArray.singleElementInASortedArray(); // Q3
-        d21SearchingBinarySearchOnArray.peakElement(); // Q4
+        d21SearchingBinarySearchOnArray.searchForStartAndEndIndexOfAnElementInAnArray(); // Q1 //##
+        d21SearchingBinarySearchOnArray.positionWhereTargetIsPresentOrShouldBeInserted(); // Q2 //##
+        d21SearchingBinarySearchOnArray.singleElementInASortedArray(); // Q3 //##
+        d21SearchingBinarySearchOnArray.peakElement(); // Q4 //##
 
-        d21SearchingBinarySearchOnArray.searhAMatrix(); // AQ1
-        d21SearchingBinarySearchOnArray.minimumCostToBuildAnArray(3, 2,new int[][]{ {7, 3}, {2, 1},{4, 9} });// AQ2
-        d21SearchingBinarySearchOnArray.maximumHeightOfAStaircase(20); // AQ3
+        d21SearchingBinarySearchOnArray.searhAMatrix(); // AQ1 //##
+        d21SearchingBinarySearchOnArray.minimumCostToBuildAnArray(3, 2,new int[][]{ {7, 3}, {2, 1},{4, 9} });// AQ2 //##
+        d21SearchingBinarySearchOnArray.maximumHeightOfAStaircase(20); // AQ3 //##
 
 
     }

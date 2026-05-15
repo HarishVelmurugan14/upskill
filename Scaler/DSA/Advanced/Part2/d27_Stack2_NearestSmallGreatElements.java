@@ -26,10 +26,10 @@ public class d27_Stack2_NearestSmallGreatElements {
 
         int[] A = {8, 2, 4, 9, 7, 5, 3, 10};
         d27_Stack2_NearestSmallGreatElements.print("", A);
-        d27_Stack2_NearestSmallGreatElements.nearestSmallerElementsToTheLeft(A);
-        d27_Stack2_NearestSmallGreatElements.nearestGreaterElementsToTheRight(A);
-        d27_Stack2_NearestSmallGreatElements.nearestSmallerElementsToTheRight(A);
-        d27_Stack2_NearestSmallGreatElements.nearestGreaterElementsToTheRight(A);
+        d27_Stack2_NearestSmallGreatElements.nearestSmallerElementsToTheLeft(A); //##
+        d27_Stack2_NearestSmallGreatElements.nearestGreaterElementsToTheRight(A); //##
+        d27_Stack2_NearestSmallGreatElements.nearestSmallerElementsToTheRight(A); //##
+        d27_Stack2_NearestSmallGreatElements.nearestGreaterElementsToTheRight(A); //##
 
         d27_Stack2_NearestSmallGreatElements.largestRectangleInAHistogram(new int[]{2, 1, 5, 6, 2, 3}); //## // Q1 // LC 84
         d27_Stack2_NearestSmallGreatElements.prevSmallerValuesInAnArray(new int[]{4, 5, 2, 10, 8}); //## // Q2 // LC901

@@ -36,13 +36,13 @@ public class d24_ClassesObjects_LinkedLists {
          *   null head, index=0, index out of bounds
          */
 
-        ListNode list = createList(new int[]{3, 5, 1, 7, 8, 2, 5, 3});
+        ListNode list = createList(new int[]{3, 5, 1, 7, 8, 2, 5, 3}); //##
 
         ListNode head = list;
-        insertAtLast(head);
-        insertAtIndex(head, 3, 100);
-        printList(head);
-        deleteAtIndex(head, 1);
+        insertAtLast(head); //##
+        insertAtIndex(head, 3, 100); //##
+        printList(head); //##
+        deleteAtIndex(head, 1); //##
 
 
     }
