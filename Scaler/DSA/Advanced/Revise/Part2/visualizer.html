@@ -1796,6 +1796,160 @@ const PROBLEMS = {
         <div class="ds-block"><div class="ds-label">Queue &nbsp;(node values)</div><div class="ds-row">${qH}</div></div>
         <div class="ds-block"><div class="ds-label">Reconstructed Tree &nbsp;(green=built · amber=current)</div>${treeH}</div>`;
     }
+  },
+
+  // ── d31 Q1 · Validate BST (/## · LC98) ──────────────────────────────────────
+  "d31_isValidBST": {
+    title: "Validate BST",
+    day: "d31",
+    section: "Tree",
+    topic: "BST",
+    complexity: "O(N) time · O(H) space",
+    lc: "LC 98",
+    initial: null,
+
+    makeSteps(_) {
+      // Tree: 5(0), left=3(1), right=6(2), 3.right=7(3) — 7 violates upper bound (>5 in left subtree)
+      return [
+        { activeId: -1, visitedIds: [], pathIds: [], labels: {}, result: null,
+          msg: 'isValidBST: DFS passing <b>(min, max)</b> bounds down. Every node must satisfy <code>min &lt; val &lt; max</code>. This tree has a hidden violation.' },
+        { activeId: 0, visitedIds: [], pathIds: [], labels: {0:'(MIN,MAX)'}, result: null,
+          msg: 'Visit root <b>5</b>. Bounds = (MIN, MAX). 5 is in range. Recurse left with (MIN, 4), right with (6, MAX).' },
+        { activeId: 1, visitedIds: [], pathIds: [], labels: {0:'(MIN,MAX)', 1:'(MIN,4)'}, result: null,
+          msg: 'Visit <b>3</b>. Bounds = (MIN, 4). 3 ≤ 4 ✓. Left → null → true. Recurse right with (4, 4).' },
+        { activeId: 3, visitedIds: [], pathIds: [3], labels: {0:'(MIN,MAX)', 1:'(MIN,4)', 3:'7 &gt; 4 ❌'}, result: null,
+          msg: 'Visit <b>7</b>. Bounds = (4, 4). But 7 &gt; 4 — <b>violates upper bound!</b> Return <b>false</b> immediately.' },
+        { activeId: 1, visitedIds: [], pathIds: [3, 1], labels: {0:'(MIN,MAX)', 1:'✗ false', 3:'7&gt;4 ❌'}, result: null,
+          msg: 'Node <b>3</b>: right subtree returned false → propagate false upward.' },
+        { activeId: -1, visitedIds: [], pathIds: [3, 1, 0], labels: {0:'✗ false', 1:'✗ false', 3:'❌ violates'}, result: false, type: 'done',
+          msg: '✓ isValidBST = <b>false</b>. Node 7 is right child of 3 (left subtree of root 5) — 7 &gt; 5 breaks BST ordering. Always use <b>long</b> bounds to handle Integer.MIN/MAX_VALUE nodes.' }
+      ];
+    },
+
+    render(canvas, s) {
+      const root = mkTree([5, 0, [3, 1, null, [7, 3]], [6, 2]]);
+      const treeH = renderTree(root, s.activeId, s.visitedIds, s.pathIds, s.labels);
+      const badge = s.result !== null
+        ? `<div style="margin-top:10px;font-size:14px;font-weight:700;color:var(--red)">✗ Not a valid BST</div>`
+        : s.activeId >= 0
+          ? `<div style="font-size:12px;color:var(--text-muted);margin-top:8px">Checking bounds…</div>`
+          : '';
+      canvas.innerHTML = `
+        <div class="ds-block">
+          <div class="ds-label">BST Validation &nbsp;(labels = active bounds · purple = violation path)</div>
+          ${treeH}${badge}
+        </div>
+        <div style="margin-top:10px;font-size:11px;color:var(--text-muted);background:var(--bg-card);
+          border:1px solid var(--border);border-radius:6px;padding:10px 14px;
+          font-family:'JetBrains Mono',monospace;line-height:1.8">
+          Use <b>long</b> bounds &nbsp;·&nbsp; left → (min, node.val−1) &nbsp;·&nbsp; right → (node.val+1, max)
+        </div>`;
+    }
+  },
+
+  // ── d31 Q4 · Search in BST (/## · LC700) ────────────────────────────────────
+  "d31_searchInABST": {
+    title: "Search in BST",
+    day: "d31",
+    section: "Tree",
+    topic: "BST",
+    complexity: "O(H) time · O(H) space",
+    lc: "LC 700",
+    initial: null,
+
+    makeSteps(_) {
+      // Tree: 5(0), left=3(1), right=6(2), 3.left=2(3), 3.right=4(4). Search for B=4.
+      return [
+        { activeId: -1, visitedIds: [], pathIds: [], target: 4, result: null,
+          msg: 'searchInABST: target = <b>4</b>. BST property: if val == target → found; target &lt; val → go left; target &gt; val → go right.' },
+        { activeId: 0, visitedIds: [], pathIds: [], target: 4, result: null,
+          msg: 'At root <b>5</b>. Is 4 == 5? No. 4 &lt; 5 → go <b>left</b>.' },
+        { activeId: 1, visitedIds: [0], pathIds: [], target: 4, result: null,
+          msg: 'At node <b>3</b>. Is 4 == 3? No. 4 &gt; 3 → go <b>right</b>.' },
+        { activeId: -1, visitedIds: [0, 1], pathIds: [4], target: 4, result: 1, type: 'done',
+          msg: 'At node <b>4</b>. Is 4 == 4? <b>Yes!</b> Return <b>1</b>. (3 comparisons = O(H) depth)' }
+      ];
+    },
+
+    render(canvas, s) {
+      const root = mkTree([5, 0, [3, 1, [2, 3], [4, 4]], [6, 2]]);
+      const treeH = renderTree(root, s.activeId, s.visitedIds, s.pathIds);
+      const badge = s.result !== null
+        ? `<div style="margin-top:10px;font-size:14px;font-weight:700;color:var(--green)">✓ Found — return 1</div>`
+        : s.activeId >= 0
+          ? `<div style="font-size:12px;color:var(--text-muted);margin-top:8px">Searching for <b>${s.target}</b>…</div>`
+          : `<div style="font-size:12px;color:var(--text-muted);margin-top:8px">Target = <b>${s.target}</b></div>`;
+      canvas.innerHTML = `
+        <div class="ds-block">
+          <div class="ds-label">BST Search &nbsp;(target = ${s.target} · green = visited · purple = found)</div>
+          ${treeH}
+          ${badge}
+        </div>
+        <div style="margin-top:10px;font-size:11px;color:var(--text-muted);background:var(--bg-card);
+          border:1px solid var(--border);border-radius:6px;padding:10px 14px;
+          font-family:'JetBrains Mono',monospace;line-height:1.8">
+          if val == B → return 1 &nbsp;·&nbsp; val &gt; B → recurse left &nbsp;·&nbsp; val &lt; B → recurse right
+        </div>`;
+    }
+  },
+
+  // ── d31 Q2 · Sorted Array → BST (/## · LC108) ───────────────────────────────
+  "d31_sortedArrayToBST": {
+    title: "Sorted Array → Balanced BST",
+    day: "d31",
+    section: "Tree",
+    topic: "BST",
+    complexity: "O(N) time · O(N) space",
+    lc: "LC 108",
+    initial: null,
+
+    makeSteps(_) {
+      // A=[1,2,3,4,5,6] → tree: 3(0), 1(1,right=2(2)), 5(3,left=4(4),right=6(5))
+      const A = [1, 2, 3, 4, 5, 6];
+      return [
+        { builtIds: [], activeId: -1, lo: -1, hi: -1, mid: -1,
+          msg: 'sortedArrayToBST: pick <b>mid</b> as root to guarantee balanced height (like binary search). Recurse left half → left subtree; right half → right subtree.' },
+        { builtIds: [], activeId: 0, lo: 0, hi: 5, mid: 2,
+          msg: 'convert([0..5]): mid = (0+5)/2 = <b>2</b>. Root = a[2] = <b>3</b>. Recurse left [0..1], right [3..5].' },
+        { builtIds: [0], activeId: 1, lo: 0, hi: 1, mid: 0,
+          msg: 'convert([0..1]) — left of 3: mid = (0+1)/2 = <b>0</b>. Root = a[0] = <b>1</b>. Recurse left [0..-1]=null, right [1..1].' },
+        { builtIds: [0, 1], activeId: 2, lo: 1, hi: 1, mid: 1,
+          msg: 'convert([1..1]) — right of 1: mid = <b>1</b>. Root = a[1] = <b>2</b>. l == r → leaf node, both children null.' },
+        { builtIds: [0, 1, 2], activeId: 3, lo: 3, hi: 5, mid: 4,
+          msg: 'convert([3..5]) — right of 3: mid = (3+5)/2 = <b>4</b>. Root = a[4] = <b>5</b>. Recurse left [3..3], right [5..5].' },
+        { builtIds: [0, 1, 2, 3], activeId: 4, lo: 3, hi: 3, mid: 3,
+          msg: 'convert([3..3]) — left of 5: mid = <b>3</b>. Root = a[3] = <b>4</b>. Leaf node.' },
+        { builtIds: [0, 1, 2, 3, 4], activeId: 5, lo: 5, hi: 5, mid: 5,
+          msg: 'convert([5..5]) — right of 5: mid = <b>5</b>. Root = a[5] = <b>6</b>. Leaf node.' },
+        { builtIds: [0, 1, 2, 3, 4, 5], activeId: -1, lo: -1, hi: -1, mid: -1, type: 'done',
+          msg: '✓ Balanced BST built. Root = 3. Height = 3. Inorder traversal gives back [1,2,3,4,5,6] ✓' }
+      ];
+    },
+
+    render(canvas, s) {
+      const A = [1, 2, 3, 4, 5, 6];
+      const arrH = A.map((v, i) => {
+        if (s.lo < 0) return cell(v, 'c-input');
+        if (i === s.mid) return cell(v, 'c-active');
+        if (i >= s.lo && i <= s.hi) return cell(v, 'c-input');
+        return cell(v, 'c-empty');
+      }).join('');
+
+      // 3(0), left=1(1,right=2(2)), right=5(3,left=4(4),right=6(5))
+      const root = mkTree([3, 0, [1, 1, null, [2, 2]], [5, 3, [4, 4], [6, 5]]]);
+      const treeH = renderTree(root, s.activeId, s.builtIds);
+
+      canvas.innerHTML = `
+        <div class="ds-block">
+          <div class="ds-label">Sorted Array &nbsp;(amber = mid/new root · grey = outside active range)</div>
+          <div class="ds-row">${arrH}</div>
+          ${s.lo >= 0 ? `<div style="font-size:11px;color:var(--text-muted);margin-top:6px;font-family:'JetBrains Mono',monospace">range [${s.lo}..${s.hi}] &nbsp;·&nbsp; mid=${s.mid} &nbsp;·&nbsp; a[${s.mid}]=${A[s.mid]}</div>` : ''}
+        </div>
+        <div class="ds-block">
+          <div class="ds-label">BST Being Built &nbsp;(green = done · amber = current root)</div>
+          ${treeH}
+        </div>`;
+    }
   }
 
 };
