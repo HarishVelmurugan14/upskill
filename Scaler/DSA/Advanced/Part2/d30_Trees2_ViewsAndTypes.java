@@ -26,11 +26,15 @@ public class d30_Trees2_ViewsAndTypes {
         d30_Trees2_ViewsAndTypes d30_trees2_viewsAndTypes = new d30_Trees2_ViewsAndTypes();
 
         d30_trees2_viewsAndTypes.levelOrderTraversal(input()); // Q1 //##
-        d30_trees2_viewsAndTypes.buildTreeWithInOrderAndPreOrder(null, null); //Q2 //##
-        d30_trees2_viewsAndTypes.buildTreeWithInOrderAndPostOrder(null, null);
+        d30_trees2_viewsAndTypes.buildTreeWithInOrderAndPostOrder(null, null); //Q2 //##
         int x = d30_trees2_viewsAndTypes.isBalanced(isBalancedInput()); // Q3 //##
         System.out.println(x);
         d30_trees2_viewsAndTypes.leftViewOfABinaryTree(input()); // Q4 //##
+
+        d30_trees2_viewsAndTypes.buildTreeWithInOrderAndPreOrder(null, null); //AQ1 //##
+        d30_trees2_viewsAndTypes.serialize(null); //AQ2 //##
+        d30_trees2_viewsAndTypes.deserialize(null); //AQ3 //##
+        d30_trees2_viewsAndTypes.rightView(null); //AQ4 //##
 
     }
 
@@ -242,6 +246,66 @@ public class d30_Trees2_ViewsAndTypes {
 
         return result;
     }
+
+    public void rightView(TreeNode A){
+        ArrayList<ArrayList<Integer>> list = levelOrderTraversal(A);
+        for (ArrayList<Integer> subList : list) {
+            int size = subList.size();
+            System.out.println(subList.get(size-1));
+        }
+    }
+
+    public ArrayList<Integer> serialize(TreeNode A) {
+        ArrayList<Integer> ans = new ArrayList<Integer>();
+        Queue<TreeNode> q = new LinkedList<>();
+        q.add(A);
+        while(q.size() != 0){
+            TreeNode cur = q.peek();
+            q.remove();
+            if(cur == null){
+                ans.add(-1);
+                continue;
+            }
+
+            ans.add(cur.val);
+            q.add(cur.left);
+            q.add(cur.right);
+        }
+        return ans;
+    }
+
+    public TreeNode deserialize(ArrayList<Integer> A) {
+    if (A == null || A.isEmpty() || A.get(0) == -1) return null;
+
+    TreeNode root = new TreeNode(A.get(0));
+    Queue<TreeNode> q = new LinkedList<>();
+    q.add(root);
+    int i = 1;
+
+    while (!q.isEmpty() && i < A.size()) {
+        TreeNode cur = q.poll();
+
+        // left child
+        if (i < A.size()) {
+            int leftVal = A.get(i++);
+            if (leftVal != -1) {
+                cur.left = new TreeNode(leftVal);
+                q.add(cur.left);        // only enqueue real nodes
+            }
+        }
+
+        // right child
+        if (i < A.size()) {
+            int rightVal = A.get(i++);
+            if (rightVal != -1) {
+                cur.right = new TreeNode(rightVal);
+                q.add(cur.right);       // only enqueue real nodes
+            }
+        }
+    }
+
+    return root;
+}
 
 
     /* Section : ------------------------------- [ Generic Utilities ] ------------------------------- */

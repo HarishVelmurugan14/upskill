@@ -377,6 +377,21 @@
         <div class="cx-why-text">HashMap gives O(1) root lookup; without it linear search → O(N²)</div>
       </div>
       <div class="cx-item">
+        <div class="cx-method-name">buildTreeWithInOrderAndPostOrder</div>
+        <div class="cx-badges"><span class="badge b-n">O(N) with map</span><span class="badge b-n">O(N)</span></div>
+        <div class="cx-why-text">Same as PreOrder variant — post gives root at end instead of start</div>
+      </div>
+      <div class="cx-item">
+        <div class="cx-method-name">leftViewOfABinaryTree / rightView</div>
+        <div class="cx-badges"><span class="badge b-n">O(N)</span><span class="badge b-n">O(W)</span></div>
+        <div class="cx-why-text">BFS level-order: track first/last node per level; queue holds one level</div>
+      </div>
+      <div class="cx-item">
+        <div class="cx-method-name">serialize / deserialize</div>
+        <div class="cx-badges"><span class="badge b-n">O(N)</span><span class="badge b-n">O(N)</span></div>
+        <div class="cx-why-text">BFS: every node visited once; queue + output array both O(N)</div>
+      </div>
+      <div class="cx-item">
         <div class="cx-method-name">isValidBST</div>
         <div class="cx-badges"><span class="badge b-n">O(N)</span><span class="badge b-log">O(H)</span></div>
         <div class="cx-why-text">Single DFS passing (long min, long max) bounds; every node once</div>

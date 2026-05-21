@@ -251,6 +251,20 @@
       </div>
     </div>
     <div class="ap-row">
+      <div class="ap-signal">Left view / right view — first/last node visible at each level</div>
+      <div class="ap-reach">
+        <span class="ap-technique">BFS with Level Flag</span>
+        <span class="ap-hint">level-order BFS · track level size · leftView: add first child per level · rightView: add last child per level</span>
+      </div>
+    </div>
+    <div class="ap-row">
+      <div class="ap-signal">Save tree to array and rebuild from array</div>
+      <div class="ap-reach">
+        <span class="ap-technique">Serialize / Deserialize with BFS</span>
+        <span class="ap-hint">serialize: level-order, push -1 for null · deserialize: queue real nodes only, wire left/right from array · i pointer for position</span>
+      </div>
+    </div>
+    <div class="ap-row">
       <div class="ap-signal">Tree with left &lt; root &lt; right — search, validate, build balanced</div>
       <div class="ap-reach">
         <span class="ap-technique">BST Properties</span>

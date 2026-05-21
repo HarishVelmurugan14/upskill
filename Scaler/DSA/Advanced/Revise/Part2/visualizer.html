@@ -1567,6 +1567,235 @@ const PROBLEMS = {
         ${flagH ? `<div class="ds-block"><div class="ds-label">Level flag</div>${flagH}</div>` : ''}
         <div class="ds-block"><div class="ds-label">Left View Result</div><div class="ds-row">${resH || '<span style="color:var(--text-muted);font-size:12px">—</span>'}</div></div>`;
     }
+  },
+
+  // ── d30 AQ1 · Build Tree with InOrder and PostOrder (/##) ───────────────────
+  "d30_buildTreeWithInOrderAndPostOrder": {
+    title: "Build Tree: InOrder + PostOrder",
+    day: "d30",
+    section: "Tree",
+    topic: "Views & Types",
+    complexity: "O(N) time · O(H) space",
+    lc: "LC 106",
+    initial: null,
+
+    makeSteps(_) {
+      // post=[6,3,2,1], in=[6,1,3,2] → builds tree: 1(left=1(left=6,right=3), right=2)
+      return [
+        { built:[], active:-1, callInfo:null,
+          msg:'Post=[6,3,2,1], In=[6,1,3,2]. <b>PostOrder</b>: last element is root. In splits left/right.' },
+        { built:[], active:0, callInfo:{rootVal:1, postR:'[0..3]', inR:'[0..3]', inIdx:1, r:1},
+          msg:'Call(post[0..3], in[0..3]): root = post[3] = <b>1</b>. Find 1 in in[] at index 1. r=1−0+0=<b>1</b>. LST: post[0..0], in[0..0]. RST: post[1..2], in[2..3].' },
+        { built:[0], active:1, callInfo:{rootVal:6, postR:'[0..0]', inR:'[0..0]', inIdx:0, r:0},
+          msg:'Recurse LST → Call(post[0..0], in[0..0]): root = <b>6</b>. Leaf node.' },
+        { built:[0,1], active:2, callInfo:{rootVal:2, postR:'[1..2]', inR:'[2..3]', inIdx:3, r:2},
+          msg:'Recurse RST → Call(post[1..2], in[2..3]): root = post[2] = <b>2</b>. Find at in-index 3. r=<b>2</b>. LST: post[1..1],in[2..2]. RST: none.' },
+        { built:[0,1,2], active:3, callInfo:{rootVal:3, postR:'[1..1]', inR:'[2..2]', inIdx:2, r:1},
+          msg:'Recurse LST of 2 → root = <b>3</b>. Leaf node. Node <b>2</b> has left=3, right=null.' },
+        { built:[0,1,2,3], active:-1, callInfo:null, type:'done',
+          msg:'✓ Tree built. Key: post[post_e] is root; in splits left (in_s..inIdx-1) from right (inIdx+1..in_e).' }
+      ];
+    },
+
+    render(canvas, s) {
+      const root = mkTree([1, 0, [6, 1], [2, 2, [3, 3], null]]);
+      const postArr = [6,3,2,1], inArr = [6,1,3,2];
+      const treeH = renderTree(root, s.active, s.built);
+      let callHtml = '';
+      if (s.callInfo) {
+        const {rootVal, postR, inR, inIdx, r} = s.callInfo;
+        callHtml = `
+          <div style="margin-top:10px;background:var(--bg-card);border:1px solid var(--border);
+            border-radius:8px;padding:12px 16px;font-size:12px;line-height:2;font-family:'JetBrains Mono',monospace">
+            <div>Call: post<b>${postR}</b>, in<b>${inR}</b></div>
+            <div>root = <b style="color:var(--amber)">${rootVal}</b> &nbsp;·&nbsp; found at in[${inIdx}] &nbsp;·&nbsp; r=${r}</div>
+            <div style="color:var(--text-muted)">post=[${postArr}] &nbsp;·&nbsp; in=[${inArr}]</div>
+          </div>`;
+      }
+      canvas.innerHTML = `
+        <div class="ds-block">
+          <div class="ds-label">Tree Being Built &nbsp;(green=done · amber=current root)</div>
+          ${treeH}${callHtml}
+        </div>`;
+    }
+  },
+
+  // ── d30 AQ4 · Right View of Binary Tree (/##) ───────────────────────────────
+  "d30_rightView": {
+    title: "Right View of Binary Tree",
+    day: "d30",
+    section: "Tree",
+    topic: "Views & Types",
+    complexity: "O(N) time · O(N) space",
+    lc: "LC 199",
+    initial: null,
+
+    makeSteps(_) {
+      // Tree: 3(0), left=9(1), right=20(2), 9.right=68(3), 20.left=15(4), 20.right=7(5)
+      const nodes = {
+        0:{val:3,left:1,right:2}, 1:{val:9,left:null,right:3},
+        2:{val:20,left:4,right:5}, 3:{val:68,left:null,right:null},
+        4:{val:15,left:null,right:null}, 5:{val:7,left:null,right:null}
+      };
+      const valOf = id => nodes[id].val;
+      const steps = [], queue = [0], result = [3];
+      steps.push({activeId:-1, queueIds:[...queue], result:[...result], levelNum:0,
+        msg:`Root <b>3</b> always visible → add to result. BFS: per level, add the last child seen.`});
+      let levelNum = 0;
+      while (queue.length) {
+        const levelSize = queue.length;
+        let lastInLevel = null;
+        levelNum++;
+        for (let i = 0; i < levelSize; i++) {
+          const id = queue.shift(), n = nodes[id];
+          if (n.left !== null) {
+            lastInLevel = n.left;
+            queue.push(n.left);
+            steps.push({activeId:n.left, queueIds:[...queue], result:[...result], levelNum,
+              msg:`Level ${levelNum}: enqueue left child <b>${valOf(n.left)}</b> of ${n.val}. Track as potential last.`});
+          }
+          if (n.right !== null) {
+            lastInLevel = n.right;
+            queue.push(n.right);
+            steps.push({activeId:n.right, queueIds:[...queue], result:[...result], levelNum,
+              msg:`Level ${levelNum}: enqueue right child <b>${valOf(n.right)}</b> of ${n.val}. Update last.`});
+          }
+          if (n.left === null && n.right === null) {
+            steps.push({activeId:id, queueIds:[...queue], result:[...result], levelNum,
+              msg:`Node <b>${n.val}</b> is a leaf — no children.`});
+          }
+        }
+        if (lastInLevel !== null) {
+          result.push(valOf(lastInLevel));
+          steps.push({activeId:lastInLevel, queueIds:[...queue], result:[...result], levelNum,
+            msg:`End of level ${levelNum} → rightmost = <b>${valOf(lastInLevel)}</b>. Add to result.`});
+        }
+      }
+      steps.push({activeId:-1, queueIds:[], result:[...result], levelNum, type:'done',
+        msg:`✓ Right view: [<b>${result.join(', ')}</b>] — one node per level, rightmost visible from right.`});
+      return steps;
+    },
+
+    render(canvas, s) {
+      const root = mkTree([3, 0, [9, 1, null, [68, 3]], [20, 2, [15, 4], [7, 5]]]);
+      const nodeVals = {0:3,1:9,2:20,3:68,4:15,5:7};
+      const treeH = renderTree(root, s.activeId, []);
+      const qH = s.queueIds.length
+        ? s.queueIds.map(id => `<span class="cell c-input" style="width:42px">${nodeVals[id]}</span>`).join('')
+        : '<span style="color:var(--text-muted);font-size:12px">(empty)</span>';
+      const resH = s.result.map(v => `<span class="cell c-result" style="width:42px">${v}</span>`).join('');
+      canvas.innerHTML = `
+        <div class="ds-block"><div class="ds-label">Tree &nbsp;(amber = candidate for right view)</div>${treeH}</div>
+        <div class="ds-block"><div class="ds-label">Queue</div><div class="ds-row">${qH}</div></div>
+        <div class="ds-block"><div class="ds-label">Right View Result</div><div class="ds-row">${resH || '<span style="color:var(--text-muted);font-size:12px">—</span>'}</div></div>`;
+    }
+  },
+
+  // ── d30 AQ2 · Serialize Binary Tree (/##) ───────────────────────────────────
+  "d30_serialize": {
+    title: "Serialize Binary Tree",
+    day: "d30",
+    section: "Tree",
+    topic: "Views & Types",
+    complexity: "O(N) time · O(N) space",
+    lc: "LC 297",
+    initial: null,
+
+    makeSteps(_) {
+      // Tree: 1(0), left=2(1), right=3(2), 2.left=4(3)
+      const nodes = {
+        0:{val:1,left:1,right:2}, 1:{val:2,left:3,right:null},
+        2:{val:3,left:null,right:null}, 3:{val:4,left:null,right:null}
+      };
+      const valOf = id => nodes[id]?.val ?? '∅';
+      const steps = [], queue = [0], result = [];
+      steps.push({activeId:-1, queueIds:[...queue], result:[], 
+        msg:`BFS serialization: enqueue root. Dequeue node: add val (or -1 for null), enqueue both children (even nulls).`});
+      
+      while (queue.length && result.length < 8) { // limit for demo
+        const id = queue.shift();
+        if (id === null) {
+          result.push(-1);
+          steps.push({activeId:-1, queueIds:[...queue], result:[...result],
+            msg:`Dequeue <b>null</b> → add <b>-1</b> to result. Don't enqueue children.`});
+        } else {
+          const n = nodes[id];
+          result.push(n.val);
+          steps.push({activeId:id, queueIds:[...queue], result:[...result],
+            msg:`Dequeue node <b>${n.val}</b> → add <b>${n.val}</b>. Enqueue left=${valOf(n.left)}, right=${valOf(n.right)}.`});
+          queue.push(n.left);
+          queue.push(n.right);
+        }
+      }
+      steps.push({activeId:-1, queueIds:[], result:[...result], type:'done',
+        msg:`✓ Serialized: [<b>${result.join(', ')}</b>] — level-order with -1 for null nodes.`});
+      return steps;
+    },
+
+    render(canvas, s) {
+      const root = mkTree([1, 0, [2, 1, [4, 3], null], [3, 2]]);
+      const treeH = renderTree(root, s.activeId, []);
+      const qH = s.queueIds.length
+        ? s.queueIds.map(id => id === null ? `<span class="cell c-empty">∅</span>` : `<span class="cell c-input" style="width:42px">${[1,2,3,4][id]}</span>`).join('')
+        : '<span style="color:var(--text-muted);font-size:12px">(empty)</span>';
+      const resH = s.result.map(v => `<span class="cell ${v===-1?'c-empty':'c-result'}" style="width:42px">${v===-1?'-1':v}</span>`).join('');
+      canvas.innerHTML = `
+        <div class="ds-block"><div class="ds-label">Tree</div>${treeH}</div>
+        <div class="ds-block"><div class="ds-label">Queue</div><div class="ds-row">${qH}</div></div>
+        <div class="ds-block"><div class="ds-label">Serialized Array</div><div class="ds-row">${resH || '<span style="color:var(--text-muted);font-size:12px">—</span>'}</div></div>`;
+    }
+  },
+
+  // ── d30 AQ3 · Deserialize Binary Tree (/##) ─────────────────────────────────
+  "d30_deserialize": {
+    title: "Deserialize Binary Tree",
+    day: "d30",
+    section: "Tree",
+    topic: "Views & Types",
+    complexity: "O(N) time · O(N) space",
+    lc: "LC 297",
+    initial: null,
+
+    makeSteps(_) {
+      // Array: [1,2,3,4,-1,-1,-1] → reconstructs tree
+      const A = [1,2,3,4,-1,-1,-1];
+      const steps = [];
+      steps.push({builtIds:[], activeId:-1, i:0, queueIds:[], phase:'init',
+        msg:`Array=[1,2,3,4,-1,-1,-1]. Create root=A[0]=<b>1</b>, enqueue it. i=1.`});
+      const queue = [0]; // ids
+      const nodes = {0:{val:1,id:0}};
+      let nextId = 1, i = 1;
+      steps.push({builtIds:[0], activeId:0, i:1, queueIds:[...queue], phase:'build',
+        msg:`Dequeue node <b>1</b>. A[1]=<b>2</b> → create left child, enqueue. A[2]=<b>3</b> → create right child, enqueue. i=3.`});
+      nodes[1] = {val:2,id:1}; nodes[2] = {val:3,id:2};
+      queue.shift(); queue.push(1); queue.push(2); i=3;
+      steps.push({builtIds:[0,1,2], activeId:1, i:3, queueIds:[...queue], phase:'build',
+        msg:`Dequeue node <b>2</b>. A[3]=<b>4</b> → create left child, enqueue. A[4]=<b>-1</b> → null right child. i=5.`});
+      nodes[3] = {val:4,id:3};
+      queue.shift(); queue.push(3); i=5;
+      steps.push({builtIds:[0,1,2,3], activeId:2, i:5, queueIds:[...queue], phase:'build',
+        msg:`Dequeue node <b>3</b>. A[5]=<b>-1</b> → null left. A[6]=<b>-1</b> → null right. i=7. Queue=[4].`});
+      queue.shift(); i=7;
+      steps.push({builtIds:[0,1,2,3], activeId:3, i:7, queueIds:[3], phase:'build',
+        msg:`Dequeue node <b>4</b>. i≥N → done. Tree reconstructed.`});
+      steps.push({builtIds:[0,1,2,3], activeId:-1, i:7, queueIds:[], phase:'done', type:'done',
+        msg:`✓ Tree deserialized from [1,2,3,4,-1,-1,-1]. Key: only enqueue non-null nodes.`});
+      return steps;
+    },
+
+    render(canvas, s) {
+      const root = mkTree([1, 0, [2, 1, [4, 3], null], [3, 2]]);
+      const treeH = renderTree(root, s.activeId, s.builtIds);
+      const A = [1,2,3,4,-1,-1,-1];
+      const arrH = A.map((v, idx) => `<span class="cell ${idx<s.i?(v===-1?'c-empty':'c-result'):'c-input'}" style="width:42px">${v===-1?'-1':v}</span>`).join('');
+      const qH = s.queueIds.length
+        ? s.queueIds.map(id => `<span class="cell c-input" style="width:42px">${[1,2,3,4][id]}</span>`).join('')
+        : '<span style="color:var(--text-muted);font-size:12px">(empty)</span>';
+      canvas.innerHTML = `
+        <div class="ds-block"><div class="ds-label">Serialized Array &nbsp;(i=${s.i})</div><div class="ds-row">${arrH}</div></div>
+        <div class="ds-block"><div class="ds-label">Queue &nbsp;(node values)</div><div class="ds-row">${qH}</div></div>
+        <div class="ds-block"><div class="ds-label">Reconstructed Tree &nbsp;(green=built · amber=current)</div>${treeH}</div>`;
+    }
   }
 
 };
