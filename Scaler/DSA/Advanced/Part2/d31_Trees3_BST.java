@@ -92,8 +92,8 @@ public class d31_Trees3_BST {
             return true;
         }
         // System.out.println(A.val + " : "+ min + " : "+ max);
-        if (A.val >= min && A.val <= max) {
-            return (isValidBST(A.left, min, (long) (A.val) - 1) && isValidBST(A.right, (long) (A.val) + 1, max));
+        if (A.val > min && A.val < max) {
+            return (isValidBST(A.left, min, (long) (A.val)) && isValidBST(A.right, (long) (A.val), max));
         }
         return false;
     }
