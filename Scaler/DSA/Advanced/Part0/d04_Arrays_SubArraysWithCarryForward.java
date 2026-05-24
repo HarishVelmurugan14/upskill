@@ -237,7 +237,7 @@ public class d04_Arrays_SubArraysWithCarryForward {
     }
 
     public void numberOfPossibleSubArrays(int n) {
-        int count = MathsFormulas.sumOfNNaturalNumbers(n);
+        int count = (n * (n + 1)) / 2;;
         print("Total Number of SubArray's possible : " + count);
     }
 

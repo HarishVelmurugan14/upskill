@@ -29,6 +29,7 @@ public class Advanced_DSA_Part0 {
 
         // Q1, Q3, AQ4 : Pick One
         d04_arrays_subArraysWithCarryForward.smallestSubArrayWithBothMinAndMaxElements(null); // Q2
+        d04_arrays_subArraysWithCarryForward.numberOfPossibleSubArrays(21); // Q3
         d04_arrays_subArraysWithCarryForward.subArrayInAGivenRange(null, 1, 3); // Q4
         d04_arrays_subArraysWithCarryForward.storeAllSubArraysInA2DMatrix(null); // Q5
         d04_arrays_carryForward.numberOfAGPairsInAString("ABCGAGG"); // Q6
