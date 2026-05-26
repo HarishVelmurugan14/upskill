@@ -1,0 +1,866 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Visualizer — Part 0</title>
+  <link rel="stylesheet" href="style.css">
+  <style>
+    /* ── Layout ── */
+    #viz-root { display: flex; gap: 1.5rem; align-items: flex-start; margin-top: 1rem; }
+    #problem-panel { width: 240px; flex-shrink: 0; }
+    #viz-panel { flex: 1; min-height: 320px; }
+    @media (max-width: 720px) { #viz-root { flex-direction: column; } #problem-panel { width: 100%; } }
+
+    /* ── Topic filter ── */
+    .topic-bar { display: flex; flex-direction: column; gap: 0; margin-bottom: 1rem; }
+    .filter-row { display: flex; flex-wrap: wrap; gap: 8px; padding: 6px 0; }
+    .filter-row.topic-row { border-top: 1px solid var(--border); }
+    .topic-pill { padding: 4px 14px; border-radius: 999px; font-size: 12px; cursor: pointer;
+                  border: 1px solid var(--border); background: transparent; color: var(--text-muted);
+                  font-family: inherit; transition: all 0.15s; }
+    .topic-pill:hover { color: var(--text); border-color: #484f58; }
+    .topic-pill.active { color: var(--teal); border-color: var(--teal); background: rgba(121,192,255,0.08); }
+    .topic-pill.sec-pill { font-weight: 700; font-size: 11px; letter-spacing: 0.3px; }
+
+    /* ── Problem cards ── */
+    .prob-card { padding: 10px 13px; border-radius: 8px; cursor: pointer; margin-bottom: 6px;
+                 border: 1px solid var(--border); background: var(--bg-card); transition: border-color 0.15s; }
+    .prob-card:hover { border-color: #484f58; }
+    .prob-card.selected { border-color: var(--teal); background: rgba(121,192,255,0.05); }
+    .prob-day  { font-size: 10px; font-weight: 700; color: var(--text-muted);
+                 font-family: 'JetBrains Mono', monospace; margin-bottom: 3px; }
+    .prob-name { font-size: 13px; font-weight: 600; color: var(--text); margin-bottom: 2px; }
+    .prob-meta { font-size: 11px; color: var(--text-muted); }
+
+    /* ── Data-structure cells ── */
+    .cell { width: 46px; height: 34px; border-radius: 6px; display: inline-flex; align-items: center;
+            justify-content: center; font-size: 13px; font-weight: 600; border: 1px solid;
+            transition: all 0.25s; font-family: 'JetBrains Mono', monospace; }
+    .c-input  { background: rgba(88,166,255,0.10);  color: var(--blue);        border-color: rgba(88,166,255,0.30); }
+    .c-result { background: rgba(63,185,80,0.10);   color: var(--green);       border-color: rgba(63,185,80,0.30); }
+    .c-active { background: rgba(210,153,34,0.18);  color: var(--amber);       border-color: rgba(210,153,34,0.45); }
+    .c-empty  { background: rgba(139,148,158,0.05); color: var(--text-muted);  border-color: rgba(139,148,158,0.18); border-style: dashed; }
+
+    /* ── DS layout helpers ── */
+    .ds-block { margin-bottom: 18px; }
+    .ds-label { font-size: 10px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase;
+                color: var(--text-muted); margin-bottom: 8px; }
+    .ds-row   { display: flex; gap: 6px; align-items: center; flex-wrap: wrap; }
+
+    /* ── Controls ── */
+    #explanation { font-size: 13px; color: var(--text-muted); min-height: 42px;
+                   text-align: center; margin: 14px 0 6px; line-height: 1.6; }
+    #controls { display: flex; gap: 10px; justify-content: center; margin-top: 10px; }
+    #controls button { font-size: 12px; padding: 6px 16px; cursor: pointer;
+                       background: var(--bg-elevated); border: 1px solid var(--border);
+                       color: var(--text); border-radius: 6px; font-family: inherit; transition: all 0.15s; }
+    #controls button:hover:not(:disabled) { border-color: var(--teal); color: var(--teal); }
+    #controls button:disabled { opacity: 0.35; cursor: default; }
+    .complexity-footer { font-size: 11px; color: var(--text-muted); text-align: center;
+                         margin-top: 12px; font-family: 'JetBrains Mono', monospace; }
+    #viz-empty { color: var(--text-muted); font-size: 13px; padding: 3rem 0; text-align: center; }
+    #viz-panel .prob-sub { font-size: 13px; color: var(--text-muted); margin-bottom: 20px; }
+  </style>
+</head>
+<body>
+
+<header>
+  <a class="logo" href="../../../../../index.html">upskill</a>
+  <nav class="breadcrumb">
+    <a href="../../../../../index.html">Home</a><span class="sep">/</span>
+    <a href="../../../../../index.html">DSA</a><span class="sep">/</span>
+    <a href="../../../../../index.html">Part 0</a><span class="sep">/</span>
+    <span class="cur">Visualizer</span>
+  </nav>
+</header>
+
+<div class="sec-nav">
+  <a class="pill blue"         href="approach-picker.html">Approach Picker</a>
+  <a class="pill red"          href="common-mistakes.html">Common Mistakes</a>
+  <a class="pill green"        href="complexities.html">Complexities</a>
+  <a class="pill purple"       href="key-patterns.html">Key Patterns</a>
+  <a class="pill teal current" href="visualizer.html">Visualizer</a>
+  <a class="pill orange"       href="leetcode-references.html">LeetCode Refs</a>
+</div>
+
+<main>
+  <div class="page-title">Visualizer</div>
+  <div class="page-sub">Part 0 · Days 3–7 · Select a problem to step through it</div>
+
+  <div class="topic-bar" id="topic-bar"></div>
+
+  <div id="viz-root">
+    <div id="problem-panel">
+      <div id="prob-list"></div>
+    </div>
+    <div id="viz-panel">
+      <div id="viz-empty">← Select a problem to load its visualizer</div>
+    </div>
+  </div>
+</main>
+
+<script>
+// ─── Shared render helpers ────────────────────────────────────────────────────
+function cell(val, cls) {
+  return `<span class="cell ${cls}">${val === -1 ? '–' : val}</span>`;
+}
+function arrayRow(A, activeIdx) {
+  return A.map((v, i) => cell(v, i === activeIdx ? 'c-active' : 'c-input')).join('');
+}
+function resultRow(res, filledUpTo) {
+  return res.map((v, i) =>
+    i <= filledUpTo && v !== null
+      ? cell(v === -1 ? '–' : v, 'c-result')
+      : cell('?', 'c-empty')
+  ).join('');
+}
+
+// ─── PROBLEMS registry ────────────────────────────────────────────────────────
+const PROBLEMS = {
+
+  // ── d03 · Range Sum Query (Prefix Sum) ──────────────────────────────────────
+  "d03_rangeSumQuery": {
+    title: "Range Sum Query",
+    day: "d03",
+    section: "Prefix Sum",
+    topic: "Prefix Sum",
+    complexity: "O(N) time · O(N) space",
+    lc: "LC 303",
+    initial: { A: [3, -2, 5, -1, 6], queries: [[0, 2], [1, 4], [2, 4]] },
+
+    makeSteps({ A, queries }) {
+      const N = A.length;
+      const steps = [];
+      
+      // Build prefix array
+      const prefix = [A[0]];
+      steps.push({ phase: 'build', i: 0, prefix: [...prefix], qIdx: -1, sum: null,
+        msg: `Build prefix sum array. prefix[0] = A[0] = <b>${A[0]}</b>` });
+
+      for (let i = 1; i < N; i++) {
+        prefix[i] = prefix[i - 1] + A[i];
+        steps.push({ phase: 'build', i, prefix: [...prefix], qIdx: -1, sum: null,
+          msg: `prefix[${i}] = prefix[${i-1}] + A[${i}] = ${prefix[i-1]} + ${A[i]} = <b>${prefix[i]}</b>` });
+      }
+
+      steps.push({ phase: 'query', i: -1, prefix: [...prefix], qIdx: -1, sum: null,
+        msg: `Prefix array built: [${prefix.join(', ')}]. Now answer queries in O(1) each.` });
+
+      // Answer queries
+      for (let q = 0; q < queries.length; q++) {
+        const [L, R] = queries[q];
+        const sum = L === 0 ? prefix[R] : prefix[R] - prefix[L - 1];
+        steps.push({ phase: 'query', i: -1, prefix: [...prefix], qIdx: q, sum, L, R,
+          msg: `Query [${L}, ${R}]: sum = ${L === 0 ? `prefix[${R}]` : `prefix[${R}] - prefix[${L-1}]`} = ${L === 0 ? prefix[R] : `${prefix[R]} - ${prefix[L-1]}`} = <b>${sum}</b>` });
+      }
+
+      steps.push({ phase: 'done', i: -1, prefix, qIdx: -1, sum: null, type: 'done',
+        msg: `✓ All queries answered in O(1) time using prefix sum.` });
+      return steps;
+    },
+
+    render(canvas, s) {
+      const A = [3, -2, 5, -1, 6];
+      const queries = [[0, 2], [1, 4], [2, 4]];
+      
+      const arrHtml = A.map((v, i) => cell(v, i === s.i ? 'c-active' : 'c-input')).join('');
+      const prefixHtml = s.prefix 
+        ? s.prefix.map((v, i) => cell(v, i === s.i ? 'c-result' : (i <= s.i ? 'c-result' : 'c-empty'))).join('')
+        : '';
+
+      let queryHtml = '';
+      if (s.phase === 'query' && s.qIdx >= 0) {
+        const [L, R] = queries[s.qIdx];
+        const highlightArr = A.map((v, i) => 
+          cell(v, i >= L && i <= R ? 'c-active' : 'c-input')
+        ).join('');
+        queryHtml = `
+          <div class="ds-block">
+            <div class="ds-label">Query Range [${L}, ${R}]</div>
+            <div class="ds-row">${highlightArr}</div>
+            <div style="margin-top:8px;font-size:12px;color:var(--green);font-weight:600">Sum = ${s.sum}</div>
+          </div>`;
+      }
+
+      canvas.innerHTML = `
+        <div class="ds-block">
+          <div class="ds-label">Input Array A</div>
+          <div class="ds-row">${arrHtml}</div>
+        </div>
+        <div class="ds-block">
+          <div class="ds-label">Prefix Sum Array</div>
+          <div class="ds-row">${prefixHtml}</div>
+        </div>
+        ${queryHtml}`;
+    }
+  },
+
+  // ── d03 · Equilibrium Index ─────────────────────────────────────────────────
+  "d03_equilibriumIndex": {
+    title: "Equilibrium Index",
+    day: "d03",
+    section: "Prefix Sum",
+    topic: "Prefix Sum",
+    complexity: "O(N) time · O(N) space",
+    lc: "LC 724",
+    initial: [-7, 1, 5, 2, -4, 3, 0],
+
+    makeSteps(A) {
+      const N = A.length;
+      const steps = [];
+      
+      // Build prefix sum
+      const prefix = [A[0]];
+      steps.push({ phase: 'build', i: 0, prefix: [...prefix], eqIdx: -1, leftSum: null, rightSum: null,
+        msg: `Build prefix sum. prefix[0] = ${A[0]}` });
+
+      for (let i = 1; i < N; i++) {
+        prefix[i] = prefix[i - 1] + A[i];
+        steps.push({ phase: 'build', i, prefix: [...prefix], eqIdx: -1, leftSum: null, rightSum: null,
+          msg: `prefix[${i}] = prefix[${i-1}] + A[${i}] = <b>${prefix[i]}</b>` });
+      }
+
+      steps.push({ phase: 'check', i: -1, prefix: [...prefix], eqIdx: -1, leftSum: null, rightSum: null,
+        msg: `Prefix built: [${prefix.join(', ')}]. Now find equilibrium index where leftSum == rightSum.` });
+
+      // Find equilibrium
+      let found = -1;
+      for (let i = 0; i < N; i++) {
+        const leftSum = i === 0 ? 0 : prefix[i - 1];
+        const rightSum = prefix[N - 1] - prefix[i];
+        
+        if (leftSum === rightSum && found === -1) {
+          found = i;
+          steps.push({ phase: 'check', i, prefix: [...prefix], eqIdx: i, leftSum, rightSum,
+            msg: `i=${i}: leftSum=${leftSum}, rightSum=${rightSum} → <b>EQUILIBRIUM FOUND!</b> ✓` });
+        } else {
+          steps.push({ phase: 'check', i, prefix: [...prefix], eqIdx: found, leftSum, rightSum,
+            msg: `i=${i}: leftSum=${leftSum}, rightSum=${rightSum} → not equal, continue.` });
+        }
+      }
+
+      steps.push({ phase: 'done', i: -1, prefix, eqIdx: found, leftSum: null, rightSum: null, type: 'done',
+        msg: found >= 0 ? `✓ Equilibrium index = <b>${found}</b>` : `✓ No equilibrium index found.` });
+      return steps;
+    },
+
+    render(canvas, s) {
+      const A = [-7, 1, 5, 2, -4, 3, 0];
+      
+      const arrHtml = A.map((v, i) => 
+        cell(v, i === s.eqIdx ? 'c-result' : (i === s.i ? 'c-active' : 'c-input'))
+      ).join('');
+
+      let infoHtml = '';
+      if (s.phase === 'check' && s.i >= 0) {
+        infoHtml = `
+          <div style="margin-top:12px;font-size:12px;color:var(--text-muted)">
+            leftSum (indices 0..${s.i-1}) = <b style="color:var(--blue)">${s.leftSum}</b><br>
+            rightSum (indices ${s.i+1}..${A.length-1}) = <b style="color:var(--amber)">${s.rightSum}</b>
+          </div>`;
+      }
+
+      canvas.innerHTML = `
+        <div class="ds-block">
+          <div class="ds-label">Array A &nbsp;(amber=checking · green=equilibrium)</div>
+          <div class="ds-row">${arrHtml}</div>
+          ${infoHtml}
+        </div>`;
+    }
+  },
+
+  // ── d04 · AG Pairs (Carry Forward) ──────────────────────────────────────────
+  "d04_agPairs": {
+    title: "Count 'ag' Pairs",
+    day: "d04",
+    section: "Carry Forward",
+    topic: "Carry Forward",
+    complexity: "O(N) time · O(1) space",
+    lc: "",
+    initial: "agcgagg",
+
+    makeSteps(S) {
+      const A = S.split('');
+      const N = A.length;
+      const steps = [];
+      
+      let aCount = 0, pairCount = 0;
+      
+      steps.push({ i: -1, aCount: 0, pairCount: 0,
+        msg: `Count 'ag' pairs in forward order. Carry forward count of 'a' seen so far.` });
+
+      for (let i = 0; i < N; i++) {
+        if (A[i] === 'a') {
+          aCount++;
+          steps.push({ i, aCount, pairCount,
+            msg: `i=${i}: Found '<b>a</b>' → aCount = <b>${aCount}</b>` });
+        } else if (A[i] === 'g') {
+          pairCount += aCount;
+          steps.push({ i, aCount, pairCount,
+            msg: `i=${i}: Found '<b>g</b>' → add ${aCount} pairs (one for each 'a' seen) → pairCount = <b>${pairCount}</b>` });
+        } else {
+          steps.push({ i, aCount, pairCount,
+            msg: `i=${i}: char='<b>${A[i]}</b>' → skip` });
+        }
+      }
+
+      steps.push({ i: -1, aCount, pairCount, type: 'done',
+        msg: `✓ Total 'ag' pairs = <b>${pairCount}</b>` });
+      return steps;
+    },
+
+    render(canvas, s) {
+      const S = "agcgagg";
+      const A = S.split('');
+      
+      const strHtml = A.map((c, i) => 
+        `<span class="cell ${i === s.i ? 'c-active' : 'c-input'}" style="width:36px">${c}</span>`
+      ).join('');
+
+      canvas.innerHTML = `
+        <div class="ds-block">
+          <div class="ds-label">String</div>
+          <div class="ds-row">${strHtml}</div>
+        </div>
+        <div style="margin-top:12px;font-size:12px;color:var(--text-muted)">
+          Count of 'a' seen so far: <b style="color:var(--blue)">${s.aCount}</b><br>
+          Total 'ag' pairs: <b style="color:var(--green)">${s.pairCount}</b>
+        </div>`;
+    }
+  },
+
+  // ── d04 · Leader Elements ───────────────────────────────────────────────────
+  "d04_leaderElements": {
+    title: "Leader Elements",
+    day: "d04",
+    section: "Carry Forward",
+    topic: "Carry Forward",
+    complexity: "O(N) time · O(N) space",
+    lc: "",
+    initial: [16, 17, 4, 3, 5, 2],
+
+    makeSteps(A) {
+      const N = A.length;
+      const steps = [];
+      const result = [];
+      
+      let maxFromRight = A[N - 1];
+      result.push(maxFromRight);
+      
+      steps.push({ i: N - 1, maxFromRight, result: [...result],
+        msg: `Start from right. A[${N-1}]=${A[N-1]} is always a leader.` });
+
+      for (let i = N - 2; i >= 0; i--) {
+        if (A[i] > maxFromRight) {
+          result.push(A[i]);
+          maxFromRight = A[i];
+          steps.push({ i, maxFromRight, result: [...result],
+            msg: `i=${i}: A[${i}]=${A[i]} > maxFromRight(${maxFromRight === A[i] ? A[i+1] : maxFromRight}) → <b>Leader!</b> Update max.` });
+        } else {
+          steps.push({ i, maxFromRight, result: [...result],
+            msg: `i=${i}: A[${i}]=${A[i]} ≤ maxFromRight(${maxFromRight}) → not a leader.` });
+        }
+      }
+
+      const finalResult = result.reverse();
+      steps.push({ i: -1, maxFromRight, result: finalResult, type: 'done',
+        msg: `✓ Leaders (in order): [${finalResult.join(', ')}]` });
+      return steps;
+    },
+
+    render(canvas, s) {
+      const A = [16, 17, 4, 3, 5, 2];
+      
+      const arrHtml = A.map((v, i) => {
+        const isLeader = s.result.includes(v) && (i === s.i || s.i === -1);
+        return cell(v, i === s.i ? 'c-active' : (isLeader ? 'c-result' : 'c-input'));
+      }).join('');
+
+      const resHtml = s.result.length 
+        ? s.result.map(v => cell(v, 'c-result')).join('')
+        : '';
+
+      canvas.innerHTML = `
+        <div class="ds-block">
+          <div class="ds-label">Array A &nbsp;(traverse right → left)</div>
+          <div class="ds-row">${arrHtml}</div>
+        </div>
+        <div class="ds-block">
+          <div class="ds-label">Leaders Found</div>
+          <div class="ds-row">${resHtml}</div>
+        </div>
+        <div style="margin-top:8px;font-size:12px;color:var(--text-muted)">
+          Max from right: <b style="color:var(--amber)">${s.maxFromRight}</b>
+        </div>`;
+    }
+  },
+
+  // ── Contribution Technique · Sum of All Subarrays ───────────────────────────
+  "contrib_sumAllSubarrays": {
+    title: "Sum of All Subarrays",
+    day: "d04",
+    section: "Contribution",
+    topic: "Contribution Technique",
+    complexity: "O(N) time · O(1) space",
+    lc: "",
+    initial: [1, 3, 2, 5],
+
+    makeSteps(A) {
+      const N = A.length;
+      const steps = [];
+      let totalSum = 0;
+
+      steps.push({ i: -1, totalSum: 0, contribution: null,
+        msg: `Each element A[i] appears in (i+1)×(N-i) subarrays. Contribution = A[i] × count.` });
+
+      for (let i = 0; i < N; i++) {
+        const count = (i + 1) * (N - i);
+        const contrib = A[i] * count;
+        totalSum += contrib;
+        steps.push({ i, totalSum, contribution: contrib, count,
+          msg: `i=${i}: A[${i}]=${A[i]} appears in (${i+1})×(${N}-${i}) = <b>${count}</b> subarrays → contribution = ${A[i]}×${count} = <b>${contrib}</b> → sum = <b>${totalSum}</b>` });
+      }
+
+      steps.push({ i: -1, totalSum, contribution: null, type: 'done',
+        msg: `✓ Sum of all subarrays = <b>${totalSum}</b>` });
+      return steps;
+    },
+
+    render(canvas, s) {
+      const A = [1, 3, 2, 5];
+      
+      const arrHtml = A.map((v, i) => cell(v, i === s.i ? 'c-active' : 'c-input')).join('');
+
+      let detailHtml = '';
+      if (s.i >= 0) {
+        detailHtml = `
+          <div style="margin-top:12px;font-size:12px;color:var(--text-muted)">
+            Contribution of A[${s.i}] = <b style="color:var(--amber)">${s.contribution}</b> 
+            (appears in ${s.count} subarrays)
+          </div>`;
+      }
+
+      canvas.innerHTML = `
+        <div class="ds-block">
+          <div class="ds-label">Array A</div>
+          <div class="ds-row">${arrHtml}</div>
+          ${detailHtml}
+        </div>
+        <div style="margin-top:8px;font-size:12px;color:var(--text-muted);font-family:'JetBrains Mono',monospace">
+          Running sum = <b style="color:${s.type === 'done' ? 'var(--green)' : 'var(--text)'};font-size:14px">${s.totalSum}</b>
+        </div>`;
+    }
+  },
+
+  // ── Sliding Window · Max Sum of K Elements ──────────────────────────────────
+  "sliding_maxSumK": {
+    title: "Max Sum of K Elements",
+    day: "d05",
+    section: "Sliding Window",
+    topic: "Sliding Window",
+    complexity: "O(N) time · O(1) space",
+    lc: "LC 643",
+    initial: { A: [-3, 4, -2, 5, 3, -2, 8, 2, 1, 4], k: 4 },
+
+    makeSteps({ A, k }) {
+      const N = A.length;
+      const steps = [];
+      
+      // Calculate first window
+      let currentSum = 0;
+      for (let i = 0; i < k; i++) {
+        currentSum += A[i];
+      }
+      let maxSum = currentSum;
+      
+      steps.push({ start: 0, end: k - 1, currentSum, maxSum, phase: 'init',
+        msg: `First window [0..${k-1}]: sum = <b>${currentSum}</b>. Max = ${maxSum}` });
+
+      // Slide window
+      for (let end = k; end < N; end++) {
+        const start = end - k + 1;
+        const removing = A[start - 1];
+        const adding = A[end];
+        currentSum = currentSum - removing + adding;
+        
+        if (currentSum > maxSum) {
+          maxSum = currentSum;
+          steps.push({ start, end, currentSum, maxSum, phase: 'slide',
+            msg: `Slide: remove A[${start-1}]=${removing}, add A[${end}]=${adding} → sum = <b>${currentSum}</b> → <b>New Max!</b> ✓` });
+        } else {
+          steps.push({ start, end, currentSum, maxSum, phase: 'slide',
+            msg: `Slide: remove A[${start-1}]=${removing}, add A[${end}]=${adding} → sum = <b>${currentSum}</b> (max still ${maxSum})` });
+        }
+      }
+
+      steps.push({ start: -1, end: -1, currentSum: maxSum, maxSum, phase: 'done', type: 'done',
+        msg: `✓ Maximum sum of ${k} consecutive elements = <b>${maxSum}</b>` });
+      return steps;
+    },
+
+    render(canvas, s) {
+      const A = [-3, 4, -2, 5, 3, -2, 8, 2, 1, 4];
+      const k = 4;
+      
+      const arrHtml = A.map((v, i) => {
+        if (s.start >= 0 && i >= s.start && i <= s.end) {
+          return cell(v, 'c-result');
+        }
+        return cell(v, 'c-input');
+      }).join('');
+
+      let windowHtml = '';
+      if (s.start >= 0) {
+        const windowVals = A.slice(s.start, s.end + 1);
+        windowHtml = `
+          <div style="margin-top:12px;font-size:12px;color:var(--text-muted)">
+            Window [${s.start}..${s.end}]: [${windowVals.join(', ')}]<br>
+            Current sum: <b style="color:var(--amber)">${s.currentSum}</b><br>
+            Max sum so far: <b style="color:var(--green)">${s.maxSum}</b>
+          </div>`;
+      }
+
+      canvas.innerHTML = `
+        <div class="ds-block">
+          <div class="ds-label">Array A &nbsp;(green = current window)</div>
+          <div class="ds-row">${arrHtml}</div>
+          ${windowHtml}
+        </div>`;
+    }
+  },
+
+  // ── d04 · Smallest Subarray with Min and Max ────────────────────────────────
+  "d04_smallestSubarrayMinMax": {
+    title: "Smallest Subarray with Min & Max",
+    day: "d04",
+    section: "Carry Forward",
+    topic: "Carry Forward",
+    complexity: "O(N) time · O(1) space",
+    lc: "",
+    initial: [1, 2, 6, 1, 3, 4, 6, 4, 6, 3],
+
+    makeSteps(A) {
+      const N = A.length;
+      const minVal = Math.min(...A);
+      const maxVal = Math.max(...A);
+      const steps = [];
+      
+      steps.push({ i: -1, lastMin: -1, lastMax: -1, minLength: N, minVal, maxVal,
+        msg: `Find smallest subarray containing both min=${minVal} and max=${maxVal}. Track latest positions.` });
+
+      let lastMin = -1, lastMax = -1, minLength = N;
+
+      for (let i = 0; i < N; i++) {
+        if (A[i] === minVal) {
+          lastMin = i;
+          if (lastMax !== -1) {
+            const len = i - lastMax + 1;
+            if (len < minLength) {
+              minLength = len;
+              steps.push({ i, lastMin, lastMax, minLength, minVal, maxVal, foundBetter: true,
+                msg: `i=${i}: Found min(${minVal}) at ${i}. Last max at ${lastMax} → length = ${len} → <b>New shortest!</b>` });
+            } else {
+              steps.push({ i, lastMin, lastMax, minLength, minVal, maxVal, foundBetter: false,
+                msg: `i=${i}: Found min(${minVal}) at ${i}. Length = ${len}, not better than ${minLength}.` });
+            }
+          } else {
+            steps.push({ i, lastMin, lastMax, minLength, minVal, maxVal, foundBetter: false,
+              msg: `i=${i}: Found min(${minVal}) at ${i}. No max seen yet.` });
+          }
+        } else if (A[i] === maxVal) {
+          lastMax = i;
+          if (lastMin !== -1) {
+            const len = i - lastMin + 1;
+            if (len < minLength) {
+              minLength = len;
+              steps.push({ i, lastMin, lastMax, minLength, minVal, maxVal, foundBetter: true,
+                msg: `i=${i}: Found max(${maxVal}) at ${i}. Last min at ${lastMin} → length = ${len} → <b>New shortest!</b>` });
+            } else {
+              steps.push({ i, lastMin, lastMax, minLength, minVal, maxVal, foundBetter: false,
+                msg: `i=${i}: Found max(${maxVal}) at ${i}. Length = ${len}, not better than ${minLength}.` });
+            }
+          } else {
+            steps.push({ i, lastMin, lastMax, minLength, minVal, maxVal, foundBetter: false,
+              msg: `i=${i}: Found max(${maxVal}) at ${i}. No min seen yet.` });
+          }
+        } else {
+          steps.push({ i, lastMin, lastMax, minLength, minVal, maxVal, foundBetter: false,
+            msg: `i=${i}: A[${i}]=${A[i]} is neither min nor max, skip.` });
+        }
+      }
+
+      steps.push({ i: -1, lastMin, lastMax, minLength, minVal, maxVal, type: 'done',
+        msg: `✓ Smallest subarray length = <b>${minLength}</b>` });
+      return steps;
+    },
+
+    render(canvas, s) {
+      const A = [1, 2, 6, 1, 3, 4, 6, 4, 6, 3];
+      
+      const arrHtml = A.map((v, i) => {
+        if (i === s.i) return cell(v, 'c-active');
+        if (i === s.lastMin || i === s.lastMax) return cell(v, 'c-result');
+        return cell(v, 'c-input');
+      }).join('');
+
+      let infoHtml = '';
+      if (s.i >= 0) {
+        infoHtml = `
+          <div style="margin-top:12px;font-size:12px;color:var(--text-muted)">
+            Last min(${s.minVal}) position: <b style="color:var(--blue)">${s.lastMin >= 0 ? s.lastMin : 'not seen'}</b><br>
+            Last max(${s.maxVal}) position: <b style="color:var(--amber)">${s.lastMax >= 0 ? s.lastMax : 'not seen'}</b><br>
+            Shortest length so far: <b style="color:var(--green)">${s.minLength}</b>
+          </div>`;
+      }
+
+      canvas.innerHTML = `
+        <div class="ds-block">
+          <div class="ds-label">Array A &nbsp;(amber=current · green=tracked positions)</div>
+          <div class="ds-row">${arrHtml}</div>
+          ${infoHtml}
+        </div>`;
+    }
+  },
+
+  // ── d04 · Max Stock Profit (One Transaction) ────────────────────────────────
+  "d04_maxStockProfit": {
+    title: "Max Stock Profit (One Transaction)",
+    day: "d04",
+    section: "Carry Forward",
+    topic: "Carry Forward",
+    complexity: "O(N) time · O(1) space",
+    lc: "LC 121",
+    initial: [1, 4, 5, 2, 4],
+
+    makeSteps(A) {
+      const N = A.length;
+      const steps = [];
+      
+      if (N === 0) return steps;
+
+      let maxProfit = 0;
+      let maxFromRight = A[N - 1];
+      
+      steps.push({ i: N - 1, maxFromRight, maxProfit, currentProfit: 0,
+        msg: `Start from right. Track max price to the right of each position.` });
+
+      for (let i = N - 2; i >= 0; i--) {
+        const profit = maxFromRight - A[i];
+        if (profit > maxProfit) {
+          maxProfit = profit;
+          steps.push({ i, maxFromRight, maxProfit, currentProfit: profit,
+            msg: `i=${i}: Buy at ${A[i]}, sell at ${maxFromRight} → profit = <b>${profit}</b> → <b>New Max!</b> ✓` });
+        } else {
+          steps.push({ i, maxFromRight, maxProfit, currentProfit: profit,
+            msg: `i=${i}: Buy at ${A[i]}, sell at ${maxFromRight} → profit = ${profit} (max still ${maxProfit})` });
+        }
+        
+        if (A[i] > maxFromRight) {
+          maxFromRight = A[i];
+          steps.push({ i, maxFromRight, maxProfit, currentProfit: profit, updateMax: true,
+            msg: `Update maxFromRight to ${A[i]} (larger than previous ${maxFromRight})` });
+        }
+      }
+
+      steps.push({ i: -1, maxFromRight, maxProfit, currentProfit: 0, type: 'done',
+        msg: `✓ Maximum profit = <b>${maxProfit}</b>` });
+      return steps;
+    },
+
+    render(canvas, s) {
+      const A = [1, 4, 5, 2, 4];
+      
+      const arrHtml = A.map((v, i) => cell(v, i === s.i ? 'c-active' : 'c-input')).join('');
+
+      let infoHtml = '';
+      if (s.i >= 0) {
+        infoHtml = `
+          <div style="margin-top:12px;font-size:12px;color:var(--text-muted)">
+            Buy price: <b style="color:var(--blue)">${A[s.i]}</b><br>
+            Max sell price to right: <b style="color:var(--amber)">${s.maxFromRight}</b><br>
+            Current profit: <b style="color:var(--text)">${s.currentProfit}</b><br>
+            Max profit so far: <b style="color:var(--green)">${s.maxProfit}</b>
+          </div>`;
+      }
+
+      canvas.innerHTML = `
+        <div class="ds-block">
+          <div class="ds-label">Stock Prices &nbsp;(traverse right → left)</div>
+          <div class="ds-row">${arrHtml}</div>
+          ${infoHtml}
+        </div>`;
+    }
+  },
+
+  // ── d03 · Special Indices ───────────────────────────────────────────────────
+  "d03_specialIndices": {
+    title: "Special Indices",
+    day: "d03",
+    section: "Prefix Sum",
+    topic: "Prefix Sum",
+    complexity: "O(N) time · O(N) space",
+    lc: "",
+    initial: [2, 1, 6, 4, 5, 2, 8],
+
+    makeSteps(A) {
+      const N = A.length;
+      const steps = [];
+      
+      // Build prefix sums for even and odd indices
+      const prefixEven = new Array(N);
+      const prefixOdd = new Array(N);
+      
+      prefixEven[0] = A[0];
+      prefixOdd[0] = 0;
+      
+      for (let i = 1; i < N; i++) {
+        prefixEven[i] = prefixEven[i - 1] + (i % 2 === 0 ? A[i] : 0);
+        prefixOdd[i] = prefixOdd[i - 1] + (i % 2 === 1 ? A[i] : 0);
+      }
+
+      steps.push({ phase: 'build', i: -1, count: 0, evenSum: null, oddSum: null,
+        msg: `Build prefix sums for even-indexed and odd-indexed elements separately.` });
+
+      let count = 0;
+      for (let i = 0; i < N; i++) {
+        const oddSum = (i === 0 ? 0 : prefixOdd[i - 1]) + 
+                       (prefixEven[N - 1] - prefixEven[i]);
+        const evenSum = (i === 0 ? 0 : prefixEven[i - 1]) + 
+                        (prefixOdd[N - 1] - prefixOdd[i]);
+        
+        if (oddSum === evenSum) {
+          count++;
+          steps.push({ phase: 'check', i, count, evenSum, oddSum, isSpecial: true,
+            msg: `i=${i}: Remove A[${i}]=${A[i]}. New evenSum=${evenSum}, oddSum=${oddSum} → <b>Equal! Special index.</b> ✓` });
+        } else {
+          steps.push({ phase: 'check', i, count, evenSum, oddSum, isSpecial: false,
+            msg: `i=${i}: Remove A[${i}]=${A[i]}. New evenSum=${evenSum}, oddSum=${oddSum} → not equal.` });
+        }
+      }
+
+      steps.push({ phase: 'done', i: -1, count, evenSum: null, oddSum: null, type: 'done',
+        msg: `✓ Total special indices = <b>${count}</b>` });
+      return steps;
+    },
+
+    render(canvas, s) {
+      const A = [2, 1, 6, 4, 5, 2, 8];
+      
+      const arrHtml = A.map((v, i) => 
+        cell(v, i === s.i ? (s.isSpecial ? 'c-result' : 'c-active') : 'c-input')
+      ).join('');
+
+      let infoHtml = '';
+      if (s.phase === 'check') {
+        const match = s.evenSum === s.oddSum;
+        infoHtml = `
+          <div style="margin-top:12px;font-size:12px;color:var(--text-muted)">
+            After removing index ${s.i}:<br>
+            Sum of even indices: <b style="color:var(--blue)">${s.evenSum}</b><br>
+            Sum of odd indices: <b style="color:var(--amber)">${s.oddSum}</b><br>
+            ${match ? '<span style="color:var(--green);font-weight:600">✓ SPECIAL INDEX</span>' : ''}
+          </div>`;
+      }
+
+      canvas.innerHTML = `
+        <div class="ds-block">
+          <div class="ds-label">Array A &nbsp;(green=special · amber=checking)</div>
+          <div class="ds-row">${arrHtml}</div>
+          ${infoHtml}
+        </div>
+        <div style="margin-top:8px;font-size:12px;color:var(--text-muted)">
+          Special indices found: <b style="color:var(--green)">${s.count}</b>
+        </div>`;
+    }
+  }
+
+};
+
+// ─── UI Controller ────────────────────────────────────────────────────────────
+let currentProb = null;
+let currentSteps = [];
+let stepIdx = 0;
+
+function renderProblemList(filterTopic = 'all') {
+  const topics = [...new Set(Object.values(PROBLEMS).map(p => p.section))];
+  
+  // Render filter pills
+  const topicBar = document.getElementById('topic-bar');
+  let pills = `<div class="filter-row"><span class="topic-pill sec-pill ${filterTopic === 'all' ? 'active' : ''}" data-topic="all">All</span></div>`;
+  pills += `<div class="filter-row topic-row">`;
+  for (const t of topics) {
+    pills += `<span class="topic-pill ${filterTopic === t ? 'active' : ''}" data-topic="${t}">${t}</span>`;
+  }
+  pills += `</div>`;
+  topicBar.innerHTML = pills;
+  
+  // Attach click handlers
+  document.querySelectorAll('.topic-pill').forEach(p => {
+    p.addEventListener('click', () => renderProblemList(p.dataset.topic));
+  });
+
+  // Render problem cards
+  const probList = document.getElementById('prob-list');
+  let html = '';
+  for (const [key, prob] of Object.entries(PROBLEMS)) {
+    if (filterTopic !== 'all' && prob.section !== filterTopic) continue;
+    const sel = currentProb === key ? 'selected' : '';
+    html += `<div class="prob-card ${sel}" data-key="${key}">
+      <div class="prob-day">${prob.day}</div>
+      <div class="prob-name">${prob.title}</div>
+      <div class="prob-meta">${prob.topic}</div>
+    </div>`;
+  }
+  probList.innerHTML = html;
+  
+  // Attach click handlers
+  document.querySelectorAll('.prob-card').forEach(c => {
+    c.addEventListener('click', () => loadProblem(c.dataset.key));
+  });
+}
+
+function loadProblem(key) {
+  currentProb = key;
+  const prob = PROBLEMS[key];
+  currentSteps = prob.makeSteps(prob.initial);
+  stepIdx = 0;
+  
+  renderProblemList();
+  renderStep();
+}
+
+function renderStep() {
+  const prob = PROBLEMS[currentProb];
+  const step = currentSteps[stepIdx];
+  const panel = document.getElementById('viz-panel');
+  
+  panel.innerHTML = `
+    <div class="prob-sub">${prob.title} · ${prob.day}</div>
+    <div id="canvas"></div>
+    <div id="explanation">${step.msg}</div>
+    <div id="controls">
+      <button id="btn-prev">← Prev</button>
+      <button id="btn-next">Next →</button>
+      <button id="btn-reset">Reset</button>
+    </div>
+    <div class="complexity-footer">${prob.complexity}${prob.lc ? ` · ${prob.lc}` : ''}</div>
+  `;
+  
+  const canvas = document.getElementById('canvas');
+  prob.render(canvas, step);
+  
+  document.getElementById('btn-prev').disabled = stepIdx === 0;
+  document.getElementById('btn-next').disabled = stepIdx === currentSteps.length - 1;
+  
+  document.getElementById('btn-prev').addEventListener('click', () => { stepIdx--; renderStep(); });
+  document.getElementById('btn-next').addEventListener('click', () => { stepIdx++; renderStep(); });
+  document.getElementById('btn-reset').addEventListener('click', () => { stepIdx = 0; renderStep(); });
+}
+
+// Initialize
+renderProblemList();
+</script>
+
+</body>
+</html>

@@ -24,8 +24,8 @@ public class ContributionTechnique_4 {
 
         //Problems
 
-        contributionTechnique.sumOfAllSubArrays();
-        contributionTechnique.maxSubArray();
+        contributionTechnique.sumOfAllSubArrays(); // Q2
+        contributionTechnique.maxSubArray(); // Q1
         contributionTechnique.countSubArraysWithSumLessThanB();
     }
 

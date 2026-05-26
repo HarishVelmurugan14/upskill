@@ -21,7 +21,7 @@ public class SlidingWindowTechnique_5 {
         SlidingWindowTechnique_5 slidingWindowTechnique = new SlidingWindowTechnique_5();
 
         slidingWindowTechnique.maxSumSubArray();
-        slidingWindowTechnique.checkIfSubArrayWithLengthBHasSumC();
+        slidingWindowTechnique.checkIfSubArrayWithLengthBHasSumC(); // Q3
         slidingWindowTechnique.indexOfSubArrayWithLeastAverage();
     }
 
@@ -50,39 +50,30 @@ public class SlidingWindowTechnique_5 {
         optimal(array, k);
     }
 
-    private void checkIfSubArrayWithLengthBHasSumC() {
+    private int checkIfSubArrayWithLengthBHasSumC() {
         // Complexity : Time : [ O(N) ]
         // Complexity : Space : [ O(1) ]
         /*Given an array A of length N. Also given are integers B and C.
         Return 1 if there exists a subarray with length B having sum C and 0 otherwise*/
-        int[] A = {4, 3, 2, 6, 1};
+        int[] A = new int[]{4, 3, 2, 6, 1};
         int B = 3;
         int C = 11;
-
-        int n = A.length;
         int currentSum = 0;
-        for (int i = 0; i < B; i++) {
+        for(int i = 0; i< B; i++){
             currentSum += A[i];
         }
-        System.out.println(currentSum + " start : 0 ");
-        if (currentSum == C) {
-//            return 1;
-        }
-        int start = 1;
-        int end = n - B + 1;
 
-        while (end < n) {
-            System.out.println("Before : " + currentSum + " start : " + A[start - 1] + " End : " + A[end]);
-            currentSum = currentSum - A[start - 1] + A[end];
-            System.out.println(currentSum + " start : " + start);
-            if (currentSum == C) {
-                System.out.println(currentSum + " Success : start : " + start);
-//                return 1;
-            }
-            end++;
-            start++;
+        if(currentSum == C) {
+            return 1;
         }
-//        return 0;
+
+        for(int j = B; j< A.length; j++){
+            currentSum = currentSum + A[j] - A[j-B];
+            if(currentSum == C) {
+                return 1;
+            }
+        }
+        return 0;
     }
 
     private int indexOfSubArrayWithLeastAverage() {
