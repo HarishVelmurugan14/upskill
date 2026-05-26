@@ -392,7 +392,8 @@
             document.getElementById('timeComplexity').textContent = currentProblem.timeComplexity;
             document.getElementById('spaceComplexity').textContent = currentProblem.spaceComplexity;
 
-            hideAllSections();
+            hideInfoSections();
+            document.getElementById('problemSection').classList.add('active');
             document.getElementById('complexitySection').classList.add('active');
         }
 
@@ -411,7 +412,8 @@
                 approachSteps.appendChild(li);
             });
 
-            hideAllSections();
+            hideInfoSections();
+            document.getElementById('problemSection').classList.add('active');
             document.getElementById('approachSection').classList.add('active');
         }
 
@@ -433,8 +435,15 @@
                 topicTags.appendChild(span);
             });
 
-            hideAllSections();
+            hideInfoSections();
+            document.getElementById('problemSection').classList.add('active');
             document.getElementById('topicSection').classList.add('active');
+        }
+
+        function hideInfoSections() {
+            document.getElementById('complexitySection').classList.remove('active');
+            document.getElementById('approachSection').classList.remove('active');
+            document.getElementById('topicSection').classList.remove('active');
         }
 
         function hideAllSections() {
