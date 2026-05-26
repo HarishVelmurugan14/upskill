@@ -250,27 +250,32 @@
             color: #667eea;
         }
 
-        .filter-select {
+        .filter-input {
             padding: 10px 20px;
             font-size: 15px;
             border: 2px solid #667eea;
             border-radius: 8px;
             background: white;
             color: #333;
-            cursor: pointer;
+            cursor: text;
             outline: none;
             transition: all 0.3s ease;
-            min-width: 250px;
+            min-width: 300px;
         }
 
-        .filter-select:hover {
+        .filter-input:hover {
             border-color: #5568d3;
             box-shadow: 0 2px 8px rgba(102, 126, 234, 0.2);
         }
 
-        .filter-select:focus {
+        .filter-input:focus {
             border-color: #5568d3;
             box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .filter-input::placeholder {
+            color: #999;
+            font-style: italic;
         }
 
         .problem-count {
@@ -286,9 +291,14 @@
         
         <div class="filter-section">
             <label class="filter-label">Filter by Topic:</label>
-            <select id="topicFilter" class="filter-select" onchange="updateProblemCount()">
-                <option value="all">All Topics</option>
-            </select>
+            <input type="text" id="topicFilter" class="filter-input" 
+                   list="topicList" 
+                   placeholder="Type to search or select 'All Topics'..."
+                   oninput="updateProblemCount()" 
+                   autocomplete="off">
+            <datalist id="topicList">
+                <option value="All Topics">
+            </datalist>
             <span class="problem-count" id="problemCount"></span>
         </div>
         
@@ -428,25 +438,26 @@
                 problem.tags.forEach(tag => topicSet.add(tag));
             });
             
-            const topicFilter = document.getElementById('topicFilter');
+            const topicList = document.getElementById('topicList');
             const sortedTopics = Array.from(topicSet).sort();
             
             sortedTopics.forEach(topic => {
                 const option = document.createElement('option');
                 option.value = topic;
-                option.textContent = topic;
-                topicFilter.appendChild(option);
+                topicList.appendChild(option);
             });
         }
 
         function getFilteredProblems() {
-            const selectedTopic = document.getElementById('topicFilter').value;
+            const selectedTopic = document.getElementById('topicFilter').value.trim();
             
-            if (selectedTopic === 'all') {
+            if (selectedTopic === '' || selectedTopic.toLowerCase() === 'all topics') {
                 return problems;
             }
             
-            return problems.filter(problem => problem.tags.includes(selectedTopic));
+            return problems.filter(problem => 
+                problem.tags.some(tag => tag.toLowerCase().includes(selectedTopic.toLowerCase()))
+            );
         }
 
         function updateProblemCount() {
