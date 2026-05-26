@@ -232,11 +232,65 @@
             padding: 40px;
             font-size: 1.2em;
         }
+
+        .filter-section {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 15px;
+            margin-bottom: 20px;
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 10px;
+        }
+
+        .filter-label {
+            font-size: 16px;
+            font-weight: 600;
+            color: #667eea;
+        }
+
+        .filter-select {
+            padding: 10px 20px;
+            font-size: 15px;
+            border: 2px solid #667eea;
+            border-radius: 8px;
+            background: white;
+            color: #333;
+            cursor: pointer;
+            outline: none;
+            transition: all 0.3s ease;
+            min-width: 250px;
+        }
+
+        .filter-select:hover {
+            border-color: #5568d3;
+            box-shadow: 0 2px 8px rgba(102, 126, 234, 0.2);
+        }
+
+        .filter-select:focus {
+            border-color: #5568d3;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .problem-count {
+            font-size: 14px;
+            color: #8b949e;
+            font-weight: 500;
+        }
     </style>
 </head>
 <body>
     <div class="container">
         <h1>🎯 Random Problem Viewer</h1>
+        
+        <div class="filter-section">
+            <label class="filter-label">Filter by Topic:</label>
+            <select id="topicFilter" class="filter-select" onchange="updateProblemCount()">
+                <option value="all">All Topics</option>
+            </select>
+            <span class="problem-count" id="problemCount"></span>
+        </div>
         
         <div class="button-group">
             <button class="btn-load" onclick="loadProblem()">Load Problem</button>
@@ -362,15 +416,56 @@
 
         let currentProblem = null;
 
+        // Initialize topic filter on page load
+        window.onload = function() {
+            populateTopicFilter();
+            updateProblemCount();
+        };
+
+        function populateTopicFilter() {
+            const topicSet = new Set();
+            problems.forEach(problem => {
+                problem.tags.forEach(tag => topicSet.add(tag));
+            });
+            
+            const topicFilter = document.getElementById('topicFilter');
+            const sortedTopics = Array.from(topicSet).sort();
+            
+            sortedTopics.forEach(topic => {
+                const option = document.createElement('option');
+                option.value = topic;
+                option.textContent = topic;
+                topicFilter.appendChild(option);
+            });
+        }
+
+        function getFilteredProblems() {
+            const selectedTopic = document.getElementById('topicFilter').value;
+            
+            if (selectedTopic === 'all') {
+                return problems;
+            }
+            
+            return problems.filter(problem => problem.tags.includes(selectedTopic));
+        }
+
+        function updateProblemCount() {
+            const filteredProblems = getFilteredProblems();
+            const countElement = document.getElementById('problemCount');
+            countElement.textContent = `(${filteredProblems.length} problem${filteredProblems.length !== 1 ? 's' : ''})`;
+        }
+
         function loadProblem() {
-            if (problems.length === 0) {
-                alert("No problems available. Please add problems to the database.");
+            const filteredProblems = getFilteredProblems();
+            
+            if (filteredProblems.length === 0) {
+                alert("No problems available for the selected topic.");
                 return;
             }
 
-            // Select a random problem
-            const randomIndex = Math.floor(Math.random() * problems.length);
-            currentProblem = problems[randomIndex];
+            // Select a random problem from filtered list
+            const randomIndex = Math.floor(Math.random() * filteredProblems.length);
+            currentProblem = filteredProblems[randomIndex];
 
             // Update problem section
             document.getElementById('problemTitle').textContent = currentProblem.title;
