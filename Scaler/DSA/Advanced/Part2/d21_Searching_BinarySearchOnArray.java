@@ -318,10 +318,10 @@ public class d21_Searching_BinarySearchOnArray {
       for (int i = 0; i < A - 1; i++) {
          for (int j = 0; j < B; j++) {
             lb = lower_bound(C[i + 1], C[i][j]); // check for next element as in soltion
-            if (lb != B) {
+            if (lb != B) { // no elements greater
                ans = Math.min(ans, Math.abs(C[i][j] - C[i + 1][lb])); // Update answer
             }
-            if (lb != 0) {
+            if (lb != 0) { // all elements greater
                ans = Math.min(ans, Math.abs(C[i][j] - C[i + 1][lb - 1]));
             }
          }
