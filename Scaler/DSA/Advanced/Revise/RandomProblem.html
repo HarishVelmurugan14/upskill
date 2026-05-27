@@ -800,6 +800,206 @@
                 ],
                 topic: "Binary Search on Answer. This is a classic 'binary search the answer' problem where we search for the maximum value that satisfies a condition. The sum formula 1+2+...+n = n(n+1)/2 is key.",
                 tags: ["Binary Search", "Math", "Binary Search on Answer", "Sum Formula"]
+            },
+            {
+                title: "Square Root of Integer",
+                description: "Given an integer A. Compute and return the square root of A. If A is not a perfect square, return floor(sqrt(A)).\n\nConstraints:\n• 0 <= A <= 10^9\n\nNOTE:\n• The value of A*A can cross the range of Integer\n• Do not use the sqrt function from the standard library\n• Users are expected to solve this in O(log(A)) time",
+                sampleInput: "Input 1:\nA = 11\n\nInput 2:\nA = 9",
+                sampleOutput: "Output 1: 3\n(floor(sqrt(11)) = 3)\n\nOutput 2: 3\n(sqrt(9) = 3)",
+                timeComplexity: "O(log N)",
+                spaceComplexity: "O(1)",
+                approach: [
+                    "Use Binary Search on answer from 0 to A",
+                    "For each mid, check if mid * mid == A (perfect square) or mid * mid <= A",
+                    "Important: Use long to avoid overflow when computing mid * mid",
+                    "If mid * mid <= A, answer could be mid, search right: low = mid + 1",
+                    "If mid * mid > A, search left: high = mid - 1",
+                    "Return the largest mid where mid * mid <= A"
+                ],
+                topic: "Binary Search on Answer with overflow handling. Classic problem demonstrating binary search to find square root without using built-in functions. Key challenge is handling integer overflow.",
+                tags: ["Binary Search", "Math", "Binary Search on Answer", "Integer Overflow"]
+            },
+            {
+                title: "Rotated Sorted Array Search",
+                description: "Given a sorted array of integers A of size N and an integer B, where array A is rotated at some pivot unknown beforehand.\n\nFor example, the array [0, 1, 2, 4, 5, 6, 7] might become [4, 5, 6, 7, 0, 1, 2].\n\nYour task is to search for the target value B in the array. If found, return its index; otherwise, return -1.\n\nYou can assume that no duplicates exist in the array.\n\nConstraints:\n• 1 <= N <= 1000000\n• 1 <= A[i] <= 10^9\n• All elements in A are Distinct\n\nNOTE: You are expected to solve this problem with a time complexity of O(log(N)).",
+                sampleInput: "Input 1:\nA = [4, 5, 6, 7, 0, 1, 2]\nB = 4\n\nInput 2:\nA = [4, 5, 6, 7, 0, 1, 2]\nB = 3",
+                sampleOutput: "Output 1: 0\n(4 is found at index 0)\n\nOutput 2: -1\n(3 is not present in array)",
+                timeComplexity: "O(log N)",
+                spaceComplexity: "O(1)",
+                approach: [
+                    "Modified Binary Search: At mid, one half is always sorted",
+                    "Check if left half [low...mid] is sorted: A[low] <= A[mid]",
+                    "If sorted and target in range [A[low], A[mid]], search left; else right",
+                    "Otherwise right half [mid...high] is sorted",
+                    "If target in range [A[mid], A[high]], search right; else left",
+                    "Continue until target found or search space exhausted"
+                ],
+                topic: "Binary Search on Rotated Sorted Array. Key insight: even in a rotated array, one half is always sorted. Use this to determine which half to search.",
+                tags: ["Binary Search", "Rotated Array", "Sorted Array", "Modified Binary Search"]
+            },
+            {
+                title: "Median of Two Sorted Arrays",
+                description: "Given two sorted arrays A and B of size M and N respectively, return the median of the two sorted arrays.\n\nRound off the value to the floor integer [2.6=2, 2.2=2]\n\nConstraints:\n• 0 <= M <= 10^5\n• 0 <= N <= 10^5\n• -10^9 <= A[i], B[i] <= 10^9",
+                sampleInput: "Input 1:\nA = [5, 7]\nB = [6]\n\nInput 2:\nA = [1, 2]\nB = [3, 4]",
+                sampleOutput: "Output 1: 6\n(Merged: [5, 6, 7], median = 6)\n\nOutput 2: 2\n(Merged: [1, 2, 3, 4], median = (2+3)/2 = 2)",
+                timeComplexity: "O(log(min(M, N)))",
+                spaceComplexity: "O(1)",
+                approach: [
+                    "Use Binary Search on the smaller array to partition both arrays",
+                    "Find partition such that left half has (M+N+1)/2 elements",
+                    "Ensure max(leftA) <= min(rightB) and max(leftB) <= min(rightA)",
+                    "If total length is odd, median = max(left partition)",
+                    "If even, median = (max(left) + min(right)) / 2",
+                    "Adjust partition using binary search until valid partition found"
+                ],
+                topic: "Binary Search on partition point. Advanced problem requiring binary search to find the correct partition point where two arrays can be split to find median efficiently.",
+                tags: ["Binary Search", "Median", "Sorted Arrays", "Partition", "Hard"]
+            },
+            {
+                title: "Matrix Median",
+                description: "Given a matrix of integers A of size N x M in which each row is sorted.\n\nFind and return the overall median of matrix A.\n\nConstraints:\n• 1 <= N, M <= 10^5\n• 1 <= N*M <= 10^6\n• 1 <= A[i] <= 10^9\n• N*M is odd\n\nNOTE: No extra memory is allowed.",
+                sampleInput: "Input 1:\nA = [[1, 3, 5],\n     [2, 6, 9],\n     [3, 6, 9]]\n\nInput 2:\nA = [[5, 17, 100]]",
+                sampleOutput: "Output 1: 5\n(All elements sorted: [1,2,3,3,5,6,6,9,9], median = 5)\n\nOutput 2: 17\n(Only 3 elements, middle one is 17)",
+                timeComplexity: "O(N * M * log(max-min))",
+                spaceComplexity: "O(1)",
+                approach: [
+                    "Binary Search on the answer (value range): min to max element in matrix",
+                    "For each mid value, count elements <= mid using binary search on each row",
+                    "If count <= mid is less than (N*M)/2, median is larger → low = mid + 1",
+                    "If count is greater, median is smaller or equal → high = mid",
+                    "The median is the smallest number with count > (N*M)/2",
+                    "Use binary search on each row to count elements efficiently"
+                ],
+                topic: "Binary Search on Value Range. Instead of searching positions, we binary search on the value itself. Count how many elements are smaller than mid to determine position.",
+                tags: ["Binary Search", "Matrix", "Binary Search on Answer", "Row-wise Sorted"]
+            },
+            {
+                title: "ADD OR NOT",
+                description: "Given an array of integers A of size N and an integer B.\n\nIn a single operation, any one element of the array can be increased by 1. You are allowed to do at most B such operations.\n\nFind the number with the maximum number of occurrences and return an array C of size 2, where C[0] is the number of occurrences, and C[1] is the number with maximum occurrence. If there are several such numbers, your task is to find the minimum one.\n\nConstraints:\n• 1 <= N <= 10^5\n• -10^9 <= A[i] <= 10^9\n• 0 <= B <= 10^9",
+                sampleInput: "Input 1:\nA = [3, 1, 2, 2, 1]\nB = 3\n\nInput 2:\nA = [5, 5, 5]\nB = 3",
+                sampleOutput: "Output 1: [4, 2]\n(Can make [2,2,2,2] with 3 operations)\n\nOutput 2: [3, 5]\n(Already have 3 occurrences of 5)",
+                timeComplexity: "O(N log N + N * log(max operations))",
+                spaceComplexity: "O(1)",
+                approach: [
+                    "Sort the array first",
+                    "For each unique element as target, use sliding window + binary search",
+                    "Binary search on window size: how many consecutive elements can be made equal?",
+                    "For a window, calculate operations needed to make all elements equal to rightmost",
+                    "Track maximum frequency and corresponding minimum number",
+                    "Optimize using prefix sums to calculate operations in O(1)"
+                ],
+                topic: "Binary Search with Sliding Window. Combination of sorting, binary search on window size, and prefix sums to efficiently find maximum achievable frequency.",
+                tags: ["Binary Search", "Sliding Window", "Sorting", "Greedy", "Optimization"]
+            },
+            {
+                title: "Ath Magical Number",
+                description: "You are given three positive integers, A, B, and C.\n\nAny positive integer is magical if divisible by either B or C.\n\nReturn the Ath smallest magical number. Since the answer may be very large, return modulo 10^9 + 7.\n\nConstraints:\n• 1 <= A <= 10^9\n• 2 <= B, C <= 40000\n\nNote: Ensure to prevent integer overflow while calculating.",
+                sampleInput: "Input 1:\nA = 1, B = 2, C = 3\n\nInput 2:\nA = 4, B = 2, C = 3",
+                sampleOutput: "Output 1: 2\n(First magical number is 2)\n\nOutput 2: 6\n(Magical numbers: 2,3,4,6... 4th is 6)",
+                timeComplexity: "O(log(A * min(B, C)))",
+                spaceComplexity: "O(1)",
+                approach: [
+                    "Binary Search on the answer: search range [1, A * min(B, C)]",
+                    "For a given mid, count magical numbers <= mid using inclusion-exclusion",
+                    "Count = mid/B + mid/C - mid/LCM(B,C) where LCM = (B*C)/GCD(B,C)",
+                    "If count < A, search right: low = mid + 1",
+                    "If count >= A, potential answer, search left: high = mid - 1",
+                    "Return answer % (10^9 + 7)"
+                ],
+                topic: "Binary Search on Answer with Math (Inclusion-Exclusion Principle). Use GCD/LCM and inclusion-exclusion to count multiples efficiently.",
+                tags: ["Binary Search", "Math", "GCD", "LCM", "Inclusion-Exclusion", "Binary Search on Answer"]
+            },
+            {
+                title: "Find Smallest Again (Bth Smallest Triplet Sum)",
+                description: "Given an integer array A of size N. If we store the sum of each triplet of the array A in a new list, then find the Bth smallest element among the list.\n\nNOTE: A triplet consists of three elements from the array. Let's say if A[i], A[j], A[k] are the elements of the triplet then i < j < k.\n\nConstraints:\n• 3 <= N <= 500\n• 1 <= A[i] <= 10^8\n• 1 <= B <= (N*(N-1)*(N-2))/6",
+                sampleInput: "Input 1:\nA = [2, 4, 3, 2]\nB = 3\n\nInput 2:\nA = [1, 5, 7, 3, 2]\nB = 9",
+                sampleOutput: "Output 1: 9\n(Triplet sums: 9,8,7,9... 3rd smallest is 9)\n\nOutput 2: 14",
+                timeComplexity: "O(N^2 * log(sum range))",
+                spaceComplexity: "O(1)",
+                approach: [
+                    "Binary Search on the answer (value of Bth smallest sum)",
+                    "Range: [sum of 3 smallest, sum of 3 largest]",
+                    "For each mid, count triplets with sum <= mid",
+                    "Use nested loops: fix first two elements, binary search for valid third elements",
+                    "If count < B, search right; if count >= B, potential answer, search left",
+                    "Return the smallest value where count >= B"
+                ],
+                topic: "Binary Search on Answer with Counting. Instead of generating all triplets, binary search on the sum value and count valid triplets efficiently.",
+                tags: ["Binary Search", "Triplets", "Binary Search on Answer", "Counting"]
+            },
+            {
+                title: "Painter's Partition Problem",
+                description: "Given 2 integers A and B and an array of integers C of size N. Element C[i] represents the length of ith board. You have to paint all N boards [C0, C1, C2... CN-1]. There are A painters available and each of them takes B units of time to paint 1 unit of the board.\n\nCalculate and return the minimum time required to paint all boards under the constraints:\n• 2 painters cannot share a board to paint\n• A painter will only paint contiguous boards\n\nReturn the ans % 10000003.\n\nConstraints:\n• 1 <= A <= 1000\n• 1 <= B <= 10^6\n• 1 <= N <= 10^5\n• 1 <= C[i] <= 10^6",
+                sampleInput: "Input 1:\nA = 2, B = 5\nC = [1, 10]\n\nInput 2:\nA = 10, B = 1\nC = [1, 8, 11, 3]",
+                sampleOutput: "Output 1: 50\n(Painter 1: board 0, Painter 2: board 1, max = 10*5 = 50)\n\nOutput 2: 11\n(Assign board 2 to one painter, others to remaining)",
+                timeComplexity: "O(N * log(sum of array))",
+                spaceComplexity: "O(1)",
+                approach: [
+                    "Binary Search on time: range [max(C[i]), sum(C)]",
+                    "For each mid time, check if boards can be painted by A painters",
+                    "Greedy check: assign boards to painters, if sum > mid, need new painter",
+                    "If painters needed <= A, time is sufficient → try smaller (high = mid - 1)",
+                    "If painters needed > A, need more time → (low = mid + 1)",
+                    "Return (answer * B) % 10000003"
+                ],
+                topic: "Binary Search on Answer (Minimize Maximum). Classic problem pattern: minimize the maximum allocation. Binary search on the answer and verify feasibility greedily.",
+                tags: ["Binary Search", "Binary Search on Answer", "Greedy", "Minimize Maximum", "Allocation"]
+            },
+            {
+                title: "Aggressive Cows",
+                description: "Farmer John has built a new long barn with N stalls. Given an array of integers A of size N where each element represents the location of the stall and an integer B which represents the number of cows.\n\nHis cows don't like this barn layout and become aggressive towards each other once put into a stall. To prevent the cows from hurting each other, John wants to assign the cows to the stalls, such that the minimum distance between any two of them is as large as possible. What is the largest minimum distance?\n\nConstraints:\n• 2 <= N <= 100000\n• 0 <= A[i] <= 10^9\n• 2 <= B <= N",
+                sampleInput: "Input 1:\nA = [1, 2, 3, 4, 5]\nB = 3\n\nInput 2:\nA = [1, 2]\nB = 2",
+                sampleOutput: "Output 1: 2\n(Place cows at positions 1,3,5 with min distance 2)\n\nOutput 2: 1\n(Place cows at 1 and 2, distance = 1)",
+                timeComplexity: "O(N log N + N log(max-min))",
+                spaceComplexity: "O(1)",
+                approach: [
+                    "Sort the stall positions first",
+                    "Binary Search on minimum distance: range [1, A[N-1] - A[0]]",
+                    "For each mid distance, greedily check if B cows can be placed",
+                    "Greedy: Place first cow at A[0], next cow at first position >= prev + mid",
+                    "If B cows can be placed with distance mid, try larger (low = mid + 1)",
+                    "If not possible, try smaller distance (high = mid - 1)",
+                    "Return largest valid distance"
+                ],
+                topic: "Binary Search on Answer (Maximize Minimum). Opposite of minimize maximum: we want to maximize the minimum distance. Binary search on distance and verify greedily.",
+                tags: ["Binary Search", "Binary Search on Answer", "Greedy", "Maximize Minimum", "Sorting"]
+            },
+            {
+                title: "Allocate Books",
+                description: "Given an array of integers A of size N and an integer B.\n\nThe College library has N books. The ith book has A[i] number of pages. You have to allocate books to B number of students so that the maximum number of pages allocated to a student is minimum.\n\nRules:\n• A book will be allocated to exactly one student\n• Each student has to be allocated at least one book\n• Allotment should be in contiguous order\n\nCalculate and return that minimum possible number.\n\nNOTE: Return -1 if a valid assignment is not possible.\n\nConstraints:\n• 1 <= N <= 10^5\n• 1 <= A[i], B <= 10^5",
+                sampleInput: "Input 1:\nA = [12, 34, 67, 90]\nB = 2\n\nInput 2:\nA = [12, 15, 78]\nB = 4",
+                sampleOutput: "Output 1: 113\n(Student 1: [12,34,67]=113, Student 2: [90]=90, max=113)\n\nOutput 2: -1\n(4 students but only 3 books, impossible)",
+                timeComplexity: "O(N * log(sum of pages))",
+                spaceComplexity: "O(1)",
+                approach: [
+                    "If B > N, return -1 (more students than books)",
+                    "Binary Search on answer: range [max(A[i]), sum(A)]",
+                    "For each mid (max pages), check if books can be allocated to B students",
+                    "Greedy: assign books until sum exceeds mid, then assign to next student",
+                    "If students needed <= B, allocation valid → try smaller max (high = mid - 1)",
+                    "If students needed > B, need larger max → (low = mid + 1)",
+                    "Return minimum valid max pages"
+                ],
+                topic: "Binary Search on Answer (Minimize Maximum). Same pattern as Painter's Partition. Minimize the maximum load across students using binary search and greedy verification.",
+                tags: ["Binary Search", "Binary Search on Answer", "Greedy", "Minimize Maximum", "Book Allocation"]
+            },
+            {
+                title: "Special Integer",
+                description: "Given an array of integers A and an integer B, find and return the maximum value K such that there is no subarray in A of size K with the sum of elements greater than B.\n\nConstraints:\n• 1 <= |A| <= 100000\n• 1 <= A[i] <= 10^9\n• 1 <= B <= 10^9",
+                sampleInput: "Input 1:\nA = [1, 2, 3, 4, 5]\nB = 10\n\nInput 2:\nA = [5, 17, 100, 11]\nB = 130",
+                sampleOutput: "Output 1: 2\n(All subarrays of size 2 have sum <= 10)\n\nOutput 2: 3\n(Subarray [5,17,100] has sum 122 <= 130, but size 4 exceeds)",
+                timeComplexity: "O(N * log N)",
+                spaceComplexity: "O(1)",
+                approach: [
+                    "Binary Search on K (subarray length): range [1, N]",
+                    "For each mid (window size), check all windows of size mid",
+                    "Use sliding window to calculate sum of each window of size mid",
+                    "If any window has sum > B, K cannot be mid or larger",
+                    "If all windows have sum <= B, K can be mid, try larger (low = mid + 1)",
+                    "Return largest valid K"
+                ],
+                topic: "Binary Search on Answer with Sliding Window. Binary search on the subarray length and verify using sliding window technique for efficient sum calculation.",
+                tags: ["Binary Search", "Sliding Window", "Binary Search on Answer", "Subarray Sum"]
             }
         ];
 
