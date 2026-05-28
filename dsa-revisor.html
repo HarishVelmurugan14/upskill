@@ -6,6 +6,58 @@
   <title>DSA Revisor — Random Problem Viewer</title>
   <link rel="stylesheet" href="Scaler/DSA/Advanced/Revise/Part2/style.css">
   <style>
+    /* ════════════════════════════════════════════════════════════
+       🖤 DARCULA × CLAUDE CODE PALETTE
+       Deep slate base, Claude orange primary, Darcula syntax accents
+       ════════════════════════════════════════════════════════════ */
+    :root {
+      --bg:            #1e1f22 !important;   /* IntelliJ 2023+ dark */
+      --bg-card:       #2b2d30 !important;   /* editor surface */
+      --bg-card-hover: #393b40 !important;
+      --bg-elevated:   #2b2d30 !important;
+      --border:        #393b40 !important;   /* subtle divider */
+      --text:          #dfe1e5 !important;   /* Darcula default fg */
+      --text-body:     #bcbec4 !important;
+      --text-muted:    #7c7d80 !important;
+
+      /* Accents — Darcula syntax + Claude orange */
+      --blue:   #4eade5 !important;   /* IntelliJ method-call blue */
+      --green:  #6aab73 !important;   /* string green */
+      --red:    #cf5b56 !important;   /* error red */
+      --purple: #c77dbb !important;   /* keyword magenta */
+      --amber:  #d6bd72 !important;   /* number yellow */
+      --orange: #cc7832 !important;   /* Darcula keyword orange (Claude vibe) */
+      --teal:   #56a8f5 !important;   /* link blue */
+
+      /* Hero accent (the Claude orange — used for active states) */
+      --accent:        #d97757;
+      --accent-soft:   rgba(217,119,87,0.12);
+      --accent-border: rgba(217,119,87,0.40);
+    }
+    body {
+      background: var(--bg) !important;
+      color: var(--text-body) !important;
+    }
+    header { background: rgba(30,31,34,0.92) !important; border-bottom-color: var(--border) !important; }
+    .sec-nav { background: var(--bg) !important; }
+
+    /* Logo + active pill use Claude orange */
+    .logo { color: var(--accent) !important; }
+    .pill.blue.current {
+      color: var(--accent) !important;
+      border-color: var(--accent-border) !important;
+      background: var(--accent-soft) !important;
+    }
+
+    /* Code blocks — IntelliJ editor look */
+    pre {
+      background: #1e1f22 !important;
+      border: 1px solid #393b40 !important;
+    }
+    pre code {
+      color: #bcbec4 !important;
+      font-family: 'JetBrains Mono', 'SF Mono', monospace !important;
+    }
     /* ────────────────────────────────────────────────────────────
        Page-specific tweaks layered on top of Part2/style.css
        ──────────────────────────────────────────────────────────── */
@@ -88,7 +140,7 @@
     }
     .filter-block input:focus {
       outline: none;
-      border-color: var(--blue);
+      border-color: var(--accent);
     }
     .filter-actions {
       display: flex;
@@ -109,16 +161,16 @@
       white-space: nowrap;
     }
     .btn:hover:not(:disabled) {
-      border-color: var(--blue);
-      color: var(--blue);
+      border-color: var(--accent);
+      color: var(--accent);
     }
     .btn:disabled { opacity: 0.35; cursor: default; }
     .btn-primary {
-      background: rgba(88,166,255,0.12);
-      border-color: rgba(88,166,255,0.35);
-      color: var(--blue);
+      background: var(--accent-soft);
+      border-color: var(--accent-border);
+      color: var(--accent);
     }
-    .btn-primary:hover { background: rgba(88,166,255,0.18); }
+    .btn-primary:hover { background: rgba(217,119,87,0.20); }
 
     .problem-count {
       font-size: 11px;
@@ -179,8 +231,8 @@
     }
     .tab:hover { color: var(--text); }
     .tab.active {
-      color: var(--blue);
-      border-bottom-color: var(--blue);
+      color: var(--accent);
+      border-bottom-color: var(--accent);
     }
     .tab-panel { display: none; animation: fadeIn 0.18s ease; }
     .tab-panel.active { display: block; }
@@ -216,7 +268,7 @@
       font-size: 10px;
       font-weight: 700;
       letter-spacing: 1.2px;
-      color: var(--purple);
+      color: var(--accent);
       text-transform: uppercase;
       margin-bottom: 6px;
     }
@@ -544,7 +596,7 @@
     .pattern-card .pat-name {
       font-size: 13.5px;
       font-weight: 600;
-      color: var(--purple);
+      color: var(--accent);
       margin-bottom: 4px;
     }
     .pattern-card .pat-when {
@@ -734,6 +786,380 @@
       main { padding: 24px 18px 80px; }
       .cell { width: 40px; height: 33px; font-size: 12px; }
       .idx-num, .ptr-marker { width: 40px; }
+    }
+
+    /* ═══════════════════════════════════════════════════════════════
+       ✨ PREMIUM POLISH — typography upgrade
+       Bigger, warmer, more inviting. Layered on top of everything.
+       ═══════════════════════════════════════════════════════════════ */
+
+    /* Serif for warmth (quote + problem title) */
+    @import url('https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,500;0,9..144,600;1,9..144,500&display=swap');
+
+    body {
+      font-size: 16px !important;
+      line-height: 1.7 !important;
+      color: var(--text-body) !important;
+    }
+
+    /* Header taller and more confident */
+    header { padding: 16px 32px !important; }
+    .logo { font-size: 14px !important; letter-spacing: 1.5px !important; }
+    .breadcrumb { font-size: 13px !important; }
+
+    .sec-nav { padding: 14px 32px !important; gap: 10px !important; top: 57px !important; }
+    .pill { padding: 7px 18px !important; font-size: 13px !important; font-weight: 500 !important; }
+
+    main {
+      max-width: 1180px !important;
+      padding: 40px 32px 120px !important;
+    }
+
+    /* ── Quote banner — hero treatment ── */
+    .quote-banner {
+      background: linear-gradient(135deg, rgba(217,119,87,0.10), rgba(217,119,87,0.02)) !important;
+      border: 1px solid var(--accent-border) !important;
+      border-left: 4px solid var(--accent) !important;
+      border-radius: 14px !important;
+      padding: 26px 32px !important;
+      margin-bottom: 40px !important;
+      gap: 22px !important;
+    }
+    .quote-icon {
+      font-size: 38px !important;
+      opacity: 0.85 !important;
+      color: var(--accent);
+      line-height: 1;
+      font-family: 'Fraunces', Georgia, serif;
+    }
+    .quote-text {
+      font-family: 'Fraunces', Georgia, serif !important;
+      font-size: 19px !important;
+      line-height: 1.55 !important;
+      color: var(--text) !important;
+      font-style: italic !important;
+      font-weight: 500;
+    }
+    .quote-author {
+      font-size: 12px !important;
+      letter-spacing: 1.5px !important;
+      text-transform: uppercase;
+      margin-top: 10px !important;
+      color: var(--accent) !important;
+      opacity: 0.85;
+    }
+    .quote-refresh {
+      padding: 7px 14px !important;
+      font-size: 12px !important;
+      border-radius: 999px !important;
+    }
+
+    /* ── Filters — more elegant ── */
+    .filters {
+      padding: 20px 22px !important;
+      border-radius: 12px !important;
+      gap: 16px !important;
+      margin-bottom: 22px !important;
+    }
+    .filter-block label {
+      font-size: 11px !important;
+      letter-spacing: 1.4px !important;
+      color: var(--text-muted) !important;
+      margin-bottom: 8px !important;
+    }
+    .filter-block input {
+      font-size: 15px !important;
+      padding: 11px 14px !important;
+      border-radius: 8px !important;
+      background: rgba(13,17,23,0.6) !important;
+    }
+    .btn { padding: 11px 20px !important; font-size: 13px !important; border-radius: 8px !important; font-weight: 600; }
+    .check-row { font-size: 13px !important; }
+
+    /* ── Top tabs — bigger touch targets ── */
+    .tabs { margin-bottom: 32px !important; gap: 2px !important; }
+    .tab {
+      padding: 14px 24px !important;
+      font-size: 14px !important;
+      font-weight: 600 !important;
+      letter-spacing: 0.3px !important;
+      border-bottom-width: 3px !important;
+    }
+
+    /* ── Problem viewer — hero treatment ── */
+    .prob-title {
+      font-family: 'Fraunces', Georgia, serif !important;
+      font-size: 34px !important;
+      font-weight: 600 !important;
+      line-height: 1.2 !important;
+      letter-spacing: -0.5px !important;
+      color: var(--text) !important;
+      margin-bottom: 10px !important;
+    }
+    .prob-subtopic {
+      font-size: 12px !important;
+      letter-spacing: 1.8px !important;
+      color: var(--teal) !important;
+      margin-bottom: 22px !important;
+      font-weight: 600 !important;
+    }
+    .prob-story {
+      background: linear-gradient(135deg, rgba(217,119,87,0.10), rgba(217,119,87,0.02)) !important;
+      border-left: 4px solid var(--accent) !important;
+      padding: 18px 22px !important;
+      border-radius: 10px !important;
+      font-size: 15.5px !important;
+      line-height: 1.75 !important;
+      color: var(--text-body) !important;
+      margin-bottom: 28px !important;
+    }
+    .prob-story::before {
+      font-size: 11px !important;
+      letter-spacing: 1.6px !important;
+      margin-bottom: 10px !important;
+    }
+    .prob-desc {
+      font-size: 15.5px !important;
+      line-height: 1.8 !important;
+      color: var(--text-body) !important;
+      margin-bottom: 28px !important;
+    }
+
+    .io-grid { gap: 18px !important; margin-bottom: 28px !important; }
+    .io-box {
+      padding: 18px 22px !important;
+      border-radius: 10px !important;
+      background: rgba(22,27,34,0.7) !important;
+    }
+    .io-label {
+      font-size: 11px !important;
+      letter-spacing: 1.6px !important;
+      margin-bottom: 12px !important;
+      color: var(--text-muted) !important;
+    }
+    .io-body {
+      font-size: 14px !important;
+      line-height: 1.7 !important;
+      color: var(--text) !important;
+    }
+
+    .stag {
+      padding: 5px 14px !important;
+      font-size: 12px !important;
+      border-radius: 999px !important;
+    }
+    .ds-label { font-size: 11px !important; letter-spacing: 1.6px !important; margin-bottom: 10px !important; }
+
+    /* ── Solutions tabs — chip-row ── */
+    .sol-tabs { gap: 8px !important; margin-bottom: 22px !important; }
+    .sol-tab {
+      padding: 9px 18px !important;
+      font-size: 13px !important;
+      font-weight: 600 !important;
+      border-radius: 999px !important;
+      border-width: 1.5px !important;
+    }
+    .complexity-pill {
+      padding: 6px 14px !important;
+      font-size: 12.5px !important;
+      border-radius: 8px !important;
+      background: rgba(22,27,34,0.8) !important;
+    }
+    .complexity-pill .val { font-weight: 600 !important; }
+    .sol-meta { gap: 12px !important; margin-bottom: 22px !important; }
+
+    .sol-block { margin-bottom: 24px !important; }
+    .sol-block-label {
+      font-size: 11px !important;
+      letter-spacing: 1.6px !important;
+      margin-bottom: 12px !important;
+    }
+    .sol-mini-story {
+      font-size: 15px !important;
+      line-height: 1.7 !important;
+      padding: 14px 18px !important;
+      border-radius: 8px !important;
+      color: var(--text-body) !important;
+      border-left-width: 4px !important;
+    }
+
+    /* ── Code blocks — readable ── */
+    pre {
+      font-size: 14px !important;
+      line-height: 1.7 !important;
+      padding: 18px 22px !important;
+      border-radius: 10px !important;
+    }
+    pre code {
+      font-size: 14px !important;
+      font-family: 'JetBrains Mono', 'SF Mono', monospace !important;
+    }
+    pre.pseudo { padding: 16px 20px !important; }
+
+    /* ── Visualizer — bigger cells, more drama ── */
+    .viz-canvas {
+      padding: 32px !important;
+      border-radius: 14px !important;
+      min-height: 260px !important;
+    }
+    .cell {
+      width: 52px !important;
+      height: 42px !important;
+      font-size: 14px !important;
+      font-weight: 600 !important;
+      border-radius: 7px !important;
+      border-width: 1.5px !important;
+    }
+    .idx-num, .ptr-marker { width: 52px !important; font-size: 11px !important; }
+    .viz-controls { gap: 12px !important; margin-top: 20px !important; }
+    .viz-controls button {
+      font-size: 13px !important;
+      padding: 9px 22px !important;
+      font-weight: 600 !important;
+      border-radius: 8px !important;
+    }
+    .viz-explanation {
+      font-size: 14.5px !important;
+      line-height: 1.7 !important;
+      margin: 20px 0 6px !important;
+    }
+    .viz-footer { font-size: 12px !important; margin-top: 12px !important; }
+
+    /* ── Topic notes — magazine layout ── */
+    .notes-summary {
+      font-family: 'Fraunces', Georgia, serif !important;
+      font-size: 18px !important;
+      font-weight: 500 !important;
+      line-height: 1.65 !important;
+      padding: 20px 24px !important;
+      border-radius: 10px !important;
+      border-left-width: 4px !important;
+      color: var(--text) !important;
+      margin-bottom: 36px !important;
+    }
+    .notes-section { margin-bottom: 40px !important; }
+    .notes-section h3 {
+      font-size: 13px !important;
+      letter-spacing: 1.8px !important;
+      padding-bottom: 12px !important;
+      margin-bottom: 20px !important;
+      color: var(--text) !important;
+      font-weight: 700 !important;
+    }
+    .tp-card {
+      padding: 16px 22px !important;
+      margin-bottom: 10px !important;
+      border-radius: 10px !important;
+      border-left-width: 4px !important;
+    }
+    .tp-card .tp-title { font-size: 15px !important; margin-bottom: 6px !important; color: var(--text) !important; }
+    .tp-card .tp-body { font-size: 14.5px !important; line-height: 1.7 !important; color: var(--text-body) !important; }
+
+    .pattern-card {
+      padding: 18px 22px !important;
+      border-radius: 10px !important;
+      margin-bottom: 14px !important;
+    }
+    .pattern-card .pat-name { font-size: 16px !important; font-weight: 600 !important; margin-bottom: 6px !important; }
+    .pattern-card .pat-when { font-size: 13.5px !important; line-height: 1.65 !important; margin-bottom: 10px !important; color: var(--text-body) !important; }
+    .pattern-card .pat-examples { font-size: 12px !important; margin-top: 10px !important; }
+
+    .edge-list li {
+      padding: 12px 16px 12px 38px !important;
+      font-size: 14px !important;
+      border-radius: 8px !important;
+      margin-bottom: 8px !important;
+    }
+    .edge-list li::before { font-size: 15px !important; left: 14px !important; }
+
+    .mk-card2 { border-radius: 10px !important; margin-bottom: 16px !important; }
+    .mk-card2 .mk2-title { padding: 14px 18px !important; font-size: 14.5px !important; }
+    .mk2-side { padding: 14px 18px !important; }
+    .mk2-tag { font-size: 11px !important; letter-spacing: 1.4px !important; margin-bottom: 8px !important; }
+    .mk-card2 .mk2-why { padding: 12px 18px !important; font-size: 13px !important; line-height: 1.6 !important; }
+
+    /* ── Mobile premium overrides ── */
+    @media (max-width: 640px) {
+      body { font-size: 15px !important; }
+      main { padding: 22px 16px 80px !important; }
+      .prob-title { font-size: 24px !important; }
+      .quote-text { font-size: 16px !important; }
+      .quote-icon { font-size: 28px !important; }
+      .notes-summary { font-size: 16px !important; padding: 16px 18px !important; }
+      .prob-story, .prob-desc { font-size: 14.5px !important; }
+      .io-body, pre, pre code { font-size: 13px !important; }
+      .tab { padding: 11px 14px !important; font-size: 12px !important; }
+      .filter-block input { font-size: 16px !important; } /* prevent iOS zoom */
+      .cell { width: 38px !important; height: 34px !important; font-size: 12px !important; }
+      .idx-num, .ptr-marker { width: 38px !important; }
+      .viz-canvas { padding: 18px 14px !important; }
+    }
+
+    /* ═══════════════════════════════════════════════════════════════
+       📖 READABILITY LAYER — for long-form prose surfaces
+       Dark is great for code; reading needs lighter surfaces,
+       higher-contrast ink, looser leading, and a comfortable measure.
+       ═══════════════════════════════════════════════════════════════ */
+
+    /* Use a slightly lighter "paper" surface for reading panels so text feels less buried */
+    .prob-story,
+    .prob-desc,
+    .sol-mini-story,
+    .notes-summary,
+    .tp-card,
+    .pattern-card,
+    .edge-list li,
+    .mk-card2 {
+      background-color: #2f3136 !important;   /* one shade above card bg — feels like off-white paper inverted */
+    }
+
+    /* High-contrast ink for ALL prose */
+    .prob-title          { color: #ffffff !important; }
+    .prob-desc           { color: #e6e6e8 !important; font-weight: 400 !important; }
+    .prob-story          { color: #ececef !important; }
+    .sol-mini-story      { color: #ececef !important; }
+    .notes-summary       { color: #f4f4f6 !important; }
+    .tp-card .tp-title   { color: #ffffff !important; font-weight: 700 !important; }
+    .tp-card .tp-body    { color: #e6e6e8 !important; }
+    .pattern-card .pat-when { color: #e6e6e8 !important; }
+    .edge-list li        { color: #e6e6e8 !important; }
+    .io-body             { color: #f0f0f2 !important; }
+
+    /* Comfortable reading measure (max ~75 chars per line on desktop) */
+    .prob-desc,
+    .prob-story,
+    .sol-mini-story,
+    .notes-summary,
+    .tp-card .tp-body,
+    .pattern-card .pat-when {
+      max-width: 72ch;
+      line-height: 1.8 !important;
+      letter-spacing: 0.01em;
+    }
+
+    /* Bump prose font sizes for genuine reading comfort */
+    .prob-desc          { font-size: 16.5px !important; }
+    .prob-story         { font-size: 16.5px !important; font-weight: 450 !important; }
+    .sol-mini-story     { font-size: 16px !important; }
+    .notes-summary      { font-size: 19px !important; line-height: 1.7 !important; }
+    .tp-card .tp-body   { font-size: 15.5px !important; }
+    .pattern-card .pat-when { font-size: 14.5px !important; }
+    .edge-list li       { font-size: 15px !important; line-height: 1.7 !important; }
+
+    /* Headlines pop harder */
+    .prob-title         { font-weight: 700 !important; letter-spacing: -0.5px !important; }
+    .tp-card .tp-title  { font-size: 16px !important; }
+    .pattern-card .pat-name { font-size: 17px !important; color: var(--accent) !important; }
+
+    /* Selection color uses the Claude accent so highlighting feels native */
+    ::selection { background: rgba(217,119,87,0.35); color: #fff; }
+
+    /* Mobile reading overrides — keep it generous, just slightly smaller */
+    @media (max-width: 640px) {
+      .prob-desc, .prob-story { font-size: 16px !important; line-height: 1.7 !important; }
+      .notes-summary          { font-size: 17px !important; }
+      .tp-card .tp-body       { font-size: 15px !important; }
+      .edge-list li           { font-size: 14.5px !important; }
     }
   </style>
 </head>
