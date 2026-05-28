@@ -794,7 +794,7 @@
        ═══════════════════════════════════════════════════════════════ */
 
     /* Serif for warmth (quote + problem title) */
-    @import url('https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,500;0,9..144,600;0,9..144,700;1,9..144,500;1,9..144,600&family=Lora:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500;1,600&display=swap');
+    @import url('https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,500;0,9..144,600;0,9..144,700;1,9..144,500;1,9..144,600&family=Lora:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500;1,600&family=Caveat:wght@500;600;700&family=Quicksand:wght@400;500;600;700&family=Patrick+Hand&family=Gloria+Hallelujah&display=swap');
 
     body {
       font-size: 16px !important;
@@ -1789,7 +1789,137 @@
       html body .prob-title { font-size: 40px !important; }
       html body .quote-banner .quote-text { font-size: 22px !important; }
     }
-  </style>
+
+    /* ═══════════════════════════════════════════════════════════════
+       FIXES — paper +2% darker, code sticker, common-mistakes,
+       viz contrast, h3 font.
+       ═══════════════════════════════════════════════════════════════ */
+
+    :root {
+      --paper:        #e9ede9 !important;  /* +2% darker */
+      --paper-2:      #cfd6d2 !important;
+      --paper-3:      #f7f9f7 !important;
+    }
+    /* More saturated multicolour wash */
+    html, body, html body {
+      background-image:
+        radial-gradient(900px 600px at 0% 0%, #ffd6df 0%, transparent 55%),
+        radial-gradient(900px 600px at 100% 0%, #cfe0ef 0%, transparent 55%),
+        radial-gradient(900px 600px at 50% 100%, #d0e6d6 0%, transparent 55%) !important;
+    }
+
+    /* ─── H3 SECTION HEADINGS — replace bad Caveat with cleaner script ─── */
+    html body .notes-section h3 {
+      font-family: 'Patrick Hand', 'Quicksand', sans-serif !important;
+      font-style: normal !important;
+      font-size: 28px !important;
+      letter-spacing: 0.02em !important;
+      font-weight: 400 !important;
+    }
+
+    /* ─── CODE / PSEUDO sticker — sit cleanly inside, not crash border ─── */
+    html body pre { padding-top: 38px !important; }
+    html body pre::before {
+      top: 8px !important;
+      left: 12px !important;
+      border-radius: 6px !important;
+      font-family: 'Quicksand', sans-serif !important;
+      font-size: 12px !important;
+      font-weight: 700 !important;
+      letter-spacing: 0.06em !important;
+      text-transform: uppercase !important;
+      padding: 3px 10px !important;
+      content: 'Code' !important;
+    }
+    html body pre.pseudo::before { content: 'Pseudocode' !important; }
+    /* Hide sticker inside small inline pre blocks (mistake cards) — too cramped */
+    html body .mk-card2 pre::before,
+    html body .mk-card2 pre { padding-top: 14px !important; }
+    html body .mk-card2 pre::before { display: none !important; }
+
+    /* ─── COMMON MISTAKES cards — repaint to storybook palette ─── */
+    html body .mk-card2 {
+      background: var(--paper-3) !important;
+      border: 3px solid var(--rule) !important;
+      border-radius: 12px !important;
+      box-shadow: 0 3px 0 var(--paper-2), 0 8px 18px rgba(28,37,48,0.08) !important;
+      overflow: hidden !important;
+      margin: 14px 0 !important;
+    }
+    html body .mk-card2 .mk2-title {
+      background: var(--paper) !important;
+      color: var(--ink) !important;
+      border-bottom: 2px dashed var(--rule) !important;
+      font-family: 'Quicksand', sans-serif !important;
+      font-weight: 700 !important;
+      font-size: 16px !important;
+      padding: 12px 18px !important;
+    }
+    html body .mk2-side { padding: 14px 16px !important; }
+    html body .mk2-side.x { background: #fdecec !important; border-right: 2px dashed var(--rule) !important; }
+    html body .mk2-side.o { background: #e7f5ec !important; }
+    html body .mk2-tag {
+      font-family: 'Quicksand', sans-serif !important;
+      font-weight: 700 !important;
+      font-size: 12px !important;
+      letter-spacing: 0.08em !important;
+      text-transform: uppercase !important;
+      margin-bottom: 6px !important;
+    }
+    html body .mk2-tag.x { color: var(--coral-deep) !important; }
+    html body .mk2-tag.o { color: var(--sage-deep) !important; }
+    html body .mk-card2 .mk2-side pre {
+      background: var(--ink) !important;
+      color: var(--paper-3) !important;
+      border: none !important;
+      box-shadow: none !important;
+      border-radius: 8px !important;
+      padding: 12px 14px !important;
+      margin: 0 !important;
+    }
+    html body .mk-card2 .mk2-side pre code { color: var(--paper-3) !important; }
+    html body .mk-card2 .mk2-why {
+      background: var(--paper) !important;
+      color: var(--ink) !important;
+      border-top: 2px dashed var(--rule) !important;
+      font-family: 'Quicksand', sans-serif !important;
+      font-weight: 500 !important;
+      font-size: 14.5px !important;
+      padding: 12px 18px !important;
+    }
+    html body .mk-card2 .mk2-why strong { color: var(--coral-deep) !important; }
+    /* mobile: split stacks */
+    @media (max-width: 720px) {
+      html body .mk2-side.x { border-right: none !important; border-bottom: 2px dashed var(--rule) !important; }
+    }
+
+    /* ─── VISUALIZER — darker, more contrast ─── */
+    html body .viz-canvas {
+      background: linear-gradient(180deg, #2d3a4a, #1f2a38) !important;
+      border: 3px solid var(--ink) !important;
+      box-shadow: 0 4px 0 #0b1219, 0 12px 24px rgba(28,37,48,0.20) !important;
+      color: #f4f6f5 !important;
+    }
+    html body .viz-canvas * { color: #f4f6f5 !important; }
+    html body .viz-empty {
+      background: var(--paper-3) !important;
+      color: var(--ink-soft) !important;
+    }
+    html body .viz-footer {
+      background: var(--paper-3) !important;
+      color: var(--ink) !important;
+    }
+    html body .cell {
+      background: #f4f6f5 !important;
+      color: var(--ink) !important;
+      border: 2px solid #4a5564 !important;
+      font-weight: 700 !important;
+    }
+    html body .cell.active { background: var(--coral) !important; color: #fff !important; border-color: var(--coral-deep) !important; }
+    html body .cell.pivot  { background: var(--honey) !important; color: #fff !important; border-color: var(--honey-deep) !important; }
+    html body .cell.matched,
+    html body .cell.found  { background: var(--sage) !important; color: #fff !important; border-color: var(--sage-deep) !important; }
+    html body .idx-num, html body .ptr-marker { color: #cfd6d2 !important; }
   </style>
 </head>
 <body>
