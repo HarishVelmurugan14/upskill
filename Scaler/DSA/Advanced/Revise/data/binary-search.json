@@ -1,0 +1,819 @@
+[
+  {
+    "id": "bs-left-right-index",
+    "title": "Find Left Most and Right Most Index of Element",
+    "subTopic": "Lower / Upper Bound",
+    "tags": [
+      "Binary Search",
+      "Lower Bound",
+      "Upper Bound",
+      "Duplicates"
+    ],
+    "description": "Given a sorted array A of size N and an integer B, return [firstIndex(B), lastIndex(B)]. If B is absent return [-1, -1]. Must be O(log N).",
+    "sampleInput": "A = [5, 7, 7, 8, 8, 10]\nB = 8",
+    "sampleOutput": "[3, 4]",
+    "story": "Two binary searches, same shape. Once you hit the target, don't celebrate — keep walking left to find the first occurrence, then run a second BS walking right to find the last.",
+    "solutions": [
+      {
+        "label": "Brute",
+        "complexity": {
+          "time": "O(N)",
+          "space": "O(1)"
+        },
+        "pseudocode": "scan left → right, record first and last index where A[i] == B",
+        "story": "If you're allowed a single linear pass, this is the lazy answer. Two pointers — first hit goes to 'first', every hit overwrites 'last'.",
+        "code": "public int[] linearScan(int[] A, int B) {\n    int first = -1, last = -1;\n    for (int i = 0; i < A.length; i++) {\n        if (A[i] == B) {\n            if (first == -1) first = i;\n            last = i;\n        }\n    }\n    return new int[]{ first, last };\n}"
+      },
+      {
+        "label": "Optimal",
+        "complexity": {
+          "time": "O(log N)",
+          "space": "O(1)"
+        },
+        "pseudocode": "BS1 → on hit: store first, high = mid - 1\nBS2 → on hit: store last,  low  = mid + 1",
+        "story": "Same loop body twice, only the 'on equal' branch flips direction. Memorise: 'first hugs left, last hugs right.'",
+        "code": "public int[] searchForStartAndEndIndexOfAnElementInAnArray(int[] A, int B) {\n    int N = A.length;\n    int[] result = new int[]{-1, -1};\n    if (N == 0) return result;\n\n    int low = 0, high = N - 1, first = -1, last = -1;\n\n    // First occurrence\n    while (low <= high) {\n        int mid = low + (high - low) / 2;\n        if (A[mid] < B)      low  = mid + 1;\n        else if (A[mid] > B) high = mid - 1;\n        else { first = mid; high = mid - 1; }\n    }\n\n    // Last occurrence\n    low = 0; high = N - 1;\n    while (low <= high) {\n        int mid = low + (high - low) / 2;\n        if (A[mid] < B)      low  = mid + 1;\n        else if (A[mid] > B) high = mid - 1;\n        else { last = mid; low = mid + 1; }\n    }\n\n    if (first != -1) { result[0] = first; result[1] = last; }\n    return result;\n}"
+      }
+    ],
+    "viz": {
+      "kind": "bs-bound",
+      "data": {
+        "A": [
+          5,
+          7,
+          7,
+          8,
+          8,
+          10
+        ],
+        "B": 8,
+        "mode": "both"
+      }
+    }
+  },
+  {
+    "id": "bs-insert-position",
+    "title": "Search Insert Position (Lower Bound)",
+    "subTopic": "Lower Bound",
+    "tags": [
+      "Binary Search",
+      "Lower Bound",
+      "Insert Position"
+    ],
+    "description": "Sorted A, target B. If B exists return its index, else return the index of the smallest element ≥ B (or N if all are smaller).",
+    "sampleInput": "A = [1, 3, 5, 6]\nB = 5",
+    "sampleOutput": "2",
+    "story": "This IS lower_bound dressed in interview clothes. Keep an ans = N sentinel — it auto-handles the 'insert at end' case.",
+    "solutions": [
+      {
+        "label": "Brute",
+        "complexity": {
+          "time": "O(N)",
+          "space": "O(1)"
+        },
+        "pseudocode": "scan i = 0..N-1; first i with A[i] >= B is the answer; else N",
+        "story": "Walk until something is at least as big as B. If nothing is, you append.",
+        "code": "public int linearScan(int[] A, int B) {\n    for (int i = 0; i < A.length; i++) if (A[i] >= B) return i;\n    return A.length;\n}"
+      },
+      {
+        "label": "Optimal",
+        "complexity": {
+          "time": "O(log N)",
+          "space": "O(1)"
+        },
+        "pseudocode": "ans = N\nwhile low <= high:\n  if A[mid] < B  → low = mid + 1\n  else           → ans = mid, high = mid - 1\nreturn ans",
+        "story": "Whenever you find something ≥ B, lock it in as a candidate and keep looking left for an earlier one. The sentinel N is your safety net.",
+        "code": "public int positionWhereTargetIsPresentOrShouldBeInserted(int[] A, int B) {\n    int N = A.length;\n    int low = 0, high = N - 1, res = N;\n\n    while (low <= high) {\n        int mid = low + ((high - low) / 2);\n        if (A[mid] < B)      low = mid + 1;\n        else if (A[mid] > B) { res = mid; high = mid - 1; }\n        else                 return mid;\n    }\n    return res;\n}"
+      }
+    ],
+    "viz": {
+      "kind": "bs-lower-bound",
+      "data": {
+        "A": [
+          1,
+          3,
+          5,
+          6
+        ],
+        "B": 4
+      }
+    }
+  },
+  {
+    "id": "bs-single-element",
+    "title": "Single Element in Sorted Array",
+    "subTopic": "BS on Pattern",
+    "tags": [
+      "Binary Search",
+      "Pattern",
+      "Index Parity",
+      "XOR Alternative"
+    ],
+    "description": "Every element appears twice in sorted order, except one unique element. Find it in O(log N).",
+    "sampleInput": "A = [1, 1, 2, 2, 3, 3, 4, 5, 5]",
+    "sampleOutput": "4",
+    "story": "Before the unique element, pairs sit at (even, odd). After it, they shift to (odd, even). Binary search hunts for where the pattern breaks.",
+    "solutions": [
+      {
+        "label": "Brute",
+        "complexity": {
+          "time": "O(N)",
+          "space": "O(1)"
+        },
+        "pseudocode": "for i in 0..N-1 step 2: if A[i] != A[i+1] return A[i]\nreturn A[N-1]",
+        "story": "Walk in twos. The first time the pair breaks, the left side is your loner.",
+        "code": "public int linearScan(int[] A) {\n    int N = A.length;\n    for (int i = 0; i < N - 1; i += 2) {\n        if (A[i] != A[i + 1]) return A[i];\n    }\n    return A[N - 1];\n}"
+      },
+      {
+        "label": "Optimal",
+        "complexity": {
+          "time": "O(log N)",
+          "space": "O(1)"
+        },
+        "pseudocode": "Handle 1-element and boundary loners first.\nLoop with low=1, high=N-2:\n  if A[mid] == A[mid+1]:\n    if mid is even → unique is on the right (low = mid + 2)\n    else           → unique is on the left  (high = mid - 1)\n  else if A[mid] == A[mid-1]:\n    same logic with mid -= 1\n  else return A[mid]",
+        "story": "Even index + matches its neighbour = the loner is past you. Odd index + matches = the loner is behind you. Walk by 2, never by 1.",
+        "code": "public int singleElementInASortedArray(int[] A) {\n    int N = A.length;\n    if (N == 1)             return A[0];\n    if (A[0] != A[1])       return A[0];\n    if (A[N - 1] != A[N-2]) return A[N - 1];\n\n    int low = 1, high = N - 2;\n    while (low <= high) {\n        int mid = low + (high - low) / 2;\n        if (A[mid] == A[mid + 1]) {\n            if (mid % 2 == 0) low  = mid + 2;\n            else              high = mid - 1;\n        } else if (A[mid] == A[mid - 1]) {\n            mid = mid - 1;\n            if (mid % 2 == 0) low  = mid + 2;\n            else              high = mid - 1;\n        } else {\n            return A[mid];\n        }\n    }\n    return -1;\n}"
+      },
+      {
+        "label": "Alternative — XOR",
+        "complexity": {
+          "time": "O(N)",
+          "space": "O(1)"
+        },
+        "pseudocode": "xor all elements; pairs cancel; what's left is the loner",
+        "story": "If you forget the index-parity trick, XOR every element. Duplicates annihilate, the lone one survives. Not O(log) but bulletproof.",
+        "code": "public int xorScan(int[] A) {\n    int x = 0;\n    for (int v : A) x ^= v;\n    return x;\n}"
+      }
+    ],
+    "viz": {
+      "kind": "bs-single-element",
+      "data": {
+        "A": [
+          1,
+          1,
+          2,
+          2,
+          3,
+          3,
+          4,
+          5,
+          5
+        ]
+      }
+    }
+  },
+  {
+    "id": "bs-peak-element",
+    "title": "Find a Peak Element",
+    "subTopic": "BS on Unimodal",
+    "tags": [
+      "Binary Search",
+      "Peak",
+      "Unimodal",
+      "Gradient"
+    ],
+    "description": "Find any element ≥ both neighbours. Corners count if they beat their one neighbour. Guaranteed a single peak. Solve in O(log N).",
+    "sampleInput": "A = [5, 17, 100, 11]",
+    "sampleOutput": "100",
+    "story": "If you're standing on a slope, walk uphill. That direction must contain a peak. Binary search just walks uphill twice as fast.",
+    "solutions": [
+      {
+        "label": "Brute",
+        "complexity": {
+          "time": "O(N)",
+          "space": "O(1)"
+        },
+        "pseudocode": "scan; return A[i] when both neighbours are smaller",
+        "story": "Just look. Linear and obvious.",
+        "code": "public int linearScan(int[] A) {\n    int N = A.length;\n    if (N == 1) return A[0];\n    if (A[0] >= A[1]) return A[0];\n    if (A[N-1] >= A[N-2]) return A[N-1];\n    for (int i = 1; i < N - 1; i++) {\n        if (A[i] >= A[i-1] && A[i] >= A[i+1]) return A[i];\n    }\n    return -1;\n}"
+      },
+      {
+        "label": "Optimal",
+        "complexity": {
+          "time": "O(log N)",
+          "space": "O(1)"
+        },
+        "pseudocode": "Pre-check both boundaries.\nLoop low=1, high=N-2:\n  if A[mid] beats both neighbours → return A[mid]\n  else if A[mid] > A[mid-1]      → climbing, go right\n  else                            → descending, go left",
+        "story": "Don't think 'find target'. Think 'walk toward higher ground'. A peak must exist in the direction of increase.",
+        "code": "public int peakElement(int[] A) {\n    int N = A.length;\n    if (N == 1) return A[0];\n    if (A[0]     >= A[1])     return A[0];\n    if (A[N - 1] >= A[N - 2]) return A[N - 1];\n\n    int low = 1, high = N - 2;\n    while (low <= high) {\n        int mid = low + ((high - low) / 2);\n        if (A[mid] > A[mid + 1] && A[mid] > A[mid - 1]) return A[mid];\n        else if (A[mid] > A[mid - 1]) low  = mid + 1;\n        else                          high = mid - 1;\n    }\n    return -1;\n}"
+      }
+    ],
+    "viz": {
+      "kind": "bs-peak",
+      "data": {
+        "A": [
+          5,
+          17,
+          100,
+          11
+        ]
+      }
+    }
+  },
+  {
+    "id": "bs-matrix-search",
+    "title": "Matrix Search",
+    "subTopic": "BS on 2D Matrix",
+    "tags": [
+      "Binary Search",
+      "2D Matrix",
+      "Sorted Matrix",
+      "Flat Indexing"
+    ],
+    "description": "N×M matrix, rows sorted left-to-right, each row's first element ≥ previous row's last. Return 1 if B exists, else 0.",
+    "sampleInput": "A = [[1, 3, 5, 7],\n     [10, 11, 16, 20],\n     [23, 30, 34, 50]]\nB = 30",
+    "sampleOutput": "1",
+    "story": "Pretend the matrix is one long sorted array of length N*M. Binary search on that virtual array. Convert index → (row, col) on the fly: row = idx / M, col = idx % M.",
+    "solutions": [
+      {
+        "label": "Optimal",
+        "complexity": {
+          "time": "O(log(N*M))",
+          "space": "O(1)"
+        },
+        "pseudocode": "low = 0, high = N*M - 1\nwhile low <= high:\n  mid = ...; r = mid/M; c = mid%M\n  compare A[r][c] with B and shrink as usual",
+        "story": "Flat indexing turns 2D into 1D for free. The whole sorted property of the matrix is just one BS away.",
+        "code": "public int searhAMatrix(int[][] A, int B) {\n    int N = A.length, M = A[0].length;\n    int low = 0, high = (N * M) - 1;\n\n    while (low <= high) {\n        int mid = low + ((high - low) / 2);\n        int r = mid / M, c = mid % M;\n        if (A[r][c] == B)      return 1;\n        else if (A[r][c] < B)  low  = mid + 1;\n        else                   high = mid - 1;\n    }\n    return 0;\n}"
+      }
+    ],
+    "viz": {
+      "kind": "bs-matrix",
+      "data": {
+        "A": [
+          [
+            1,
+            3,
+            5,
+            7
+          ],
+          [
+            10,
+            11,
+            16,
+            20
+          ],
+          [
+            23,
+            30,
+            34,
+            50
+          ]
+        ],
+        "B": 30
+      }
+    }
+  },
+  {
+    "id": "bs-minimum-difference",
+    "title": "Minimum Difference",
+    "subTopic": "BS + Sorting (Closest Element)",
+    "tags": [
+      "Binary Search",
+      "Lower Bound",
+      "Matrix",
+      "Sorting"
+    ],
+    "description": "Matrix C of A×B. For each adjacent row pair, find the minimum absolute difference between any element of row i and any element of row i+1. Return the smallest such diff.",
+    "sampleInput": "A = 3, B = 2\nC = [[7, 3], [2, 1], [4, 9]]",
+    "sampleOutput": "1",
+    "story": "Sort each row, then for every element pick its closest neighbour in the next row using lower_bound. Track the smallest |diff| globally.",
+    "solutions": [
+      {
+        "label": "Optimal",
+        "complexity": {
+          "time": "O(A · B · log B)",
+          "space": "O(1)"
+        },
+        "pseudocode": "sort each row\nfor each i, j:\n  lb = lower_bound(C[i+1], C[i][j])\n  consider |C[i][j] - C[i+1][lb]|     (closest greater)\n  consider |C[i][j] - C[i+1][lb-1]|   (closest smaller)\n  update ans = min",
+        "story": "Closest = one of two: the first element ≥ you, or the one right before it. Lower bound gives you both for free.",
+        "code": "public int minimumCostToBuildAnArray(int A, int B, int[][] C) {\n    int ans = 1_000_000_000, lb;\n    for (int i = 0; i < A; i++) Arrays.sort(C[i]);\n\n    for (int i = 0; i < A - 1; i++) {\n        for (int j = 0; j < B; j++) {\n            lb = lower_bound(C[i + 1], C[i][j]);\n            if (lb != B) ans = Math.min(ans, Math.abs(C[i][j] - C[i + 1][lb]));\n            if (lb != 0) ans = Math.min(ans, Math.abs(C[i][j] - C[i + 1][lb - 1]));\n        }\n    }\n    return ans;\n}\n\nprivate int lower_bound(int[] a, int val) {\n    int low = 0, high = a.length - 1, ans = a.length;\n    while (low <= high) {\n        int mid = (high - low) / 2 + low;\n        if (a[mid] < val) low = mid + 1;\n        else { ans = mid; high = mid - 1; }\n    }\n    return ans;\n}"
+      }
+    ],
+    "viz": {
+      "kind": "bs-lower-bound",
+      "data": {
+        "A": [
+          1,
+          2,
+          4,
+          9
+        ],
+        "B": 3,
+        "label": "lower_bound of 3 in next row"
+      }
+    }
+  },
+  {
+    "id": "bs-staircase",
+    "title": "Maximum Height of Staircase",
+    "subTopic": "BS on Answer (Math)",
+    "tags": [
+      "Binary Search",
+      "BS on Answer",
+      "Math",
+      "Sum Formula"
+    ],
+    "description": "Given A blocks, build max-height staircase where stair i needs i blocks. Find max h such that 1+2+...+h ≤ A.",
+    "sampleInput": "A = 20",
+    "sampleOutput": "5",
+    "story": "h·(h+1)/2 ≤ A. Either solve the quadratic, binary search on h, or just walk one stair at a time. All three work.",
+    "solutions": [
+      {
+        "label": "Brute (greedy walk)",
+        "complexity": {
+          "time": "O(√A)",
+          "space": "O(1)"
+        },
+        "pseudocode": "x = 1, steps = 0\nwhile A >= x: A -= x; steps++; x++\nreturn steps",
+        "story": "Just keep buying the next stair until you can't afford it. Surprisingly fast — only ~√(2A) stairs exist.",
+        "code": "public int maximumHeightOfAStaircase(int A) {\n    int x = 1, steps = 0;\n    while (A >= x) {\n        steps++;\n        A -= x;\n        x++;\n    }\n    return steps;\n}"
+      },
+      {
+        "label": "Optimal (BS on answer)",
+        "complexity": {
+          "time": "O(log A)",
+          "space": "O(1)"
+        },
+        "pseudocode": "low=0, high=sqrt(2A)+1; find max h with h*(h+1)/2 <= A",
+        "story": "Classic BS on answer. Predicate is monotonic — once h is too tall, every larger h is also too tall.",
+        "code": "public int staircaseBS(int A) {\n    long low = 0, high = (long) Math.sqrt(2.0 * A) + 1, ans = 0;\n    while (low <= high) {\n        long mid = low + (high - low) / 2;\n        if (mid * (mid + 1) / 2 <= A) { ans = mid; low = mid + 1; }\n        else high = mid - 1;\n    }\n    return (int) ans;\n}"
+      }
+    ],
+    "viz": {
+      "kind": "bs-on-answer",
+      "data": {
+        "low": 0,
+        "high": 6,
+        "target": 5,
+        "label": "max h with h(h+1)/2 ≤ 20",
+        "predicate": "h*(h+1)/2 <= A"
+      }
+    }
+  },
+  {
+    "id": "bs-sqrt",
+    "title": "Square Root of Integer",
+    "subTopic": "BS on Answer (Math)",
+    "tags": [
+      "Binary Search",
+      "BS on Answer",
+      "Math",
+      "Overflow"
+    ],
+    "description": "Compute floor(sqrt(A)) without using Math.sqrt. A up to 1e9 means mid*mid overflows int — use long.",
+    "sampleInput": "A = 11",
+    "sampleOutput": "3",
+    "story": "Largest x with x·x ≤ A. Standard BS on answer. The only trap is integer overflow when squaring mid.",
+    "solutions": [
+      {
+        "label": "Brute",
+        "complexity": {
+          "time": "O(√A)",
+          "space": "O(1)"
+        },
+        "pseudocode": "for x = 0..: if x*x > A return x - 1",
+        "story": "Linear scan until you overshoot.",
+        "code": "public int linearScan(int A) {\n    long x = 0;\n    while ((x + 1) * (x + 1) <= A) x++;\n    return (int) x;\n}"
+      },
+      {
+        "label": "Optimal",
+        "complexity": {
+          "time": "O(log A)",
+          "space": "O(1)"
+        },
+        "pseudocode": "low=1, high=A/2; track largest mid with mid*mid <= A (as long)",
+        "story": "Use long for the multiplication. A/2 is a sharper upper bound than A.",
+        "code": "public int squareRootOfANumber(int A) {\n    if (A == 0) return 0;\n    long low = 1, high = A / 2, sqrt = 1;\n\n    while (low <= high) {\n        long mid = low + ((high - low) / 2);\n        long numPos = mid * mid;\n        if (numPos <= A) { sqrt = mid; low = mid + 1; }\n        else             high = mid - 1;\n    }\n    return (int) sqrt;\n}"
+      }
+    ],
+    "viz": {
+      "kind": "bs-on-answer",
+      "data": {
+        "low": 1,
+        "high": 11,
+        "target": 3,
+        "label": "max x with x*x ≤ 11",
+        "predicate": "mid*mid <= A"
+      }
+    }
+  },
+  {
+    "id": "bs-rotated-search",
+    "title": "Rotated Sorted Array Search",
+    "subTopic": "Rotated Sorted Array",
+    "tags": [
+      "Binary Search",
+      "Rotated Array",
+      "Pivot"
+    ],
+    "description": "Sorted array rotated at unknown pivot. Find target index in O(log N). No duplicates.",
+    "sampleInput": "A = [4, 5, 6, 7, 0, 1, 2]\nB = 0",
+    "sampleOutput": "4",
+    "story": "First find the rotation pivot with BS (smallest element). Then you know which sorted half contains B and run a normal BS on that half.",
+    "solutions": [
+      {
+        "label": "Brute",
+        "complexity": {
+          "time": "O(N)",
+          "space": "O(1)"
+        },
+        "pseudocode": "linear scan",
+        "story": "If it's small, scan it. Otherwise it's a sin.",
+        "code": "public int linearScan(int[] A, int B) {\n    for (int i = 0; i < A.length; i++) if (A[i] == B) return i;\n    return -1;\n}"
+      },
+      {
+        "label": "Optimal — pivot + BS",
+        "complexity": {
+          "time": "O(log N)",
+          "space": "O(1)"
+        },
+        "pseudocode": "k = rotationFactor(A)   // index of smallest element\nif B == A[0] return 0\nif B > A[0] → search [0, k-1]\nelse        → search [k, N-1]",
+        "story": "Pivot splits the array into two sorted halves. A[0] tells you which half B lives in. Then it's vanilla BS.",
+        "code": "public int rotatedSortedArraySearch(int[] A, int B) {\n    int N = A.length;\n    int low = 0, high = N - 1;\n    int k = rotationFactor(A);\n\n    if (B == A[0]) return 0;\n    else if (B > A[0]) high = k > 0 ? k - 1 : N - 1;\n    else               low  = k;\n\n    while (low <= high) {\n        int mid = low + ((high - low) / 2);\n        if (B < A[mid])      high = mid - 1;\n        else if (B > A[mid]) low  = mid + 1;\n        else                 return mid;\n    }\n    return -1;\n}\n\nprivate int rotationFactor(int[] A) {\n    int N = A.length, low = 0, high = N - 1, rotation = 0;\n    while (low <= high) {\n        int mid = low + ((high - low) / 2);\n        if (A[mid] >= A[0]) low = mid + 1;\n        else { rotation = mid; high = mid - 1; }\n    }\n    return rotation;\n}"
+      }
+    ],
+    "viz": {
+      "kind": "bs-rotated",
+      "data": {
+        "A": [
+          4,
+          5,
+          6,
+          7,
+          0,
+          1,
+          2
+        ],
+        "B": 0
+      }
+    }
+  },
+  {
+    "id": "bs-median-two-sorted",
+    "title": "Median of Two Sorted Arrays",
+    "subTopic": "BS on Partition",
+    "tags": [
+      "Binary Search",
+      "Median",
+      "Partition",
+      "Hard"
+    ],
+    "description": "Two sorted arrays A, B. Return the median of the merged sequence. Must run in O(log(min(M,N))).",
+    "sampleInput": "A = [1, 2, 7, 9, 11, 13]\nB = [1, 3, 4, 5, 8, 10]",
+    "sampleOutput": "6",
+    "story": "Don't merge. Binary search a partition on the smaller array such that everything on the left of both arrays ≤ everything on the right. The median falls out of the four boundary values.",
+    "solutions": [
+      {
+        "label": "Brute — merge and pick",
+        "complexity": {
+          "time": "O(M + N)",
+          "space": "O(M + N)"
+        },
+        "pseudocode": "merge using two pointers; return middle (or avg of middle two)",
+        "story": "Easy and correct but doesn't meet the log requirement.",
+        "code": "public int mergeAndPick(int[] A, int[] B) {\n    int m = A.length, n = B.length;\n    int[] merged = new int[m + n];\n    int i = 0, j = 0, k = 0;\n    while (i < m && j < n) merged[k++] = A[i] <= B[j] ? A[i++] : B[j++];\n    while (i < m) merged[k++] = A[i++];\n    while (j < n) merged[k++] = B[j++];\n    int t = m + n;\n    return t % 2 == 1 ? merged[t/2] : (merged[t/2 - 1] + merged[t/2]) / 2;\n}"
+      },
+      {
+        "label": "Optimal — BS on partition",
+        "complexity": {
+          "time": "O(log(min(M,N)))",
+          "space": "O(1)"
+        },
+        "pseudocode": "Ensure A is the smaller array.\nlow=0, high=|A|; leftCount = (M+N+1)/2\nLoop:\n  pX = (low+high)/2; pY = leftCount - pX\n  4 boundary values (use ±∞ at edges)\n  if maxLeftX <= minRightY && maxLeftY <= minRightX: done\n  else if maxLeftX > minRightY: high = pX - 1\n  else: low = pX + 1",
+        "story": "Slice both arrays into 'left' and 'right' halves. Valid slice = each side's max ≤ the other side's min. Median pops out of the four corner values.",
+        "code": "public int findMedianInSortedArrays(int[] A, int[] B) {\n    if (A.length > B.length) return findMedianInSortedArrays(B, A);\n\n    int n = A.length, m = B.length;\n    int low = 0, high = n;\n    int leftCount = (n + m + 1) / 2;\n\n    while (low <= high) {\n        int pX = (low + high) / 2;\n        int pY = leftCount - pX;\n\n        int maxLeftX  = pX == 0 ? Integer.MIN_VALUE : A[pX - 1];\n        int minRightX = pX == n ? Integer.MAX_VALUE : A[pX];\n        int maxLeftY  = pY == 0 ? Integer.MIN_VALUE : B[pY - 1];\n        int minRightY = pY == m ? Integer.MAX_VALUE : B[pY];\n\n        if (maxLeftX <= minRightY && maxLeftY <= minRightX) {\n            if ((n + m) % 2 == 0)\n                return (Math.max(maxLeftX, maxLeftY) + Math.min(minRightX, minRightY)) / 2;\n            return Math.max(maxLeftX, maxLeftY);\n        } else if (maxLeftX > minRightY) high = pX - 1;\n        else                              low  = pX + 1;\n    }\n    return 0;\n}"
+      }
+    ],
+    "viz": {
+      "kind": "bs-partition",
+      "data": {
+        "A": [
+          1,
+          2,
+          7,
+          9,
+          11,
+          13
+        ],
+        "B": [
+          1,
+          3,
+          4,
+          5,
+          8,
+          10
+        ]
+      }
+    }
+  },
+  {
+    "id": "bs-matrix-median",
+    "title": "Matrix Median",
+    "subTopic": "BS on Value Range",
+    "tags": [
+      "Binary Search",
+      "Matrix",
+      "Count-Based BS",
+      "Row-wise Sorted"
+    ],
+    "description": "N×M matrix, each row sorted (rows independent). N*M is odd. Find the overall median without extra memory.",
+    "sampleInput": "A = [[1, 3, 5], [2, 6, 9], [3, 6, 9]]",
+    "sampleOutput": "5",
+    "story": "Don't sort the matrix. Guess a value v, count how many elements ≤ v across all rows (each row uses BS). The smallest v with count > N*M/2 is the median.",
+    "solutions": [
+      {
+        "label": "Brute — flatten and sort",
+        "complexity": {
+          "time": "O(N·M log(N·M))",
+          "space": "O(N·M)"
+        },
+        "pseudocode": "copy to flat array; sort; return middle",
+        "story": "Works but violates 'no extra memory'.",
+        "code": "public int flattenSort(int[][] A) {\n    int n = A.length, m = A[0].length;\n    int[] flat = new int[n * m];\n    int k = 0;\n    for (int[] row : A) for (int v : row) flat[k++] = v;\n    Arrays.sort(flat);\n    return flat[(n * m) / 2];\n}"
+      },
+      {
+        "label": "Optimal — BS on value range",
+        "complexity": {
+          "time": "O(log(maxVal) · N · log M)",
+          "space": "O(1)"
+        },
+        "pseudocode": "low=1, high=1e9; need = N*M/2\nLoop:\n  mid = ...\n  count = sum over rows of lowerBound(row, mid)\n  if count > need: high = mid - 1\n  else: ans = mid; low = mid + 1\nreturn ans",
+        "story": "Binary search the VALUE, not the position. For each guess, count things ≤ it. The median is the smallest value with enough things below it.",
+        "code": "public int findMatrixMedian(int[][] A) {\n    int n = A.length, m = A[0].length;\n    int low = 0, high = 1_000_000_000;\n    int medPos = n * m / 2, ans = -1;\n\n    while (low <= high) {\n        int mid = (high - low) / 2 + low;\n        int cnt = 0;\n        for (int i = 0; i < n; i++) cnt += lowerBound(A[i], mid);\n        if (cnt > medPos) high = mid - 1;\n        else { ans = mid; low = mid + 1; }\n    }\n    return ans;\n}\n\nprivate int lowerBound(int[] A, int val) {\n    int l = 0, h = A.length - 1, ans = -1;\n    while (l <= h) {\n        int mid = (h - l) / 2 + l;\n        if (A[mid] < val) { ans = mid; l = mid + 1; }\n        else h = mid - 1;\n    }\n    return ans + 1;\n}"
+      }
+    ],
+    "viz": {
+      "kind": "bs-on-answer",
+      "data": {
+        "low": 1,
+        "high": 9,
+        "target": 5,
+        "label": "smallest v with count(≤v) > 4",
+        "predicate": "count <= medPos"
+      }
+    }
+  },
+  {
+    "id": "bs-add-or-not",
+    "title": "ADD OR NOT",
+    "subTopic": "BS + Prefix Sum",
+    "tags": [
+      "Binary Search",
+      "Sorting",
+      "Prefix Sum",
+      "Greedy"
+    ],
+    "description": "Array A of N ints, budget B. Each op: +1 to any element. Maximize the count of some target value (preferring smaller value on ties). Return [count, value].",
+    "sampleInput": "A = [3, 1, 2, 2, 1]\nB = 3",
+    "sampleOutput": "[4, 2]",
+    "story": "Sort first. For each value A[i] as the target, BS the largest window ending at i that can be raised to A[i] using ≤ B ops. Use a prefix sum to compute the cost in O(1).",
+    "solutions": [
+      {
+        "label": "Optimal",
+        "complexity": {
+          "time": "O(N log N)",
+          "space": "O(N)"
+        },
+        "pseudocode": "sort; prefix[i+1] = prefix[i] + A[i]\nfor each i:\n  BS cnt in [1..i+1]:\n    cost = A[i] * cnt - (prefix[i+1] - prefix[i - cnt + 1])\n    if cost <= B → feasible, try larger cnt\n  update [count, value]",
+        "story": "Cost to raise the last `cnt` numbers to A[i] = A[i]*cnt − their sum. Prefix sum makes that O(1). BS the largest feasible cnt.",
+        "code": "public int[] addOrNot(int[] A, int B) {\n    Arrays.sort(A);\n    int n = A.length;\n    long[] prefix = new long[n + 1];\n    for (int i = 0; i < n; i++) prefix[i + 1] = prefix[i] + A[i];\n\n    int[] ans = new int[]{ -1, -1 };\n    for (int i = 0; i < n; i++) {\n        int lo = 1, hi = i + 1, mx = 0;\n        while (lo <= hi) {\n            int cnt = (lo + hi) / 2;\n            if ((long) A[i] * cnt - (prefix[i + 1] - prefix[i - cnt + 1]) <= B) {\n                mx = cnt;\n                lo = cnt + 1;\n            } else hi = cnt - 1;\n        }\n        if (ans[0] < mx) { ans[0] = mx; ans[1] = A[i]; }\n    }\n    return ans;\n}"
+      }
+    ],
+    "viz": {
+      "kind": "bs-on-answer",
+      "data": {
+        "low": 1,
+        "high": 5,
+        "target": 4,
+        "label": "max cnt with cost(cnt) ≤ B",
+        "predicate": "cost(cnt) <= B"
+      }
+    }
+  },
+  {
+    "id": "bs-magical-number",
+    "title": "Ath Magical Number",
+    "subTopic": "BS on Answer (Math + GCD/LCM)",
+    "tags": [
+      "Binary Search",
+      "BS on Answer",
+      "GCD",
+      "LCM",
+      "Inclusion-Exclusion"
+    ],
+    "description": "Numbers divisible by B or C are 'magical'. Return the Ath smallest magical number modulo 1e9+7.",
+    "sampleInput": "A = 4, B = 2, C = 3",
+    "sampleOutput": "6",
+    "story": "Binary search the value. Count of magical numbers ≤ x = x/B + x/C − x/LCM(B,C). Smallest x with count ≥ A is the answer.",
+    "solutions": [
+      {
+        "label": "Optimal",
+        "complexity": {
+          "time": "O(log(A · min(B,C)))",
+          "space": "O(1)"
+        },
+        "pseudocode": "lcm = B*C / gcd(B,C)\nlow=2, high=A*min(B,C)\nmid = …; count = mid/B + mid/C - mid/lcm\nif count >= A: ans = mid; high = mid - 1\nelse:           low = mid + 1\nreturn ans % MOD",
+        "story": "Inclusion-exclusion gives 'how many magicals ≤ x' in O(1). BS shrinks to the smallest value with enough.",
+        "code": "public int athMagicalNumber(int A, int B, int C) {\n    long lcm = (long) B * C / gcd(B, C);\n    long low = 2, high = (long) A * Math.min(B, C), ans = 0;\n    while (low <= high) {\n        long mid = (high - low) / 2 + low;\n        long cntB = mid / B, cntC = mid / C, cntBC = mid / lcm;\n        if (cntB + cntC - cntBC >= A) { ans = mid; high = mid - 1; }\n        else                            low = mid + 1;\n    }\n    return (int) (ans % 1_000_000_007L);\n}\n\nprivate int gcd(int x, int y) { return x == 0 ? y : gcd(y % x, x); }"
+      }
+    ],
+    "viz": {
+      "kind": "bs-on-answer",
+      "data": {
+        "low": 2,
+        "high": 8,
+        "target": 6,
+        "label": "min v with count(magical ≤ v) ≥ A",
+        "predicate": "v/B + v/C - v/lcm >= A"
+      }
+    }
+  },
+  {
+    "id": "bs-triplet-sum",
+    "title": "Bth Smallest Triplet Sum",
+    "subTopic": "BS on Value + Counting",
+    "tags": [
+      "Binary Search",
+      "Triplets",
+      "Two Pointers",
+      "Counting"
+    ],
+    "description": "For all triplets i<j<k of array A, find the Bth smallest sum A[i]+A[j]+A[k].",
+    "sampleInput": "A = [2, 4, 3, 2]\nB = 3",
+    "sampleOutput": "9",
+    "story": "Sort A. Binary search the sum value. For each candidate, count triplets with sum < it (two-pointer in O(N²)). Smallest value with count ≥ B is the answer.",
+    "solutions": [
+      {
+        "label": "Optimal",
+        "complexity": {
+          "time": "O(N² · log(sumRange))",
+          "space": "O(1)"
+        },
+        "pseudocode": "sort\nlow = 3*min, high = 3*max\nmid = …; count = triplets with sum < mid (two-pointer)\nif count >= B: high = mid - 1\nelse:           ans = mid; low = mid + 1",
+        "story": "Same flavour as matrix median — guess the value, count things below it, binary search to the smallest value with enough.",
+        "code": "public int BthSmallestTripletSum(int[] A, int B) {\n    Arrays.sort(A);\n    int n = A.length;\n    int low = 0, high = A[n-1] + A[n-2] + A[n-3], ans = 0;\n    while (low <= high) {\n        int mid = (high - low) / 2 + low;\n        int count = countLess(A, mid);\n        if (count >= B) high = mid - 1;\n        else { ans = mid; low = mid + 1; }\n    }\n    return ans;\n}\n\nprivate int countLess(int[] A, int val) {\n    int cnt = 0;\n    for (int i = 0; i < A.length; i++) {\n        int s = i + 1, e = A.length - 1;\n        while (s < e) {\n            if (A[i] + A[s] + A[e] < val) { cnt += e - s; s++; }\n            else e--;\n        }\n    }\n    return cnt;\n}"
+      }
+    ],
+    "viz": {
+      "kind": "bs-on-answer",
+      "data": {
+        "low": 6,
+        "high": 12,
+        "target": 9,
+        "label": "smallest v with count(<v) >= B",
+        "predicate": "count < B"
+      }
+    }
+  },
+  {
+    "id": "bs-painters",
+    "title": "Painter's Partition",
+    "subTopic": "BS on Answer (Minimize Max)",
+    "tags": [
+      "Binary Search",
+      "BS on Answer",
+      "Greedy",
+      "Minimize Maximum"
+    ],
+    "description": "N boards, A painters, B time per unit. Each painter paints contiguous boards. Minimize total time. Return ans % 10000003.",
+    "sampleInput": "C = [3, 5, 1, 7, 8, 2, 5, 3]\nA = 3, B = 2",
+    "sampleOutput": "32",
+    "story": "Binary search the max work any single painter does. Greedily check: walk left→right, start a new painter whenever the current load would exceed mid. If painters used ≤ A, mid is feasible.",
+    "solutions": [
+      {
+        "label": "Optimal",
+        "complexity": {
+          "time": "O(N log(sum))",
+          "space": "O(1)"
+        },
+        "pseudocode": "low = max(C), high = sum(C)\nmid = candidate time\nif canPaint(mid): ans = mid; high = mid - 1\nelse:              low = mid + 1\nreturn (ans * B) % MOD\n\ncanPaint(time):\n  painters = 1, run = 0\n  for board in C:\n    if run + board > time: painters++; run = board\n    else                   run += board\n    if painters > A: return false\n  return true",
+        "story": "BS on the answer's range. Predicate = 'can we finish in time t?'. low has to be max(C) — no painter can paint less than the biggest single board.",
+        "code": "public int paintersPartitionMinimumTimeToPaint(int A, int B, int[] C) {\n    int MOD = 10000003;\n    if (C.length == 0) return 0;\n    if (A > C.length) A = C.length;\n\n    int maxBoard = 0;\n    long totalSum = 0;\n    for (int b : C) { maxBoard = Math.max(maxBoard, b); totalSum += b; }\n\n    long left = maxBoard, right = totalSum, result = right;\n    while (left <= right) {\n        long mid = (left + right) / 2;\n        if (isPaintingCompletionPossible(C, A, mid)) { result = mid; right = mid - 1; }\n        else                                          left  = mid + 1;\n    }\n    return (int) ((result * B) % MOD);\n}\n\nprivate boolean isPaintingCompletionPossible(int[] C, int A, long maxTime) {\n    int painters = 1;\n    long currentSum = 0;\n    for (int b : C) {\n        if (currentSum + b > maxTime) {\n            painters++;\n            currentSum = b;\n            if (painters > A) return false;\n        } else currentSum += b;\n    }\n    return true;\n}"
+      }
+    ],
+    "viz": {
+      "kind": "bs-on-answer",
+      "data": {
+        "low": 8,
+        "high": 34,
+        "target": 16,
+        "label": "min time T with canPaint(T)",
+        "predicate": "painters used <= A"
+      }
+    }
+  },
+  {
+    "id": "bs-aggressive-cows",
+    "title": "Aggressive Cows",
+    "subTopic": "BS on Answer (Maximize Min)",
+    "tags": [
+      "Binary Search",
+      "BS on Answer",
+      "Greedy",
+      "Maximize Minimum"
+    ],
+    "description": "Place B cows in N stalls (positions in A). Maximize the minimum distance between any two placed cows.",
+    "sampleInput": "A = [2, 6, 11, 14, 19, 25, 30, 39, 43]\nB = 4",
+    "sampleOutput": "13",
+    "story": "Binary search the minimum distance. For each guess d, greedily place cows: first at A[0], each next at first stall ≥ lastPlaced + d. If B cows fit, try larger d.",
+    "solutions": [
+      {
+        "label": "Optimal",
+        "complexity": {
+          "time": "O(N log(max-min))",
+          "space": "O(1)"
+        },
+        "pseudocode": "sort A\nlow = 1, high = A[N-1] - A[0]\nmid = candidate distance\nif canPlace(mid): ans = mid; low = mid + 1\nelse:              high = mid - 1",
+        "story": "Opposite direction from painter's: maximize on success → go right. Predicate is greedy fit-them-in.",
+        "code": "public int aggressiveCowsLargestMinDistance(int[] A, int B) {\n    Arrays.sort(A);\n    int left = 1, right = A[A.length - 1] - A[0], result = 0;\n\n    while (left <= right) {\n        int mid = (left + right) / 2;\n        if (canPlaceCows(A, B, mid)) { result = mid; left = mid + 1; }\n        else                          right = mid - 1;\n    }\n    return result;\n}\n\nprivate boolean canPlaceCows(int[] stalls, int B, int minDist) {\n    int count = 1, lastPlaced = stalls[0];\n    for (int i = 1; i < stalls.length; i++) {\n        if (stalls[i] - lastPlaced >= minDist) {\n            count++;\n            lastPlaced = stalls[i];\n            if (count == B) return true;\n        }\n    }\n    return false;\n}"
+      }
+    ],
+    "viz": {
+      "kind": "bs-on-answer",
+      "data": {
+        "low": 1,
+        "high": 41,
+        "target": 13,
+        "label": "max distance d with canPlace(d)",
+        "predicate": "cows placed >= B"
+      }
+    }
+  },
+  {
+    "id": "bs-allocate-books",
+    "title": "Allocate Books",
+    "subTopic": "BS on Answer (Minimize Max)",
+    "tags": [
+      "Binary Search",
+      "BS on Answer",
+      "Greedy",
+      "Minimize Maximum"
+    ],
+    "description": "N books with page counts, B students. Allocate contiguous books minimizing the max pages any student reads. Return -1 if impossible.",
+    "sampleInput": "books = [12, 34, 67, 90]\nB = 2",
+    "sampleOutput": "113",
+    "story": "Same skeleton as painter's. low = largest single book (a student must read at least that), high = sum. Minimize on success.",
+    "solutions": [
+      {
+        "label": "Optimal",
+        "complexity": {
+          "time": "O(N log(sum))",
+          "space": "O(1)"
+        },
+        "pseudocode": "edge: students > books → -1\nlow = max(book), high = sum(books)\nif canAllot(mid): ans = mid; high = mid - 1\nelse:              low = mid + 1\n\ncanAllot(max):\n  students = 1, run = 0\n  for pages in books:\n    run += pages\n    if run > max: students++; run = pages\n    if students > B: return false\n  return true",
+        "story": "Twin of painter's partition. If you can solve one you solve both.",
+        "code": "public int minimumDifferenceBetweenBooksAllotted(int[] books, int students) {\n    if (books == null || books.length == 0) return -1;\n    if (students <= 0 || students > books.length) return -1;\n\n    int maxPage = 0, maxSingleBook = 0;\n    for (int x : books) { maxPage += x; maxSingleBook = Math.max(x, maxSingleBook); }\n\n    int low = Math.max(1, maxSingleBook), high = maxPage, ans = high;\n    while (low <= high) {\n        int mid = low + (high - low) / 2;\n        if (canBeAllotted(books, students, mid)) { ans = mid; high = mid - 1; }\n        else                                       low  = mid + 1;\n    }\n    return ans;\n}\n\nprivate boolean canBeAllotted(int[] books, int students, int maxPages) {\n    int allotted = 1, current = 0;\n    for (int p : books) {\n        current += p;\n        if (current > maxPages) { allotted++; current = p; }\n        if (allotted > students) return false;\n    }\n    return true;\n}"
+      }
+    ],
+    "viz": {
+      "kind": "bs-on-answer",
+      "data": {
+        "low": 90,
+        "high": 203,
+        "target": 113,
+        "label": "min max-pages M with canAllot(M)",
+        "predicate": "students used <= B"
+      }
+    }
+  },
+  {
+    "id": "bs-special-integer",
+    "title": "Special Integer",
+    "subTopic": "BS on Answer + Sliding Window",
+    "tags": [
+      "Binary Search",
+      "Sliding Window",
+      "BS on Answer",
+      "Subarray Sum"
+    ],
+    "description": "Find max K such that NO subarray of size K has sum > B.",
+    "sampleInput": "A = [5, 17, 100, 11]\nB = 130",
+    "sampleOutput": "3",
+    "story": "Binary search K. Predicate uses a sliding window of length K — if any window's sum exceeds B, K is too big.",
+    "solutions": [
+      {
+        "label": "Optimal",
+        "complexity": {
+          "time": "O(N log N)",
+          "space": "O(1)"
+        },
+        "pseudocode": "low = 0, high = N\nmid = candidate K\nif allWindowsOk(mid): K = mid; low = mid + 1\nelse:                  high = mid - 1\n\nallWindowsOk(K):\n  if K == 0 return true\n  build first window sum\n  slide; if any sum > B return false\n  return true",
+        "story": "Predicate is monotonic: if length K is bad, all longer lengths are also bad (they contain a bad K-window).",
+        "code": "public int maxSubArrayFactorLessThanB(int[] nums, int sum) {\n    int low = 0, high = nums.length, K = -1;\n    while (low <= high) {\n        int mid = low + (high - low) / 2;\n        if (subArrayOk(nums, sum, mid)) { K = mid; low = mid + 1; }\n        else                              high = mid - 1;\n    }\n    return K;\n}\n\nprivate boolean subArrayOk(int[] nums, int sum, int K) {\n    if (K == 0) return true;\n    long windowSum = 0;\n    for (int i = 0; i < K; i++) windowSum += nums[i];\n    if (windowSum > sum) return false;\n\n    for (int i = K; i < nums.length; i++) {\n        windowSum += nums[i] - nums[i - K];\n        if (windowSum > sum) return false;\n    }\n    return true;\n}"
+      }
+    ],
+    "viz": {
+      "kind": "sliding-window",
+      "data": {
+        "A": [
+          5,
+          17,
+          100,
+          11
+        ],
+        "K": 3,
+        "B": 130
+      }
+    }
+  }
+]

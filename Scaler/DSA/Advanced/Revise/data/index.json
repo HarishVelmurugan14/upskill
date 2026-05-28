@@ -1,0 +1,14 @@
+{
+  "topics": [
+    {
+      "name": "Binary Search",
+      "file": "binary-search.json",
+      "notesFile": "binary-search.notes.json"
+    },
+    {
+      "name": "Linked List",
+      "file": "linked-list.json",
+      "notesFile": "linked-list.notes.json"
+    }
+  ]
+}

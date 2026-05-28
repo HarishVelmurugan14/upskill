@@ -1,0 +1,142 @@
+{
+  "topic": "Linked List",
+  "summary": "Linked lists are pointer gymnastics. Every problem reduces to one of five moves: traverse, reverse, insert, delete, or two-pointer chase. The dummy node and the three-pointer (prev/curr/next) dance solve 90% of the cases.",
+  "thoughtProcess": [
+    {
+      "title": "1. Always reach for a dummy node",
+      "body": "Any operation that may touch the head (insert at head, delete first, merge, partition) becomes uniform when you put a dummy before head. dummy.next is the always-correct return value."
+    },
+    {
+      "title": "2. The three-pointer reversal dance",
+      "body": "prev, curr, next. Save next, flip curr.next to prev, slide prev=curr, slide curr=next. This pattern is the atom of every reversal — full, partial (B..C), or in K-groups."
+    },
+    {
+      "title": "3. Two pointers solve 'from the end' in one pass",
+      "body": "Stretch a fixed gap between fast and slow. When fast falls off, slow is exactly N from the end. No length computation needed."
+    },
+    {
+      "title": "4. Visualize before coding",
+      "body": "Draw 3-4 nodes on paper, label each arrow, then move them. The code is just the transcription. Skip this and you'll introduce a null-pointer bug every time."
+    },
+    {
+      "title": "5. Edge cases live at head, tail, and 1-node lists",
+      "body": "Always mentally test: empty list, single node, head operation, tail operation. If your code handles all four uniformly (usually thanks to dummy), it's correct."
+    },
+    {
+      "title": "6. Recursion ↔ iteration trade-off",
+      "body": "Recursive LL is elegant but blows the stack on long chains (10^5+ nodes). Default to iterative for production; use recursion only when the structure (e.g., reverse-in-K-groups) genuinely simplifies."
+    }
+  ],
+  "commonMistakes": [
+    {
+      "title": "Forgetting to save next before flipping",
+      "wrong": "curr.next = prev;\ncurr = curr.next;  // already null/prev",
+      "right": "ListNode next = curr.next;\ncurr.next = prev;\nprev = curr;\ncurr = next;",
+      "why": "Once you flip curr.next, you've lost the way forward. Always cache it first."
+    },
+    {
+      "title": "Advancing pointer after a deletion",
+      "wrong": "if (c.val == c.next.val) c.next = c.next.next;\nc = c.next;  // skips a possible duplicate",
+      "right": "if (c.val == c.next.val) c.next = c.next.next;\nelse c = c.next;",
+      "why": "After deleting, the new c.next could itself be a duplicate. Only advance when you did NOT delete."
+    },
+    {
+      "title": "Off-by-one when walking to predecessor",
+      "wrong": "for (int i = 0; i < pos; i++) prev = prev.next;  // wrong if pos == 0 with no dummy",
+      "right": "ListNode dummy = new ListNode(0); dummy.next = head;\nListNode prev = dummy;\nfor (int i = 0; i < pos; i++) prev = prev.next;",
+      "why": "Without a dummy, position 0 has no predecessor and the loop variant breaks. Dummy unifies all positions."
+    },
+    {
+      "title": "Not null-checking fast before advancing",
+      "wrong": "for (int i = 0; i < B; i++) fast = fast.next;",
+      "right": "for (int i = 0; i < B; i++) {\n    if (fast.next == null) return head.next;  // B >= length\n    fast = fast.next;\n}",
+      "why": "If B is larger than the list length, naive advance crashes with NPE."
+    },
+    {
+      "title": "Returning the old head after reversal",
+      "wrong": "// after full reversal\nreturn head;  // head is now the TAIL",
+      "right": "return prev;  // prev is the new head",
+      "why": "After the loop, prev stands on the last node we flipped — that is now the head."
+    },
+    {
+      "title": "Setting random pointer before next is rewired",
+      "wrong": "// interweaving copy:\nfor (Node c=head; c!=null; c=c.next.next)\n    c.next.random = c.random.next;\n// but loop terminator c=c.next.next is wrong if we already unzipped",
+      "right": "// Do interleave → set randoms → THEN unzip. Three separate passes.",
+      "why": "Each phase relies on the structure left by the previous one. Mixing them corrupts both."
+    },
+    {
+      "title": "Recursive reverse leaves a cycle",
+      "wrong": "ListNode rev = reverse(head.next);\nhead.next.next = head;\n// missing head.next = null",
+      "right": "ListNode rev = reverse(head.next);\nhead.next.next = head;\nhead.next = null;\nreturn rev;",
+      "why": "Without the null assignment, the old head still points forward — first two nodes form a cycle."
+    },
+    {
+      "title": "Using == on Integer values from a list",
+      "wrong": "if (node.val == target)   // OK for int, fails silently for boxed Integer",
+      "right": "// Use primitive int for ListNode.val.\n// If you must compare Integer, use .equals().",
+      "why": "Java auto-unboxes only sometimes. == on Integer compares references, equal values may return false."
+    }
+  ],
+  "keyPatterns": [
+    {
+      "name": "Dummy + walk-to-predecessor",
+      "when": "Any single-position insert / delete (including head).",
+      "template": "ListNode dummy = new ListNode(0);\ndummy.next = head;\nListNode prev = dummy;\nfor (int i = 0; i < pos; i++) prev = prev.next;\n// splice via prev\nreturn dummy.next;",
+      "examples": ["Insert at Position", "Delete at Position"]
+    },
+    {
+      "name": "Three-pointer reversal",
+      "when": "Reverse the entire list, or a contiguous segment.",
+      "template": "ListNode prev = null, curr = head;\nwhile (curr != null) {\n    ListNode next = curr.next;\n    curr.next = prev;\n    prev = curr;\n    curr = next;\n}\nreturn prev;",
+      "examples": ["Reverse Linked List", "Reverse in K Groups (iterative)"]
+    },
+    {
+      "name": "Front-insertion partial reversal",
+      "when": "Reverse positions B..C in one pass.",
+      "template": "ListNode pre = dummy;\nfor (int i=1; i<B; i++) pre = pre.next;\nListNode start = pre.next, then = start.next;\nfor (int k=0; k<C-B; k++) {\n    start.next = then.next;\n    then.next  = pre.next;\n    pre.next   = then;\n    then = start.next;\n}",
+      "examples": ["Reverse Linked List II (Partial)"]
+    },
+    {
+      "name": "Two-pointer N-from-end",
+      "when": "Find or remove the Nth node counted from tail in one pass.",
+      "template": "ListNode dummy = new ListNode(0); dummy.next = head;\nListNode fast = dummy, slow = dummy;\nfor (int i=0; i<N; i++) fast = fast.next;\nwhile (fast.next != null) { fast = fast.next; slow = slow.next; }\n// slow.next is the victim",
+      "examples": ["Remove Nth Node from End"]
+    },
+    {
+      "name": "Fast/slow (tortoise & hare)",
+      "when": "Cycle detection, find middle, find cycle entrance.",
+      "template": "ListNode slow = head, fast = head;\nwhile (fast != null && fast.next != null) {\n    slow = slow.next;\n    fast = fast.next.next;\n    if (slow == fast) return true;  // cycle\n}",
+      "examples": ["Detect Cycle", "Find Middle"]
+    },
+    {
+      "name": "HashMap clone",
+      "when": "Deep-copy with arbitrary extra pointer (random).",
+      "template": "Map<Node,Node> m = new HashMap<>();\nfor (Node c=head; c!=null; c=c.next) m.put(c, new Node(c.val));\nfor (Node c=head; c!=null; c=c.next) {\n    m.get(c).next   = m.get(c.next);\n    m.get(c).random = m.get(c.random);\n}",
+      "examples": ["Copy List with Random Pointer"]
+    },
+    {
+      "name": "Interweave + unzip (O(1) clone)",
+      "when": "Deep-copy without extra space.",
+      "template": "// Pass 1: A → A' → B → B' → ...\n// Pass 2: clone.random = orig.random.next\n// Pass 3: unzip to two lists",
+      "examples": ["Copy List with Random Pointer (O(1) space)"]
+    },
+    {
+      "name": "Group reversal",
+      "when": "Reverse every K-sized block, optionally leaving the leftover.",
+      "template": "// reach the K-th node; if absent, stop.\n// reverse the K-block in-place (three-pointer).\n// stitch prevGroupEnd → newHead → groupStart → nextGroup",
+      "examples": ["Reverse Linked List in K Groups"]
+    }
+  ],
+  "edgeCases": [
+    "Empty list (head == null) — return null immediately or let dummy handle it.",
+    "Single node — reversal returns same node; delete returns null; insert returns new head.",
+    "Operation at head — use a dummy so position 0 isn't special.",
+    "Operation at tail — make sure your loop reaches the last node (while c.next != null vs while c != null).",
+    "Position out of range — silently return unchanged, or return head.next if removing first.",
+    "K == 1 in K-group reversal — should return list unchanged.",
+    "B == C in partial reversal — no-op.",
+    "All duplicates — duplicate-removal should collapse to one node, not zero.",
+    "Long chain (10^5+) — recursive reversal will stack-overflow; prefer iterative.",
+    "Random pointer pointing to itself or null — interweaving copy must check c.random != null before dereferencing."
+  ]
+}

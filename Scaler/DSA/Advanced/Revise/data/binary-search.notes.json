@@ -1,0 +1,142 @@
+{
+  "topic": "Binary Search",
+  "summary": "Binary search isn't really about searching arrays — it's about exploiting a monotonic property. If you can answer a yes/no question that flips exactly once across a range, binary search applies.",
+  "thoughtProcess": [
+    {
+      "title": "1. Is the input (or the answer space) monotonic?",
+      "body": "Sorted arrays are the obvious case. The deeper trick: if you can frame the problem as 'what is the smallest/largest X such that predicate(X) is true?' and predicate is monotonic in X, binary search works on the answer."
+    },
+    {
+      "title": "2. Define the search space precisely.",
+      "body": "low and high must bracket the answer. For BS on answer, low = minimum feasible, high = maximum feasible. Get this wrong and you'll loop forever or miss the answer."
+    },
+    {
+      "title": "3. Write a clean predicate / check function.",
+      "body": "Extract the feasibility check into a private boolean method (canPlaceCows, isPaintingCompletionPossible, canBeAllotted). Keep the binary search loop dumb — it just shrinks the range."
+    },
+    {
+      "title": "4. Decide which side to shrink on success.",
+      "body": "Maximize answer (aggressive cows): on success, store result and try larger → low = mid + 1. Minimize answer (painter's partition): on success, store result and try smaller → high = mid - 1. The 'store result on every success' pattern is bulletproof."
+    },
+    {
+      "title": "5. Pick the loop invariant: low <= high.",
+      "body": "Default to while (low <= high), exit when low > high, return the stored answer. Avoid low < high unless you have a strong reason — it requires careful mid-update logic."
+    },
+    {
+      "title": "6. Watch overflow and types.",
+      "body": "mid = low + (high - low) / 2 — never (low + high) / 2. For mid * mid, use long. For sums (painter, allocate), totals can exceed int."
+    }
+  ],
+  "commonMistakes": [
+    {
+      "title": "Mid overflow",
+      "wrong": "int mid = (low + high) / 2;",
+      "right": "int mid = low + (high - low) / 2;",
+      "why": "low + high can overflow int when both are large. The right form never does."
+    },
+    {
+      "title": "Forgetting to store the candidate answer",
+      "wrong": "if (canDo(mid)) high = mid - 1;\nelse low = mid + 1;\n// return ???",
+      "right": "if (canDo(mid)) { ans = mid; high = mid - 1; }\nelse low = mid + 1;\nreturn ans;",
+      "why": "When the loop exits, low > high — neither is guaranteed to be the answer. Always capture mid the moment the predicate succeeds."
+    },
+    {
+      "title": "Wrong direction after success",
+      "wrong": "// Aggressive cows — wanted MAX min distance\nif (canPlace(mid)) { ans = mid; high = mid - 1; }",
+      "right": "if (canPlace(mid)) { ans = mid; low = mid + 1; } // try larger",
+      "why": "Maximize answer → on success go RIGHT. Minimize answer → on success go LEFT. Confuse these and you'll converge to the boundary instead of the optimum."
+    },
+    {
+      "title": "Off-by-one in lower / upper bound",
+      "wrong": "while (low < high) { ... high = mid; }\n// returns... maybe low? maybe -1?",
+      "right": "// Lower bound: smallest index with A[i] >= B\nint ans = N;  // sentinel: 'not found'\nwhile (low <= high) {\n  int mid = low + (high-low)/2;\n  if (A[mid] >= B) { ans = mid; high = mid - 1; }\n  else low = mid + 1;\n}\nreturn ans;",
+      "why": "The store-on-success pattern works for both lower and upper bound. Sentinel value handles 'not found' cleanly."
+    },
+    {
+      "title": "Integer overflow in mid*mid (sqrt)",
+      "wrong": "if (mid * mid <= A) ...",
+      "right": "long m = mid;\nif (m * m <= A) ...",
+      "why": "For A up to 1e9, mid can be ~3e4, and mid*mid fits int — but the moment A grows, you blow up silently. Use long up front."
+    },
+    {
+      "title": "Wrong array bounds in BS on answer",
+      "wrong": "// Painter's: low = 0; high = sum;\n// guess time 0 is meaningless and breaks check",
+      "right": "low = max(C[i]);  // can never go below the largest single board\nhigh = sum(C);    // one painter does everything",
+      "why": "Pick the tightest valid bounds. Loose bounds waste iterations or trigger predicate bugs."
+    },
+    {
+      "title": "Rotated array: blindly checking A[mid] == target",
+      "wrong": "// Standard BS on rotated array — fails",
+      "right": "// Either find the pivot first, then BS on the correct half,\n// OR detect which half is sorted at each step and decide.\nif (A[low] <= A[mid]) { /* left sorted */ }\nelse { /* right sorted */ }",
+      "why": "Rotated arrays break the global sorted invariant. Restore it by finding the pivot or by reasoning about which half is sorted."
+    },
+    {
+      "title": "Modifying loop variable after store-on-success",
+      "wrong": "if (canDo(mid)) { ans = mid; high = mid; }  // not mid - 1",
+      "right": "if (canDo(mid)) { ans = mid; high = mid - 1; }",
+      "why": "high = mid creates an infinite loop when low == high. With <=, always shrink by 1."
+    }
+  ],
+  "keyPatterns": [
+    {
+      "name": "Classic BS on sorted array",
+      "when": "You have a sorted array and need to find a specific value or position.",
+      "template": "int low = 0, high = N - 1;\nwhile (low <= high) {\n    int mid = low + (high - low) / 2;\n    if (A[mid] == target) return mid;\n    else if (A[mid] < target) low = mid + 1;\n    else high = mid - 1;\n}\nreturn -1;",
+      "examples": ["Search in Sorted Array", "Single Element in Sorted Array"]
+    },
+    {
+      "name": "Lower bound (first index with A[i] >= B)",
+      "when": "Insertion point, first occurrence, or 'smallest x such that x >= B'.",
+      "template": "int ans = N;  // sentinel for 'not found'\nwhile (low <= high) {\n    int mid = low + (high - low) / 2;\n    if (A[mid] >= B) { ans = mid; high = mid - 1; }\n    else low = mid + 1;\n}\nreturn ans;",
+      "examples": ["Search Insert Position", "First/Last Occurrence", "Minimum Difference (closest greater)"]
+    },
+    {
+      "name": "BS on Answer — minimize the maximum",
+      "when": "Partition/allocate so that the largest group is as small as possible.",
+      "template": "long low = maxItem, high = totalSum, ans = high;\nwhile (low <= high) {\n    long mid = low + (high - low) / 2;\n    if (feasible(mid)) { ans = mid; high = mid - 1; }\n    else low = mid + 1;\n}\nreturn ans;",
+      "examples": ["Painter's Partition", "Allocate Books"]
+    },
+    {
+      "name": "BS on Answer — maximize the minimum",
+      "when": "Place items so that the smallest gap is as large as possible.",
+      "template": "int low = 1, high = maxRange, ans = 0;\nwhile (low <= high) {\n    int mid = low + (high - low) / 2;\n    if (canPlace(mid)) { ans = mid; low = mid + 1; }\n    else high = mid - 1;\n}\nreturn ans;",
+      "examples": ["Aggressive Cows", "Ath Magical Number (using count predicate)"]
+    },
+    {
+      "name": "BS on value range (count-based)",
+      "when": "You can't directly index the answer, but you can count how many items are ≤ X in O(log) or O(N log).",
+      "template": "while (low <= high) {\n    int mid = (low + high) / 2;\n    int count = countLE(mid);\n    if (count <= target) low = mid + 1;\n    else { ans = mid; high = mid - 1; }\n}",
+      "examples": ["Matrix Median", "Bth Smallest Triplet Sum", "Ath Magical Number"]
+    },
+    {
+      "name": "BS on 2D matrix (flattened indexing)",
+      "when": "Matrix is globally sorted (next row starts > prev row's end). Treat as 1D, map mid → (mid/M, mid%M).",
+      "template": "int low = 0, high = N*M - 1;\nwhile (low <= high) {\n    int mid = low + (high - low) / 2;\n    int r = mid / M, c = mid % M;\n    if (A[r][c] == B) return 1;\n    else if (A[r][c] < B) low = mid + 1;\n    else high = mid - 1;\n}",
+      "examples": ["Matrix Search"]
+    },
+    {
+      "name": "Peak finding (BS on unimodal)",
+      "when": "Function rises then falls (or has a peak property). Always move toward the increasing slope.",
+      "template": "while (low <= high) {\n    int mid = low + (high - low) / 2;\n    if (A[mid] > A[mid+1] && A[mid] > A[mid-1]) return A[mid];\n    else if (A[mid] > A[mid-1]) low = mid + 1;   // climbing → peak right\n    else high = mid - 1;                          // descending → peak left\n}",
+      "examples": ["Find a Peak Element"]
+    },
+    {
+      "name": "Rotated sorted array — find pivot then search",
+      "when": "Array is sorted but rotated. Locate the rotation point, then standard BS on the correct half.",
+      "template": "// Pivot: smallest element index\nwhile (low <= high) {\n    int mid = low + (high - low) / 2;\n    if (A[mid] >= A[0]) low = mid + 1;\n    else { pivot = mid; high = mid - 1; }\n}\n// Then choose half based on target vs A[0] and BS normally.",
+      "examples": ["Rotated Sorted Array Search"]
+    }
+  ],
+  "edgeCases": [
+    "N == 0 — return sentinel (-1, [-1,-1], etc.) immediately.",
+    "N == 1 — answer is A[0] or trivially checkable. Test before entering the loop.",
+    "Target smaller than A[0] or larger than A[N-1] — lower/upper bound returns N or -1.",
+    "All elements equal — first/last occurrence both span entire array.",
+    "Duplicates in 'single element' problem — index parity shifts after the unique element.",
+    "Strictly increasing/decreasing arrays in peak problem — peak is at a boundary.",
+    "B (students/painters) > N (books/boards) — return -1 (infeasible).",
+    "BS on answer with B = 0 — feasibility check must handle 'no operations' cleanly.",
+    "Overflow: A up to 1e9 means mid * mid, sum of pages, A * min(B,C) all need long.",
+    "Rotated array with rotation = 0 — algorithm should still work without special-casing."
+  ]
+}

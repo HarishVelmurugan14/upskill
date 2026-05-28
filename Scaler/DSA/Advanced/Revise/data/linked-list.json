@@ -1,0 +1,384 @@
+[
+  {
+    "id": "ll-print",
+    "title": "Print Linked List",
+    "subTopic": "Linked List Traversal",
+    "tags": [
+      "Linked List",
+      "Traversal",
+      "Basics"
+    ],
+    "description": "Walk the list and print each value followed by a space; end with a newline.",
+    "sampleInput": "1 → 2 → 3 → NULL",
+    "sampleOutput": "1 2 3",
+    "story": "Everything in linked lists starts here: `for (Node c = head; c != null; c = c.next)`.",
+    "solutions": [
+      {
+        "label": "Optimal",
+        "complexity": {
+          "time": "O(N)",
+          "space": "O(1)"
+        },
+        "pseudocode": "c = head\nwhile c != null: print c.val + ' '; c = c.next\nprint newline",
+        "story": "If you can't write this from muscle memory, every other LL problem will hurt.",
+        "code": "public void printALinkedList(ListNode head) {\n    ListNode c = head;\n    while (c != null) {\n        System.out.print(c.val + \" \");\n        c = c.next;\n    }\n    System.out.println();\n}"
+      }
+    ],
+    "viz": {
+      "kind": "ll-traverse",
+      "data": {
+        "values": [
+          1,
+          2,
+          3,
+          4,
+          5
+        ]
+      }
+    }
+  },
+  {
+    "id": "ll-reverse",
+    "title": "Reverse Linked List",
+    "subTopic": "Linked List Reversal",
+    "tags": [
+      "Linked List",
+      "Reversal",
+      "Two Pointers"
+    ],
+    "description": "Reverse a singly linked list in-place in one pass.",
+    "sampleInput": "1 → 2 → 3 → 4 → 5 → NULL",
+    "sampleOutput": "5 → 4 → 3 → 2 → 1 → NULL",
+    "story": "Three pointers, one mantra: save next, flip the arrow, slide forward. prev becomes the new head.",
+    "solutions": [
+      {
+        "label": "Iterative (optimal)",
+        "complexity": {
+          "time": "O(N)",
+          "space": "O(1)"
+        },
+        "pseudocode": "prev = null, curr = head\nwhile curr:\n  next = curr.next\n  curr.next = prev\n  prev = curr; curr = next\nreturn prev",
+        "story": "The dance: NEXT save, NEXT flip, PREV step, CURR step. Repeat until curr falls off the end.",
+        "code": "public ListNode reverseALinkedListInPlaceInOneIteration(ListNode head) {\n    ListNode prev = null, curr = head;\n    while (curr != null) {\n        ListNode next = curr.next;\n        curr.next = prev;\n        prev = curr;\n        curr = next;\n    }\n    return prev;\n}"
+      },
+      {
+        "label": "Recursive",
+        "complexity": {
+          "time": "O(N)",
+          "space": "O(N) stack"
+        },
+        "pseudocode": "if !head or !head.next: return head\nnewHead = reverse(head.next)\nhead.next.next = head\nhead.next = null\nreturn newHead",
+        "story": "Recurse to the tail, then flip on the way back. Elegant but blows the stack on long lists.",
+        "code": "public ListNode reverseRecursive(ListNode head) {\n    if (head == null || head.next == null) return head;\n    ListNode newHead = reverseRecursive(head.next);\n    head.next.next = head;\n    head.next = null;\n    return newHead;\n}"
+      }
+    ],
+    "viz": {
+      "kind": "ll-reverse",
+      "data": {
+        "values": [
+          1,
+          2,
+          3,
+          4,
+          5
+        ]
+      }
+    }
+  },
+  {
+    "id": "ll-copy-random",
+    "title": "Copy List with Random Pointer",
+    "subTopic": "Linked List Deep Copy",
+    "tags": [
+      "Linked List",
+      "Deep Copy",
+      "HashMap",
+      "Interweaving"
+    ],
+    "description": "Each node has next AND a random pointer to any node (or null). Return a deep copy.",
+    "sampleInput": "1 → 2 → 3 → 4 → 5\nrandoms: [3, 1, 5, null, 2]",
+    "sampleOutput": "Deep copy with same structure",
+    "story": "HashMap version: pass 1 clones, pass 2 wires next + random using the map. Interweaving version: insert clones between originals → set randoms in place → unzip the two lists.",
+    "solutions": [
+      {
+        "label": "HashMap (clearest)",
+        "complexity": {
+          "time": "O(N)",
+          "space": "O(N)"
+        },
+        "pseudocode": "pass 1: map[orig] = new Node(orig.val)\npass 2: for each orig:\n  map[orig].next   = map[orig.next]\n  map[orig].random = map[orig.random]",
+        "story": "Hash old → new. Then re-wire from old's pointers but look up new's nodes through the map.",
+        "code": "public RandomListNode copyRandomList(RandomListNode head) {\n    HashMap<RandomListNode, RandomListNode> map = new HashMap<>();\n    for (RandomListNode c = head; c != null; c = c.next)\n        map.put(c, new RandomListNode(c.label));\n    for (RandomListNode c = head; c != null; c = c.next) {\n        map.get(c).next   = map.get(c.next);\n        map.get(c).random = map.get(c.random);\n    }\n    return map.get(head);\n}"
+      },
+      {
+        "label": "Interweaving (O(1) space)",
+        "complexity": {
+          "time": "O(N)",
+          "space": "O(1)"
+        },
+        "pseudocode": "Pass 1: insert clone after each original (A→A'→B→B'…).\nPass 2: clone.random = original.random.next.\nPass 3: unzip the two lists, restoring originals.",
+        "story": "Smuggle the clones inside the original list to skip the hash map. Three passes, no extra storage.",
+        "code": "public RandomListNode copyRandomListInterleave(RandomListNode head) {\n    if (head == null) return null;\n    for (RandomListNode c = head; c != null; c = c.next.next) {\n        RandomListNode clone = new RandomListNode(c.label);\n        clone.next = c.next;\n        c.next = clone;\n    }\n    for (RandomListNode c = head; c != null; c = c.next.next)\n        if (c.random != null) c.next.random = c.random.next;\n    RandomListNode dummy = new RandomListNode(0), t = dummy;\n    for (RandomListNode c = head; c != null; c = c.next) {\n        t.next = c.next;\n        t = t.next;\n        c.next = c.next.next;\n    }\n    return dummy.next;\n}"
+      }
+    ],
+    "viz": {
+      "kind": "ll-traverse",
+      "data": {
+        "values": [
+          1,
+          2,
+          3,
+          4,
+          5
+        ],
+        "label": "Copy: pass through original, allocate clones"
+      }
+    }
+  },
+  {
+    "id": "ll-insert-at-position",
+    "title": "Insert at Position",
+    "subTopic": "Linked List Insertion",
+    "tags": [
+      "Linked List",
+      "Insertion",
+      "Edge Cases"
+    ],
+    "description": "Insert a new node with value B at 0-indexed position C. C ≥ length → insert at tail.",
+    "sampleInput": "A = 1 → 2, B = 3, C = 0",
+    "sampleOutput": "3 → 1 → 2",
+    "story": "Walk to node at index C-1, then splice. Use a dummy node so 'insert at head' isn't a special case.",
+    "solutions": [
+      {
+        "label": "Optimal",
+        "complexity": {
+          "time": "O(N)",
+          "space": "O(1)"
+        },
+        "pseudocode": "dummy.next = head; prev = dummy\nfor i in 0..C-1: if prev.next == null break; prev = prev.next\nnewNode.next = prev.next; prev.next = newNode\nreturn dummy.next",
+        "story": "Dummy node = no edge case for the head. Walk to the predecessor and splice.",
+        "code": "public ListNode insertAtPosition(ListNode head, int value, int pos) {\n    ListNode dummy = new ListNode(0);\n    dummy.next = head;\n    ListNode prev = dummy;\n    for (int i = 0; i < pos && prev.next != null; i++) prev = prev.next;\n    ListNode node = new ListNode(value);\n    node.next = prev.next;\n    prev.next = node;\n    return dummy.next;\n}"
+      }
+    ],
+    "viz": {
+      "kind": "ll-insert",
+      "data": {
+        "values": [
+          1,
+          2
+        ],
+        "insertValue": 3,
+        "insertAt": 1
+      }
+    }
+  },
+  {
+    "id": "ll-delete-at-position",
+    "title": "Delete at Position",
+    "subTopic": "Linked List Deletion",
+    "tags": [
+      "Linked List",
+      "Deletion",
+      "Edge Cases"
+    ],
+    "description": "Delete the B-th node (0-indexed). If B is out of range, return list unchanged.",
+    "sampleInput": "A = 1 → 2 → 3, B = 1",
+    "sampleOutput": "1 → 3",
+    "story": "Walk to predecessor, skip the doomed node. Dummy node makes 'delete head' just like any other.",
+    "solutions": [
+      {
+        "label": "Optimal",
+        "complexity": {
+          "time": "O(N)",
+          "space": "O(1)"
+        },
+        "pseudocode": "dummy.next = head; prev = dummy\nfor i in 0..B-1: if prev.next == null return head; prev = prev.next\nif prev.next != null: prev.next = prev.next.next\nreturn dummy.next",
+        "story": "Find the node just before the victim, then point past it.",
+        "code": "public ListNode deleteAtPosition(ListNode head, int pos) {\n    ListNode dummy = new ListNode(0);\n    dummy.next = head;\n    ListNode prev = dummy;\n    for (int i = 0; i < pos; i++) {\n        if (prev.next == null) return head;\n        prev = prev.next;\n    }\n    if (prev.next != null) prev.next = prev.next.next;\n    return dummy.next;\n}"
+      }
+    ],
+    "viz": {
+      "kind": "ll-delete",
+      "data": {
+        "values": [
+          1,
+          2,
+          3
+        ],
+        "deleteAt": 1
+      }
+    }
+  },
+  {
+    "id": "ll-remove-duplicates",
+    "title": "Remove Duplicates from Sorted List",
+    "subTopic": "Linked List Deduplication",
+    "tags": [
+      "Linked List",
+      "Sorted List",
+      "Duplicates",
+      "In-place"
+    ],
+    "description": "Sorted list → each value appears once. Skip consecutive duplicates.",
+    "sampleInput": "1 → 1 → 2 → 3 → 3 → NULL",
+    "sampleOutput": "1 → 2 → 3 → NULL",
+    "story": "Walk with one pointer. If next equals current, jump over next.",
+    "solutions": [
+      {
+        "label": "Optimal",
+        "complexity": {
+          "time": "O(N)",
+          "space": "O(1)"
+        },
+        "pseudocode": "c = head\nwhile c && c.next:\n  if c.val == c.next.val: c.next = c.next.next\n  else c = c.next\nreturn head",
+        "story": "Don't advance when you delete — there might be another duplicate right behind it.",
+        "code": "public ListNode removeDuplicates(ListNode head) {\n    ListNode c = head;\n    while (c != null && c.next != null) {\n        if (c.val == c.next.val) c.next = c.next.next;\n        else c = c.next;\n    }\n    return head;\n}"
+      }
+    ],
+    "viz": {
+      "kind": "ll-traverse",
+      "data": {
+        "values": [
+          1,
+          1,
+          2,
+          3,
+          3
+        ],
+        "label": "skip when c.val == c.next.val"
+      }
+    }
+  },
+  {
+    "id": "ll-remove-nth-end",
+    "title": "Remove Nth Node from End",
+    "subTopic": "Linked List Two-Pointer",
+    "tags": [
+      "Linked List",
+      "Two Pointers",
+      "Nth from End",
+      "One Pass"
+    ],
+    "description": "Remove the B-th node counted from the end in one pass. If B ≥ length, remove the head.",
+    "sampleInput": "1 → 2 → 3 → 4 → 5, B = 2",
+    "sampleOutput": "1 → 2 → 3 → 5",
+    "story": "Stretch a rubber band of length B between two pointers. Slide both until fast falls off — slow lands on the predecessor.",
+    "solutions": [
+      {
+        "label": "Optimal — two pointers",
+        "complexity": {
+          "time": "O(N)",
+          "space": "O(1)"
+        },
+        "pseudocode": "dummy.next = head; fast = slow = dummy\nadvance fast B steps\nwhile fast.next: fast = fast.next; slow = slow.next\nslow.next = slow.next.next\nreturn dummy.next",
+        "story": "Dummy makes the 'remove first' case stop being special. Two pointers, gap of B, slide together.",
+        "code": "public ListNode removeNthFromEnd(ListNode head, int B) {\n    ListNode dummy = new ListNode(0);\n    dummy.next = head;\n    ListNode fast = dummy, slow = dummy;\n    for (int i = 0; i < B; i++) {\n        if (fast.next == null) { return head == null ? null : head.next; }\n        fast = fast.next;\n    }\n    while (fast.next != null) { fast = fast.next; slow = slow.next; }\n    slow.next = slow.next.next;\n    return dummy.next;\n}"
+      }
+    ],
+    "viz": {
+      "kind": "ll-two-pointer",
+      "data": {
+        "values": [
+          1,
+          2,
+          3,
+          4,
+          5
+        ],
+        "gap": 2
+      }
+    }
+  },
+  {
+    "id": "ll-reverse-partial",
+    "title": "Reverse Linked List II (Partial)",
+    "subTopic": "Linked List Partial Reversal",
+    "tags": [
+      "Linked List",
+      "Reversal",
+      "Partial",
+      "One Pass"
+    ],
+    "description": "Reverse positions B through C (1-indexed), in-place, one pass.",
+    "sampleInput": "1 → 2 → 3 → 4 → 5, B=2, C=4",
+    "sampleOutput": "1 → 4 → 3 → 2 → 5",
+    "story": "Walk to the node before B. Reverse exactly (C − B + 1) nodes by repeatedly lifting the next node to the front of the segment. Stitch back.",
+    "solutions": [
+      {
+        "label": "Optimal",
+        "complexity": {
+          "time": "O(N)",
+          "space": "O(1)"
+        },
+        "pseudocode": "dummy.next = head; pre = dummy\nadvance pre B-1 steps\nstart = pre.next; then = start.next\nfor k in 1..(C-B):\n  start.next = then.next\n  then.next  = pre.next\n  pre.next   = then\n  then = start.next\nreturn dummy.next",
+        "story": "Front-insertion: keep lifting `then` to the front of the segment. After (C-B) lifts the segment is reversed and stitched.",
+        "code": "public ListNode reverseBetween(ListNode head, int B, int C) {\n    if (head == null || B == C) return head;\n    ListNode dummy = new ListNode(0);\n    dummy.next = head;\n    ListNode pre = dummy;\n    for (int i = 1; i < B; i++) pre = pre.next;\n    ListNode start = pre.next, then = start.next;\n    for (int k = 0; k < C - B; k++) {\n        start.next = then.next;\n        then.next  = pre.next;\n        pre.next   = then;\n        then = start.next;\n    }\n    return dummy.next;\n}"
+      }
+    ],
+    "viz": {
+      "kind": "ll-reverse",
+      "data": {
+        "values": [
+          1,
+          2,
+          3,
+          4,
+          5
+        ],
+        "from": 2,
+        "to": 4
+      }
+    }
+  },
+  {
+    "id": "ll-reverse-k",
+    "title": "Reverse Linked List in K Groups",
+    "subTopic": "Linked List Group Reversal",
+    "tags": [
+      "Linked List",
+      "Reversal",
+      "Group Reversal",
+      "K-Group"
+    ],
+    "description": "Reverse the list B at a time. B always divides the length.",
+    "sampleInput": "[1, 2, 3, 4, 5, 6], B = 3",
+    "sampleOutput": "[3, 2, 1, 6, 5, 4]",
+    "story": "Reverse the first K. Recursively reverse the rest. Connect the old head (now tail) to the recursive result.",
+    "solutions": [
+      {
+        "label": "Recursive",
+        "complexity": {
+          "time": "O(N)",
+          "space": "O(N/K) stack"
+        },
+        "pseudocode": "if length < K: return head\nreverse first K nodes (standard reversal)\nold head.next = reverseK(nextGroupHead, K)\nreturn newHead of this group",
+        "story": "Reverse K, then say 'do the same to what's left, please.' The recursion handles the rest.",
+        "code": "public ListNode reverseKGroup(ListNode head, int K) {\n    ListNode c = head;\n    int cnt = 0;\n    while (c != null && cnt < K) { c = c.next; cnt++; }\n    if (cnt < K) return head;\n\n    ListNode prev = null, curr = head;\n    for (int i = 0; i < K; i++) {\n        ListNode nxt = curr.next;\n        curr.next = prev;\n        prev = curr;\n        curr = nxt;\n    }\n    head.next = reverseKGroup(curr, K);\n    return prev;\n}"
+      },
+      {
+        "label": "Iterative",
+        "complexity": {
+          "time": "O(N)",
+          "space": "O(1)"
+        },
+        "pseudocode": "dummy; prevGroupEnd = dummy\nLoop:\n  reach K-th node (if can't, break)\n  reverse the K-block\n  stitch prevGroupEnd to the new head, set new prevGroupEnd",
+        "story": "Same idea, no recursion. Maintain prevGroupEnd to stitch each reversed block back into the chain.",
+        "code": "public ListNode reverseKGroupIter(ListNode head, int K) {\n    ListNode dummy = new ListNode(0);\n    dummy.next = head;\n    ListNode prevGroupEnd = dummy;\n\n    while (true) {\n        ListNode kth = prevGroupEnd;\n        for (int i = 0; i < K && kth != null; i++) kth = kth.next;\n        if (kth == null) break;\n\n        ListNode groupStart = prevGroupEnd.next;\n        ListNode nextGroup  = kth.next;\n\n        ListNode prev = nextGroup, curr = groupStart;\n        while (curr != nextGroup) {\n            ListNode nxt = curr.next;\n            curr.next = prev;\n            prev = curr;\n            curr = nxt;\n        }\n\n        prevGroupEnd.next = kth;\n        prevGroupEnd = groupStart;\n    }\n    return dummy.next;\n}"
+      }
+    ],
+    "viz": {
+      "kind": "ll-reverse",
+      "data": {
+        "values": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6
+        ],
+        "groupSize": 3
+      }
+    }
+  }
+]

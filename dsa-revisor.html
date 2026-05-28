@@ -1,0 +1,1315 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>DSA Revisor — Random Problem Viewer</title>
+  <link rel="stylesheet" href="Scaler/DSA/Advanced/Revise/Part2/style.css">
+  <style>
+    /* ────────────────────────────────────────────────────────────
+       Page-specific tweaks layered on top of Part2/style.css
+       ──────────────────────────────────────────────────────────── */
+    main { max-width: 1200px; }
+
+    /* ── Quote banner ── */
+    .quote-banner {
+      background: linear-gradient(135deg, rgba(88,166,255,0.06), rgba(188,140,255,0.06));
+      border: 1px solid var(--border);
+      border-left: 3px solid var(--purple);
+      border-radius: 10px;
+      padding: 16px 22px;
+      margin-bottom: 28px;
+      display: flex;
+      align-items: center;
+      gap: 18px;
+    }
+    .quote-icon { font-size: 22px; opacity: 0.65; flex-shrink: 0; }
+    .quote-body { flex: 1; }
+    .quote-text {
+      font-size: 14px;
+      color: var(--text-body);
+      line-height: 1.55;
+      font-style: italic;
+    }
+    .quote-author {
+      font-size: 11px;
+      color: var(--text-muted);
+      margin-top: 6px;
+      letter-spacing: 0.4px;
+    }
+    .quote-refresh {
+      background: transparent;
+      border: 1px solid var(--border);
+      color: var(--text-muted);
+      border-radius: 5px;
+      padding: 4px 10px;
+      font-size: 11px;
+      cursor: pointer;
+      font-family: inherit;
+      transition: all 0.15s;
+      flex-shrink: 0;
+    }
+    .quote-refresh:hover { color: var(--text); border-color: #484f58; }
+
+    /* ── Filters ── */
+    .filters {
+      display: grid;
+      grid-template-columns: 1fr 1fr auto;
+      gap: 12px;
+      align-items: end;
+      margin-bottom: 18px;
+      padding: 16px 18px;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+    }
+    @media (max-width: 720px) {
+      .filters { grid-template-columns: 1fr; }
+    }
+    .filter-block label {
+      display: block;
+      font-size: 10px;
+      font-weight: 700;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 1.1px;
+      margin-bottom: 6px;
+    }
+    .filter-block input {
+      width: 100%;
+      background: var(--bg);
+      border: 1px solid var(--border);
+      color: var(--text);
+      border-radius: 6px;
+      padding: 8px 12px;
+      font-family: inherit;
+      font-size: 13px;
+      transition: border-color 0.15s;
+    }
+    .filter-block input:focus {
+      outline: none;
+      border-color: var(--blue);
+    }
+    .filter-actions {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+    }
+    .btn {
+      background: var(--bg-elevated);
+      border: 1px solid var(--border);
+      color: var(--text);
+      border-radius: 6px;
+      padding: 8px 16px;
+      font-family: inherit;
+      font-size: 12px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.15s;
+      white-space: nowrap;
+    }
+    .btn:hover:not(:disabled) {
+      border-color: var(--blue);
+      color: var(--blue);
+    }
+    .btn:disabled { opacity: 0.35; cursor: default; }
+    .btn-primary {
+      background: rgba(88,166,255,0.12);
+      border-color: rgba(88,166,255,0.35);
+      color: var(--blue);
+    }
+    .btn-primary:hover { background: rgba(88,166,255,0.18); }
+
+    .problem-count {
+      font-size: 11px;
+      color: var(--text-muted);
+      font-family: 'JetBrains Mono', monospace;
+      margin-left: 6px;
+    }
+
+    /* ── Practice toolbar ── */
+    .practice-bar {
+      display: none;
+      gap: 12px;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 20px;
+      padding: 12px 16px;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+    }
+    .practice-bar.active { display: flex; }
+    .practice-progress {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 12px;
+      color: var(--text-muted);
+      min-width: 70px;
+      text-align: center;
+    }
+    .check-row {
+      display: flex; align-items: center; gap: 6px;
+      font-size: 12px; color: var(--text-muted);
+    }
+    .check-row input { accent-color: var(--blue); }
+
+    /* ── Top-level Tabs ── */
+    .tabs {
+      display: flex;
+      gap: 4px;
+      border-bottom: 1px solid var(--border);
+      margin-bottom: 22px;
+      overflow-x: auto;
+      scrollbar-width: none;
+    }
+    .tabs::-webkit-scrollbar { display: none; }
+    .tab {
+      padding: 10px 18px;
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--text-muted);
+      background: transparent;
+      border: none;
+      border-bottom: 2px solid transparent;
+      cursor: pointer;
+      font-family: inherit;
+      white-space: nowrap;
+      transition: all 0.15s;
+      letter-spacing: 0.2px;
+    }
+    .tab:hover { color: var(--text); }
+    .tab.active {
+      color: var(--blue);
+      border-bottom-color: var(--blue);
+    }
+    .tab-panel { display: none; animation: fadeIn 0.18s ease; }
+    .tab-panel.active { display: block; }
+
+    /* ── Problem panel ── */
+    .prob-title {
+      font-size: 20px;
+      font-weight: 700;
+      color: var(--text);
+      margin-bottom: 6px;
+    }
+    .prob-subtopic {
+      font-size: 11px;
+      color: var(--teal);
+      font-family: 'JetBrains Mono', monospace;
+      letter-spacing: 0.5px;
+      margin-bottom: 14px;
+      text-transform: uppercase;
+    }
+    .prob-story {
+      background: rgba(188,140,255,0.05);
+      border-left: 3px solid var(--purple);
+      padding: 12px 16px;
+      border-radius: 6px;
+      font-size: 13px;
+      color: var(--text-body);
+      line-height: 1.65;
+      margin-bottom: 22px;
+    }
+    .prob-story::before {
+      content: '🧠 Story to remember';
+      display: block;
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 1.2px;
+      color: var(--purple);
+      text-transform: uppercase;
+      margin-bottom: 6px;
+    }
+    .prob-desc {
+      font-size: 13.5px;
+      color: var(--text-body);
+      line-height: 1.7;
+      white-space: pre-wrap;
+      margin-bottom: 22px;
+    }
+
+    .io-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 14px;
+      margin-bottom: 22px;
+    }
+    @media (max-width: 680px) { .io-grid { grid-template-columns: 1fr; } }
+    .io-box {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 14px 16px;
+    }
+    .io-label {
+      font-size: 10px;
+      color: var(--text-muted);
+      font-weight: 700;
+      letter-spacing: 1.2px;
+      text-transform: uppercase;
+      margin-bottom: 8px;
+    }
+    .io-body {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 12.5px;
+      color: var(--text-body);
+      white-space: pre-wrap;
+      line-height: 1.6;
+    }
+
+    .tag-row { display: flex; gap: 6px; flex-wrap: wrap; }
+    .stag {
+      padding: 3px 10px;
+      border-radius: 20px;
+      font-size: 11px;
+      background: rgba(88,166,255,0.08);
+      border: 1px solid rgba(88,166,255,0.22);
+      color: var(--blue);
+      font-family: 'JetBrains Mono', monospace;
+    }
+
+    /* ── Solutions panel ── */
+    .sol-tabs {
+      display: flex;
+      gap: 6px;
+      margin-bottom: 16px;
+      flex-wrap: wrap;
+    }
+    .sol-tab {
+      padding: 6px 14px;
+      border-radius: 20px;
+      font-size: 12px;
+      font-weight: 500;
+      background: transparent;
+      border: 1px solid var(--border);
+      color: var(--text-muted);
+      cursor: pointer;
+      font-family: inherit;
+      transition: all 0.15s;
+    }
+    .sol-tab:hover { color: var(--text); border-color: #484f58; }
+    .sol-tab.active {
+      color: var(--green);
+      border-color: var(--green);
+      background: rgba(63,185,80,0.08);
+    }
+    .sol-tab.brute.active   { color: var(--orange); border-color: var(--orange); background: rgba(255,123,114,0.08); }
+    .sol-tab.better.active  { color: var(--amber);  border-color: var(--amber);  background: rgba(210,153,34,0.08); }
+
+    .sol-meta {
+      display: flex;
+      gap: 14px;
+      margin-bottom: 14px;
+      flex-wrap: wrap;
+    }
+    .complexity-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 4px 10px;
+      border-radius: 5px;
+      font-size: 11px;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      font-family: 'JetBrains Mono', monospace;
+    }
+    .complexity-pill .lbl {
+      color: var(--text-muted);
+      font-weight: 600;
+    }
+    .complexity-pill .val { color: var(--teal); }
+
+    .sol-block { margin-bottom: 18px; }
+    .sol-block-label {
+      font-size: 10px;
+      color: var(--text-muted);
+      font-weight: 700;
+      letter-spacing: 1.2px;
+      text-transform: uppercase;
+      margin-bottom: 8px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .sol-block-label::before {
+      content: '';
+      width: 3px; height: 12px; background: var(--blue);
+      border-radius: 2px;
+    }
+    .sol-mini-story {
+      font-size: 13px;
+      color: var(--text-body);
+      line-height: 1.6;
+      padding: 10px 14px;
+      background: rgba(63,185,80,0.04);
+      border-left: 3px solid rgba(63,185,80,0.4);
+      border-radius: 5px;
+    }
+
+    /* ── Visualizer panel ── */
+    .viz-controls {
+      display: flex;
+      gap: 10px;
+      justify-content: center;
+      margin-top: 14px;
+    }
+    .viz-controls button {
+      font-size: 12px;
+      padding: 6px 16px;
+      cursor: pointer;
+      background: var(--bg-elevated);
+      border: 1px solid var(--border);
+      color: var(--text);
+      border-radius: 6px;
+      font-family: inherit;
+      transition: all 0.15s;
+    }
+    .viz-controls button:hover:not(:disabled) { border-color: var(--teal); color: var(--teal); }
+    .viz-controls button:disabled { opacity: 0.35; cursor: default; }
+
+    .viz-canvas {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 24px;
+      min-height: 200px;
+    }
+    .viz-explanation {
+      text-align: center;
+      font-size: 13px;
+      color: var(--text-muted);
+      margin: 14px 0 4px;
+      line-height: 1.6;
+      min-height: 38px;
+    }
+    .viz-footer {
+      text-align: center;
+      font-size: 11px;
+      color: var(--text-muted);
+      font-family: 'JetBrains Mono', monospace;
+      margin-top: 8px;
+    }
+    .viz-empty {
+      text-align: center;
+      color: var(--text-muted);
+      font-size: 13px;
+      padding: 40px 0;
+    }
+
+    /* ── Visualizer cells ── */
+    .cell {
+      width: 46px; height: 36px;
+      border-radius: 6px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 13px;
+      font-weight: 600;
+      border: 1px solid;
+      font-family: 'JetBrains Mono', monospace;
+      transition: all 0.22s;
+    }
+    .c-input  { background: rgba(88,166,255,0.10); color: var(--blue);  border-color: rgba(88,166,255,0.30); }
+    .c-active { background: rgba(210,153,34,0.18); color: var(--amber); border-color: rgba(210,153,34,0.45); }
+    .c-result { background: rgba(63,185,80,0.14);  color: var(--green); border-color: rgba(63,185,80,0.40); }
+    .c-low    { background: rgba(121,192,255,0.10); color: var(--teal); border-color: rgba(121,192,255,0.35); }
+    .c-high   { background: rgba(188,140,255,0.10); color: var(--purple); border-color: rgba(188,140,255,0.35); }
+    .c-out    { background: rgba(139,148,158,0.05); color: var(--text-muted); border-color: rgba(139,148,158,0.18); opacity: 0.4; }
+    .c-eliminated { background: transparent; color: var(--text-muted); border-color: var(--border); border-style: dashed; opacity: 0.45; }
+    .c-mid    { background: rgba(248,81,73,0.12); color: var(--red); border-color: rgba(248,81,73,0.45); }
+    .c-peak   { background: rgba(63,185,80,0.20); color: var(--green); border-color: var(--green); }
+
+    .idx-row { display: flex; gap: 6px; margin-bottom: 4px; }
+    .idx-num {
+      width: 46px; text-align: center;
+      font-size: 10px; color: var(--text-muted);
+      font-family: 'JetBrains Mono', monospace;
+    }
+    .ds-block { margin-bottom: 18px; }
+    .ds-label {
+      font-size: 10px; font-weight: 700; letter-spacing: 1px;
+      text-transform: uppercase; color: var(--text-muted); margin-bottom: 8px;
+    }
+    .ds-row { display: flex; gap: 6px; flex-wrap: wrap; align-items: center; }
+
+    .ptr-marker {
+      width: 46px; text-align: center;
+      font-size: 10px; font-weight: 700;
+      font-family: 'JetBrains Mono', monospace;
+    }
+    .ptr-low  { color: var(--teal); }
+    .ptr-mid  { color: var(--red); }
+    .ptr-high { color: var(--purple); }
+    .ptr-ans  { color: var(--green); }
+
+    /* ── Number line (BS on answer) ── */
+    .num-line {
+      position: relative;
+      height: 64px;
+      background: rgba(48,54,61,0.3);
+      border-radius: 6px;
+      border: 1px solid var(--border);
+      margin: 12px 0;
+    }
+    .num-line-track {
+      position: absolute;
+      top: 50%;
+      left: 0; right: 0;
+      height: 6px;
+      background: rgba(88,166,255,0.18);
+      transform: translateY(-50%);
+    }
+    .num-line-active {
+      position: absolute;
+      top: 50%;
+      height: 6px;
+      background: var(--amber);
+      transform: translateY(-50%);
+      transition: all 0.3s;
+    }
+    .num-marker {
+      position: absolute;
+      top: 50%;
+      width: 38px;
+      transform: translate(-50%, -50%);
+      text-align: center;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 11px;
+      font-weight: 600;
+      padding: 4px 0;
+      border-radius: 4px;
+      transition: all 0.3s;
+    }
+    .num-marker.mid {
+      color: var(--red);
+      background: rgba(248,81,73,0.15);
+      border: 1px solid var(--red);
+      top: -8px;
+      transform: translate(-50%, 0);
+    }
+    .num-marker.low  { color: var(--teal); top: 36px; }
+    .num-marker.high { color: var(--purple); top: 36px; }
+    .num-marker.ans  { color: var(--green); top: 60px; }
+
+    /* ── Topic notes (collapsible cards) ── */
+    .notes-summary {
+      font-size: 14px;
+      color: var(--text-body);
+      line-height: 1.7;
+      padding: 14px 18px;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-left: 3px solid var(--teal);
+      border-radius: 8px;
+      margin-bottom: 28px;
+    }
+    .notes-section { margin-bottom: 30px; }
+    .notes-section h3 {
+      font-size: 12px;
+      color: var(--text-muted);
+      font-weight: 700;
+      letter-spacing: 1.2px;
+      text-transform: uppercase;
+      padding-bottom: 10px;
+      border-bottom: 1px solid var(--border);
+      margin-bottom: 14px;
+    }
+    .tp-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-left: 3px solid var(--blue);
+      border-radius: 8px;
+      padding: 12px 16px;
+      margin-bottom: 8px;
+    }
+    .tp-card .tp-title {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text);
+      margin-bottom: 4px;
+    }
+    .tp-card .tp-body {
+      font-size: 13px;
+      color: var(--text-body);
+      line-height: 1.65;
+    }
+
+    .pattern-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 14px 18px;
+      margin-bottom: 12px;
+    }
+    .pattern-card .pat-name {
+      font-size: 13.5px;
+      font-weight: 600;
+      color: var(--purple);
+      margin-bottom: 4px;
+    }
+    .pattern-card .pat-when {
+      font-size: 12px;
+      color: var(--text-muted);
+      line-height: 1.6;
+      margin-bottom: 8px;
+    }
+    .pattern-card .pat-examples {
+      font-size: 11px;
+      color: var(--text-muted);
+      font-style: italic;
+      margin-top: 8px;
+    }
+
+    .edge-list { list-style: none; padding: 0; }
+    .edge-list li {
+      padding: 8px 14px 8px 28px;
+      font-size: 13px;
+      color: var(--text-body);
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      margin-bottom: 6px;
+      position: relative;
+      line-height: 1.55;
+    }
+    .edge-list li::before {
+      content: '⚠';
+      position: absolute;
+      left: 10px;
+      color: var(--amber);
+      font-size: 13px;
+    }
+
+    /* ── Mistake card (re-use look from common-mistakes.html) ── */
+    .mk-card2 {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      overflow: hidden;
+      margin-bottom: 12px;
+    }
+    .mk-card2 .mk2-title {
+      padding: 10px 14px;
+      background: rgba(248,81,73,0.06);
+      border-bottom: 1px solid rgba(248,81,73,0.15);
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text);
+    }
+    .mk-card2 .mk2-split {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+    }
+    @media (max-width: 680px) {
+      .mk-card2 .mk2-split { grid-template-columns: 1fr; }
+    }
+    .mk2-side { padding: 10px 14px; }
+    .mk2-side.x { background: rgba(248,81,73,0.04); border-right: 1px solid var(--border); }
+    .mk2-side.o { background: rgba(63,185,80,0.04); }
+    .mk2-tag {
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 1.2px;
+      text-transform: uppercase;
+      margin-bottom: 6px;
+    }
+    .mk2-tag.x { color: var(--red); }
+    .mk2-tag.o { color: var(--green); }
+    .mk-card2 .mk2-why {
+      padding: 9px 14px;
+      font-size: 12px;
+      color: var(--text-muted);
+      line-height: 1.55;
+      border-top: 1px solid var(--border);
+      background: rgba(13,17,23,0.4);
+    }
+    .mk-card2 .mk2-why strong { color: var(--text-body); }
+
+    /* ── Pseudocode block special look ── */
+    pre.pseudo {
+      background: rgba(121,192,255,0.04);
+      border-color: rgba(121,192,255,0.18);
+    }
+    pre.pseudo code { color: #9cdcfe; }
+
+    /* ── Visualizer rows scroll horizontally if they overflow (phones) ── */
+    .viz-canvas .ds-row,
+    .viz-canvas .idx-row {
+      overflow-x: auto;
+      flex-wrap: nowrap;
+      scrollbar-width: thin;
+      padding-bottom: 4px;
+    }
+    .viz-canvas .ds-row::-webkit-scrollbar,
+    .viz-canvas .idx-row::-webkit-scrollbar { height: 6px; }
+    .viz-canvas .ds-row::-webkit-scrollbar-thumb,
+    .viz-canvas .idx-row::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+
+    /* ───────────────────────────────────────────────────────────────
+       MOBILE (≤ 640px) — phones in portrait
+       ─────────────────────────────────────────────────────────────── */
+    @media (max-width: 640px) {
+
+      /* Header + nav tighter */
+      header { padding: 10px 14px; gap: 8px; }
+      .breadcrumb { font-size: 11px; }
+      .sec-nav { padding: 10px 14px; }
+      .pill { padding: 5px 12px; font-size: 11px; }
+
+      /* Main column hugs edges */
+      main { padding: 18px 12px 80px; }
+
+      /* Quote banner — stack icon above and shrink */
+      .quote-banner {
+        padding: 12px 14px;
+        gap: 10px;
+        margin-bottom: 18px;
+        flex-wrap: wrap;
+      }
+      .quote-icon { font-size: 18px; }
+      .quote-text { font-size: 13px; }
+      .quote-refresh { font-size: 10px; padding: 3px 8px; }
+
+      /* Filters — already stack via existing media; tighten padding */
+      .filters { padding: 12px 12px; gap: 10px; margin-bottom: 14px; }
+      .filter-block input { font-size: 14px; padding: 9px 12px; } /* 14px = no iOS auto-zoom */
+      .filter-actions { flex-wrap: wrap; }
+      .btn { padding: 9px 14px; font-size: 12px; }
+
+      /* Practice bar — compact */
+      .practice-bar { padding: 10px 12px; gap: 8px; flex-wrap: wrap; justify-content: space-between; }
+      .practice-progress { font-size: 11px; min-width: 50px; }
+
+      /* Top tabs — slightly smaller */
+      .tab { padding: 9px 12px; font-size: 11px; }
+
+      /* Problem viewer */
+      .prob-title { font-size: 17px; }
+      .prob-subtopic { font-size: 10px; }
+      .prob-story, .prob-desc { font-size: 13px; }
+      .io-box { padding: 12px; }
+      .io-body { font-size: 11.5px; }
+
+      /* Solution tabs wrap nicely */
+      .sol-tab { padding: 6px 12px; font-size: 11px; }
+      .complexity-pill { font-size: 10px; padding: 4px 8px; }
+
+      /* Visualizer canvas — cells shrink so an 8-element array fits ~ 312px wide */
+      .viz-canvas { padding: 14px 12px; }
+      .cell { width: 34px; height: 30px; font-size: 11px; border-radius: 5px; }
+      .idx-num, .ptr-marker { width: 34px; font-size: 9px; }
+      .viz-controls { flex-wrap: wrap; gap: 6px; }
+      .viz-controls button { font-size: 11px; padding: 7px 12px; }
+      .viz-explanation { font-size: 12px; }
+      .viz-footer { font-size: 10px; }
+
+      /* Number line markers shrink */
+      .num-marker { width: 30px; font-size: 10px; }
+
+      /* 2D matrix grid auto-sizes via overflow scroll wrapper */
+      .viz-canvas .ds-block > div[style*="grid-template-columns"] {
+        overflow-x: auto;
+      }
+
+      /* Notes tab */
+      .notes-summary { font-size: 13px; padding: 12px 14px; }
+      .tp-card .tp-title { font-size: 12.5px; }
+      .tp-card .tp-body { font-size: 12.5px; }
+      .pattern-card { padding: 12px 14px; }
+      .pattern-card .pat-name { font-size: 13px; }
+      .edge-list li { font-size: 12.5px; padding-left: 26px; }
+      .mk2-side { padding: 8px 12px; }
+      .mk-card2 .mk2-split { grid-template-columns: 1fr; }
+      .mk2-side.x { border-right: none; border-bottom: 1px solid var(--border); }
+
+      /* pre/code shrink */
+      pre { font-size: 11px !important; padding: 10px 12px !important; }
+      pre code { font-size: 11px !important; }
+    }
+
+    /* ───────────────────────────────────────────────────────────────
+       MID (641–960px) — small tablets / large phones landscape
+       ─────────────────────────────────────────────────────────────── */
+    @media (min-width: 641px) and (max-width: 960px) {
+      main { padding: 24px 18px 80px; }
+      .cell { width: 40px; height: 33px; font-size: 12px; }
+      .idx-num, .ptr-marker { width: 40px; }
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <a class="logo" href="index.html">upskill</a>
+  <nav class="breadcrumb">
+    <a href="index.html">Home</a><span class="sep">/</span>
+    <span class="cur">DSA Revisor</span>
+  </nav>
+</header>
+
+<div class="sec-nav">
+  <a class="pill blue current" href="dsa-revisor.html">🎯 Practice</a>
+  <a class="pill teal"        href="Scaler/DSA/Advanced/Revise/Part2/visualizer.html">Part 2 Visualizer</a>
+  <a class="pill red"         href="Scaler/DSA/Advanced/Revise/Part2/common-mistakes.html">Common Mistakes</a>
+  <a class="pill green"       href="Scaler/DSA/Advanced/Revise/Part2/complexities.html">Complexities</a>
+  <a class="pill purple"      href="Scaler/DSA/Advanced/Revise/Part2/key-patterns.html">Key Patterns</a>
+  <a class="pill orange"      href="Scaler/DSA/Advanced/Revise/Part2/leetcode-references.html">LeetCode Refs</a>
+</div>
+
+<main>
+
+  <!-- Quote Banner -->
+  <div class="quote-banner" id="quoteBanner">
+    <div class="quote-icon">❝</div>
+    <div class="quote-body">
+      <div class="quote-text" id="quoteText">Loading…</div>
+      <div class="quote-author" id="quoteAuthor"></div>
+    </div>
+    <button class="quote-refresh" onclick="loadRandomQuote()">↻ refresh</button>
+  </div>
+
+  <!-- Filters -->
+  <div class="filters">
+    <div class="filter-block">
+      <label>Topic</label>
+      <input type="text" id="topicFilter" list="topicList" placeholder="All Topics" oninput="onTopicChange()" autocomplete="off">
+      <datalist id="topicList"><option value="All Topics"></datalist>
+    </div>
+    <div class="filter-block">
+      <label>Sub Topic <span class="problem-count" id="problemCount"></span></label>
+      <input type="text" id="subTopicFilter" list="subTopicList" placeholder="All Sub Topics" oninput="updateProblemCount()" autocomplete="off">
+      <datalist id="subTopicList"><option value="All Sub Topics"></datalist>
+    </div>
+    <div class="filter-actions">
+      <button class="btn btn-primary" onclick="loadRandomProblem()">🎲 Random</button>
+      <label class="check-row">
+        <input type="checkbox" id="practiceCheckbox" onchange="togglePracticeMode()">
+        Practice All
+      </label>
+    </div>
+  </div>
+
+  <!-- Practice toolbar -->
+  <div class="practice-bar" id="practiceBar">
+    <button class="btn" id="prevBtn" onclick="practicePrev()">← Previous</button>
+    <span class="practice-progress" id="practiceProgress">0 / 0</span>
+    <button class="btn" id="nextBtn" onclick="practiceNext()">Next →</button>
+  </div>
+
+  <!-- Tabs -->
+  <div class="tabs" id="topTabs">
+    <button class="tab active" data-tab="problem">Problem</button>
+    <button class="tab" data-tab="solutions">Solutions</button>
+    <button class="tab" data-tab="visualizer">Visualizer</button>
+    <button class="tab" data-tab="notes">Topic Notes</button>
+  </div>
+
+  <!-- Problem tab -->
+  <div class="tab-panel active" id="tab-problem">
+    <div id="problemEmpty" class="viz-empty">← Pick a Topic / Sub Topic and click <b>Random</b> (or check Practice All) to load a problem.</div>
+    <div id="problemContent" style="display:none">
+      <div class="prob-title" id="probTitle"></div>
+      <div class="prob-subtopic" id="probSubTopic"></div>
+      <div class="prob-story" id="probStory"></div>
+      <div class="prob-desc" id="probDesc"></div>
+
+      <div class="io-grid">
+        <div class="io-box">
+          <div class="io-label">📥 Sample Input</div>
+          <div class="io-body" id="sampleIn"></div>
+        </div>
+        <div class="io-box">
+          <div class="io-label">📤 Sample Output</div>
+          <div class="io-body" id="sampleOut"></div>
+        </div>
+      </div>
+
+      <div class="ds-block">
+        <div class="ds-label">Sub-topic Tags</div>
+        <div class="tag-row" id="probTags"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Solutions tab -->
+  <div class="tab-panel" id="tab-solutions">
+    <div id="solEmpty" class="viz-empty">Load a problem first to see solutions.</div>
+    <div id="solContent" style="display:none">
+      <div class="sol-tabs" id="solTabs"></div>
+      <div class="sol-meta" id="solMeta"></div>
+
+      <div class="sol-block">
+        <div class="sol-block-label">Mini story</div>
+        <div class="sol-mini-story" id="solStory"></div>
+      </div>
+
+      <div class="sol-block">
+        <div class="sol-block-label">Pseudocode</div>
+        <pre class="pseudo"><code id="solPseudo"></code></pre>
+      </div>
+
+      <div class="sol-block">
+        <div class="sol-block-label">Java</div>
+        <pre><code id="solCode"></code></pre>
+      </div>
+    </div>
+  </div>
+
+  <!-- Visualizer tab -->
+  <div class="tab-panel" id="tab-visualizer">
+    <div id="vizEmpty" class="viz-empty">Load a problem first to see its visualizer.</div>
+    <div id="vizContent" style="display:none">
+      <div class="viz-canvas" id="vizCanvas"></div>
+      <div class="viz-explanation" id="vizExplanation"></div>
+      <div class="viz-controls">
+        <button id="vizPrev" onclick="vizStep(-1)">← Prev</button>
+        <button id="vizPlay" onclick="vizTogglePlay()">▶ Play</button>
+        <button id="vizNext" onclick="vizStep(1)">Next →</button>
+        <button id="vizReset" onclick="vizReset()">↺ Reset</button>
+      </div>
+      <div class="viz-footer" id="vizFooter"></div>
+    </div>
+  </div>
+
+  <!-- Topic Notes tab -->
+  <div class="tab-panel" id="tab-notes">
+    <div id="notesEmpty" class="viz-empty">Pick a Topic to see its notes.</div>
+    <div id="notesContent" style="display:none">
+      <div class="notes-summary" id="notesSummary"></div>
+
+      <div class="notes-section">
+        <h3>🧠 Thought Process</h3>
+        <div id="notesThought"></div>
+      </div>
+
+      <div class="notes-section">
+        <h3>🔑 Key Patterns</h3>
+        <div id="notesPatterns"></div>
+      </div>
+
+      <div class="notes-section">
+        <h3>🚫 Common Mistakes</h3>
+        <div id="notesMistakes"></div>
+      </div>
+
+      <div class="notes-section">
+        <h3>⚠ Edge Cases Checklist</h3>
+        <ul class="edge-list" id="notesEdge"></ul>
+      </div>
+    </div>
+  </div>
+
+</main>
+
+<script src="Scaler/DSA/Advanced/Revise/viz/engine.js"></script>
+<script src="Scaler/DSA/Advanced/Revise/viz/viz-kinds.js"></script>
+<script>
+  // ─────────────────────────────────────────────────────────────────────
+  //  STATE
+  // ─────────────────────────────────────────────────────────────────────
+  const DATA_DIR = 'Scaler/DSA/Advanced/Revise/data';
+  let topicIndex = [];                  // [{name, file, notesFile?}]
+  let problems = [];                    // flat across loaded topics; each .topicName attached
+  const loadedTopics = new Set();
+  const topicNotes = {};                // topicName → notes JSON
+  let quotes = [];
+
+  let currentProblem = null;
+  let currentSolutionIdx = 0;
+  let practiceMode = false;
+  let practicePool = [];
+  let practiceIdx = 0;
+
+  // ─────────────────────────────────────────────────────────────────────
+  //  BOOT
+  // ─────────────────────────────────────────────────────────────────────
+  window.addEventListener('load', init);
+
+  async function init() {
+    // Quotes
+    try {
+      const r = await fetch(`${DATA_DIR}/quotes.json`, { cache: 'no-cache' });
+      quotes = await r.json();
+      loadRandomQuote();
+    } catch (e) { console.warn('quotes failed', e); }
+
+    // Topic index
+    try {
+      const r = await fetch(`${DATA_DIR}/index.json`, { cache: 'no-cache' });
+      const idx = await r.json();
+      topicIndex = idx.topics || [];
+    } catch (e) {
+      console.error('index.json failed:', e);
+      alert('Could not load data/index.json. Check console.');
+      return;
+    }
+
+    populateTopicDropdown();
+    populateSubTopicDropdown();
+    updateProblemCount();
+    wireTabs();
+  }
+
+  function loadRandomQuote() {
+    if (!quotes.length) return;
+    const q = quotes[Math.floor(Math.random() * quotes.length)];
+    document.getElementById('quoteText').textContent = q.q;
+    document.getElementById('quoteAuthor').textContent = '— ' + q.a;
+  }
+
+  // ─────────────────────────────────────────────────────────────────────
+  //  TOPIC + SUB-TOPIC FILTERS
+  // ─────────────────────────────────────────────────────────────────────
+  function populateTopicDropdown() {
+    const dl = document.getElementById('topicList');
+    dl.innerHTML = '<option value="All Topics">';
+    topicIndex.map(t => t.name).sort().forEach(n => {
+      const o = document.createElement('option');
+      o.value = n;
+      dl.appendChild(o);
+    });
+  }
+
+  function getSelectedTopic() {
+    const v = document.getElementById('topicFilter').value.trim();
+    if (!v || v.toLowerCase() === 'all topics') return null;
+    return v;
+  }
+
+  function problemsInTopic() {
+    const t = getSelectedTopic();
+    if (!t) return problems;
+    return problems.filter(p => p.topicName && p.topicName.toLowerCase() === t.toLowerCase());
+  }
+
+  async function ensureTopicLoaded(name) {
+    if (loadedTopics.has(name)) return;
+    const entry = topicIndex.find(t => t.name === name);
+    if (!entry) return;
+    try {
+      const r = await fetch(`${DATA_DIR}/${entry.file}`, { cache: 'no-cache' });
+      const arr = await r.json();
+      arr.forEach(p => { p.topicName = name; });
+      problems = problems.concat(arr);
+      loadedTopics.add(name);
+
+      // Notes (optional)
+      if (entry.notesFile && !topicNotes[name]) {
+        try {
+          const rn = await fetch(`${DATA_DIR}/${entry.notesFile}`, { cache: 'no-cache' });
+          topicNotes[name] = await rn.json();
+        } catch (e) { console.warn('notes failed', name, e); }
+      }
+    } catch (e) {
+      console.error(`topic "${name}" failed:`, e);
+      alert(`Could not load topic "${name}".`);
+    }
+  }
+
+  async function ensureSelectedTopicLoaded() {
+    const t = getSelectedTopic();
+    if (t) await ensureTopicLoaded(t);
+    else   await Promise.all(topicIndex.map(t => ensureTopicLoaded(t.name)));
+  }
+
+  async function onTopicChange() {
+    document.getElementById('subTopicFilter').value = '';
+    await ensureSelectedTopicLoaded();
+    populateSubTopicDropdown();
+    updateProblemCount();
+    renderNotesTab();   // refresh notes for the chosen topic
+  }
+
+  function populateSubTopicDropdown() {
+    const set = new Set();
+    problemsInTopic().forEach(p => p.tags.forEach(t => set.add(t)));
+    const dl = document.getElementById('subTopicList');
+    dl.innerHTML = '<option value="All Sub Topics">';
+    Array.from(set).sort().forEach(n => {
+      const o = document.createElement('option');
+      o.value = n;
+      dl.appendChild(o);
+    });
+  }
+
+  function getFilteredProblems() {
+    const sub = document.getElementById('subTopicFilter').value.trim().toLowerCase();
+    const base = problemsInTopic();
+    if (!sub || sub === 'all sub topics' || sub === 'all topics') return base;
+    return base.filter(p => p.tags.some(t => t.toLowerCase().includes(sub)));
+  }
+
+  function updateProblemCount() {
+    const n = getFilteredProblems().length;
+    document.getElementById('problemCount').textContent = `(${n})`;
+  }
+
+  // ─────────────────────────────────────────────────────────────────────
+  //  RANDOM / PRACTICE
+  // ─────────────────────────────────────────────────────────────────────
+  async function loadRandomProblem() {
+    await ensureSelectedTopicLoaded();
+    const pool = getFilteredProblems();
+    if (!pool.length) { alert('No problems match.'); return; }
+    const p = pool[Math.floor(Math.random() * pool.length)];
+    showProblem(p);
+  }
+
+  async function togglePracticeMode() {
+    practiceMode = document.getElementById('practiceCheckbox').checked;
+    const bar = document.getElementById('practiceBar');
+    if (practiceMode) {
+      await ensureSelectedTopicLoaded();
+      practicePool = getFilteredProblems();
+      if (!practicePool.length) {
+        alert('No problems match.');
+        document.getElementById('practiceCheckbox').checked = false;
+        practiceMode = false;
+        return;
+      }
+      practiceIdx = 0;
+      bar.classList.add('active');
+      showProblem(practicePool[0]);
+    } else {
+      bar.classList.remove('active');
+    }
+  }
+
+  function practicePrev() { if (practiceIdx > 0) { practiceIdx--; showProblem(practicePool[practiceIdx]); } }
+  function practiceNext() { if (practiceIdx < practicePool.length - 1) { practiceIdx++; showProblem(practicePool[practiceIdx]); } }
+
+  // ─────────────────────────────────────────────────────────────────────
+  //  PROBLEM RENDER
+  // ─────────────────────────────────────────────────────────────────────
+  function showProblem(p) {
+    currentProblem = p;
+    currentSolutionIdx = 0;
+
+    // Problem tab
+    document.getElementById('problemEmpty').style.display = 'none';
+    document.getElementById('problemContent').style.display = 'block';
+    document.getElementById('probTitle').textContent = p.title;
+    document.getElementById('probSubTopic').textContent = p.subTopic || '';
+    document.getElementById('probStory').textContent = p.story || '';
+    document.getElementById('probDesc').textContent = p.description || '';
+    document.getElementById('sampleIn').textContent = p.sampleInput || '';
+    document.getElementById('sampleOut').textContent = p.sampleOutput || '';
+
+    const tagRow = document.getElementById('probTags');
+    tagRow.innerHTML = '';
+    (p.tags || []).forEach(t => {
+      const s = document.createElement('span');
+      s.className = 'stag';
+      s.textContent = t;
+      tagRow.appendChild(s);
+    });
+
+    // Solutions tab
+    renderSolutionsTab();
+
+    // Visualizer tab
+    renderVisualizerTab();
+
+    // Practice progress
+    if (practiceMode) {
+      document.getElementById('practiceProgress').textContent = `${practiceIdx + 1} / ${practicePool.length}`;
+      document.getElementById('prevBtn').disabled = (practiceIdx === 0);
+      document.getElementById('nextBtn').disabled = (practiceIdx === practicePool.length - 1);
+    }
+
+    // Move user to Problem tab
+    switchTab('problem');
+  }
+
+  // ─────────────────────────────────────────────────────────────────────
+  //  SOLUTIONS RENDER
+  // ─────────────────────────────────────────────────────────────────────
+  function renderSolutionsTab() {
+    const p = currentProblem;
+    if (!p) return;
+    document.getElementById('solEmpty').style.display = 'none';
+    document.getElementById('solContent').style.display = 'block';
+
+    const tabs = document.getElementById('solTabs');
+    tabs.innerHTML = '';
+    (p.solutions || []).forEach((s, i) => {
+      const btn = document.createElement('button');
+      btn.className = 'sol-tab' + (i === currentSolutionIdx ? ' active' : '') + ' ' + classifyLabel(s.label);
+      btn.textContent = s.label;
+      btn.onclick = () => { currentSolutionIdx = i; renderSolutionsTab(); };
+      tabs.appendChild(btn);
+    });
+
+    const sol = p.solutions[currentSolutionIdx];
+    if (!sol) return;
+    const meta = document.getElementById('solMeta');
+    meta.innerHTML = `
+      <span class="complexity-pill"><span class="lbl">Time</span><span class="val">${sol.complexity.time}</span></span>
+      <span class="complexity-pill"><span class="lbl">Space</span><span class="val">${sol.complexity.space}</span></span>
+    `;
+    document.getElementById('solStory').textContent = sol.story || '';
+    document.getElementById('solPseudo').textContent = sol.pseudocode || '';
+    document.getElementById('solCode').textContent = sol.code || '';
+  }
+
+  function classifyLabel(label) {
+    const l = (label || '').toLowerCase();
+    if (l.startsWith('brute')) return 'brute';
+    if (l.startsWith('better')) return 'better';
+    return ''; // optimal/recursive/iterative — default green
+  }
+
+  // ─────────────────────────────────────────────────────────────────────
+  //  VISUALIZER
+  // ─────────────────────────────────────────────────────────────────────
+  let vizState = null; // { steps, idx, kind, data, timer }
+
+  function renderVisualizerTab() {
+    const p = currentProblem;
+    document.getElementById('vizEmpty').style.display = 'none';
+    document.getElementById('vizContent').style.display = 'block';
+
+    vizClearTimer();
+    const kind = p.viz && p.viz.kind;
+    const data = p.viz && p.viz.data;
+    if (!kind || !window.VIZ_KINDS || !window.VIZ_KINDS[kind]) {
+      document.getElementById('vizCanvas').innerHTML =
+        `<div class="viz-empty">No visualizer registered for kind <code>${kind || '?'}</code>.</div>`;
+      document.getElementById('vizExplanation').innerHTML = '';
+      document.getElementById('vizFooter').innerHTML = '';
+      return;
+    }
+
+    const viz = window.VIZ_KINDS[kind];
+    const steps = viz.makeSteps(data);
+    vizState = { steps, idx: 0, viz, data, timer: null };
+    document.getElementById('vizFooter').textContent = viz.footer ? viz.footer(data) : '';
+    vizRenderCurrent();
+  }
+
+  function vizRenderCurrent() {
+    if (!vizState) return;
+    const s = vizState.steps[vizState.idx];
+    vizState.viz.render(document.getElementById('vizCanvas'), s, vizState.data);
+    document.getElementById('vizExplanation').innerHTML = s.msg || '';
+    document.getElementById('vizPrev').disabled = (vizState.idx === 0);
+    document.getElementById('vizNext').disabled = (vizState.idx === vizState.steps.length - 1);
+  }
+
+  function vizStep(d) {
+    if (!vizState) return;
+    const ni = vizState.idx + d;
+    if (ni < 0 || ni >= vizState.steps.length) return;
+    vizState.idx = ni;
+    vizRenderCurrent();
+  }
+
+  function vizReset() {
+    if (!vizState) return;
+    vizClearTimer();
+    vizState.idx = 0;
+    vizRenderCurrent();
+    document.getElementById('vizPlay').textContent = '▶ Play';
+  }
+
+  function vizTogglePlay() {
+    if (!vizState) return;
+    if (vizState.timer) { vizClearTimer(); document.getElementById('vizPlay').textContent = '▶ Play'; return; }
+    document.getElementById('vizPlay').textContent = '⏸ Pause';
+    vizState.timer = setInterval(() => {
+      if (vizState.idx < vizState.steps.length - 1) {
+        vizState.idx++;
+        vizRenderCurrent();
+      } else {
+        vizClearTimer();
+        document.getElementById('vizPlay').textContent = '▶ Play';
+      }
+    }, 950);
+  }
+
+  function vizClearTimer() {
+    if (vizState && vizState.timer) { clearInterval(vizState.timer); vizState.timer = null; }
+  }
+
+  // ─────────────────────────────────────────────────────────────────────
+  //  TOPIC NOTES
+  // ─────────────────────────────────────────────────────────────────────
+  function renderNotesTab() {
+    const t = getSelectedTopic();
+    const wrap = document.getElementById('notesContent');
+    const empty = document.getElementById('notesEmpty');
+    if (!t || !topicNotes[t]) {
+      wrap.style.display = 'none';
+      empty.style.display = '';
+      empty.textContent = t
+        ? `No notes file registered for "${t}". Add a notesFile entry in data/index.json.`
+        : 'Pick a Topic to see its notes.';
+      return;
+    }
+    empty.style.display = 'none';
+    wrap.style.display = 'block';
+
+    const n = topicNotes[t];
+    document.getElementById('notesSummary').textContent = n.summary || '';
+
+    document.getElementById('notesThought').innerHTML = (n.thoughtProcess || []).map(x => `
+      <div class="tp-card">
+        <div class="tp-title">${escapeHTML(x.title)}</div>
+        <div class="tp-body">${escapeHTML(x.body)}</div>
+      </div>
+    `).join('');
+
+    document.getElementById('notesPatterns').innerHTML = (n.keyPatterns || []).map(x => `
+      <div class="pattern-card">
+        <div class="pat-name">${escapeHTML(x.name)}</div>
+        <div class="pat-when"><b>When:</b> ${escapeHTML(x.when)}</div>
+        <pre class="pseudo"><code>${escapeHTML(x.template)}</code></pre>
+        <div class="pat-examples">Examples: ${(x.examples || []).map(escapeHTML).join(' · ')}</div>
+      </div>
+    `).join('');
+
+    document.getElementById('notesMistakes').innerHTML = (n.commonMistakes || []).map(x => `
+      <div class="mk-card2">
+        <div class="mk2-title">${escapeHTML(x.title)}</div>
+        <div class="mk2-split">
+          <div class="mk2-side x">
+            <div class="mk2-tag x">✗ Wrong</div>
+            <pre><code>${escapeHTML(x.wrong)}</code></pre>
+          </div>
+          <div class="mk2-side o">
+            <div class="mk2-tag o">✓ Right</div>
+            <pre><code>${escapeHTML(x.right)}</code></pre>
+          </div>
+        </div>
+        <div class="mk2-why"><strong>Why:</strong> ${escapeHTML(x.why)}</div>
+      </div>
+    `).join('');
+
+    document.getElementById('notesEdge').innerHTML = (n.edgeCases || [])
+      .map(e => `<li>${escapeHTML(e)}</li>`).join('');
+  }
+
+  function escapeHTML(s) {
+    return String(s || '')
+      .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+  }
+
+  // ─────────────────────────────────────────────────────────────────────
+  //  TABS
+  // ─────────────────────────────────────────────────────────────────────
+  function wireTabs() {
+    document.querySelectorAll('#topTabs .tab').forEach(t => {
+      t.addEventListener('click', () => switchTab(t.dataset.tab));
+    });
+  }
+  function switchTab(name) {
+    document.querySelectorAll('#topTabs .tab').forEach(t =>
+      t.classList.toggle('active', t.dataset.tab === name));
+    document.querySelectorAll('.tab-panel').forEach(p =>
+      p.classList.toggle('active', p.id === 'tab-' + name));
+    if (name === 'notes') renderNotesTab();
+  }
+</script>
+
+</body>
+</html>
