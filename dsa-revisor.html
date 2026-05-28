@@ -1104,33 +1104,33 @@
        ═══════════════════════════════════════════════════════════════ */
 
     :root {
-      /* paper + ink — darker, richer linen */
-      --paper:        #e8dcc0;  /* darker warm linen */
-      --paper-2:      #d4c5a3;  /* paper shadow */
-      --paper-3:      #f2e9d0;  /* paper highlight (cards) */
-      --ink:          #1f1810;  /* near-black walnut ink */
-      --ink-soft:     #4a3826;  /* soft brown ink */
-      --rule:         #a8946a;  /* darker dashed-rule */
+      /* paper + ink — a touch darker than the bright version */
+      --paper:        #ede2c7;  /* warm linen paper */
+      --paper-2:      #dccfa9;  /* paper shadow */
+      --paper-3:      #f8eed5;  /* paper highlight (cards) */
+      --ink:          #241a0e;  /* deep walnut ink */
+      --ink-soft:     #50402c;  /* soft brown ink */
+      --rule:         #b8a47a;  /* dashed-rule colour */
 
-      /* accents — deepened, more mature */
-      --coral:        #c75a3f;  /* deeper terracotta */
-      --coral-soft:   #f0c2b2;
-      --coral-deep:   #8a3522;
-      --sage:         #5a8560;  /* deeper sage */
-      --sage-soft:    #c2d8ba;
-      --sage-deep:    #2e5638;
-      --ocean:        #2d6589;  /* deeper ocean blue */
-      --ocean-soft:   #b4cee0;
-      --ocean-deep:   #133d5e;
-      --plum:         #74487a;  /* deeper plum */
-      --plum-soft:    #d4bdd6;
-      --plum-deep:    #44264a;
-      --honey:        #b8821f;  /* deeper honey */
-      --honey-soft:   #f1d995;
-      --honey-deep:   #7a5208;
-      --rose:         #a8425f;  /* deeper rose */
-      --rose-soft:    #e8bcc8;
-      --rose-deep:    #6e213d;
+      /* accents — saturated picture-book colours */
+      --coral:        #e26648;  /* terracotta */
+      --coral-soft:   #fbcfc0;
+      --coral-deep:   #9c3f28;
+      --sage:         #639266;  /* sage green */
+      --sage-soft:    #cce0c4;
+      --sage-deep:    #36633f;
+      --ocean:        #357293;  /* ocean blue */
+      --ocean-soft:   #bfd8ea;
+      --ocean-deep:   #19476b;
+      --plum:         #815285;  /* plum */
+      --plum-soft:    #dcc7de;
+      --plum-deep:    #4f3055;
+      --honey:        #cd8f24;  /* honey ochre */
+      --honey-soft:   #f7e0a8;
+      --honey-deep:   #8a5d0d;
+      --rose:         #b94d6c;  /* warm rose */
+      --rose-soft:    #f2c8d5;
+      --rose-deep:    #7d2944;
     }
 
     /* ─── PAGE ─── */
@@ -1142,9 +1142,8 @@
       background-size: 28px 28px, 7px 7px !important;
       background-position: 0 0, 14px 14px !important;
       color: var(--ink) !important;
-      font-family: 'Lora', 'Merriweather', Georgia, serif !important;
-      font-size: 16.5px !important;
-      line-height: 1.7 !important;
+      font-family: 'Quicksand', 'Nunito', system-ui, sans-serif !important;
+      font-size: 16px !important;
     }
 
     /* ─── HEADER ─── */
@@ -1159,10 +1158,9 @@
     html body header span { color: var(--ink-soft) !important; }
     html body header .logo {
       color: var(--coral-deep) !important;
-      font-family: 'Fraunces', 'Lora', Georgia, serif !important;
-      font-size: 26px !important;
+      font-family: 'Caveat', cursive !important;
+      font-size: 34px !important;
       font-weight: 700 !important;
-      letter-spacing: -0.01em !important;
     }
 
     /* ─── SEC NAV ─── */
@@ -1176,9 +1174,8 @@
       border: 2px solid var(--rule) !important;
       border-radius: 999px !important;
       box-shadow: 0 2px 0 var(--paper-2) !important;
-      font-family: 'Lora', Georgia, serif !important;
-      font-weight: 600 !important;
-      font-size: 14px !important;
+      font-family: 'Quicksand', sans-serif !important;
+      font-weight: 700 !important;
     }
     html body .sec-nav .pill:hover {
       color: var(--coral-deep) !important;
@@ -1241,12 +1238,11 @@
       padding: 22px 28px !important;
     }
     html body .quote-banner .quote-text {
-      color: #2a1b04 !important;
-      font-family: 'Fraunces', 'Lora', Georgia, serif !important;
-      font-style: italic !important;
-      font-size: 22px !important;
-      line-height: 1.45 !important;
-      font-weight: 500 !important;
+      color: #3a2608 !important;
+      font-family: 'Caveat', cursive !important;
+      font-size: 28px !important;
+      line-height: 1.35 !important;
+      font-weight: 600 !important;
     }
     html body .quote-banner .quote-author {
       color: var(--coral-deep) !important;
@@ -1271,20 +1267,17 @@
     html body .filter-block label {
       color: var(--coral-deep) !important;
       font-weight: 700 !important;
-      font-family: 'Lora', Georgia, serif !important;
-      font-size: 13px !important;
-      letter-spacing: 0.05em !important;
-      text-transform: uppercase !important;
+      font-family: 'Caveat', cursive !important;
+      font-size: 18px !important;
     }
     html body .filter-block input,
     html body .filter-block select {
       background: var(--paper-3) !important;
       color: var(--ink) !important;
       border: 2px solid var(--rule) !important;
-      border-radius: 8px !important;
-      font-family: 'Lora', Georgia, serif !important;
-      font-weight: 500 !important;
-      font-size: 15px !important;
+      border-radius: 10px !important;
+      font-family: 'Quicksand', sans-serif !important;
+      font-weight: 600 !important;
       padding: 8px 12px !important;
     }
     html body .filter-block input:focus,
@@ -1295,10 +1288,9 @@
     }
     html body .practice-progress {
       color: var(--coral-deep) !important;
-      font-family: 'Fraunces', 'Lora', Georgia, serif !important;
-      font-size: 18px !important;
+      font-family: 'Caveat', cursive !important;
+      font-size: 24px !important;
       font-weight: 700 !important;
-      font-style: italic !important;
     }
 
     /* ─── TABS (top of the book page) ─── */
@@ -1311,12 +1303,10 @@
       color: var(--ink-soft) !important;
       border: 2px solid var(--rule) !important;
       border-bottom: none !important;
-      border-radius: 10px 10px 0 0 !important;
-      padding: 10px 20px !important;
-      font-family: 'Lora', Georgia, serif !important;
-      font-weight: 600 !important;
-      font-size: 14.5px !important;
-      letter-spacing: 0.02em !important;
+      border-radius: 12px 12px 0 0 !important;
+      padding: 10px 18px !important;
+      font-family: 'Quicksand', sans-serif !important;
+      font-weight: 700 !important;
     }
     html body .tabs .tab:hover {
       color: var(--coral-deep) !important;
@@ -1332,19 +1322,19 @@
     /* ─── CHAPTER TITLE ─── */
     html body .prob-title {
       color: var(--ink) !important;
-      font-family: 'Fraunces', 'Lora', Georgia, serif !important;
-      font-size: 40px !important;
+      font-family: 'Caveat', cursive !important;
+      font-size: 56px !important;
       font-weight: 700 !important;
-      line-height: 1.15 !important;
-      letter-spacing: -0.015em !important;
+      line-height: 1.05 !important;
       margin: 6px 0 4px !important;
+      text-shadow: 2px 3px 0 rgba(43,32,20,0.08) !important;
     }
     html body .prob-subtopic {
       color: var(--plum-deep) !important;
-      font-family: 'Lora', Georgia, serif !important;
+      font-family: 'Quicksand', sans-serif !important;
       font-weight: 700 !important;
-      letter-spacing: 0.08em !important;
-      font-size: 12px !important;
+      letter-spacing: 0.04em !important;
+      font-size: 13px !important;
       text-transform: uppercase !important;
     }
 
@@ -1354,13 +1344,13 @@
     html body .prob-tale,
     html body .sol-mini-story,
     html body .sol-approach {
-      border-radius: 12px !important;
+      border-radius: 14px !important;
       padding: 22px 26px !important;
       margin: 14px 0 !important;
-      font-family: 'Lora', Georgia, serif !important;
-      font-size: 16px !important;
+      font-family: 'Quicksand', sans-serif !important;
+      font-size: 17px !important;
       line-height: 1.75 !important;
-      font-weight: 400 !important;
+      font-weight: 500 !important;
     }
 
     html body .prob-desc {
@@ -1377,15 +1367,13 @@
       position: relative;
     }
     html body .prob-story::before {
-      content: 'In Plain English' !important;
+      content: '🌟  In Plain English' !important;
       display: block !important;
-      font-family: 'Fraunces', 'Lora', Georgia, serif !important;
-      font-style: italic !important;
-      font-size: 18px !important;
+      font-family: 'Caveat', cursive !important;
+      font-size: 26px !important;
       color: var(--coral-deep) !important;
-      margin-bottom: 10px !important;
+      margin-bottom: 8px !important;
       font-weight: 700 !important;
-      letter-spacing: 0.02em !important;
     }
 
     html body .prob-tale {
@@ -1396,24 +1384,21 @@
       position: relative;
     }
     html body .prob-tale::before {
-      content: 'Once Upon an Algorithm' !important;
+      content: '🦊  Once Upon an Algorithm' !important;
       display: block !important;
-      font-family: 'Fraunces', 'Lora', Georgia, serif !important;
-      font-style: italic !important;
-      font-size: 18px !important;
+      font-family: 'Caveat', cursive !important;
+      font-size: 26px !important;
       color: var(--plum-deep) !important;
-      margin-bottom: 12px !important;
+      margin-bottom: 10px !important;
       font-weight: 700 !important;
-      letter-spacing: 0.02em !important;
     }
     html body .prob-tale::first-letter {
-      font-family: 'Fraunces', 'Lora', Georgia, serif !important;
-      font-size: 56px !important;
+      font-family: 'Caveat', cursive !important;
+      font-size: 62px !important;
       float: left !important;
-      line-height: 0.9 !important;
-      padding: 4px 10px 0 0 !important;
+      line-height: 0.85 !important;
+      padding: 6px 10px 0 0 !important;
       color: var(--plum-deep) !important;
-      font-weight: 700 !important;
     }
     html body .prob-tale::after {
       content: ' ❦' !important;
@@ -1429,15 +1414,13 @@
       box-shadow: 0 3px 0 var(--sage-deep) !important;
     }
     html body .sol-mini-story.sol-plain::before {
-      content: 'Plain English' !important;
+      content: '🌱  Plain English' !important;
       display: block !important;
-      font-family: 'Fraunces', 'Lora', Georgia, serif !important;
-      font-style: italic !important;
-      font-size: 17px !important;
+      font-family: 'Caveat', cursive !important;
+      font-size: 24px !important;
       color: var(--sage-deep) !important;
       margin-bottom: 8px !important;
       font-weight: 700 !important;
-      letter-spacing: 0.02em !important;
     }
 
     html body .sol-mini-story.sol-tale {
@@ -1447,15 +1430,13 @@
       box-shadow: 0 3px 0 var(--rose-deep) !important;
     }
     html body .sol-mini-story.sol-tale::before {
-      content: 'A Little Tale' !important;
+      content: '📖  A Little Tale' !important;
       display: block !important;
-      font-family: 'Fraunces', 'Lora', Georgia, serif !important;
-      font-style: italic !important;
-      font-size: 17px !important;
+      font-family: 'Caveat', cursive !important;
+      font-size: 24px !important;
       color: var(--rose-deep) !important;
       margin-bottom: 8px !important;
       font-weight: 700 !important;
-      letter-spacing: 0.02em !important;
     }
 
     html body .sol-approach {
@@ -1467,29 +1448,27 @@
       padding: 22px 22px 22px 22px !important;
     }
     html body .sol-approach::before {
-      content: 'The Approach' !important;
+      content: '🗺️  The Approach' !important;
       display: block !important;
-      font-family: 'Fraunces', 'Lora', Georgia, serif !important;
-      font-style: italic !important;
-      font-size: 17px !important;
+      font-family: 'Caveat', cursive !important;
+      font-size: 24px !important;
       color: var(--ocean-deep) !important;
       margin-bottom: 12px !important;
       font-weight: 700 !important;
-      letter-spacing: 0.02em !important;
     }
     html body .sol-approach > li {
       background: var(--paper-3) !important;
       border: 2px solid var(--ocean) !important;
       color: var(--ink) !important;
-      border-radius: 8px !important;
+      border-radius: 10px !important;
       padding: 10px 14px 10px 48px !important;
       margin: 8px 0 !important;
       position: relative !important;
       counter-increment: step !important;
-      font-family: 'Lora', Georgia, serif !important;
-      font-size: 15.5px !important;
-      line-height: 1.65 !important;
-      font-weight: 400 !important;
+      font-family: 'Quicksand', sans-serif !important;
+      font-size: 16px !important;
+      line-height: 1.6 !important;
+      font-weight: 500 !important;
     }
     html body .sol-approach { counter-reset: step !important; }
     html body .sol-approach > li::before {
@@ -1502,8 +1481,8 @@
       background: var(--ocean) !important;
       color: #fff !important;
       border-radius: 50% !important;
-      font-family: 'Fraunces', 'Lora', Georgia, serif !important;
-      font-size: 15px !important;
+      font-family: 'Caveat', cursive !important;
+      font-size: 18px !important;
       font-weight: 700 !important;
       box-shadow: 0 2px 0 var(--ocean-deep) !important;
     }
@@ -1533,22 +1512,20 @@
     }
     html body pre.pseudo code { color: var(--ink) !important; }
     html body pre::before {
-      content: 'Code' !important;
+      content: '📝 Code' !important;
       position: absolute !important;
-      top: -12px !important; left: 18px !important;
+      top: -14px !important; left: 18px !important;
       background: var(--coral) !important;
       color: #fff !important;
-      padding: 2px 14px !important;
-      border-radius: 6px !important;
-      font-family: 'Lora', Georgia, serif !important;
-      font-size: 12px !important;
+      padding: 3px 12px !important;
+      border-radius: 999px !important;
+      font-family: 'Caveat', cursive !important;
+      font-size: 18px !important;
       font-weight: 700 !important;
-      letter-spacing: 0.08em !important;
-      text-transform: uppercase !important;
       box-shadow: 0 2px 0 var(--coral-deep) !important;
     }
     html body pre.pseudo::before {
-      content: 'Pseudocode' !important;
+      content: '✏️ Pseudocode' !important;
       background: var(--sage) !important;
       box-shadow: 0 2px 0 var(--sage-deep) !important;
     }
@@ -1557,24 +1534,23 @@
     html body .notes-summary {
       background: var(--honey-soft) !important;
       border: 3px solid var(--honey) !important;
-      color: #2a1c04 !important;
-      border-radius: 12px !important;
+      color: #4a3210 !important;
+      border-radius: 14px !important;
       padding: 22px 26px !important;
       box-shadow: 0 3px 0 var(--honey-deep) !important;
-      font-family: 'Lora', Georgia, serif !important;
+      font-family: 'Quicksand', sans-serif !important;
       font-style: normal !important;
-      font-weight: 400 !important;
-      font-size: 16.5px !important;
+      font-weight: 600 !important;
+      font-size: 18px !important;
       line-height: 1.75 !important;
       letter-spacing: 0 !important;
     }
     html body .notes-section h3 {
-      font-family: 'Fraunces', 'Lora', Georgia, serif !important;
+      font-family: 'Caveat', cursive !important;
       color: var(--coral-deep) !important;
-      font-size: 26px !important;
+      font-size: 36px !important;
       margin: 28px 0 12px !important;
       font-weight: 700 !important;
-      letter-spacing: -0.01em !important;
     }
     html body .tp-card {
       background: var(--plum-soft) !important;
@@ -1586,20 +1562,19 @@
       box-shadow: 0 3px 0 var(--plum-deep) !important;
     }
     html body .tp-card .tp-title {
-      font-family: 'Fraunces', 'Lora', Georgia, serif !important;
-      font-size: 19px !important;
+      font-family: 'Caveat', cursive !important;
+      font-size: 26px !important;
       color: var(--plum-deep) !important;
       font-weight: 700 !important;
-      margin-bottom: 8px !important;
-      letter-spacing: -0.005em !important;
+      margin-bottom: 6px !important;
     }
     html body .tp-card .tp-body {
-      font-family: 'Lora', Georgia, serif !important;
+      font-family: 'Quicksand', sans-serif !important;
       font-style: normal !important;
-      font-size: 15.5px !important;
+      font-size: 16px !important;
       line-height: 1.75 !important;
       color: var(--ink) !important;
-      font-weight: 400 !important;
+      font-weight: 500 !important;
     }
     html body .pattern-card {
       background: var(--ocean-soft) !important;
@@ -1611,31 +1586,29 @@
       box-shadow: 0 3px 0 var(--ocean-deep) !important;
     }
     html body .pattern-card .pat-name {
-      font-family: 'Fraunces', 'Lora', Georgia, serif !important;
-      font-size: 19px !important;
+      font-family: 'Caveat', cursive !important;
+      font-size: 26px !important;
       color: var(--ocean-deep) !important;
       font-weight: 700 !important;
-      letter-spacing: -0.005em !important;
     }
     html body .pattern-card .pat-when {
-      font-family: 'Lora', Georgia, serif !important;
+      font-family: 'Quicksand', sans-serif !important;
       font-style: normal !important;
-      font-size: 15.5px !important;
+      font-size: 16px !important;
       line-height: 1.75 !important;
       color: var(--ink) !important;
-      font-weight: 400 !important;
+      font-weight: 500 !important;
     }
     html body .edge-list { list-style: none !important; padding: 0 !important; }
     html body .edge-list li {
       background: var(--coral-soft) !important;
       border: 2px solid var(--coral) !important;
       color: var(--coral-deep) !important;
-      border-radius: 8px !important;
+      border-radius: 10px !important;
       padding: 10px 14px !important;
       margin: 8px 0 !important;
-      font-family: 'Lora', Georgia, serif !important;
-      font-weight: 500 !important;
-      font-size: 15px !important;
+      font-family: 'Quicksand', sans-serif !important;
+      font-weight: 600 !important;
     }
 
     /* ─── SAMPLE I/O ─── */
@@ -1650,12 +1623,10 @@
       padding: 14px 16px !important;
     }
     html body .io-label {
-      font-family: 'Lora', Georgia, serif !important;
+      font-family: 'Caveat', cursive !important;
       color: var(--coral-deep) !important;
-      font-size: 13px !important;
+      font-size: 22px !important;
       font-weight: 700 !important;
-      letter-spacing: 0.08em !important;
-      text-transform: uppercase !important;
     }
     html body .io-body {
       background: var(--paper-3) !important;
@@ -1672,12 +1643,11 @@
       background: var(--sage-soft) !important;
       color: var(--sage-deep) !important;
       border: 2px solid var(--sage) !important;
-      border-radius: 6px !important;
+      border-radius: 999px !important;
       padding: 3px 12px !important;
-      font-family: 'Lora', Georgia, serif !important;
-      font-weight: 600 !important;
-      font-size: 12.5px !important;
-      letter-spacing: 0.02em !important;
+      font-family: 'Quicksand', sans-serif !important;
+      font-weight: 700 !important;
+      font-size: 13px !important;
     }
     html body .stag:nth-child(2n) { background: var(--ocean-soft) !important; color: var(--ocean-deep) !important; border-color: var(--ocean) !important; }
     html body .stag:nth-child(3n) { background: var(--coral-soft) !important; color: var(--coral-deep) !important; border-color: var(--coral) !important; }
@@ -1691,12 +1661,11 @@
       background: var(--paper-3) !important;
       color: var(--ink) !important;
       border: 2px solid var(--rule) !important;
-      border-radius: 8px !important;
-      font-family: 'Lora', Georgia, serif !important;
-      font-weight: 600 !important;
-      font-size: 14px !important;
-      box-shadow: 0 2px 0 var(--paper-2) !important;
-      padding: 8px 18px !important;
+      border-radius: 10px !important;
+      font-family: 'Quicksand', sans-serif !important;
+      font-weight: 700 !important;
+      box-shadow: 0 3px 0 var(--paper-2) !important;
+      padding: 8px 16px !important;
     }
     html body .btn-primary {
       background: var(--coral) !important;
@@ -1716,11 +1685,10 @@
       background: var(--paper) !important;
       color: var(--ink-soft) !important;
       border: 2px solid var(--rule) !important;
-      border-radius: 8px !important;
-      padding: 8px 18px !important;
-      font-family: 'Lora', Georgia, serif !important;
-      font-weight: 600 !important;
-      font-size: 14px !important;
+      border-radius: 10px !important;
+      padding: 8px 16px !important;
+      font-family: 'Quicksand', sans-serif !important;
+      font-weight: 700 !important;
       box-shadow: 0 2px 0 var(--paper-2) !important;
     }
     html body .sol-tabs .sol-tab.active {
@@ -1767,12 +1735,11 @@
       background: var(--paper-3) !important;
       color: var(--ink) !important;
       border: 2px solid var(--ocean) !important;
-      border-radius: 8px !important;
+      border-radius: 10px !important;
       padding: 6px 14px !important;
-      font-family: 'Lora', Georgia, serif !important;
-      font-weight: 600 !important;
-      font-size: 13.5px !important;
-      box-shadow: 0 2px 0 var(--ocean-deep) !important;
+      font-family: 'Quicksand', sans-serif !important;
+      font-weight: 700 !important;
+      box-shadow: 0 3px 0 var(--ocean-deep) !important;
     }
     html body .cell {
       background: var(--paper-3) !important;
