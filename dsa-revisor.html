@@ -1104,13 +1104,13 @@
        ═══════════════════════════════════════════════════════════════ */
 
     :root {
-      /* paper + ink — a touch darker than the bright version */
-      --paper:        #ede2c7;  /* warm linen paper */
-      --paper-2:      #dccfa9;  /* paper shadow */
-      --paper-3:      #f8eed5;  /* paper highlight (cards) */
-      --ink:          #241a0e;  /* deep walnut ink */
-      --ink-soft:     #50402c;  /* soft brown ink */
-      --rule:         #b8a47a;  /* dashed-rule colour */
+      /* paper + ink — bluish-white instead of cream */
+      --paper:        #dde6ef;  /* bluish paper */
+      --paper-2:      #c2d0de;  /* paper shadow */
+      --paper-3:      #eef3f9;  /* paper highlight (cards) */
+      --ink:          #14202e;  /* deep navy ink */
+      --ink-soft:     #3a4a5e;  /* soft navy ink */
+      --rule:         #97abc2;  /* dashed-rule colour */
 
       /* accents — saturated picture-book colours */
       --coral:        #e26648;  /* terracotta */
@@ -1208,9 +1208,9 @@
 
     /* 2-column layout on wide screens */
     @media (min-width: 1200px) {
-      html body #tab-problem,
-      html body #tab-solutions,
-      html body #tab-notes {
+      html body #tab-problem.active,
+      html body #tab-solutions.active,
+      html body #tab-notes.active {
         display: grid !important;
         grid-template-columns: 1fr 1fr;
         gap: 26px 36px;
