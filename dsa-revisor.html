@@ -2201,6 +2201,168 @@
       .notes-summary, .quote-banner { transform: none !important; }
       main::after { width: 44px; height: 44px; font-size: 24px; right: 14px; bottom: 14px; }
     }
+
+    /* ═══════════════════════════════════════════════════════════════
+       🧹  KILL ALL REMAINING DARK SURFACES  🧹
+       The base Part2/style.css was dark-mode. Override what's left
+       so the page is 100% cream storybook, no black anywhere.
+       ═══════════════════════════════════════════════════════════════ */
+
+    /* Code blocks become "paper notes" — cream parchment, brown ink */
+    pre {
+      background: #fffaec !important;
+      border: 3px solid #d9b466 !important;
+      border-radius: 14px !important;
+      box-shadow:
+        0 4px 0 #c9881e,
+        0 10px 22px rgba(58,42,28,0.14) !important;
+      padding: 22px 24px 18px !important;
+      position: relative;
+      overflow-x: auto;
+    }
+    pre::before {
+      content: '📝 Code' !important;
+      position: absolute !important;
+      top: -16px !important;
+      left: 18px !important;
+      background: var(--peach) !important;
+      border: 2px solid var(--peach-deep) !important;
+      border-radius: 999px !important;
+      padding: 3px 12px !important;
+      font-family: 'Caveat', cursive !important;
+      font-size: 18px !important;
+      color: #5a2d10 !important;
+      font-weight: 700 !important;
+      box-shadow: 0 2px 0 #b8552a !important;
+    }
+    pre.pseudo::before {
+      content: '✏️ Pseudocode' !important;
+      background: var(--mint) !important;
+      border-color: var(--mint-deep) !important;
+      color: #1f4a2c !important;
+      box-shadow: 0 2px 0 #2d7048 !important;
+    }
+    pre::after {
+      /* keep the dog-ear, but in cream */
+      background: linear-gradient(225deg, #e8c98a 50%, #fffaec 50%) !important;
+      border-radius: 0 12px 0 12px !important;
+      box-shadow: -2px 2px 4px rgba(58,42,28,0.18) !important;
+    }
+    pre code {
+      color: #3a2a1c !important;
+      font-family: 'JetBrains Mono', monospace !important;
+      font-size: 13.5px !important;
+      line-height: 1.7 !important;
+      text-shadow: none !important;
+    }
+    pre.pseudo code { color: #1f4a2c !important; }
+
+    /* Bury any remaining dark surfaces from the base stylesheet */
+    .ds-block,
+    .ds-block *:not(.stag):not(.btn):not(.btn-primary):not(pre):not(pre *),
+    .sol-meta,
+    .complexity-pill,
+    .viz-explanation,
+    .viz-footer,
+    .viz-empty,
+    .prob-subtopic,
+    .practice-bar,
+    .practice-progress {
+      background-color: transparent !important;
+    }
+    .ds-label, .ds-block .ds-label {
+      font-family: 'Caveat', cursive !important;
+      color: var(--lavender-deep) !important;
+      font-size: 22px !important;
+      letter-spacing: 0 !important;
+      text-transform: none !important;
+    }
+    .viz-empty {
+      background: #fffaec !important;
+      border: 2px dashed #d9b466 !important;
+      border-radius: 14px !important;
+      color: var(--ink-soft) !important;
+      font-family: 'Caveat', cursive !important;
+      font-size: 22px !important;
+      padding: 28px !important;
+    }
+    .viz-footer {
+      background: #fffaec !important;
+      border: 2px dashed #d9b466 !important;
+      border-radius: 12px !important;
+      color: var(--ink) !important;
+      font-family: 'Quicksand', sans-serif !important;
+      padding: 12px 16px !important;
+      margin-top: 12px !important;
+    }
+    .practice-progress {
+      font-family: 'Caveat', cursive !important;
+      color: var(--peach-deep) !important;
+      font-size: 22px !important;
+    }
+
+    /* Tabs container background */
+    .tabs { background: transparent !important; }
+    .tab-panel { background: transparent !important; }
+
+    /* Solution sub-tabs container */
+    .sol-tabs { background: transparent !important; padding: 6px 0 !important; }
+
+    /* Visualizer cells (numbers in the array) */
+    .cell.active   { background: var(--peach) !important; color: #5a2d10 !important; border-color: var(--peach-deep) !important; }
+    .cell.pivot    { background: var(--honey) !important; color: #5a3a0a !important; border-color: var(--honey-deep) !important; }
+    .cell.matched, .cell.found { background: var(--mint) !important; color: #1f4a2c !important; border-color: var(--mint-deep) !important; }
+    .cell.discarded { background: #f0e4d0 !important; color: #b8a88a !important; }
+    .ptr-marker, .idx-num {
+      color: var(--peach-deep) !important;
+      font-family: 'Caveat', cursive !important;
+      font-size: 16px !important;
+    }
+
+    /* Header logo area / nav */
+    header *, .sec-nav * { color: var(--ink-soft); }
+    .logo { color: var(--peach-deep) !important; }
+
+    /* Doodle margin sparkles ── floating ✦ / ❀ / ☁ in the page corners */
+    main::before {
+      content: '';
+      position: absolute;
+      top: 20px;
+      left: -10px;
+      width: 60px;
+      height: 600px;
+      pointer-events: none;
+      background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 60 600' fill='none'><g opacity='0.55'><text x='14' y='40'  font-family='Caveat,cursive' font-size='28' fill='%23e8794a'>✦</text><text x='28' y='130' font-family='Caveat,cursive' font-size='22' fill='%238b6cb8'>❀</text><text x='10' y='220' font-family='Caveat,cursive' font-size='26' fill='%23d99e2a'>☼</text><text x='30' y='330' font-family='Caveat,cursive' font-size='24' fill='%234ea872'>✿</text><text x='12' y='430' font-family='Caveat,cursive' font-size='22' fill='%23d96384'>♥</text><text x='28' y='540' font-family='Caveat,cursive' font-size='26' fill='%234a90c9'>☁</text></g></svg>");
+      background-repeat: repeat-y;
+      z-index: 2;
+    }
+
+    /* Book-spine binding gradient down the left edge */
+    body {
+      background-image:
+        radial-gradient(ellipse at top, #fdf6e3 0%, #f5e8c8 100%),
+        linear-gradient(90deg, rgba(184,85,42,0.10) 0, rgba(184,85,42,0) 22px) !important;
+      background-attachment: fixed !important;
+    }
+
+    /* Soft sepia frame around the entire main area */
+    main {
+      border-left: 1px dashed rgba(184,85,42,0.25);
+      border-right: 1px dashed rgba(184,85,42,0.25);
+      padding-left: 32px !important;
+      padding-right: 32px !important;
+    }
+
+    /* Make sure the body text doesn't show any dark fallback */
+    body, body * {
+      text-shadow: none;
+    }
+    body { color: var(--ink) !important; }
+
+    @media (max-width: 640px) {
+      main::before { display: none; }
+      main { border-left: none; border-right: none; padding-left: 16px !important; padding-right: 16px !important; }
+    }
   </style>
 </head>
 <body>
