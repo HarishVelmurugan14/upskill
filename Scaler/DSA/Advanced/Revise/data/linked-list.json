@@ -50,6 +50,8 @@
     "sampleInput": "1 → 2 → 3 → 4 → 5 → NULL",
     "sampleOutput": "5 → 4 → 3 → 2 → 1 → NULL",
     "story": "Three pointers, one mantra: save next, flip the arrow, slide forward. prev becomes the new head.",
+    "plain": "Walk the list once. At every node, flip its `next` arrow to point BACKWARDS instead of forwards. You need three pointers to do this safely: prev (where you came from), curr (where you are), next (where you were about to go — saved before you smash the arrow). When you fall off the end, prev is the new head.",
+    "tale": "Imagine a long line of children holding hands, each child's right hand clasping the next child's left. You are told to reverse the line without anyone letting go for more than a heartbeat. So you go to the first child and say: 'remember the hand you were holding (that is `next`). Now let go of it. Now take the hand of the empty space behind you (that is `prev`).' Then you walk to the child who was on the right, and you whisper the same instructions. Heartbeat by heartbeat, the line turns around. When you reach the end, the last child you spoke to is now leading the parade.",
     "solutions": [
       {
         "label": "Iterative (optimal)",
@@ -57,6 +59,16 @@
           "time": "O(N)",
           "space": "O(1)"
         },
+        "plain": "Keep three references: prev (starts null), curr (starts at head), and next (a temp). On each iteration, save curr.next into next, point curr.next at prev, then slide prev = curr and curr = next. When curr becomes null, prev is the new head.",
+        "tale": "Three friends — Past, Present, Future — walk down the line together. Present grabs the hand of the next child (Future) before letting go, then turns and gives that hand back to Past. Then everyone shuffles one seat forward: Past becomes who Present was, Present becomes who Future was, and a new Future appears. When Future steps off the cliff at the end, Past is left standing as the head of the reversed line.",
+        "approach": [
+          "Initialise prev = null and curr = head.",
+          "While curr is not null, snapshot next = curr.next so you don't lose the tail.",
+          "Flip the arrow: curr.next = prev.",
+          "Slide prev forward: prev = curr.",
+          "Slide curr forward: curr = next.",
+          "When the loop exits, curr is null and prev points to the original last node — return prev as the new head."
+        ],
         "pseudocode": "prev = null, curr = head\nwhile curr:\n  next = curr.next\n  curr.next = prev\n  prev = curr; curr = next\nreturn prev",
         "story": "The dance: NEXT save, NEXT flip, PREV step, CURR step. Repeat until curr falls off the end.",
         "code": "public ListNode reverseALinkedListInPlaceInOneIteration(ListNode head) {\n    ListNode prev = null, curr = head;\n    while (curr != null) {\n        ListNode next = curr.next;\n        curr.next = prev;\n        prev = curr;\n        curr = next;\n    }\n    return prev;\n}"
@@ -67,6 +79,15 @@
           "time": "O(N)",
           "space": "O(N) stack"
         },
+        "plain": "Recurse to the end of the list. The deepest call returns the original tail — that is the new head, and it just bubbles up unchanged. On the way back, each call flips one arrow: it makes its successor point back to itself, then severs its own forward arrow.",
+        "tale": "A whisper travels down the line: 'pass it on, the last person should turn around.' The whisper reaches the last child who turns. As the whisper bounces back, each child it passes turns around in turn, until the whole line has flipped. Beautiful, but every child waited on the stack for the whisper to come back — if the line is a million children long, the stack will collapse.",
+        "approach": [
+          "Base case: if head is null or head.next is null, return head — nothing to flip.",
+          "Recurse on head.next; capture the returned new head of the reversed sub-list.",
+          "Flip the link between head and its old successor: head.next.next = head.",
+          "Sever head's old forward pointer: head.next = null (this becomes the new tail).",
+          "Return the captured new head all the way back up the call stack."
+        ],
         "pseudocode": "if !head or !head.next: return head\nnewHead = reverse(head.next)\nhead.next.next = head\nhead.next = null\nreturn newHead",
         "story": "Recurse to the tail, then flip on the way back. Elegant but blows the stack on long lists.",
         "code": "public ListNode reverseRecursive(ListNode head) {\n    if (head == null || head.next == null) return head;\n    ListNode newHead = reverseRecursive(head.next);\n    head.next.next = head;\n    head.next = null;\n    return newHead;\n}"

@@ -1096,70 +1096,283 @@
     }
 
     /* ═══════════════════════════════════════════════════════════════
-       📖 READABILITY LAYER — for long-form prose surfaces
-       Dark is great for code; reading needs lighter surfaces,
-       higher-contrast ink, looser leading, and a comfortable measure.
+       📖 STORYBOOK READING MODE
+       The page is dark like an IDE. But reading surfaces are
+       PARCHMENT CARDS — cream paper, dark serif ink, drop caps,
+       ornaments. The kind of page you can't stop reading.
        ═══════════════════════════════════════════════════════════════ */
 
-    /* Use a slightly lighter "paper" surface for reading panels so text feels less buried */
+    /* ── Parchment card base (used by every prose surface) ── */
     .prob-story,
+    .prob-tale,
     .prob-desc,
-    .sol-mini-story,
+    .sol-mini-story.sol-plain,
+    .sol-mini-story.sol-tale,
     .notes-summary,
     .tp-card,
     .pattern-card,
     .edge-list li,
-    .mk-card2 {
-      background-color: #2f3136 !important;   /* one shade above card bg — feels like off-white paper inverted */
-    }
-
-    /* High-contrast ink for ALL prose */
-    .prob-title          { color: #ffffff !important; }
-    .prob-desc           { color: #e6e6e8 !important; font-weight: 400 !important; }
-    .prob-story          { color: #ececef !important; }
-    .sol-mini-story      { color: #ececef !important; }
-    .notes-summary       { color: #f4f4f6 !important; }
-    .tp-card .tp-title   { color: #ffffff !important; font-weight: 700 !important; }
-    .tp-card .tp-body    { color: #e6e6e8 !important; }
-    .pattern-card .pat-when { color: #e6e6e8 !important; }
-    .edge-list li        { color: #e6e6e8 !important; }
-    .io-body             { color: #f0f0f2 !important; }
-
-    /* Comfortable reading measure (max ~75 chars per line on desktop) */
-    .prob-desc,
-    .prob-story,
-    .sol-mini-story,
-    .notes-summary,
-    .tp-card .tp-body,
-    .pattern-card .pat-when {
+    .sol-approach li {
+      background: linear-gradient(180deg, #faf4e6 0%, #f3ead2 100%) !important;
+      color: #2a2520 !important;
+      border: 1px solid #d9c89f !important;
+      border-radius: 10px !important;
+      box-shadow:
+        0 2px 0 rgba(0,0,0,0.25),
+        0 8px 24px rgba(0,0,0,0.35),
+        inset 0 1px 0 rgba(255,255,255,0.6) !important;
       max-width: 72ch;
-      line-height: 1.8 !important;
-      letter-spacing: 0.01em;
+      letter-spacing: 0.005em;
     }
 
-    /* Bump prose font sizes for genuine reading comfort */
-    .prob-desc          { font-size: 16.5px !important; }
-    .prob-story         { font-size: 16.5px !important; font-weight: 450 !important; }
-    .sol-mini-story     { font-size: 16px !important; }
-    .notes-summary      { font-size: 19px !important; line-height: 1.7 !important; }
-    .tp-card .tp-body   { font-size: 15.5px !important; }
-    .pattern-card .pat-when { font-size: 14.5px !important; }
-    .edge-list li       { font-size: 15px !important; line-height: 1.7 !important; }
+    /* ── Problem description: clean magazine prose ── */
+    .prob-desc {
+      font-family: 'Fraunces', Georgia, serif !important;
+      font-size: 18px !important;
+      line-height: 1.8 !important;
+      font-weight: 400 !important;
+      padding: 22px 28px !important;
+      margin-bottom: 22px !important;
+      color: #2a2520 !important;
+    }
 
-    /* Headlines pop harder */
-    .prob-title         { font-weight: 700 !important; letter-spacing: -0.5px !important; }
-    .tp-card .tp-title  { font-size: 16px !important; }
-    .pattern-card .pat-name { font-size: 17px !important; color: var(--accent) !important; }
+    /* ── Problem story (plain English) — the opening line of the chapter ── */
+    .prob-story {
+      font-family: 'Fraunces', Georgia, serif !important;
+      font-size: 19px !important;
+      line-height: 1.85 !important;
+      padding: 24px 30px !important;
+      margin-bottom: 14px !important;
+      border-left: 6px solid #c97d3f !important;
+      position: relative;
+    }
+    .prob-story::before {
+      content: 'In Plain English';
+      display: block;
+      font-family: 'Inter', sans-serif;
+      font-size: 10px;
+      font-weight: 800;
+      letter-spacing: 2px;
+      color: #c97d3f;
+      text-transform: uppercase;
+      margin-bottom: 10px;
+    }
 
-    /* Selection color uses the Claude accent so highlighting feels native */
-    ::selection { background: rgba(217,119,87,0.35); color: #fff; }
+    /* ── Problem tale: the storybook page ── */
+    .prob-tale {
+      font-family: 'Fraunces', Georgia, serif !important;
+      font-style: italic;
+      font-size: 19px !important;
+      line-height: 1.9 !important;
+      padding: 28px 34px 28px 34px !important;
+      margin: 0 0 30px !important;
+      border-left: 6px solid #7a5a8c !important;
+      position: relative;
+    }
+    .prob-tale::before {
+      content: 'Once Upon an Algorithm';
+      display: block;
+      font-family: 'Inter', sans-serif;
+      font-style: normal;
+      font-size: 10px;
+      font-weight: 800;
+      letter-spacing: 2px;
+      color: #7a5a8c;
+      text-transform: uppercase;
+      margin-bottom: 12px;
+    }
+    /* Drop cap on the tale's first letter — true storybook feel */
+    .prob-tale::first-letter {
+      font-family: 'Fraunces', Georgia, serif;
+      font-style: normal;
+      font-weight: 700;
+      font-size: 56px;
+      float: left;
+      line-height: 0.9;
+      padding: 4px 10px 0 0;
+      color: #7a5a8c;
+    }
+    /* Ornamental closing flourish */
+    .prob-tale::after {
+      content: '❦';
+      display: block;
+      text-align: center;
+      color: #7a5a8c;
+      font-size: 18px;
+      margin-top: 12px;
+      opacity: 0.6;
+    }
 
-    /* Mobile reading overrides — keep it generous, just slightly smaller */
+    /* ── Solution: Plain English (clean recipe voice) ── */
+    .sol-mini-story.sol-plain {
+      font-family: 'Fraunces', Georgia, serif !important;
+      font-size: 17px !important;
+      line-height: 1.8 !important;
+      padding: 20px 26px !important;
+      border-left: 5px solid #4a7c3a !important;
+      color: #2a2520 !important;
+    }
+
+    /* ── Solution: Storybook tale ── */
+    .sol-mini-story.sol-tale {
+      font-family: 'Fraunces', Georgia, serif !important;
+      font-style: italic;
+      font-size: 17.5px !important;
+      line-height: 1.9 !important;
+      padding: 22px 32px !important;
+      border-left: 5px solid #7a5a8c !important;
+      color: #2a2520 !important;
+      position: relative;
+    }
+    .sol-mini-story.sol-tale::before {
+      content: '“';
+      position: absolute;
+      top: -8px;
+      left: 14px;
+      font-family: 'Fraunces', Georgia, serif;
+      font-style: normal;
+      font-size: 64px;
+      line-height: 1;
+      color: #c4a86a;
+      opacity: 0.55;
+      pointer-events: none;
+    }
+
+    /* ── Approach steps — recipe card numbered list ── */
+    .sol-approach {
+      margin: 0;
+      padding-left: 0;
+      list-style: none;
+      counter-reset: ap;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      max-width: 72ch;
+    }
+    .sol-approach li {
+      counter-increment: ap;
+      position: relative;
+      padding: 14px 18px 14px 60px !important;
+      font-family: 'Fraunces', Georgia, serif !important;
+      font-size: 16px !important;
+      line-height: 1.75 !important;
+      color: #2a2520 !important;
+    }
+    .sol-approach li::before {
+      content: counter(ap);
+      position: absolute;
+      left: 14px;
+      top: 14px;
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      background: #c97d3f;
+      color: #faf4e6;
+      border: 2px solid #a85e25;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 13px;
+      font-weight: 700;
+      box-shadow: 0 2px 0 rgba(0,0,0,0.25);
+    }
+
+    /* ── Section block labels stay dark (above parchment cards) ── */
+    .sol-block-label {
+      color: var(--text-muted) !important;
+      letter-spacing: 1.5px !important;
+      font-size: 11px !important;
+      font-weight: 700 !important;
+    }
+
+    /* ── Notes summary — large pull-quote on parchment ── */
+    .notes-summary {
+      font-family: 'Fraunces', Georgia, serif !important;
+      font-size: 21px !important;
+      line-height: 1.75 !important;
+      padding: 26px 32px !important;
+      color: #2a2520 !important;
+      font-weight: 450 !important;
+    }
+
+    /* ── Thought-process / pattern / edge cards ── */
+    .tp-card, .pattern-card {
+      padding: 18px 22px !important;
+    }
+    .tp-card .tp-title {
+      font-family: 'Fraunces', Georgia, serif !important;
+      font-size: 17px !important;
+      font-weight: 700 !important;
+      color: #1f1a14 !important;
+      margin-bottom: 6px !important;
+    }
+    .tp-card .tp-body {
+      font-family: 'Fraunces', Georgia, serif !important;
+      font-size: 16px !important;
+      line-height: 1.8 !important;
+      color: #3a3228 !important;
+    }
+    .pattern-card .pat-name {
+      font-family: 'Fraunces', Georgia, serif !important;
+      font-size: 18px !important;
+      font-weight: 700 !important;
+      color: #c97d3f !important;
+    }
+    .pattern-card .pat-when {
+      font-family: 'Fraunces', Georgia, serif !important;
+      font-size: 15.5px !important;
+      line-height: 1.75 !important;
+      color: #3a3228 !important;
+    }
+    .edge-list li {
+      font-family: 'Fraunces', Georgia, serif !important;
+      font-size: 16px !important;
+      line-height: 1.75 !important;
+      padding: 12px 16px !important;
+    }
+
+    /* ── Problem title — chapter heading ── */
+    .prob-title {
+      font-family: 'Fraunces', Georgia, serif !important;
+      font-weight: 700 !important;
+      font-size: 38px !important;
+      line-height: 1.15 !important;
+      letter-spacing: -0.5px !important;
+      color: #ffffff !important;
+      margin-bottom: 6px !important;
+    }
+
+    /* ── Quote banner — already serif; ensure good contrast ── */
+    .quote-text { color: #f0eae0 !important; }
+
+    /* ── Selection: warm honey on parchment ── */
+    .prob-story::selection, .prob-tale::selection, .prob-desc::selection,
+    .sol-mini-story::selection, .notes-summary::selection,
+    .tp-card *::selection, .pattern-card *::selection,
+    .edge-list li::selection, .sol-approach li::selection {
+      background: #f1c97a;
+      color: #2a2520;
+    }
+    .prob-story *::selection, .prob-tale *::selection, .prob-desc *::selection,
+    .sol-mini-story *::selection, .notes-summary *::selection {
+      background: #f1c97a;
+      color: #2a2520;
+    }
+
+    /* ── Mobile: keep parchment, just trim padding ── */
     @media (max-width: 640px) {
-      .prob-desc, .prob-story { font-size: 16px !important; line-height: 1.7 !important; }
-      .notes-summary          { font-size: 17px !important; }
-      .tp-card .tp-body       { font-size: 15px !important; }
-      .edge-list li           { font-size: 14.5px !important; }
+      .prob-title    { font-size: 26px !important; }
+      .prob-desc     { font-size: 16.5px !important; padding: 18px 20px !important; }
+      .prob-story    { font-size: 17px !important; padding: 20px 22px !important; }
+      .prob-tale     { font-size: 17px !important; padding: 22px 24px !important; }
+      .prob-tale::first-letter { font-size: 44px; }
+      .sol-mini-story.sol-plain { font-size: 15.5px !important; padding: 16px 18px !important; }
+      .sol-mini-story.sol-tale  { font-size: 16px !important; padding: 18px 22px !important; }
+      .sol-approach li { font-size: 14.5px !important; padding: 12px 14px 12px 52px !important; }
+      .sol-approach li::before { width: 26px; height: 26px; font-size: 12px; left: 12px; top: 12px; }
+      .notes-summary { font-size: 18px !important; padding: 20px 22px !important; }
+      .tp-card .tp-body, .edge-list li, .pattern-card .pat-when { font-size: 15px !important; }
     }
   </style>
 </head>
@@ -1237,6 +1450,7 @@
       <div class="prob-title" id="probTitle"></div>
       <div class="prob-subtopic" id="probSubTopic"></div>
       <div class="prob-story" id="probStory"></div>
+      <div class="prob-tale" id="probTale"></div>
       <div class="prob-desc" id="probDesc"></div>
 
       <div class="io-grid">
@@ -1265,8 +1479,18 @@
       <div class="sol-meta" id="solMeta"></div>
 
       <div class="sol-block">
-        <div class="sol-block-label">Mini story</div>
-        <div class="sol-mini-story" id="solStory"></div>
+        <div class="sol-block-label">📖 Plain English</div>
+        <div class="sol-mini-story sol-plain" id="solPlain"></div>
+      </div>
+
+      <div class="sol-block">
+        <div class="sol-block-label">🎭 Story to Remember</div>
+        <div class="sol-mini-story sol-tale" id="solTale"></div>
+      </div>
+
+      <div class="sol-block" id="solApproachBlock">
+        <div class="sol-block-label">🪶 Approach — Step by Step</div>
+        <ol class="sol-approach" id="solApproach"></ol>
       </div>
 
       <div class="sol-block">
@@ -1516,7 +1740,16 @@
     document.getElementById('problemContent').style.display = 'block';
     document.getElementById('probTitle').textContent = p.title;
     document.getElementById('probSubTopic').textContent = p.subTopic || '';
-    document.getElementById('probStory').textContent = p.story || '';
+    var pPlain = p.plain || p.story || '';
+    var pTale  = p.tale  || '';
+    var storyEl = document.getElementById('probStory');
+    storyEl.textContent = pPlain;
+    storyEl.style.display = pPlain ? '' : 'none';
+    var taleProbEl = document.getElementById('probTale');
+    if (taleProbEl) {
+      taleProbEl.textContent = pTale;
+      taleProbEl.style.display = pTale ? '' : 'none';
+    }
     document.getElementById('probDesc').textContent = p.description || '';
     document.getElementById('sampleIn').textContent = p.sampleInput || '';
     document.getElementById('sampleOut').textContent = p.sampleOutput || '';
@@ -1573,7 +1806,22 @@
       <span class="complexity-pill"><span class="lbl">Time</span><span class="val">${sol.complexity.time}</span></span>
       <span class="complexity-pill"><span class="lbl">Space</span><span class="val">${sol.complexity.space}</span></span>
     `;
-    document.getElementById('solStory').textContent = sol.story || '';
+    document.getElementById('solStory') /* legacy no-op */;
+    var sPlain = sol.plain || sol.story || '';
+    var sTale  = sol.tale  || '';
+    var sApproach = Array.isArray(sol.approach) ? sol.approach : [];
+    document.getElementById('solPlain').textContent = sPlain;
+    var taleEl = document.getElementById('solTale');
+    if (sTale) { taleEl.textContent = sTale; taleEl.parentElement.style.display = ''; }
+    else       { taleEl.parentElement.style.display = 'none'; }
+    var apEl = document.getElementById('solApproach');
+    apEl.innerHTML = '';
+    if (sApproach.length) {
+      sApproach.forEach(function(step){ var li = document.createElement('li'); li.textContent = step; apEl.appendChild(li); });
+      document.getElementById('solApproachBlock').style.display = '';
+    } else {
+      document.getElementById('solApproachBlock').style.display = 'none';
+    }
     document.getElementById('solPseudo').textContent = sol.pseudocode || '';
     document.getElementById('solCode').textContent = sol.code || '';
   }

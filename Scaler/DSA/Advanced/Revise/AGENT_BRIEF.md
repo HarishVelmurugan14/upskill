@@ -49,14 +49,28 @@ If a topic doesn't exist yet, create both files and register them.
   "description": "Problem statement. Multi-line OK (\\n in JSON).",
   "sampleInput": "A = [...]\\nB = 5",
   "sampleOutput": "...",
-  "story": "ONE memorable analogy / hook (1-3 sentences). This is the user's mental hook for the problem.",
+
+  "story": "[legacy 1-liner — keep for backward compat, mirror the plain version]",
+  "plain": "PLAIN ENGLISH explanation of the problem. 3-6 sentences. Direct, like explaining to a smart friend. No analogies, no jargon. Used in 'In Plain English' card.",
+  "tale": "STORYBOOK version of the problem. 4-8 sentences in narrative voice. A vivid scene with a character, a stake, and a moment of insight that maps 1:1 to the algorithm's central idea. This is what the user re-reads to remember the problem cold. Used in 'Once Upon an Algorithm' card with a drop cap.",
+
   "solutions": [
     {
       "label": "Brute" | "Better" | "Optimal" | "Recursive" | "Iterative" | "Alternative — XOR" | etc,
       "complexity": { "time": "O(...)", "space": "O(...)" },
-      "pseudocode": "compact, multi-line, plain English steps",
-      "story": "one-line intuition for THIS solution",
-      "code": "<Java code in user's style — see §4>"
+
+      "plain":   "PLAIN ENGLISH explanation of THIS approach. 3-5 sentences. What you do, in order, without code.",
+      "tale":    "STORYBOOK version of THIS approach. 3-6 sentences. Use the same characters/world as the problem-level tale when possible — continuity helps memory.",
+      "approach": [
+        "Step 1 in plain imperative English — one sentence, no code.",
+        "Step 2 — the action and its purpose.",
+        "Step 3 — keep going, 5 to 9 steps typical.",
+        "..."
+      ],
+
+      "pseudocode": "compact multi-line plain-English / symbolic steps (shown in monospace)",
+      "story":      "[legacy 1-liner — keep for backward compat, mirror plain]",
+      "code":       "<Java in user's style — see §4>"
     }
   ],
   "viz": { "kind": "<viz-kind>", "data": { ... } }
@@ -66,8 +80,13 @@ If a topic doesn't exist yet, create both files and register them.
 ### Rules
 
 - **Always include Optimal.** Add Brute/Better only if they teach something distinct.
+- **`plain`, `tale`, and `approach`** are MANDATORY on every solution. They drive the parchment cards the user actually reads.
+- **`plain` voice**: 6th-grade English. Short sentences. No metaphors. Describe the mechanism.
+- **`tale` voice**: childhood-storybook narrator. Concrete character (hiker, watchman, blindfolded farmer, three friends Past/Present/Future, etc). Specific verbs. Italic serif on screen — write so it reads aloud well.
+- **`approach`**: ordered array of strings. Each entry = one atomic step the user could execute on paper. 5-9 entries typical. No code, no symbols beyond array notation.
 - **`code` is Java only.** No `import`, no `class` wrapper — just the method(s) plus tiny private helpers.
-- **`story` and per-solution `story`** are non-negotiable. They are why the user can re-derive the problem cold.
+- **Keep `story`** (legacy field) so old viewers don't break — mirror the first sentence of `plain` if you don't have a separate one.
+- See `bs-peak-element`, `bs-aggressive-cows`, and `ll-reverse` as the **gold-standard worked examples** of the dual-story + approach schema.
 
 ---
 
