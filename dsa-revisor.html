@@ -1158,11 +1158,12 @@
     html body header span { color: var(--ink-soft) !important; }
     html body header .logo {
       color: var(--coral-deep) !important;
-      font-family: 'Inter', 'Helvetica Neue', system-ui, sans-serif !important;
-      font-size: 20px !important;
-      font-weight: 800 !important;
-      letter-spacing: 0.18em !important;
-      text-transform: uppercase !important;
+      font-family: 'Fraunces', 'Lora', Georgia, serif !important;
+      font-size: 28px !important;
+      font-weight: 700 !important;
+      font-style: italic !important;
+      letter-spacing: -0.01em !important;
+      text-transform: none !important;
     }
 
     /* ─── SEC NAV ─── */
@@ -1267,10 +1268,13 @@
     }
     html body .filters * { color: var(--ink) !important; }
     html body .filter-block label {
-      color: var(--coral-deep) !important;
-      font-weight: 700 !important;
-      font-family: 'Caveat', cursive !important;
-      font-size: 18px !important;
+      color: var(--ocean-deep) !important;
+      font-weight: 800 !important;
+      font-family: 'Quicksand', sans-serif !important;
+      font-size: 12px !important;
+      letter-spacing: 0.12em !important;
+      text-transform: uppercase !important;
+      font-style: normal !important;
     }
     html body .filter-block input,
     html body .filter-block select {
@@ -1796,16 +1800,18 @@
        ═══════════════════════════════════════════════════════════════ */
 
     :root {
-      --paper:        #e9ede9 !important;  /* +2% darker */
-      --paper-2:      #cfd6d2 !important;
-      --paper-3:      #f7f9f7 !important;
+      --paper:        #f5f7f5 !important;  /* near white again */
+      --paper-2:      #d8ded9 !important;
+      --paper-3:      #fcfdfc !important;  /* cards almost white */
     }
-    /* More saturated multicolour wash */
+    /* Saturated multicolour wash on near-white paper */
     html, body, html body {
       background-image:
-        radial-gradient(900px 600px at 0% 0%, #ffd6df 0%, transparent 55%),
-        radial-gradient(900px 600px at 100% 0%, #cfe0ef 0%, transparent 55%),
-        radial-gradient(900px 600px at 50% 100%, #d0e6d6 0%, transparent 55%) !important;
+        radial-gradient(900px 600px at 0% 0%, #ffd0d9 0%, transparent 55%),
+        radial-gradient(900px 600px at 100% 0%, #c6dcee 0%, transparent 55%),
+        radial-gradient(900px 600px at 50% 100%, #c8e3cf 0%, transparent 55%),
+        radial-gradient(700px 500px at 80% 50%, #fff1c0 0%, transparent 50%),
+        radial-gradient(700px 500px at 20% 60%, #e6d8f0 0%, transparent 50%) !important;
     }
 
     /* ─── H3 SECTION HEADINGS — replace bad Caveat with cleaner script ─── */
@@ -1893,33 +1899,375 @@
       html body .mk2-side.x { border-right: none !important; border-bottom: 2px dashed var(--rule) !important; }
     }
 
-    /* ─── VISUALIZER — darker, more contrast ─── */
+    /* ─── VISUALIZER — restore Part 2 dark stage on white page ─── */
     html body .viz-canvas {
-      background: linear-gradient(180deg, #2d3a4a, #1f2a38) !important;
-      border: 3px solid var(--ink) !important;
-      box-shadow: 0 4px 0 #0b1219, 0 12px 24px rgba(28,37,48,0.20) !important;
-      color: #f4f6f5 !important;
+      background: #0d1117 !important;
+      border: 1px solid #2a313b !important;
+      border-radius: 12px !important;
+      box-shadow: 0 4px 0 #c8cfca, 0 14px 28px rgba(28,37,48,0.18) !important;
+      padding: 28px !important;
+      color: #c9d1d9 !important;
+      min-height: 240px !important;
     }
-    html body .viz-canvas * { color: #f4f6f5 !important; }
+    html body .viz-canvas *,
+    html body .viz-canvas .ds-label,
+    html body .viz-canvas .idx-num,
+    html body .viz-canvas .ptr-marker,
+    html body .viz-explanation {
+      color: #c9d1d9 !important;
+    }
     html body .viz-empty {
       background: var(--paper-3) !important;
+      border: 2px dashed var(--rule) !important;
       color: var(--ink-soft) !important;
+      border-radius: 12px !important;
+      padding: 40px 18px !important;
     }
     html body .viz-footer {
+      background: transparent !important;
+      border: none !important;
+      color: var(--ink-soft) !important;
+      font-family: 'JetBrains Mono', monospace !important;
+      font-size: 12px !important;
+      padding: 8px 0 0 !important;
+      text-align: center !important;
+    }
+    html body .viz-controls button {
       background: var(--paper-3) !important;
       color: var(--ink) !important;
+      border: 2px solid var(--rule) !important;
+      border-radius: 8px !important;
+      padding: 6px 16px !important;
+      font-family: 'Quicksand', sans-serif !important;
+      font-weight: 700 !important;
+      font-size: 13px !important;
+      box-shadow: 0 2px 0 var(--paper-2) !important;
     }
+    html body .viz-controls button:hover:not(:disabled) {
+      color: var(--ocean-deep) !important;
+      border-color: var(--ocean) !important;
+    }
+    /* Cells go back to Part 2's coloured-on-dark look */
     html body .cell {
-      background: #f4f6f5 !important;
+      background: rgba(88,166,255,0.10) !important;
+      color: #58a6ff !important;
+      border: 1px solid rgba(88,166,255,0.30) !important;
+      font-family: 'JetBrains Mono', monospace !important;
+      font-weight: 600 !important;
+    }
+    html body .cell.active,
+    html body .c-active { background: rgba(210,153,34,0.18) !important; color: #d29922 !important; border-color: rgba(210,153,34,0.45) !important; }
+    html body .cell.pivot,
+    html body .c-mid    { background: rgba(248,81,73,0.12) !important; color: #f85149 !important; border-color: rgba(248,81,73,0.45) !important; }
+    html body .cell.matched,
+    html body .cell.found,
+    html body .c-result,
+    html body .c-peak   { background: rgba(63,185,80,0.18) !important; color: #3fb950 !important; border-color: rgba(63,185,80,0.45) !important; }
+
+    /* ─── KILL ALL REMAINING CAVEAT — clean replacements ─── */
+    /* Big titles → editorial serif italic */
+    html body .prob-title {
+      font-family: 'Fraunces', 'Lora', Georgia, serif !important;
+      font-style: italic !important;
+      font-size: 38px !important;
+      font-weight: 700 !important;
+      letter-spacing: -0.015em !important;
+      text-shadow: none !important;
+    }
+    html body .quote-banner .quote-text {
+      font-family: 'Fraunces', 'Lora', Georgia, serif !important;
+      font-style: italic !important;
+      font-size: 22px !important;
+      font-weight: 500 !important;
+      line-height: 1.45 !important;
+    }
+    html body .practice-progress {
+      font-family: 'Quicksand', sans-serif !important;
+      font-size: 14px !important;
+      font-weight: 700 !important;
+      letter-spacing: 0.08em !important;
+      text-transform: uppercase !important;
+    }
+
+    /* Card prefix labels (the "In Plain English" / "Once Upon an Algorithm" lines) */
+    html body .prob-story::before,
+    html body .prob-tale::before,
+    html body .sol-mini-story.sol-plain::before,
+    html body .sol-mini-story.sol-tale::before,
+    html body .sol-approach::before {
+      font-family: 'Quicksand', sans-serif !important;
+      font-style: normal !important;
+      font-size: 12px !important;
+      font-weight: 800 !important;
+      letter-spacing: 0.14em !important;
+      text-transform: uppercase !important;
+      margin-bottom: 12px !important;
+    }
+    /* Drop cap on tale → serif */
+    html body .prob-tale::first-letter {
+      font-family: 'Fraunces', 'Lora', Georgia, serif !important;
+      font-style: italic !important;
+      font-size: 54px !important;
+      font-weight: 700 !important;
+      line-height: 0.9 !important;
+      padding: 4px 10px 0 0 !important;
+    }
+    /* Approach step numbers */
+    html body .sol-approach > li::before {
+      font-family: 'Quicksand', sans-serif !important;
+      font-size: 14px !important;
+      font-weight: 800 !important;
+    }
+
+    /* I/O labels */
+    html body .io-label {
+      font-family: 'Quicksand', sans-serif !important;
+      font-size: 11px !important;
+      font-weight: 800 !important;
+      letter-spacing: 0.14em !important;
+      text-transform: uppercase !important;
+    }
+
+    /* Notes section h3 ("🚫 Common Mistakes", etc) */
+    html body .notes-section h3 {
+      font-family: 'Fraunces', 'Lora', Georgia, serif !important;
+      font-style: italic !important;
+      font-size: 26px !important;
+      font-weight: 700 !important;
+      letter-spacing: -0.005em !important;
+    }
+
+    /* Thought-process card titles */
+    html body .tp-card .tp-title {
+      font-family: 'Fraunces', 'Lora', Georgia, serif !important;
+      font-style: italic !important;
+      font-size: 19px !important;
+      font-weight: 700 !important;
+      letter-spacing: -0.005em !important;
+    }
+    /* Pattern card names */
+    html body .pattern-card .pat-name {
+      font-family: 'Fraunces', 'Lora', Georgia, serif !important;
+      font-style: italic !important;
+      font-size: 19px !important;
+      font-weight: 700 !important;
+      letter-spacing: -0.005em !important;
+    }
+
+    /* ═══════════════════════════════════════════════════════════════
+       VISUALIZER — make it actually learnable
+       ═══════════════════════════════════════════════════════════════ */
+
+    html body .viz-stage {
+      background: #0d1117 !important;
+      border: 1px solid #2a313b !important;
+      border-radius: 14px !important;
+      box-shadow: 0 4px 0 #c8cfca, 0 14px 28px rgba(28,37,48,0.18) !important;
+      padding: 0 !important;
+      overflow: hidden !important;
+      margin-bottom: 14px !important;
+    }
+    html body .viz-stage-head {
+      display: flex !important;
+      justify-content: space-between !important;
+      align-items: center !important;
+      padding: 14px 22px !important;
+      background: linear-gradient(180deg, #161c25, #0d1117) !important;
+      border-bottom: 1px solid #2a313b !important;
+    }
+    html body .viz-title {
+      color: #c9d1d9 !important;
+      font-family: 'Fraunces', 'Lora', Georgia, serif !important;
+      font-style: italic !important;
+      font-size: 18px !important;
+      font-weight: 600 !important;
+    }
+    html body .viz-step-counter {
+      color: #58a6ff !important;
+      font-family: 'JetBrains Mono', monospace !important;
+      font-size: 13px !important;
+      font-weight: 700 !important;
+      background: rgba(88,166,255,0.12) !important;
+      padding: 4px 12px !important;
+      border-radius: 999px !important;
+      border: 1px solid rgba(88,166,255,0.35) !important;
+    }
+    html body .viz-stage .viz-canvas {
+      background: transparent !important;
+      border: none !important;
+      box-shadow: none !important;
+      padding: 28px 24px !important;
+      min-height: 240px !important;
+      color: #c9d1d9 !important;
+    }
+    html body .viz-stage .viz-explanation {
+      background: #161c25 !important;
+      border-top: 1px solid #2a313b !important;
+      color: #e6edf3 !important;
+      font-family: 'Lora', Georgia, serif !important;
+      font-size: 15.5px !important;
+      line-height: 1.6 !important;
+      padding: 16px 22px !important;
+      text-align: center !important;
+      min-height: 56px !important;
+    }
+    html body .viz-stage .viz-explanation strong,
+    html body .viz-stage .viz-explanation b {
+      color: #ffa657 !important;
+    }
+    /* bigger cells */
+    html body .viz-stage .cell {
+      width: 54px !important;
+      height: 42px !important;
+      font-size: 15px !important;
+      border-radius: 8px !important;
+      border-width: 2px !important;
+    }
+    html body .viz-stage .idx-num {
+      width: 54px !important;
+      font-size: 11px !important;
+      color: #8b949e !important;
+    }
+    html body .viz-stage .ptr-marker {
+      width: 54px !important;
+      font-size: 11px !important;
+      font-weight: 800 !important;
+    }
+    html body .viz-stage .ds-label {
+      color: #8b949e !important;
+      font-size: 11px !important;
+      font-weight: 800 !important;
+      letter-spacing: 0.14em !important;
+      text-transform: uppercase !important;
+      margin-bottom: 10px !important;
+    }
+    html body .viz-stage .ds-block { margin-bottom: 22px !important; }
+
+    /* Legend chips */
+    html body .viz-legend {
+      display: flex !important;
+      flex-wrap: wrap !important;
+      gap: 10px !important;
+      padding: 12px 16px !important;
+      background: var(--paper-3) !important;
+      border: 1px solid var(--rule) !important;
+      border-radius: 10px !important;
+      margin-bottom: 14px !important;
+    }
+    html body .viz-legend-chip {
+      display: inline-flex !important;
+      align-items: center !important;
+      gap: 8px !important;
+      background: var(--paper) !important;
+      border: 1px solid var(--rule) !important;
+      border-radius: 8px !important;
+      padding: 6px 10px !important;
+      font-family: 'Quicksand', sans-serif !important;
+      font-size: 12px !important;
       color: var(--ink) !important;
-      border: 2px solid #4a5564 !important;
+    }
+    html body .viz-legend-swatch {
+      width: 18px !important; height: 18px !important;
+      border-radius: 4px !important;
+      border: 1.5px solid !important;
+      flex-shrink: 0 !important;
+    }
+    html body .viz-legend-swatch.c-input       { background: rgba(88,166,255,0.18);  border-color: #58a6ff; }
+    html body .viz-legend-swatch.c-mid         { background: rgba(248,81,73,0.18);   border-color: #f85149; }
+    html body .viz-legend-swatch.c-low         { background: rgba(121,192,255,0.18); border-color: #79c0ff; }
+    html body .viz-legend-swatch.c-high        { background: rgba(188,140,255,0.18); border-color: #bc8cff; }
+    html body .viz-legend-swatch.c-eliminated  { background: transparent;            border-color: #6e7681; border-style: dashed; }
+    html body .viz-legend-swatch.c-active      { background: rgba(210,153,34,0.30);  border-color: #d29922; }
+    html body .viz-legend-swatch.c-result      { background: rgba(63,185,80,0.25);   border-color: #3fb950; }
+    html body .viz-legend-swatch.c-peak        { background: rgba(63,185,80,0.40);   border-color: #3fb950; }
+    html body .viz-legend-text strong {
+      font-weight: 800 !important;
+      color: var(--ink) !important;
+    }
+    html body .viz-legend-sub {
+      color: var(--ink-soft) !important;
+      font-weight: 500 !important;
+      font-size: 11px !important;
+      margin-left: 2px !important;
+    }
+
+    /* Speed slider */
+    html body .viz-speed {
+      display: inline-flex !important;
+      align-items: center !important;
+      gap: 8px !important;
+      font-family: 'Quicksand', sans-serif !important;
+      font-size: 12px !important;
+      font-weight: 700 !important;
+      color: var(--ink-soft) !important;
+      letter-spacing: 0.06em !important;
+      text-transform: uppercase !important;
+      margin-left: 12px !important;
+    }
+    html body .viz-speed input[type=range] {
+      width: 110px !important;
+      accent-color: var(--ocean) !important;
+    }
+    html body .viz-speed #vizSpeedVal {
+      font-family: 'JetBrains Mono', monospace !important;
+      text-transform: none !important;
+      color: var(--ocean-deep) !important;
+      font-weight: 700 !important;
+      min-width: 46px !important;
+      text-align: left !important;
+    }
+
+    /* Pointer marker letters inside dark stage */
+    html body .viz-stage .ptr-low,
+    html body .viz-stage .ptr-mid,
+    html body .viz-stage .ptr-high,
+    html body .viz-stage .ptr-ans {
+      display: inline-block !important;
+      padding: 2px 6px !important;
+      border-radius: 4px !important;
+      font-family: 'JetBrains Mono', monospace !important;
       font-weight: 700 !important;
     }
-    html body .cell.active { background: var(--coral) !important; color: #fff !important; border-color: var(--coral-deep) !important; }
-    html body .cell.pivot  { background: var(--honey) !important; color: #fff !important; border-color: var(--honey-deep) !important; }
-    html body .cell.matched,
-    html body .cell.found  { background: var(--sage) !important; color: #fff !important; border-color: var(--sage-deep) !important; }
-    html body .idx-num, html body .ptr-marker { color: #cfd6d2 !important; }
+    html body .viz-stage .ptr-low  { background: rgba(121,192,255,0.18); color: #79c0ff; }
+    html body .viz-stage .ptr-mid  { background: rgba(248,81,73,0.18);   color: #f85149; }
+    html body .viz-stage .ptr-high { background: rgba(188,140,255,0.18); color: #bc8cff; }
+    html body .viz-stage .ptr-ans  { background: rgba(63,185,80,0.20);   color: #3fb950; }
+
+    /* Scripted-array: per-step banner label and overlay area */
+    html body .viz-stage .viz-step-label {
+      align-self: flex-start !important;
+      font-family: 'Quicksand', sans-serif !important;
+      font-weight: 700 !important;
+      font-size: 11px !important;
+      letter-spacing: 0.14em !important;
+      text-transform: uppercase !important;
+      color: #79c0ff !important;
+      background: rgba(121,192,255,0.10) !important;
+      border: 1px solid rgba(121,192,255,0.30) !important;
+      padding: 4px 10px !important;
+      border-radius: 4px !important;
+      margin-bottom: 6px !important;
+    }
+    html body .viz-stage .viz-overlay {
+      width: 100% !important;
+      margin-top: 8px !important;
+      padding: 10px 14px !important;
+      background: rgba(255,255,255,0.04) !important;
+      border-left: 3px solid #d29922 !important;
+      border-radius: 0 6px 6px 0 !important;
+      color: #e6edf3 !important;
+      font-family: 'Lora', serif !important;
+      font-size: 14px !important;
+      line-height: 1.5 !important;
+    }
+    html body .viz-stage .viz-overlay code {
+      background: rgba(255,255,255,0.08) !important;
+      padding: 1px 6px !important;
+      border-radius: 3px !important;
+      font-family: 'JetBrains Mono', monospace !important;
+      font-size: 12.5px !important;
+      color: #ffa657 !important;
+    }
   </style>
 </head>
 <body>
@@ -2055,13 +2403,25 @@
   <div class="tab-panel" id="tab-visualizer">
     <div id="vizEmpty" class="viz-empty">Load a problem first to see its visualizer.</div>
     <div id="vizContent" style="display:none">
-      <div class="viz-canvas" id="vizCanvas"></div>
-      <div class="viz-explanation" id="vizExplanation"></div>
+      <div class="viz-stage" id="vizStage">
+        <div class="viz-stage-head">
+          <div class="viz-title" id="vizTitle"></div>
+          <div class="viz-step-counter" id="vizStepCounter">Step 0 / 0</div>
+        </div>
+        <div class="viz-canvas" id="vizCanvas"></div>
+        <div class="viz-explanation" id="vizExplanation"></div>
+      </div>
+      <div class="viz-legend" id="vizLegend"></div>
       <div class="viz-controls">
         <button id="vizPrev" onclick="vizStep(-1)">← Prev</button>
         <button id="vizPlay" onclick="vizTogglePlay()">▶ Play</button>
         <button id="vizNext" onclick="vizStep(1)">Next →</button>
         <button id="vizReset" onclick="vizReset()">↺ Reset</button>
+        <label class="viz-speed">
+          Speed
+          <input type="range" id="vizSpeed" min="300" max="2200" step="100" value="950" oninput="vizSpeedChange()">
+          <span id="vizSpeedVal">0.95s</span>
+        </label>
       </div>
       <div class="viz-footer" id="vizFooter"></div>
     </div>
@@ -2392,11 +2752,14 @@
     vizClearTimer();
     const kind = p.viz && p.viz.kind;
     const data = p.viz && p.viz.data;
+    document.getElementById('vizTitle').textContent = p.title || '';
     if (!kind || !window.VIZ_KINDS || !window.VIZ_KINDS[kind]) {
       document.getElementById('vizCanvas').innerHTML =
         `<div class="viz-empty">No visualizer registered for kind <code>${kind || '?'}</code>.</div>`;
       document.getElementById('vizExplanation').innerHTML = '';
       document.getElementById('vizFooter').innerHTML = '';
+      document.getElementById('vizLegend').innerHTML = '';
+      document.getElementById('vizStepCounter').textContent = '';
       return;
     }
 
@@ -2404,7 +2767,66 @@
     const steps = viz.makeSteps(data);
     vizState = { steps, idx: 0, viz, data, timer: null };
     document.getElementById('vizFooter').textContent = viz.footer ? viz.footer(data) : '';
+    document.getElementById('vizLegend').innerHTML = renderLegendFor(kind, data);
     vizRenderCurrent();
+  }
+
+  function renderLegendFor(kind, data) {
+    // Per-kind colour legend
+    const common = {
+      'c-input':      ['Untouched', 'Cells still in the search/work window'],
+      'c-mid':        ['Mid / probe', 'Cell currently being inspected'],
+      'c-low':        ['Low pointer', 'Left boundary of the search window'],
+      'c-high':       ['High pointer', 'Right boundary of the search window'],
+      'c-eliminated': ['Eliminated', 'Cells ruled out, no longer searched'],
+      'c-active':     ['Active', 'Cell being compared this step'],
+      'c-result':     ['Answer',  'Final answer when search ends'],
+      'c-peak':       ['Peak',    'Cell that beats both neighbours'],
+    };
+    const setsByKind = {
+      'scripted-array':    null, // read from data.legend
+      'bs-bound':          ['c-low','c-high','c-mid','c-result','c-eliminated'],
+      'bs-lower-bound':    ['c-low','c-high','c-mid','c-result','c-eliminated'],
+      'bs-peak':           ['c-low','c-high','c-mid','c-active','c-peak','c-eliminated'],
+      'bs-single-element': ['c-low','c-high','c-mid','c-result','c-eliminated'],
+      'bs-matrix':         ['c-mid','c-result','c-eliminated'],
+      'bs-on-answer':      ['c-low','c-high','c-mid','c-result'],
+      'bs-rotated':        ['c-low','c-high','c-mid','c-result','c-eliminated'],
+      'bs-partition':      ['c-low','c-high','c-mid','c-result'],
+      'sliding-window':    ['c-active','c-result','c-input'],
+      'll-traverse':       ['c-input','c-active','c-result'],
+      'll-reverse':        ['c-input','c-active','c-result'],
+      'll-insert':         ['c-input','c-active','c-result'],
+      'll-delete':         ['c-input','c-active','c-result'],
+      'll-two-pointer':    ['c-input','c-low','c-high','c-result'],
+    };
+    const keys = (kind === 'scripted-array' && data && data.legend)
+      ? data.legend
+      : (setsByKind[kind] || ['c-input','c-mid','c-result']);
+    return keys.map(k => {
+      const meta = common[k] || [k,'']; 
+      return `<span class="viz-legend-chip"><span class="viz-legend-swatch ${k}"></span><span class="viz-legend-text"><strong>${meta[0]}</strong> <span class="viz-legend-sub">${meta[1]}</span></span></span>`;
+    }).join('');
+  }
+
+  function vizSpeedChange() {
+    const v = parseInt(document.getElementById('vizSpeed').value, 10);
+    document.getElementById('vizSpeedVal').textContent = (v/1000).toFixed(2) + 's';
+    if (vizState && vizState.timer) {
+      vizClearTimer();
+      vizState.timer = setInterval(vizAdvance, v);
+    }
+  }
+
+  function vizAdvance() {
+    if (!vizState) return;
+    if (vizState.idx < vizState.steps.length - 1) {
+      vizState.idx++;
+      vizRenderCurrent();
+    } else {
+      vizClearTimer();
+      document.getElementById('vizPlay').textContent = '▶ Play';
+    }
   }
 
   function vizRenderCurrent() {
@@ -2412,6 +2834,7 @@
     const s = vizState.steps[vizState.idx];
     vizState.viz.render(document.getElementById('vizCanvas'), s, vizState.data);
     document.getElementById('vizExplanation').innerHTML = s.msg || '';
+    document.getElementById('vizStepCounter').textContent = `Step ${vizState.idx + 1} / ${vizState.steps.length}`;
     document.getElementById('vizPrev').disabled = (vizState.idx === 0);
     document.getElementById('vizNext').disabled = (vizState.idx === vizState.steps.length - 1);
   }
@@ -2436,15 +2859,8 @@
     if (!vizState) return;
     if (vizState.timer) { vizClearTimer(); document.getElementById('vizPlay').textContent = '▶ Play'; return; }
     document.getElementById('vizPlay').textContent = '⏸ Pause';
-    vizState.timer = setInterval(() => {
-      if (vizState.idx < vizState.steps.length - 1) {
-        vizState.idx++;
-        vizRenderCurrent();
-      } else {
-        vizClearTimer();
-        document.getElementById('vizPlay').textContent = '▶ Play';
-      }
-    }, 950);
+    const speed = parseInt(document.getElementById('vizSpeed').value, 10) || 950;
+    vizState.timer = setInterval(vizAdvance, speed);
   }
 
   function vizClearTimer() {

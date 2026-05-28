@@ -219,13 +219,67 @@
       }
     ],
     "viz": {
-      "kind": "bs-peak",
+      "kind": "scripted-array",
       "data": {
-        "A": [
-          5,
-          17,
-          100,
-          11
+        "A": [5, 17, 100, 11],
+        "footer": "Hand-authored walkthrough — A = [5, 17, 100, 11]. Algorithm: O(log N) peak BS.",
+        "legend": ["c-input", "c-active", "c-eliminated", "c-low", "c-mid", "c-high", "c-peak"],
+        "script": [
+          {
+            "label": "Setup",
+            "msg": "Array <strong>A = [5, 17, 100, 11]</strong>. A peak is any element <strong>≥ both its neighbours</strong>. Corners count if they beat their <em>one</em> neighbour. We'll first rule out the two corners, then binary-search the interior."
+          },
+          {
+            "label": "Corner check ⓛ — left edge",
+            "marks": {"0": "c-active", "1": "c-active"},
+            "msg": "Look at the <strong>left corner</strong>: A[0]=5 vs A[1]=17. Is <strong>5 ≥ 17</strong>? <strong>No</strong> — the slope rises away from index 0, so it cannot be a peak.",
+            "overlay": "Rule: <code>A[0] &gt;= A[1]</code> ? If yes → return A[0]. Here <code>5 &lt; 17</code>, so skip."
+          },
+          {
+            "label": "Corner check ② — right edge",
+            "marks": {"0": "c-eliminated", "2": "c-active", "3": "c-active"},
+            "msg": "Look at the <strong>right corner</strong>: A[3]=11 vs A[2]=100. Is <strong>11 ≥ 100</strong>? <strong>No</strong> — the slope rises away from index 3 too.",
+            "overlay": "Rule: <code>A[N-1] &gt;= A[N-2]</code> ? Here <code>11 &lt; 100</code>, so skip. Both corners ruled out → enter interior BS."
+          },
+          {
+            "label": "Initialise interior search",
+            "marks": {"0": "c-eliminated", "3": "c-eliminated", "1": "c-low", "2": "c-high"},
+            "ptrs": {"low": 1, "high": 2},
+            "msg": "Interior range: <strong>low = 1</strong>, <strong>high = N-2 = 2</strong>. Search window is just indices 1 and 2. Both corners are now permanently eliminated.",
+            "overlay": "Why <code>low=1, high=N-2</code>? So <code>mid-1</code> and <code>mid+1</code> are always safe — no out-of-bounds neighbour."
+          },
+          {
+            "label": "Iteration 1 — pick mid",
+            "marks": {"0": "c-eliminated", "3": "c-eliminated", "1": "c-mid", "2": "c-high"},
+            "ptrs": {"low": 1, "high": 2, "mid": 1},
+            "msg": "<strong>mid = 1 + (2-1)/2 = 1</strong>. Inspect A[1] = <strong>17</strong> and its neighbours A[0]=5, A[2]=100."
+          },
+          {
+            "label": "Iteration 1 — compare neighbours",
+            "marks": {"0": "c-eliminated", "3": "c-eliminated", "1": "c-mid", "2": "c-active"},
+            "ptrs": {"low": 1, "high": 2, "mid": 1},
+            "msg": "Is A[1]=17 greater than <em>both</em> neighbours? A[0]=5 ✓ but A[2]=100 ✗. <strong>Not a peak.</strong> Check the slope direction: A[1]=17 vs A[mid-1]=A[0]=5. <strong>17 &gt; 5</strong> → we are <strong>climbing rightward</strong>.",
+            "overlay": "Decision: slope climbs right → a peak must lie to the right → set <code>low = mid + 1 = 2</code>."
+          },
+          {
+            "label": "Iteration 2 — window shrinks",
+            "marks": {"0": "c-eliminated", "1": "c-eliminated", "3": "c-eliminated", "2": "c-low c-high c-mid"},
+            "ptrs": {"low": 2, "high": 2, "mid": 2},
+            "msg": "<strong>low = 2, high = 2</strong>. Only one cell left in the interior. <strong>mid = 2</strong>. Inspect A[2] = <strong>100</strong>."
+          },
+          {
+            "label": "Iteration 2 — peak found",
+            "marks": {"0": "c-eliminated", "1": "c-eliminated", "3": "c-eliminated", "2": "c-peak"},
+            "ptrs": {"low": 2, "high": 2, "mid": 2, "ans": 2},
+            "msg": "A[2]=100 vs A[1]=17 and A[3]=11. <strong>100 &gt; 17</strong> ✓ and <strong>100 &gt; 11</strong> ✓ — beats both neighbours. <strong>Return 100.</strong>",
+            "overlay": "Trace summary: corners skipped → 1 BS iteration narrowed to index 2 → peak. Visited <strong>2 interior probes</strong> for N=4, vs 4 for brute scan."
+          },
+          {
+            "label": "Done",
+            "marks": {"0": "c-eliminated", "1": "c-eliminated", "3": "c-eliminated", "2": "c-peak"},
+            "ptrs": {"ans": 2},
+            "msg": "✅ <strong>Answer = 100</strong> at index 2. The hiker took giant uphill jumps — at every probe he asked only one question: <em>which side rises?</em> — and the mountain funnelled him to the summit in O(log N)."
+          }
         ]
       }
     }
