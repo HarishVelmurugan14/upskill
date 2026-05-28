@@ -1390,7 +1390,7 @@
       position: relative;
     }
     html body .prob-tale::before {
-      content: '🦊  Once Upon an Algorithm' !important;
+      content: '✦ Once Upon an Algorithm' !important;
       display: block !important;
       font-family: 'Caveat', cursive !important;
       font-size: 26px !important;
@@ -1767,20 +1767,31 @@
     html body a { color: var(--coral-deep) !important; }
     html body a:hover { color: var(--coral) !important; }
 
-    /* ─── FOX MASCOT ─── */
-    html body main::after {
-      content: '🦊' !important;
+    /* ─── CHIBI MASCOT (injected by JS, see chibiMascot.js) ─── */
+    html body .chibi-mascot {
       position: fixed !important;
       right: 24px !important; bottom: 24px !important;
-      width: 60px !important; height: 60px !important;
-      display: grid !important; place-items: center !important;
-      font-size: 32px !important;
+      width: 72px !important; height: 72px !important;
       background: var(--paper-3) !important;
       border: 3px solid var(--coral) !important;
       border-radius: 50% !important;
       box-shadow: 0 4px 0 var(--coral-deep), 0 12px 24px rgba(43,32,20,0.20) !important;
       z-index: 99 !important;
       pointer-events: none !important;
+      overflow: hidden !important;
+      display: grid !important;
+      place-items: center !important;
+    }
+    html body .chibi-mascot svg { width: 90% !important; height: 90% !important; display: block !important; }
+    html body .chibi-mascot::after {
+      content: attr(data-name);
+      position: absolute;
+      bottom: -22px; left: 50%; transform: translateX(-50%);
+      font-family: 'Quicksand', sans-serif;
+      font-size: 10px; font-weight: 700;
+      color: var(--ink-soft);
+      text-transform: uppercase; letter-spacing: 0.1em;
+      white-space: nowrap;
     }
 
     /* ─── MOBILE ─── */
@@ -2281,6 +2292,67 @@
       font-size: 12.5px !important;
       color: #ffa657 !important;
     }
+
+    /* Vocabulary for hand-authored step.html (matrices, LLs, custom layouts) */
+    html body .viz-stage .viz-custom { width: 100%; display: flex; flex-direction: column; align-items: center; gap: 14px; }
+    html body .viz-stage .v-row { display: flex; gap: 4px; align-items: center; justify-content: center; flex-wrap: wrap; }
+    html body .viz-stage .v-cell {
+      min-width: 54px; height: 42px; display: grid; place-items: center;
+      background: #21262d; color: #e6edf3;
+      border: 2px solid #30363d; border-radius: 8px;
+      font-family: 'JetBrains Mono', monospace; font-size: 15px; font-weight: 700;
+    }
+    html body .viz-stage .v-cell.v-active     { background: #ad6c0d; border-color: #d29922; color: #fff; }
+    html body .viz-stage .v-cell.v-low        { background: #1f4068; border-color: #79c0ff; color: #fff; }
+    html body .viz-stage .v-cell.v-high       { background: #4a2860; border-color: #bc8cff; color: #fff; }
+    html body .viz-stage .v-cell.v-mid        { background: #8b2c2a; border-color: #f85149; color: #fff; }
+    html body .viz-stage .v-cell.v-result     { background: #1e5a2e; border-color: #3fb950; color: #fff; }
+    html body .viz-stage .v-cell.v-eliminated { background: #161c25; color: #6e7681; border-color: #21262d; text-decoration: line-through; }
+    html body .viz-stage .v-cell.v-peak       { background: #6b4609; border-color: #ffa657; color: #fff; box-shadow: 0 0 0 2px rgba(255,166,87,0.30); }
+    html body .viz-stage .v-cell.v-current    { background: #4a2860; border-color: #d2a8ff; color: #fff; box-shadow: 0 0 0 2px rgba(210,168,255,0.30); }
+    html body .viz-stage .v-cell.v-new        { background: #1e5a2e; border-color: #56d364; color: #fff; box-shadow: 0 0 0 2px rgba(86,211,100,0.35); }
+    html body .viz-stage .v-cell.v-removed    { background: #6e1d24; border-color: #f85149; color: #ffd0d4; text-decoration: line-through; }
+    html body .viz-stage .v-cell.v-null       { background: transparent; border: 2px dashed #6e7681; color: #6e7681; min-width: 40px; }
+    html body .viz-stage .v-arrow {
+      color: #8b949e; font-family: 'JetBrains Mono', monospace; font-size: 18px;
+      padding: 0 2px; font-weight: 700;
+    }
+    html body .viz-stage .v-arrow.v-rev { color: #ffa657; }
+    html body .viz-stage .v-arrow.v-new { color: #56d364; }
+    html body .viz-stage .v-arrow.v-cut { color: #f85149; text-decoration: line-through; }
+    html body .viz-stage .v-label {
+      font-family: 'Quicksand', sans-serif; font-size: 10px; font-weight: 700;
+      text-transform: uppercase; letter-spacing: 0.1em;
+      color: #79c0ff; margin-bottom: 4px;
+    }
+    html body .viz-stage .v-matrix { display: flex; flex-direction: column; gap: 4px; }
+    html body .viz-stage .v-numline {
+      position: relative; height: 60px; width: 90%;
+      background: linear-gradient(to right, transparent 0, transparent calc(50% - 1px), #30363d calc(50% - 1px), #30363d calc(50% + 1px), transparent calc(50% + 1px));
+    }
+    html body .viz-stage .v-numline-track {
+      position: absolute; top: 28px; left: 0; right: 0; height: 4px;
+      background: #30363d; border-radius: 2px;
+    }
+    html body .viz-stage .v-numline-active {
+      position: absolute; top: 28px; height: 4px; background: #79c0ff; border-radius: 2px;
+    }
+    html body .viz-stage .v-numline-marker {
+      position: absolute; transform: translateX(-50%);
+      font-family: 'JetBrains Mono', monospace; font-size: 11px; font-weight: 700;
+      padding: 2px 6px; border-radius: 4px;
+    }
+    html body .viz-stage .v-numline-marker.v-low  { top: 2px;  background: rgba(121,192,255,0.18); color: #79c0ff; }
+    html body .viz-stage .v-numline-marker.v-high { top: 2px;  background: rgba(188,140,255,0.18); color: #bc8cff; }
+    html body .viz-stage .v-numline-marker.v-mid  { top: 40px; background: rgba(248,81,73,0.18);   color: #f85149; }
+    html body .viz-stage .v-numline-marker.v-ans  { top: 40px; background: rgba(63,185,80,0.20);   color: #3fb950; }
+    html body .viz-stage .v-stat {
+      display: inline-block;
+      font-family: 'JetBrains Mono', monospace; font-size: 13px;
+      background: rgba(255,255,255,0.06); color: #e6edf3;
+      padding: 4px 10px; border-radius: 4px; margin: 0 4px;
+    }
+    html body .viz-stage .v-stat strong { color: #ffa657; }
   </style>
 </head>
 <body>
@@ -2467,6 +2539,7 @@
 
 <script src="Scaler/DSA/Advanced/Revise/viz/engine.js"></script>
 <script src="Scaler/DSA/Advanced/Revise/viz/viz-kinds.js"></script>
+<script src="Scaler/DSA/Advanced/Revise/viz/chibi-mascot.js"></script>
 <script>
   // ─────────────────────────────────────────────────────────────────────
   //  STATE

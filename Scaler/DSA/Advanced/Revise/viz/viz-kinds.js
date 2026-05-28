@@ -538,9 +538,12 @@
   // ╰─────────────────────────────────────────────────────────────────╯
   // ╭─────────────────────────────────────────────────────────────────╮
   //  SCRIPTED_ARRAY — fully hand-authored per-problem visualizer
-  //  Reads { A, script:[{msg, marks, ptrs, label, overlay}], legend }
-  //  Each script entry is one step. marks override per-index cell class,
-  //  ptrs map index → L/M/H/★, overlay is HTML drawn below the array.
+  //  Reads { A?, script:[{msg, marks, ptrs, label, overlay, html}], legend, footer }
+  //  Each script entry is one step.
+  //  - If step.html is set, it is injected as the entire canvas body
+  //    (escape hatch for matrices, linked lists, custom layouts).
+  //  - Else: renders an array using A + marks + ptrs.
+  //  overlay is HTML drawn below the main visual.
   // ╰─────────────────────────────────────────────────────────────────╯
   const SCRIPTED_ARRAY = {
     makeSteps(data) {
@@ -549,25 +552,31 @@
         ptrs:  s.ptrs  || {},
         label: s.label || '',
         overlay: s.overlay || '',
+        html:  s.html  || '',
         msg:   s.msg   || '',
       }));
     },
     render(canvas, step, data) {
-      const A = data.A;
       const children = [];
       if (step.label) {
-        const banner = E.el('div', 'viz-step-label', step.label);
-        children.push(banner);
+        children.push(E.el('div', 'viz-step-label', step.label));
       }
-      children.push(E.block('Array (index)', E.indexRow(A.length)));
-      children.push(E.block('Array (value)', E.arrayRow(A, step.marks)));
-      const hasPtrs = step.ptrs && Object.keys(step.ptrs).length > 0;
-      if (hasPtrs) {
-        const ptrs = {};
-        ['low','mid','high','ans'].forEach(k => {
-          if (step.ptrs[k] !== undefined && step.ptrs[k] !== null) ptrs[k] = step.ptrs[k];
-        });
-        children.push(E.block('Pointers', E.pointerRow(A.length, ptrs)));
+      if (step.html) {
+        const host = E.el('div', 'viz-custom');
+        host.innerHTML = step.html;
+        children.push(host);
+      } else if (data.A) {
+        const A = data.A;
+        children.push(E.block('Array (index)', E.indexRow(A.length)));
+        children.push(E.block('Array (value)', E.arrayRow(A, step.marks)));
+        const hasPtrs = step.ptrs && Object.keys(step.ptrs).length > 0;
+        if (hasPtrs) {
+          const ptrs = {};
+          ['low','mid','high','ans'].forEach(k => {
+            if (step.ptrs[k] !== undefined && step.ptrs[k] !== null) ptrs[k] = step.ptrs[k];
+          });
+          children.push(E.block('Pointers', E.pointerRow(A.length, ptrs)));
+        }
       }
       if (step.overlay) {
         const ov = E.el('div', 'viz-overlay');
