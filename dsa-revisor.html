@@ -2697,6 +2697,485 @@
       html body .prob-title { font-size: 42px !important; }
       html body .quote-banner .quote-text { font-size: 22px !important; }
     }
+
+    /* ═══════════════════════════════════════════════════════════════
+       🌤️🌤️🌤️  STORYBOOK SKY  —  v3 PALETTE PIVOT  🌤️🌤️🌤️
+       Cream is out. New palette = soft SKY + warm WHITE + lilac.
+       Think Beatrix Potter on a clear morning, not yellowed paper.
+       Also: use full screen width, kill dark surfaces still leaking.
+       ═══════════════════════════════════════════════════════════════ */
+
+    :root {
+      /* Sky storybook palette */
+      --sky-1:        #ffffff;   /* whitest */
+      --sky-2:        #f7fbff;   /* clouds */
+      --sky-3:        #e9f3fc;   /* soft sky */
+      --sky-4:        #d6e9f8;   /* sky */
+      --sky-5:        #b8d4ed;   /* sky edge */
+      --sky-6:        #6ba3d4;   /* sky dark */
+      --ink-1:        #2a3a4d !important;   /* deep navy ink */
+      --ink-2:        #4a5a6e !important;   /* soft navy ink */
+      --warm-1:       #fff6e8;   /* warm highlight */
+      --pink-1:       #ffe5ec;   /* blush */
+      --pink-2:       #ffc2d1;   /* pink */
+      --pink-3:       #e87a99;   /* pink deep */
+      --leaf-1:       #e8f5e9;   /* leaf light */
+      --leaf-2:       #b8e0c2;   /* leaf */
+      --leaf-3:       #4ea872;   /* leaf deep */
+      --sun-1:        #fff8d4;   /* sun pale */
+      --sun-2:        #ffd97d;   /* sun */
+      --sun-3:        #d99e2a;   /* sun deep */
+      --lilac-1:      #f0e9fc;   /* lilac pale */
+      --lilac-2:      #d4c5e8;   /* lilac */
+      --lilac-3:      #8b6cb8;   /* lilac deep */
+    }
+
+    /* Page background = morning sky with soft clouds */
+    html, body, html body {
+      background:
+        radial-gradient(800px 500px at 20% 0%, #fff8d4 0%, transparent 60%),
+        radial-gradient(900px 600px at 100% 30%, #ffe5ec 0%, transparent 65%),
+        radial-gradient(700px 500px at 0% 80%, #e8f5e9 0%, transparent 60%),
+        linear-gradient(180deg, #e9f3fc 0%, #d6e9f8 100%) fixed !important;
+      background-color: #d6e9f8 !important;
+      color: #2a3a4d !important;
+      font-family: 'Quicksand', 'Nunito', sans-serif !important;
+    }
+
+    /* Header = soft white cloud bar */
+    html body header {
+      background: linear-gradient(180deg, #ffffff 0%, #f7fbff 100%) !important;
+      border-bottom: 3px solid #b8d4ed !important;
+      box-shadow: 0 4px 0 rgba(184,212,237,0.45), 0 8px 18px rgba(107,163,212,0.20) !important;
+    }
+    html body header *,
+    html body header .crumb,
+    html body header a,
+    html body header span { color: #4a5a6e !important; }
+    html body header .logo {
+      color: #e87a99 !important;
+      font-family: 'Caveat', cursive !important;
+      font-size: 32px !important;
+      font-weight: 700 !important;
+    }
+
+    /* Sec nav: soft sky strip */
+    html body .sec-nav {
+      background: linear-gradient(180deg, #f7fbff, #e9f3fc) !important;
+      border-bottom: 2px dashed #b8d4ed !important;
+    }
+    html body .sec-nav .pill {
+      background: #ffffff !important;
+      color: #4a5a6e !important;
+      border: 2px solid #b8d4ed !important;
+      box-shadow: 0 2px 0 #93c0e0 !important;
+    }
+    html body .sec-nav .pill:hover {
+      background: #f7fbff !important;
+      color: #e87a99 !important;
+      border-color: #e87a99 !important;
+    }
+    html body .sec-nav .pill.current,
+    html body .sec-nav .pill.blue.current {
+      background: linear-gradient(180deg, #ffd0dd, #ffa3bd) !important;
+      color: #5a1f30 !important;
+      border: 2px solid #e87a99 !important;
+      box-shadow: 0 3px 0 #c45a7a !important;
+    }
+
+    /* ── FULL-WIDTH PAGE: use 96% width with breathing margins ── */
+    html body main {
+      background:
+        linear-gradient(180deg, #ffffff 0%, #f7fbff 100%) !important;
+      max-width: none !important;
+      width: calc(100% - 56px) !important;
+      margin: 20px 28px 80px !important;
+      padding: 32px 48px 60px !important;
+      border-radius: 24px !important;
+      border: 1px solid #b8d4ed !important;
+      box-shadow:
+        0 4px 0 #93c0e0,
+        0 22px 40px rgba(107,163,212,0.20),
+        0 50px 90px rgba(50,90,140,0.10),
+        inset 0 1px 0 #ffffff !important;
+    }
+
+    /* Two-column layout on wide screens so the page actually USES the width */
+    @media (min-width: 1200px) {
+      html body #tab-problem,
+      html body #tab-solutions,
+      html body #tab-notes {
+        display: grid !important;
+        grid-template-columns: 1fr 1fr;
+        gap: 28px 36px;
+        align-items: start;
+      }
+      html body #tab-problem .prob-title,
+      html body #tab-problem .prob-subtopic,
+      html body #tab-problem .io-grid,
+      html body #tab-problem .ds-block,
+      html body #tab-solutions .sol-tabs,
+      html body #tab-solutions .sol-meta,
+      html body #tab-notes .notes-summary {
+        grid-column: 1 / -1;
+      }
+      html body .prob-story,
+      html body .prob-tale,
+      html body .prob-desc,
+      html body .sol-mini-story,
+      html body .sol-approach,
+      html body pre,
+      html body .tp-card,
+      html body .pattern-card {
+        max-width: none !important;
+      }
+    }
+
+    /* Hide the book-gutter line that was for narrow centered layout */
+    html body main::after { display: none !important; }
+
+    /* ── Quote banner (sun ribbon) ── */
+    html body .quote-banner {
+      background: linear-gradient(135deg, #fff8d4, #ffe5b0) !important;
+      border: 3px solid #d99e2a !important;
+      border-left: 8px solid #e87a99 !important;
+      border-radius: 20px !important;
+      box-shadow: 0 4px 0 #c9881e, 0 14px 28px rgba(217,158,42,0.22) !important;
+      color: #5a3a1a !important;
+    }
+    html body .quote-banner .quote-text {
+      color: #5a3a1a !important;
+      font-family: 'Caveat', cursive !important;
+      font-size: 28px !important;
+      line-height: 1.4 !important;
+    }
+    html body .quote-banner .quote-author {
+      color: #c45a7a !important;
+    }
+
+    /* ── KILL THE DARK .filters BOX — the real culprit was .filters, not .filter-block ── */
+    html body .filters,
+    html body .filter-row,
+    html body .practice-bar {
+      background: linear-gradient(180deg, #ffffff, #f7fbff) !important;
+      background-color: #ffffff !important;
+      border: 2px solid #b8d4ed !important;
+      border-radius: 18px !important;
+      box-shadow: 0 3px 0 #93c0e0, inset 0 1px 0 #ffffff !important;
+      padding: 16px 22px !important;
+      color: #2a3a4d !important;
+    }
+    html body .filters * { color: #4a5a6e !important; }
+    html body .filter-block label { color: #6ba3d4 !important; font-weight: 700 !important; }
+    html body .filter-block input,
+    html body .filter-block select {
+      background: #ffffff !important;
+      color: #2a3a4d !important;
+      border: 2px solid #b8d4ed !important;
+      border-radius: 10px !important;
+      font-family: 'Quicksand', sans-serif !important;
+      font-weight: 600 !important;
+    }
+    html body .filter-block input:focus {
+      border-color: #e87a99 !important;
+      box-shadow: 0 0 0 3px rgba(232,122,153,0.22) !important;
+    }
+    html body .practice-progress {
+      color: #e87a99 !important;
+      font-family: 'Caveat', cursive !important;
+      font-size: 26px !important;
+      font-weight: 700 !important;
+    }
+
+    /* ── Tabs (book tabs on dashed sky binding) ── */
+    html body .tabs { border-bottom: 3px dashed #b8d4ed !important; }
+    html body .tabs .tab {
+      background: #ffffff !important;
+      color: #4a5a6e !important;
+      border: 2px solid #b8d4ed !important;
+      border-bottom: none !important;
+      box-shadow: 0 -2px 0 #93c0e0 !important;
+    }
+    html body .tabs .tab.active {
+      background: linear-gradient(180deg, #ffd0dd, #ffa3bd) !important;
+      color: #5a1f30 !important;
+      border-color: #e87a99 !important;
+      box-shadow: 0 -3px 0 #c45a7a !important;
+    }
+
+    /* ── Chapter title in pink with shadow ── */
+    html body .prob-title {
+      color: #e87a99 !important;
+      text-shadow: 2px 3px 0 rgba(196,90,122,0.18) !important;
+    }
+    html body .prob-subtopic { color: #8b6cb8 !important; }
+
+    /* ── Problem cards repainted ── */
+    html body .prob-desc {
+      background: linear-gradient(180deg, #ffffff, #f7fbff) !important;
+      border: 2px solid #b8d4ed !important;
+      color: #2a3a4d !important;
+      font-family: 'Quicksand', sans-serif !important;
+    }
+    html body .prob-story {
+      background: linear-gradient(180deg, #ffe5ec, #ffc2d1) !important;
+      border: 3px solid #e87a99 !important;
+      color: #5a1f30 !important;
+    }
+    html body .prob-story::before {
+      content: '🌟  In Plain English  🌟' !important;
+      color: #c45a7a !important;
+    }
+    html body .prob-tale {
+      background: linear-gradient(180deg, #f0e9fc, #d4c5e8) !important;
+      border: 3px solid #8b6cb8 !important;
+      color: #3a2a4a !important;
+    }
+    html body .prob-tale::before {
+      content: '🦊  Once Upon an Algorithm  🌙' !important;
+      color: #8b6cb8 !important;
+    }
+    html body .prob-tale::first-letter { color: #8b6cb8 !important; text-shadow: 2px 3px 0 rgba(139,108,184,0.20) !important; }
+    html body .prob-tale::after { color: #8b6cb8 !important; }
+
+    /* ── Solution cards ── */
+    html body .sol-mini-story.sol-plain {
+      background: linear-gradient(180deg, #e8f5e9, #b8e0c2) !important;
+      border: 3px solid #4ea872 !important;
+      color: #1f4a2c !important;
+    }
+    html body .sol-mini-story.sol-tale {
+      background: linear-gradient(180deg, #ffe5ec, #ffc2d1) !important;
+      border: 3px solid #e87a99 !important;
+      color: #5a1f30 !important;
+    }
+    html body .sol-mini-story.sol-tale::before { color: #e87a99 !important; }
+    html body .sol-approach li {
+      background: linear-gradient(180deg, #e9f3fc, #d6e9f8) !important;
+      border: 3px solid #6ba3d4 !important;
+      color: #2a3a4d !important;
+    }
+    html body .sol-approach li::before {
+      background: #6ba3d4 !important;
+      border-color: #4682b4 !important;
+      box-shadow: 0 2px 0 #4682b4 !important;
+    }
+
+    /* ── Pseudocode / code = soft sky paper, not cream ── */
+    html body pre {
+      background: linear-gradient(180deg, #ffffff, #f7fbff) !important;
+      border: 3px solid #b8d4ed !important;
+      box-shadow: 0 4px 0 #93c0e0, 0 10px 22px rgba(107,163,212,0.14) !important;
+    }
+    html body pre code { color: #2a3a4d !important; }
+    html body pre.pseudo code { color: #1f4a2c !important; }
+    html body pre::before {
+      background: #ffa3bd !important;
+      border-color: #e87a99 !important;
+      color: #5a1f30 !important;
+      box-shadow: 0 2px 0 #c45a7a !important;
+    }
+    html body pre.pseudo::before {
+      background: #b8e0c2 !important;
+      border-color: #4ea872 !important;
+      color: #1f4a2c !important;
+      box-shadow: 0 2px 0 #2d7048 !important;
+    }
+    html body pre::after {
+      background: linear-gradient(225deg, #b8d4ed 50%, #ffffff 50%) !important;
+    }
+
+    /* ── TOPIC NOTES: fix the awful font ── */
+    html body .notes-summary {
+      background: linear-gradient(180deg, #fff8d4, #ffe5b0) !important;
+      border: 3px solid #d99e2a !important;
+      color: #5a3a1a !important;
+      /* >>> CLEAN font, NOT Caveat <<< */
+      font-family: 'Quicksand', 'Nunito', sans-serif !important;
+      font-style: normal !important;
+      font-weight: 600 !important;
+      font-size: 19px !important;
+      line-height: 1.7 !important;
+      letter-spacing: 0 !important;
+    }
+    /* Topic-notes body text everywhere = Quicksand, not script */
+    html body .tp-card,
+    html body .pattern-card {
+      background: linear-gradient(180deg, #f0e9fc, #d4c5e8) !important;
+      border: 3px solid #8b6cb8 !important;
+      color: #2a1f3a !important;
+    }
+    html body .pattern-card {
+      background: linear-gradient(180deg, #e9f3fc, #d6e9f8) !important;
+      border-color: #6ba3d4 !important;
+      color: #18395a !important;
+    }
+    html body .tp-card .tp-title {
+      font-family: 'Caveat', cursive !important;
+      font-size: 26px !important;
+      color: #8b6cb8 !important;
+    }
+    html body .tp-card .tp-body {
+      font-family: 'Quicksand', 'Nunito', sans-serif !important;
+      font-style: normal !important;
+      font-size: 15.5px !important;
+      line-height: 1.75 !important;
+      color: #3a2a4a !important;
+      font-weight: 500 !important;
+    }
+    html body .pattern-card .pat-name {
+      font-family: 'Caveat', cursive !important;
+      font-size: 26px !important;
+      color: #4682b4 !important;
+    }
+    html body .pattern-card .pat-when {
+      font-family: 'Quicksand', sans-serif !important;
+      font-size: 15.5px !important;
+      line-height: 1.75 !important;
+      color: #2a3a4d !important;
+      font-weight: 500 !important;
+    }
+    html body .edge-list li {
+      background: linear-gradient(180deg, #ffe5ec, #ffc2d1) !important;
+      border: 3px solid #e87a99 !important;
+      color: #5a1f30 !important;
+      font-family: 'Quicksand', sans-serif !important;
+      font-weight: 500 !important;
+    }
+    html body .notes-section h3 {
+      font-family: 'Caveat', cursive !important;
+      color: #e87a99 !important;
+      font-size: 38px !important;
+    }
+
+    /* ── Sample IO ── */
+    html body .io-box {
+      background: #ffffff !important;
+      border: 2px dashed #b8d4ed !important;
+      border-radius: 14px !important;
+    }
+    html body .io-label {
+      font-family: 'Caveat', cursive !important;
+      color: #6ba3d4 !important;
+      font-size: 22px !important;
+    }
+    html body .io-body {
+      background: #f7fbff !important;
+      color: #2a3a4d !important;
+    }
+
+    /* ── Tags ── */
+    html body .stag {
+      background: #b8e0c2 !important; color: #1f4a2c !important; border: 2px solid #4ea872 !important;
+    }
+    html body .stag:nth-child(2n) { background: #d6e9f8 !important; color: #18395a !important; border-color: #6ba3d4 !important; }
+    html body .stag:nth-child(3n) { background: #ffc2d1 !important; color: #5a1f30 !important; border-color: #e87a99 !important; }
+    html body .stag:nth-child(4n) { background: #d4c5e8 !important; color: #3a2a4a !important; border-color: #8b6cb8 !important; }
+
+    /* ── Buttons ── */
+    html body .btn, html body .btn-primary, html body .practice-bar button, html body .filters button {
+      background: #ffffff !important;
+      color: #2a3a4d !important;
+      border: 2px solid #b8d4ed !important;
+      border-radius: 12px !important;
+      font-family: 'Quicksand', sans-serif !important;
+      font-weight: 700 !important;
+      box-shadow: 0 3px 0 #93c0e0 !important;
+    }
+    html body .btn-primary {
+      background: linear-gradient(180deg, #ffd0dd, #ffa3bd) !important;
+      color: #5a1f30 !important;
+      border-color: #e87a99 !important;
+      box-shadow: 0 3px 0 #c45a7a !important;
+    }
+    html body .btn:hover:not(:disabled), html body .filters button:hover {
+      color: #e87a99 !important;
+      border-color: #e87a99 !important;
+    }
+
+    /* ── Solution sub-tabs ── */
+    html body .sol-tabs .sol-tab {
+      background: #ffffff !important;
+      color: #4a5a6e !important;
+      border: 2px solid #b8d4ed !important;
+      box-shadow: 0 2px 0 #93c0e0 !important;
+    }
+    html body .sol-tabs .sol-tab.active {
+      background: linear-gradient(180deg, #ffd0dd, #ffa3bd) !important;
+      color: #5a1f30 !important;
+      border-color: #e87a99 !important;
+      box-shadow: 0 3px 0 #c45a7a !important;
+    }
+    html body .complexity-pill {
+      background: linear-gradient(180deg, #e8f5e9, #b8e0c2) !important;
+      color: #1f4a2c !important;
+      border: 2px solid #4ea872 !important;
+      box-shadow: 0 2px 0 #2d7048 !important;
+    }
+
+    /* ── Visualizer ── */
+    html body .viz-canvas {
+      background: linear-gradient(180deg, #ffffff, #f7fbff) !important;
+      border: 3px solid #b8d4ed !important;
+      box-shadow: 0 4px 0 #93c0e0 !important;
+    }
+    html body .viz-empty {
+      background: linear-gradient(180deg, #ffffff, #f7fbff) !important;
+      border: 2px dashed #b8d4ed !important;
+      color: #6ba3d4 !important;
+    }
+    html body .viz-footer {
+      background: #f7fbff !important;
+      border: 2px dashed #b8d4ed !important;
+      color: #2a3a4d !important;
+    }
+    html body .viz-controls button {
+      background: #ffffff !important;
+      color: #2a3a4d !important;
+      border: 2px solid #6ba3d4 !important;
+      box-shadow: 0 3px 0 #4682b4 !important;
+    }
+    html body .cell {
+      background: #ffffff !important;
+      color: #2a3a4d !important;
+      border: 2px solid #6ba3d4 !important;
+    }
+    html body .cell.active { background: #ffa3bd !important; color: #5a1f30 !important; border-color: #e87a99 !important; }
+    html body .cell.pivot  { background: #ffd97d !important; color: #5a3a0a !important; border-color: #d99e2a !important; }
+    html body .cell.matched, html body .cell.found { background: #b8e0c2 !important; color: #1f4a2c !important; border-color: #4ea872 !important; }
+
+    /* ── Default body text everywhere ── */
+    html body, html body p, html body div, html body span, html body li {
+      color: #2a3a4d !important;
+    }
+
+    /* Hide the side doodle margin since we now use full width */
+    html body main::before { display: none !important; }
+
+    /* Fox stays */
+    html body main::after {
+      content: '🦊' !important;
+      position: fixed !important;
+      right: 24px !important; bottom: 24px !important;
+      width: 60px !important; height: 60px !important;
+      display: grid !important; place-items: center !important;
+      font-size: 32px !important;
+      background: #ffffff !important;
+      border: 3px solid #e87a99 !important;
+      border-radius: 50% !important;
+      box-shadow: 0 4px 0 #c45a7a, 0 14px 28px rgba(50,90,140,0.25) !important;
+      animation: bob 4s ease-in-out infinite !important;
+      z-index: 99 !important;
+      pointer-events: none !important;
+    }
+
+    @media (max-width: 900px) {
+      html body main {
+        width: calc(100% - 20px) !important;
+        margin: 12px 10px 60px !important;
+        padding: 22px 18px 40px !important;
+      }
+    }
   </style>
 </head>
 <body>
