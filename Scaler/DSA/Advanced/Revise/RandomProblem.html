@@ -603,13 +603,25 @@
         
         <div class="filter-section">
             <label class="filter-label">Filter by Topic:</label>
-            <input type="text" id="topicFilter" class="filter-input" 
-                   list="topicList" 
+            <input type="text" id="divisionFilter" class="filter-input"
+                   list="divisionList"
                    placeholder="Type to search or select 'All Topics'..."
-                   oninput="updateProblemCount()" 
+                   oninput="onDivisionChange()"
+                   autocomplete="off">
+            <datalist id="divisionList">
+                <option value="All Topics">
+            </datalist>
+        </div>
+
+        <div class="filter-section">
+            <label class="filter-label">Filter by Sub Topic:</label>
+            <input type="text" id="topicFilter" class="filter-input"
+                   list="topicList"
+                   placeholder="Type to search or select 'All Sub Topics'..."
+                   oninput="updateProblemCount()"
                    autocomplete="off">
             <datalist id="topicList">
-                <option value="All Topics">
+                <option value="All Sub Topics">
             </datalist>
             <span class="problem-count" id="problemCount"></span>
         </div>
@@ -633,7 +645,7 @@
         <div class="button-group" id="actionButtonGroup">
             <button class="btn-complexity" onclick="showComplexity()">Complexity</button>
             <button class="btn-approach" onclick="showApproach()">Approach</button>
-            <button class="btn-topic" onclick="showTopic()">Topic</button>
+            <button class="btn-topic" onclick="showTopic()">Sub Topic</button>
         </div>
 
         <div id="problemSection" class="content-section">
@@ -671,7 +683,7 @@
         </div>
 
         <div id="topicSection" class="content-section">
-            <div class="section-title">📚 Topic</div>
+            <div class="section-title">📚 Sub Topic</div>
             <div id="topicDescription"></div>
             <div class="topic-tags" id="topicTags"></div>
         </div>
@@ -1000,6 +1012,173 @@
                 ],
                 topic: "Binary Search on Answer with Sliding Window. Binary search on the subarray length and verify using sliding window technique for efficient sum calculation.",
                 tags: ["Binary Search", "Sliding Window", "Binary Search on Answer", "Subarray Sum"]
+            },
+            {
+                title: "Print Linked List",
+                description: "You are given A which is the head of a linked list. Print the linked list in space separated manner.\n\nNote: The last node value must also be succeeded by a space and after printing the entire list you should print a new line.",
+                sampleInput: "Input 1:\nA = 1 -> 2 -> 3 -> NULL\n\nInput 2:\nA = 4 -> 3 -> 2 -> 1 -> NULL",
+                sampleOutput: "Output 1:\n1 2 3 \n\nOutput 2:\n4 3 2 1 ",
+                timeComplexity: "O(N)",
+                spaceComplexity: "O(1)",
+                approach: [
+                    "Initialize a pointer curr = head to start traversing from the beginning",
+                    "While curr is not NULL, print curr.val followed by a space",
+                    "Move to the next node: curr = curr.next",
+                    "After the loop completes, print a new line character",
+                    "Handle edge case: if head is NULL, just print new line"
+                ],
+                topic: "Linked List Traversal. This is the most fundamental operation on a linked list - traversing through all nodes sequentially using the next pointer. Essential building block for more complex linked list operations.",
+                tags: ["Linked List", "Traversal", "Basic", "Printing"]
+            },
+            {
+                title: "Reverse Linked List",
+                description: "You are given a singly linked list having head node A. You have to reverse the linked list and return the head node of that reversed list.\n\nNOTE: You have to do it in-place and in one pass.",
+                sampleInput: "Input 1:\nA = 1 -> 2 -> 3 -> 4 -> 5 -> NULL\n\nInput 2:\nA = 3 -> NULL",
+                sampleOutput: "Output 1:\n5 -> 4 -> 3 -> 2 -> 1 -> NULL\n\nOutput 2:\n3 -> NULL",
+                timeComplexity: "O(N)",
+                spaceComplexity: "O(1)",
+                approach: [
+                    "Use three pointers: prev = NULL, curr = head, next = NULL",
+                    "Traverse the list: while curr is not NULL",
+                    "Store next node: next = curr.next",
+                    "Reverse the link: curr.next = prev",
+                    "Move pointers forward: prev = curr, curr = next",
+                    "After loop, prev will be the new head. Return prev"
+                ],
+                topic: "Linked List Reversal. Classic in-place reversal using three pointers (prev, curr, next). This is a fundamental pattern used in many linked list problems involving reversal or reordering.",
+                tags: ["Linked List", "Reversal", "Two Pointers", "In-place"]
+            },
+            {
+                title: "Copy List with Random Pointer",
+                description: "A linked list A is given such that each node contains an additional random pointer which could point to any node in the list or NULL.\n\nReturn a deep copy of the list.\n\nThe returned answer should not contain the same node as the original list, but a copy of them. The pointers in the returned list should not link to any node in the original input list.",
+                sampleInput: "Input 1:\nA = [[1, 3], [2, 0], [3, NULL], [4, 1]]\n(Node values with their random pointer indices)\n\nInput 2:\nA = [[1, NULL], [2, NULL]]",
+                sampleOutput: "Output 1:\nDeep copy with same structure but new nodes\n\nOutput 2:\nDeep copy with same structure but new nodes",
+                timeComplexity: "O(N)",
+                spaceComplexity: "O(N) for HashMap, O(1) for interweaving",
+                approach: [
+                    "Approach 1 - HashMap: Create a map of original node to copied node",
+                    "First pass: Create all new nodes and store mapping",
+                    "Second pass: Set next and random pointers using the map",
+                    "Approach 2 - Interweaving: Insert copied nodes between originals",
+                    "First pass: For each node, create copy and insert after it",
+                    "Second pass: Set random pointers for copied nodes",
+                    "Third pass: Separate the two lists and restore original"
+                ],
+                topic: "Linked List Deep Copy with Random Pointers. This problem demonstrates handling complex node structures with multiple pointers. The interweaving technique is elegant for O(1) space.",
+                tags: ["Linked List", "Deep Copy", "HashMap", "Two Pointers", "Random Pointer"]
+            },
+            {
+                title: "Insert in Linked List",
+                description: "You are given A which is the head of a linked list. Also given is the value B and position C. Complete the function that should insert a new node with the said value at the given position.\n\nNotes:\n• In case the position is more than length of linked list, simply insert the new node at the tail only\n• In case the pos is 0, simply insert the new node at head only\n• Follow 0-based indexing for the node numbering",
+                sampleInput: "Input 1:\nA = 1 -> 2\nB = 3\nC = 0\n\nInput 2:\nA = 1 -> 2\nB = 3\nC = 1",
+                sampleOutput: "Output 1:\n3 -> 1 -> 2\n\nOutput 2:\n1 -> 3 -> 2",
+                timeComplexity: "O(N)",
+                spaceComplexity: "O(1)",
+                approach: [
+                    "Create new node with value B",
+                    "Edge case: If C = 0, insert at head: newNode.next = head, return newNode",
+                    "Traverse to position C-1 (one before insertion point)",
+                    "If reached end before C-1, insert at tail",
+                    "Otherwise: newNode.next = curr.next, curr.next = newNode",
+                    "Return head (or newNode if inserted at position 0)"
+                ],
+                topic: "Linked List Insertion at Position. Demonstrates pointer manipulation to insert nodes at arbitrary positions while handling edge cases (head, tail, middle).",
+                tags: ["Linked List", "Insertion", "Pointer Manipulation", "Edge Cases"]
+            },
+            {
+                title: "Delete Node in Linked List",
+                description: "You are given the head of a linked list A and an integer B. Delete the B-th node from the linked list.\n\nNote: Follow 0-based indexing for the node numbering.",
+                sampleInput: "Input 1:\nA = 1 -> 2 -> 3\nB = 1\n\nInput 2:\nA = 4 -> 3 -> 2 -> 1\nB = 0",
+                sampleOutput: "Output 1:\n1 -> 3\n(Deleted node with value 2 at index 1)\n\nOutput 2:\n3 -> 2 -> 1\n(Deleted head node with value 4 at index 0)",
+                timeComplexity: "O(N)",
+                spaceComplexity: "O(1)",
+                approach: [
+                    "Edge case: If B = 0, delete head: return head.next",
+                    "Traverse to node at position B-1 (one before deletion point)",
+                    "Check if B-1 node exists and has a next node",
+                    "Delete: curr.next = curr.next.next (skip the B-th node)",
+                    "If B >= length, no deletion needed, return head",
+                    "Return head of modified list"
+                ],
+                topic: "Linked List Deletion at Index. Standard deletion operation requiring traversal to one node before target and pointer adjustment to skip the node.",
+                tags: ["Linked List", "Deletion", "Pointer Manipulation", "Edge Cases"]
+            },
+            {
+                title: "Remove Duplicates from Sorted List",
+                description: "Given a sorted linked list, delete all duplicates such that each element appears only once.",
+                sampleInput: "Input 1:\nA = 1 -> 1 -> 2 -> NULL\n\nInput 2:\nA = 1 -> 1 -> 2 -> 3 -> 3 -> NULL",
+                sampleOutput: "Output 1:\n1 -> 2 -> NULL\n\nOutput 2:\n1 -> 2 -> 3 -> NULL",
+                timeComplexity: "O(N)",
+                spaceComplexity: "O(1)",
+                approach: [
+                    "Initialize curr = head to traverse the list",
+                    "While curr and curr.next exist:",
+                    "If curr.val == curr.next.val, skip duplicate: curr.next = curr.next.next",
+                    "Else move to next node: curr = curr.next",
+                    "Continue until end of list",
+                    "Return head (first element is always kept)"
+                ],
+                topic: "Linked List Duplicate Removal. Since the list is sorted, duplicates are adjacent. Simply skip over consecutive duplicate nodes while keeping the first occurrence.",
+                tags: ["Linked List", "Duplicates", "Sorted List", "In-place"]
+            },
+            {
+                title: "Remove Nth Node from List End",
+                description: "Given a linked list A, remove the B-th node from the end of the list and return its head.\n\nFor example, given linked list: 1->2->3->4->5, and B = 2.\nAfter removing the second node from the end, the linked list becomes 1->2->3->5.\n\nNOTE: If B is greater than the size of the list, remove the first node of the list.\n\nTry doing it using constant additional space.",
+                sampleInput: "Input 1:\nA = 1 -> 2 -> 3 -> 4 -> 5\nB = 2\n\nInput 2:\nA = 1 -> 2 -> 3 -> 4 -> 5\nB = 5",
+                sampleOutput: "Output 1:\n1 -> 2 -> 3 -> 5\n(Removed node 4)\n\nOutput 2:\n2 -> 3 -> 4 -> 5\n(Removed head node 1)",
+                timeComplexity: "O(N)",
+                spaceComplexity: "O(1)",
+                approach: [
+                    "Use two pointers: fast and slow, both start at head",
+                    "Move fast pointer B steps ahead",
+                    "If fast reaches NULL, B >= length, remove head: return head.next",
+                    "Move both pointers together until fast.next is NULL",
+                    "Now slow is at node before the one to delete",
+                    "Delete: slow.next = slow.next.next",
+                    "Return head"
+                ],
+                topic: "Linked List Two-Pointer Technique. Classic approach to find Nth node from end in one pass: maintain a gap of N between two pointers.",
+                tags: ["Linked List", "Two Pointers", "Nth from End", "One Pass"]
+            },
+            {
+                title: "Reverse Linked List II (Partial Reversal)",
+                description: "Reverse a linked list A from position B to C.\n\nNOTE: Do it in-place and in one-pass.\n\nPositions are 1-indexed.",
+                sampleInput: "Input 1:\nA = 1 -> 2 -> 3 -> 4 -> 5 -> NULL\nB = 2, C = 4\n\nInput 2:\nA = 1 -> 2 -> 3 -> 4 -> 5 -> NULL\nB = 1, C = 5",
+                sampleOutput: "Output 1:\n1 -> 4 -> 3 -> 2 -> 5 -> NULL\n(Reversed nodes 2,3,4)\n\nOutput 2:\n5 -> 4 -> 3 -> 2 -> 1 -> NULL\n(Reversed entire list)",
+                timeComplexity: "O(N)",
+                spaceComplexity: "O(1)",
+                approach: [
+                    "Use dummy node to handle edge case where B = 1",
+                    "Traverse to node at position B-1 (one before reversal start)",
+                    "Store this as pre. Store pre.next as start of reversal segment",
+                    "Reverse nodes from B to C using standard reversal (prev, curr, next)",
+                    "After reversal: connect pre.next to new head of reversed segment",
+                    "Connect tail of reversed segment (original start) to node at C+1",
+                    "Return dummy.next"
+                ],
+                topic: "Linked List Partial Reversal. Combines traversal and reversal techniques. Key insight: reverse a segment and reconnect it to surrounding nodes.",
+                tags: ["Linked List", "Reversal", "Partial Reversal", "In-place", "One Pass"]
+            },
+            {
+                title: "K Reverse Linked List (Reverse in Groups)",
+                description: "Given a singly linked list A and an integer B, reverse the nodes of the list B at a time and return the modified linked list.\n\nNOTE: B always divides the length of A.",
+                sampleInput: "Input 1:\nA = [1, 2, 3, 4, 5, 6]\nB = 2\n\nInput 2:\nA = [1, 2, 3, 4, 5, 6]\nB = 3",
+                sampleOutput: "Output 1:\n[2, 1, 4, 3, 6, 5]\n(Reversed in groups of 2)\n\nOutput 2:\n[3, 2, 1, 6, 5, 4]\n(Reversed in groups of 3)",
+                timeComplexity: "O(N)",
+                spaceComplexity: "O(1) iterative, O(N/K) recursive",
+                approach: [
+                    "Use dummy node to handle edge cases",
+                    "Keep track of prevGroupEnd (initially dummy)",
+                    "For each group of K nodes:",
+                    "Store groupStart, reverse K nodes using standard reversal",
+                    "After reversal: groupStart becomes groupEnd",
+                    "Connect prevGroupEnd.next to new group head",
+                    "Connect groupEnd.next to next group's start",
+                    "Move to next group: prevGroupEnd = groupEnd",
+                    "Return dummy.next"
+                ],
+                topic: "Linked List Reversal in Groups. Extension of basic reversal - reverse fixed-size segments repeatedly. Can be solved iteratively or recursively.",
+                tags: ["Linked List", "Reversal", "Group Reversal", "K-Group", "Iterative"]
             }
         ];
 
@@ -1008,8 +1187,14 @@
         let currentPracticeIndex = 0;
         let practiceProblems = [];
 
-        // Initialize topic filter on page load
+        // Default division for any problem that doesn't specify one.
+        // To add a new top-level Topic, just set `division: "Your Topic"` on the problem object.
+        const DEFAULT_DIVISION = "Binary Search";
+        problems.forEach(p => { if (!p.division) p.division = DEFAULT_DIVISION; });
+
+        // Initialize filters on page load
         window.onload = function() {
+            populateDivisionFilter();
             populateTopicFilter();
             updateProblemCount();
         };
@@ -1075,16 +1260,52 @@
             }
         }
 
+        function populateDivisionFilter() {
+            const divisionSet = new Set();
+            problems.forEach(p => divisionSet.add(p.division));
+
+            const divisionList = document.getElementById('divisionList');
+            // Clear existing options except the "All Topics" sentinel
+            divisionList.innerHTML = '<option value="All Topics">';
+
+            Array.from(divisionSet).sort().forEach(division => {
+                const option = document.createElement('option');
+                option.value = division;
+                divisionList.appendChild(option);
+            });
+        }
+
+        function getSelectedDivision() {
+            const value = document.getElementById('divisionFilter').value.trim();
+            if (value === '' || value.toLowerCase() === 'all topics') return null;
+            return value;
+        }
+
+        function problemsInSelectedDivision() {
+            const division = getSelectedDivision();
+            if (!division) return problems;
+            return problems.filter(p =>
+                p.division && p.division.toLowerCase() === division.toLowerCase()
+            );
+        }
+
+        function onDivisionChange() {
+            // Reset sub-topic filter when division changes so stale tags don't filter out everything
+            document.getElementById('topicFilter').value = '';
+            populateTopicFilter();
+            updateProblemCount();
+        }
+
         function populateTopicFilter() {
             const topicSet = new Set();
-            problems.forEach(problem => {
+            problemsInSelectedDivision().forEach(problem => {
                 problem.tags.forEach(tag => topicSet.add(tag));
             });
-            
+
             const topicList = document.getElementById('topicList');
-            const sortedTopics = Array.from(topicSet).sort();
-            
-            sortedTopics.forEach(topic => {
+            topicList.innerHTML = '<option value="All Sub Topics">';
+
+            Array.from(topicSet).sort().forEach(topic => {
                 const option = document.createElement('option');
                 option.value = topic;
                 topicList.appendChild(option);
@@ -1092,14 +1313,17 @@
         }
 
         function getFilteredProblems() {
-            const selectedTopic = document.getElementById('topicFilter').value.trim();
-            
-            if (selectedTopic === '' || selectedTopic.toLowerCase() === 'all topics') {
-                return problems;
+            const selectedSubTopic = document.getElementById('topicFilter').value.trim();
+            const base = problemsInSelectedDivision();
+
+            if (selectedSubTopic === '' ||
+                selectedSubTopic.toLowerCase() === 'all sub topics' ||
+                selectedSubTopic.toLowerCase() === 'all topics') {
+                return base;
             }
-            
-            return problems.filter(problem => 
-                problem.tags.some(tag => tag.toLowerCase().includes(selectedTopic.toLowerCase()))
+
+            return base.filter(problem =>
+                problem.tags.some(tag => tag.toLowerCase().includes(selectedSubTopic.toLowerCase()))
             );
         }
 
