@@ -1104,13 +1104,13 @@
        ═══════════════════════════════════════════════════════════════ */
 
     :root {
-      /* paper + ink — bluish-white instead of cream */
-      --paper:        #dde6ef;  /* bluish paper */
-      --paper-2:      #c2d0de;  /* paper shadow */
-      --paper-3:      #eef3f9;  /* paper highlight (cards) */
-      --ink:          #14202e;  /* deep navy ink */
-      --ink-soft:     #3a4a5e;  /* soft navy ink */
-      --rule:         #97abc2;  /* dashed-rule colour */
+      /* paper + ink — whitish with subtle blue/rose/green wash */
+      --paper:        #f4f6f5;  /* near-white, faint cool tint */
+      --paper-2:      #dde3e0;  /* paper shadow */
+      --paper-3:      #fbfcfb;  /* paper highlight (cards, nearly white) */
+      --ink:          #1c2530;  /* deep slate ink */
+      --ink-soft:     #4b5564;  /* soft slate ink */
+      --rule:         #c4ccc8;  /* soft sage-grey rule */
 
       /* accents — saturated picture-book colours */
       --coral:        #e26648;  /* terracotta */
@@ -1137,10 +1137,10 @@
     html, body, html body {
       background: var(--paper) !important;
       background-image:
-        radial-gradient(rgba(43,32,20,0.045) 1px, transparent 1px),
-        radial-gradient(rgba(43,32,20,0.03) 1px, transparent 1px) !important;
-      background-size: 28px 28px, 7px 7px !important;
-      background-position: 0 0, 14px 14px !important;
+        radial-gradient(900px 600px at 0% 0%, #ffe9ee 0%, transparent 55%),
+        radial-gradient(900px 600px at 100% 0%, #e3eef7 0%, transparent 55%),
+        radial-gradient(900px 600px at 50% 100%, #e6f1ea 0%, transparent 55%) !important;
+      background-attachment: fixed !important;
       color: var(--ink) !important;
       font-family: 'Quicksand', 'Nunito', system-ui, sans-serif !important;
       font-size: 16px !important;
@@ -1158,9 +1158,11 @@
     html body header span { color: var(--ink-soft) !important; }
     html body header .logo {
       color: var(--coral-deep) !important;
-      font-family: 'Caveat', cursive !important;
-      font-size: 34px !important;
-      font-weight: 700 !important;
+      font-family: 'Inter', 'Helvetica Neue', system-ui, sans-serif !important;
+      font-size: 20px !important;
+      font-weight: 800 !important;
+      letter-spacing: 0.18em !important;
+      text-transform: uppercase !important;
     }
 
     /* ─── SEC NAV ─── */
