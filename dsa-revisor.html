@@ -1374,6 +1374,833 @@
       .notes-summary { font-size: 18px !important; padding: 20px 22px !important; }
       .tp-card .tp-body, .edge-list li, .pattern-card .pat-when { font-size: 15px !important; }
     }
+
+    /* ═══════════════════════════════════════════════════════════════
+       📖📖📖  STORYBOOK PAGE MODE  📖📖📖
+       Forget the IDE. This is a children's picture book that
+       happens to teach DSA. Cream paper, pastel cards, doodle
+       ornaments, big rounded everything. Code blocks become
+       "wizard scrolls" — still dark, but tucked inside the page.
+       ═══════════════════════════════════════════════════════════════ */
+
+    @import url('https://fonts.googleapis.com/css2?family=Caveat:wght@500;700&display=swap');
+    @import url('https://fonts.googleapis.com/css2?family=Quicksand:wght@500;600;700&display=swap');
+
+    /* Re-paint the whole page to cream paper */
+    :root {
+      --paper:        #fdf6e3 !important;   /* cream paper */
+      --paper-warm:   #f7ecc9 !important;   /* warmer page edge */
+      --ink:          #3a2a1c !important;   /* coffee ink */
+      --ink-soft:     #6b4c33 !important;
+      --peach:        #ffb38a !important;
+      --peach-deep:   #e8794a !important;
+      --mint:         #a8d8b9 !important;
+      --mint-deep:    #4ea872 !important;
+      --sky:          #b6d8f2 !important;
+      --sky-deep:     #4a90c9 !important;
+      --lavender:     #d4c5e8 !important;
+      --lavender-deep:#8b6cb8 !important;
+      --rose:         #f4b8c4 !important;
+      --rose-deep:    #d96384 !important;
+      --honey:        #ffd97d !important;
+      --honey-deep:   #d99e2a !important;
+    }
+
+    html, body {
+      background:
+        radial-gradient(ellipse at top, #fdf6e3 0%, #f5e8c8 100%) fixed !important;
+      color: var(--ink) !important;
+      font-family: 'Quicksand', 'Inter', sans-serif !important;
+    }
+
+    /* Sticky top bar — pastel banner instead of dark */
+    header {
+      background: linear-gradient(180deg, #fff7e0 0%, #fdedc5 100%) !important;
+      border-bottom: 3px solid #e8b95a !important;
+      box-shadow: 0 4px 0 rgba(232,185,90,0.25) !important;
+    }
+    .sec-nav {
+      background: transparent !important;
+      border-bottom: 2px dashed #d9b466 !important;
+    }
+    .logo { color: var(--peach-deep) !important; font-family: 'Caveat', cursive !important; font-size: 28px !important; }
+    .pill.blue.current {
+      background: var(--peach) !important;
+      color: #5a2d10 !important;
+      border: 2px solid var(--peach-deep) !important;
+      border-radius: 999px !important;
+    }
+    .pill {
+      background: #fff7e0 !important;
+      color: var(--ink-soft) !important;
+      border: 2px solid #e8c98a !important;
+      border-radius: 999px !important;
+    }
+
+    /* ── Quote banner = the page's opening ribbon ── */
+    .quote-banner {
+      background:
+        linear-gradient(135deg, #fff3d4, #ffe2b5) !important;
+      border: 3px solid var(--honey-deep) !important;
+      border-radius: 18px !important;
+      box-shadow:
+        0 4px 0 #c9881e,
+        0 12px 28px rgba(217,158,42,0.25) !important;
+      padding: 22px 28px !important;
+    }
+    .quote-text {
+      color: #5a3a1a !important;
+      font-family: 'Caveat', cursive !important;
+      font-size: 26px !important;
+      line-height: 1.45 !important;
+      font-style: normal !important;
+    }
+    .quote-author {
+      color: var(--peach-deep) !important;
+      font-family: 'Quicksand', sans-serif !important;
+      font-weight: 700 !important;
+      font-size: 12px !important;
+      letter-spacing: 1.5px !important;
+      text-transform: uppercase;
+    }
+    .quote-icon {
+      color: var(--honey-deep) !important;
+      font-size: 44px !important;
+      opacity: 1 !important;
+    }
+
+    /* ── Filter / control row ── */
+    .filter-block {
+      background: #fffaec !important;
+      border: 2px solid #e8c98a !important;
+      border-radius: 14px !important;
+      padding: 14px !important;
+    }
+    .filter-block label {
+      color: var(--ink-soft) !important;
+      font-weight: 700 !important;
+    }
+    .filter-block select, .filter-block input {
+      background: #fff !important;
+      color: var(--ink) !important;
+      border: 2px solid #e8c98a !important;
+      border-radius: 8px !important;
+      font-family: 'Quicksand', sans-serif !important;
+    }
+    .filter-block select:focus, .filter-block input:focus {
+      border-color: var(--peach-deep) !important;
+      outline: none;
+    }
+
+    /* ── Buttons = bouncy storybook tiles ── */
+    .btn, .btn-primary, .practice-bar button {
+      background: #fff7e0 !important;
+      color: var(--ink) !important;
+      border: 2px solid var(--honey-deep) !important;
+      border-radius: 12px !important;
+      font-family: 'Quicksand', sans-serif !important;
+      font-weight: 700 !important;
+      padding: 10px 18px !important;
+      box-shadow: 0 3px 0 #c9881e !important;
+      transition: transform 0.1s, box-shadow 0.1s;
+    }
+    .btn:hover:not(:disabled), .btn-primary:hover, .practice-bar button:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 4px 0 #c9881e !important;
+      color: var(--peach-deep) !important;
+      border-color: var(--peach-deep) !important;
+    }
+    .btn:active, .btn-primary:active {
+      transform: translateY(2px);
+      box-shadow: 0 1px 0 #c9881e !important;
+    }
+    .btn-primary {
+      background: var(--peach) !important;
+      border-color: var(--peach-deep) !important;
+      color: #5a2d10 !important;
+      box-shadow: 0 3px 0 #b8552a !important;
+    }
+    .btn-primary:hover { box-shadow: 0 4px 0 #b8552a !important; }
+
+    /* ── Tabs = colourful book tabs sticking out of the page ── */
+    .tabs {
+      border-bottom: 3px dashed #d9b466 !important;
+      gap: 6px !important;
+    }
+    .tab {
+      background: #fff3d4 !important;
+      color: var(--ink-soft) !important;
+      border: 2px solid #e8c98a !important;
+      border-bottom: none !important;
+      border-radius: 14px 14px 0 0 !important;
+      font-family: 'Quicksand', sans-serif !important;
+      font-weight: 700 !important;
+      padding: 12px 22px !important;
+      margin-bottom: -3px !important;
+    }
+    .tab.active {
+      background: var(--peach) !important;
+      color: #5a2d10 !important;
+      border-color: var(--peach-deep) !important;
+      border-bottom: 3px solid var(--peach) !important;
+      transform: translateY(-2px);
+      box-shadow: 0 -3px 0 #b8552a;
+    }
+
+    /* ── Problem title = chapter heading, handwritten ── */
+    .prob-title {
+      font-family: 'Caveat', cursive !important;
+      color: var(--peach-deep) !important;
+      font-size: 56px !important;
+      font-weight: 700 !important;
+      line-height: 1.05 !important;
+      letter-spacing: 0 !important;
+      text-shadow: 2px 2px 0 rgba(184, 85, 42, 0.12);
+      margin-bottom: 4px !important;
+    }
+    .prob-subtopic {
+      font-family: 'Quicksand', sans-serif !important;
+      color: var(--lavender-deep) !important;
+      font-weight: 700 !important;
+      font-size: 14px !important;
+      letter-spacing: 1.5px !important;
+      text-transform: uppercase;
+      margin-bottom: 24px !important;
+    }
+
+    /* ════════════════════════════════════════════════════════════
+       The PASTEL ILLUSTRATED CARDS — every prose block gets one
+       ════════════════════════════════════════════════════════════ */
+
+    /* Reset previous parchment look on the same selectors */
+    .prob-story,
+    .prob-tale,
+    .prob-desc,
+    .sol-mini-story.sol-plain,
+    .sol-mini-story.sol-tale,
+    .notes-summary,
+    .tp-card,
+    .pattern-card,
+    .edge-list li,
+    .sol-approach li {
+      box-shadow:
+        0 4px 0 rgba(0,0,0,0.08),
+        0 12px 24px rgba(58,42,28,0.10) !important;
+      border-radius: 18px !important;
+      color: var(--ink) !important;
+      max-width: 72ch;
+      letter-spacing: 0 !important;
+    }
+
+    /* Problem DESC — light cream "this is what the chapter is about" card */
+    .prob-desc {
+      background: #fffaec !important;
+      border: 2px solid #e8c98a !important;
+      font-family: 'Quicksand', sans-serif !important;
+      font-size: 17px !important;
+      line-height: 1.75 !important;
+      padding: 22px 28px !important;
+      margin-bottom: 22px !important;
+    }
+
+    /* In Plain English — peach card */
+    .prob-story {
+      background: linear-gradient(180deg, #fff0e0, #ffd9bc) !important;
+      border: 3px solid var(--peach-deep) !important;
+      padding: 24px 30px !important;
+      margin-bottom: 18px !important;
+      position: relative;
+    }
+    .prob-story::before {
+      content: '🌟  In Plain English  🌟' !important;
+      display: block !important;
+      font-family: 'Caveat', cursive !important;
+      font-size: 22px !important;
+      font-weight: 700 !important;
+      color: var(--peach-deep) !important;
+      letter-spacing: 0 !important;
+      text-transform: none !important;
+      margin-bottom: 10px !important;
+    }
+    .prob-story {
+      font-family: 'Quicksand', sans-serif !important;
+      font-size: 17.5px !important;
+      line-height: 1.8 !important;
+      color: #4a2912 !important;
+    }
+
+    /* Once Upon an Algorithm — lavender card with drop cap */
+    .prob-tale {
+      background: linear-gradient(180deg, #f3eaff, #ddc8f4) !important;
+      border: 3px solid var(--lavender-deep) !important;
+      padding: 28px 32px !important;
+      margin: 0 0 30px !important;
+      position: relative;
+      font-family: 'Quicksand', sans-serif !important;
+      font-style: normal !important;
+      font-size: 17.5px !important;
+      line-height: 1.85 !important;
+      color: #3a2a4a !important;
+    }
+    .prob-tale::before {
+      content: '🦊  Once Upon an Algorithm  🌙' !important;
+      display: block !important;
+      font-family: 'Caveat', cursive !important;
+      font-size: 24px !important;
+      font-style: normal !important;
+      font-weight: 700 !important;
+      color: var(--lavender-deep) !important;
+      letter-spacing: 0 !important;
+      text-transform: none !important;
+      margin-bottom: 12px !important;
+    }
+    .prob-tale::first-letter {
+      font-family: 'Caveat', cursive !important;
+      font-style: normal !important;
+      font-weight: 700 !important;
+      font-size: 72px !important;
+      float: left !important;
+      line-height: 0.85 !important;
+      padding: 6px 12px 0 0 !important;
+      color: var(--lavender-deep) !important;
+    }
+    .prob-tale::after {
+      content: '✦ ❦ ✦' !important;
+      display: block !important;
+      text-align: center !important;
+      color: var(--lavender-deep) !important;
+      font-size: 18px !important;
+      margin-top: 14px !important;
+      opacity: 0.75 !important;
+    }
+
+    /* Sample Input / Output boxes — pastel kraft tags */
+    .io-box {
+      background: #fffaec !important;
+      border: 2px dashed #d9b466 !important;
+      border-radius: 14px !important;
+      padding: 14px 18px !important;
+    }
+    .io-label {
+      font-family: 'Caveat', cursive !important;
+      color: var(--honey-deep) !important;
+      font-size: 20px !important;
+      font-weight: 700 !important;
+      letter-spacing: 0 !important;
+      text-transform: none !important;
+    }
+    .io-body {
+      color: var(--ink) !important;
+      background: #fff !important;
+      border-radius: 8px !important;
+      padding: 10px 14px !important;
+      font-family: 'JetBrains Mono', monospace !important;
+      font-size: 13.5px !important;
+    }
+
+    /* Tags = little stickers */
+    .stag {
+      background: var(--mint) !important;
+      color: #1f4a2c !important;
+      border: 2px solid var(--mint-deep) !important;
+      border-radius: 999px !important;
+      padding: 4px 12px !important;
+      font-family: 'Quicksand', sans-serif !important;
+      font-weight: 700 !important;
+      font-size: 12px !important;
+    }
+    .stag:nth-child(2n)   { background: var(--sky) !important; color: #18395a !important; border-color: var(--sky-deep) !important; }
+    .stag:nth-child(3n)   { background: var(--rose) !important; color: #5a1f30 !important; border-color: var(--rose-deep) !important; }
+    .stag:nth-child(4n)   { background: var(--honey) !important; color: #5a3a0a !important; border-color: var(--honey-deep) !important; }
+
+    /* ── SOLUTIONS PAGE ── */
+
+    /* Sol-tab buttons recoloured */
+    .sol-tab {
+      background: #fff7e0 !important;
+      color: var(--ink-soft) !important;
+      border: 2px solid #e8c98a !important;
+      border-radius: 12px !important;
+      padding: 8px 16px !important;
+      font-family: 'Quicksand', sans-serif !important;
+      font-weight: 700 !important;
+    }
+    .sol-tab.active { background: var(--peach) !important; color: #5a2d10 !important; border-color: var(--peach-deep) !important; }
+    .sol-tab.brute  { color: var(--rose-deep) !important; }
+    .sol-tab.better { color: var(--honey-deep) !important; }
+
+    .sol-block-label {
+      font-family: 'Caveat', cursive !important;
+      color: var(--peach-deep) !important;
+      font-size: 22px !important;
+      font-weight: 700 !important;
+      letter-spacing: 0 !important;
+      text-transform: none !important;
+      margin-bottom: 6px !important;
+    }
+    .sol-block-label::before { display: none !important; }
+
+    .complexity-pill {
+      background: var(--mint) !important;
+      color: #1f4a2c !important;
+      border: 2px solid var(--mint-deep) !important;
+      border-radius: 999px !important;
+      padding: 4px 14px !important;
+      font-family: 'Quicksand', sans-serif !important;
+      font-weight: 700 !important;
+    }
+
+    /* Plain English (per solution) — mint card */
+    .sol-mini-story.sol-plain {
+      background: linear-gradient(180deg, #e8f7ed, #c8ecd6) !important;
+      border: 3px solid var(--mint-deep) !important;
+      padding: 22px 28px !important;
+      font-family: 'Quicksand', sans-serif !important;
+      font-size: 16.5px !important;
+      line-height: 1.8 !important;
+      color: #1f4a2c !important;
+    }
+
+    /* Storybook tale (per solution) — rose card with giant " */
+    .sol-mini-story.sol-tale {
+      background: linear-gradient(180deg, #fdeaf0, #f9c8d4) !important;
+      border: 3px solid var(--rose-deep) !important;
+      padding: 24px 32px !important;
+      font-family: 'Quicksand', sans-serif !important;
+      font-style: normal !important;
+      font-size: 16.5px !important;
+      line-height: 1.85 !important;
+      color: #5a1f30 !important;
+      position: relative;
+    }
+    .sol-mini-story.sol-tale::before {
+      content: '“' !important;
+      position: absolute !important;
+      top: -10px !important;
+      left: 16px !important;
+      font-family: 'Caveat', cursive !important;
+      font-style: normal !important;
+      font-size: 76px !important;
+      line-height: 1 !important;
+      color: var(--rose-deep) !important;
+      opacity: 0.5 !important;
+      pointer-events: none !important;
+    }
+
+    /* Approach — recipe card with sky-blue numbered circles */
+    .sol-approach {
+      gap: 12px !important;
+    }
+    .sol-approach li {
+      background: linear-gradient(180deg, #eaf4fc, #cce3f4) !important;
+      border: 3px solid var(--sky-deep) !important;
+      padding: 14px 18px 14px 64px !important;
+      font-family: 'Quicksand', sans-serif !important;
+      font-size: 15.5px !important;
+      line-height: 1.75 !important;
+      color: #18395a !important;
+    }
+    .sol-approach li::before {
+      background: var(--sky-deep) !important;
+      color: #fff !important;
+      border: 3px solid #2a6a99 !important;
+      width: 36px !important;
+      height: 36px !important;
+      left: 14px !important;
+      top: 14px !important;
+      font-family: 'Caveat', cursive !important;
+      font-size: 18px !important;
+      font-weight: 700 !important;
+      box-shadow: 0 2px 0 #2a6a99 !important;
+    }
+
+    /* Pseudocode + Java = "wizard's scroll" — dark inside the colourful page */
+    pre {
+      background: #2a2520 !important;
+      border: 3px solid #6b4c33 !important;
+      border-radius: 14px !important;
+      box-shadow: 0 4px 0 #4a3525, 0 10px 20px rgba(58,42,28,0.18) !important;
+      padding: 18px 22px !important;
+      position: relative;
+    }
+    pre::before {
+      content: '📜' !important;
+      position: absolute !important;
+      top: -14px !important;
+      left: 16px !important;
+      background: #fff7e0 !important;
+      border: 2px solid #6b4c33 !important;
+      border-radius: 999px !important;
+      padding: 2px 8px !important;
+      font-size: 16px !important;
+    }
+    pre code {
+      color: #f0e4d0 !important;
+      font-family: 'JetBrains Mono', monospace !important;
+      font-size: 13.5px !important;
+      line-height: 1.65 !important;
+    }
+    pre.pseudo code { color: #ffe2b5 !important; }
+
+    /* ── TOPIC NOTES page ── */
+    .notes-summary {
+      background: linear-gradient(180deg, #fff3d4, #ffe2b5) !important;
+      border: 3px solid var(--honey-deep) !important;
+      padding: 26px 32px !important;
+      font-family: 'Caveat', cursive !important;
+      font-size: 30px !important;
+      line-height: 1.4 !important;
+      color: #5a3a1a !important;
+      font-weight: 700 !important;
+    }
+    .notes-section h3 {
+      font-family: 'Caveat', cursive !important;
+      color: var(--peach-deep) !important;
+      font-size: 36px !important;
+      font-weight: 700 !important;
+      margin-top: 28px !important;
+      margin-bottom: 14px !important;
+    }
+    .tp-card {
+      background: linear-gradient(180deg, #f3eaff, #ddc8f4) !important;
+      border: 3px solid var(--lavender-deep) !important;
+      padding: 18px 22px !important;
+    }
+    .tp-card .tp-title {
+      font-family: 'Caveat', cursive !important;
+      color: var(--lavender-deep) !important;
+      font-size: 24px !important;
+      font-weight: 700 !important;
+    }
+    .tp-card .tp-body {
+      font-family: 'Quicksand', sans-serif !important;
+      color: #3a2a4a !important;
+      font-size: 15.5px !important;
+      line-height: 1.8 !important;
+    }
+    .pattern-card {
+      background: linear-gradient(180deg, #eaf4fc, #cce3f4) !important;
+      border: 3px solid var(--sky-deep) !important;
+      padding: 18px 22px !important;
+    }
+    .pattern-card .pat-name {
+      font-family: 'Caveat', cursive !important;
+      color: var(--sky-deep) !important;
+      font-size: 24px !important;
+      font-weight: 700 !important;
+    }
+    .pattern-card .pat-when {
+      font-family: 'Quicksand', sans-serif !important;
+      color: #18395a !important;
+      font-size: 15.5px !important;
+      line-height: 1.75 !important;
+    }
+    .edge-list li {
+      background: linear-gradient(180deg, #fdeaf0, #f9c8d4) !important;
+      border: 3px solid var(--rose-deep) !important;
+      padding: 14px 18px !important;
+      font-family: 'Quicksand', sans-serif !important;
+      color: #5a1f30 !important;
+      font-size: 15.5px !important;
+      line-height: 1.75 !important;
+      margin-bottom: 10px !important;
+    }
+
+    /* ── Visualizer panel sits on cream ── */
+    .viz-canvas {
+      background: #fffaec !important;
+      border: 3px solid #e8c98a !important;
+      border-radius: 18px !important;
+      box-shadow: 0 4px 0 #c9881e !important;
+    }
+    .viz-explanation {
+      font-family: 'Caveat', cursive !important;
+      color: var(--peach-deep) !important;
+      font-size: 22px !important;
+    }
+    .viz-controls button {
+      background: #fff7e0 !important;
+      color: var(--ink) !important;
+      border: 2px solid var(--honey-deep) !important;
+      border-radius: 999px !important;
+      font-family: 'Quicksand', sans-serif !important;
+      font-weight: 700 !important;
+      box-shadow: 0 3px 0 #c9881e !important;
+    }
+    .cell {
+      background: #fff !important;
+      color: var(--ink) !important;
+      border: 2px solid var(--honey-deep) !important;
+      border-radius: 8px !important;
+      font-family: 'JetBrains Mono', monospace !important;
+    }
+
+    /* Selection: warm honey */
+    ::selection { background: var(--honey) !important; color: var(--ink) !important; }
+
+    /* Mobile — keep storybook bouncy, just trim */
+    @media (max-width: 640px) {
+      .prob-title { font-size: 40px !important; }
+      .quote-text { font-size: 21px !important; }
+      .prob-story, .prob-tale { font-size: 16px !important; padding: 20px 22px !important; }
+      .prob-tale::first-letter { font-size: 56px !important; }
+      .sol-mini-story.sol-plain, .sol-mini-story.sol-tale { font-size: 15px !important; padding: 18px 22px !important; }
+      .sol-approach li { font-size: 14px !important; padding: 12px 14px 12px 54px !important; }
+      .sol-approach li::before { width: 30px !important; height: 30px !important; font-size: 16px !important; }
+      .notes-summary { font-size: 22px !important; }
+      .notes-section h3 { font-size: 28px !important; }
+      .tp-card .tp-title, .pattern-card .pat-name { font-size: 21px !important; }
+    }
+
+    /* ═══════════════════════════════════════════════════════════════
+       📚📚📚  STORYBOOK PRO  —  paper grain, doodle borders,
+       watercolor blooms, wavy underlines, mascot, page-turn feel
+       ═══════════════════════════════════════════════════════════════ */
+
+    @import url('https://fonts.googleapis.com/css2?family=Patrick+Hand&family=Gloria+Hallelujah&display=swap');
+
+    /* Subtle paper-grain noise + faint horizontal "page rules" behind everything */
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      z-index: 0;
+      background-image:
+        /* paper grain (tiny noise via SVG) */
+        url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='240' height='240'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 0.36  0 0 0 0 0.26  0 0 0 0 0.14  0 0 0 0.07 0'/></filter><rect width='100%25' height='100%25' filter='url(%23n)'/></svg>");
+      mix-blend-mode: multiply;
+      opacity: 0.55;
+    }
+    body > * { position: relative; z-index: 1; }
+
+    /* Soft watercolor blooms floating behind the page */
+    body::after {
+      content: '';
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      z-index: 0;
+      background:
+        radial-gradient(360px 280px at 8% 12%,  rgba(255,179,138,0.28), transparent 70%),
+        radial-gradient(420px 340px at 92% 18%, rgba(212,197,232,0.30), transparent 70%),
+        radial-gradient(380px 300px at 88% 88%, rgba(168,216,185,0.26), transparent 70%),
+        radial-gradient(340px 260px at 12% 82%, rgba(244,184,196,0.26), transparent 70%);
+      filter: blur(2px);
+    }
+
+    /* Hand-drawn wavy underline beneath the chapter title */
+    .prob-title {
+      display: inline-block !important;
+      background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 12' preserveAspectRatio='none'><path d='M2 8 Q 25 0 50 6 T 100 6 T 150 6 T 198 6' fill='none' stroke='%23e8794a' stroke-width='3' stroke-linecap='round'/></svg>") !important;
+      background-repeat: no-repeat !important;
+      background-position: left bottom !important;
+      background-size: 100% 10px !important;
+      padding-bottom: 12px !important;
+    }
+
+    /* Doodle stickers floating on the corners of hero cards */
+    .prob-story::after {
+      content: '✏️';
+      position: absolute;
+      top: -14px;
+      right: 18px;
+      font-size: 26px;
+      transform: rotate(15deg);
+      filter: drop-shadow(0 2px 0 rgba(0,0,0,0.15));
+    }
+    .prob-tale {
+      overflow: visible !important;
+    }
+    .prob-tale > .tale-corner {
+      display: none; /* placeholder if you add a JS-injected one later */
+    }
+    .sol-mini-story.sol-plain::after {
+      content: '🌱';
+      position: absolute;
+      top: -14px;
+      right: 18px;
+      font-size: 24px;
+      transform: rotate(-12deg);
+      filter: drop-shadow(0 2px 0 rgba(0,0,0,0.15));
+    }
+    .sol-mini-story.sol-plain { position: relative; }
+    .sol-mini-story.sol-tale::after {
+      content: '🦋';
+      position: absolute;
+      top: -16px;
+      right: 22px;
+      font-size: 26px;
+      transform: rotate(18deg);
+      filter: drop-shadow(0 2px 0 rgba(0,0,0,0.15));
+    }
+
+    /* Slight page-tilt on cards = "stuck into a scrapbook" feel */
+    .prob-story  { transform: rotate(-0.4deg); }
+    .prob-tale   { transform: rotate(0.5deg); }
+    .prob-desc   { transform: rotate(-0.2deg); }
+    .sol-mini-story.sol-plain { transform: rotate(-0.3deg); }
+    .sol-mini-story.sol-tale  { transform: rotate(0.4deg); }
+    .sol-approach li:nth-child(odd)  { transform: rotate(-0.3deg); }
+    .sol-approach li:nth-child(even) { transform: rotate(0.3deg); }
+    .tp-card:nth-child(odd)      { transform: rotate(-0.4deg); }
+    .tp-card:nth-child(even)     { transform: rotate(0.4deg); }
+    .pattern-card:nth-child(odd) { transform: rotate(0.3deg); }
+    .pattern-card:nth-child(even){ transform: rotate(-0.3deg); }
+    .edge-list li:nth-child(odd)  { transform: rotate(-0.3deg); }
+    .edge-list li:nth-child(even) { transform: rotate(0.4deg); }
+    .notes-summary { transform: rotate(-0.2deg); }
+    .quote-banner  { transform: rotate(-0.3deg); }
+
+    /* Hover lifts the card like fingertip nudge */
+    .prob-story, .prob-tale, .prob-desc,
+    .sol-mini-story.sol-plain, .sol-mini-story.sol-tale,
+    .sol-approach li, .tp-card, .pattern-card, .edge-list li,
+    .notes-summary, .quote-banner {
+      transition: transform 0.25s ease, box-shadow 0.25s ease !important;
+    }
+    .prob-story:hover, .prob-tale:hover,
+    .sol-mini-story.sol-plain:hover, .sol-mini-story.sol-tale:hover,
+    .sol-approach li:hover, .tp-card:hover, .pattern-card:hover, .edge-list li:hover {
+      transform: rotate(0deg) translateY(-3px) !important;
+      box-shadow:
+        0 6px 0 rgba(0,0,0,0.10),
+        0 18px 30px rgba(58,42,28,0.18) !important;
+    }
+
+    /* Section-divider doodle that you can drop between blocks */
+    .ds-block {
+      position: relative;
+      padding-top: 28px !important;
+    }
+    .ds-block::before {
+      content: '';
+      display: block;
+      width: 160px;
+      height: 18px;
+      margin: 0 auto 18px;
+      background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 160 18'><g fill='none' stroke='%23d99e2a' stroke-width='2' stroke-linecap='round'><path d='M5 9 Q 40 1 80 9 T 155 9'/><circle cx='80' cy='9' r='3' fill='%23d99e2a'/><path d='M30 9 l-4 -4 M30 9 l-4 4'/><path d='M130 9 l4 -4 M130 9 l4 4'/></g></svg>");
+      background-repeat: no-repeat;
+      background-position: center;
+    }
+
+    /* Drop cap glow on the tale (so the eye lands there immediately) */
+    .prob-tale::first-letter {
+      text-shadow: 2px 3px 0 rgba(139,108,184,0.18) !important;
+    }
+
+    /* "Once Upon an Algorithm" gets a hand-drawn frame */
+    .prob-tale {
+      background-image:
+        linear-gradient(180deg, #f3eaff, #ddc8f4),
+        url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='100%25' height='100%25'><rect x='6' y='6' width='calc(100%25 - 12px)' height='calc(100%25 - 12px)' fill='none' stroke='%238b6cb8' stroke-width='1.2' stroke-dasharray='2 4' rx='14' ry='14' opacity='0.5'/></svg>") !important;
+      background-repeat: no-repeat, no-repeat !important;
+      background-size: cover, 100% 100% !important;
+    }
+
+    /* "In Plain English" gets a softer inner dashed frame too */
+    .prob-story {
+      background-image:
+        linear-gradient(180deg, #fff0e0, #ffd9bc),
+        url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='100%25' height='100%25'><rect x='6' y='6' width='calc(100%25 - 12px)' height='calc(100%25 - 12px)' fill='none' stroke='%23e8794a' stroke-width='1.2' stroke-dasharray='2 4' rx='14' ry='14' opacity='0.5'/></svg>") !important;
+      background-repeat: no-repeat, no-repeat !important;
+      background-size: cover, 100% 100% !important;
+    }
+
+    /* The chapter title gets a tiny ★ before it */
+    .prob-title::before {
+      content: '✨ ';
+      color: var(--honey-deep);
+      font-size: 0.7em;
+      vertical-align: 0.2em;
+    }
+
+    /* Quote banner: hand-drawn underline beneath the quote */
+    .quote-text {
+      background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 6' preserveAspectRatio='none'><path d='M2 3 Q 50 0 100 3 T 198 3' fill='none' stroke='%23d99e2a' stroke-width='1.5' stroke-linecap='round' opacity='0.55'/></svg>");
+      background-repeat: no-repeat;
+      background-position: left calc(100% - 2px);
+      background-size: 100% 6px;
+      padding-bottom: 6px;
+      display: inline-block;
+    }
+
+    /* Pseudocode / Java scroll: a little dog-ear at the top-right corner */
+    pre::after {
+      content: '';
+      position: absolute;
+      top: 0;
+      right: 0;
+      width: 22px;
+      height: 22px;
+      background: linear-gradient(225deg, #4a3525 50%, #2a2520 50%);
+      border-radius: 0 12px 0 12px;
+      box-shadow: -2px 2px 4px rgba(0,0,0,0.25);
+    }
+
+    /* Sample IO label gets a tiny doodle */
+    .io-box:nth-of-type(1) .io-label::before { content: '📥 '; }
+    .io-box:nth-of-type(2) .io-label::before { content: '📤 '; }
+
+    /* Approach-list numbers: jiggle on hover (life!) */
+    .sol-approach li:hover::before {
+      animation: jiggle 0.4s ease;
+    }
+    @keyframes jiggle {
+      0%, 100% { transform: translateY(0) rotate(0); }
+      30%      { transform: translateY(-2px) rotate(-8deg); }
+      70%      { transform: translateY(0)    rotate(8deg); }
+    }
+
+    /* Floating mascot — a paper-crane in the bottom-right corner */
+    body > .mascot,
+    body::before ~ .mascot {} /* no-op selector for clarity */
+
+    /* Inject mascot via pseudo on <main> so it scrolls with content */
+    main {
+      position: relative;
+    }
+    main::after {
+      content: '🦊';
+      position: fixed;
+      right: 22px;
+      bottom: 22px;
+      width: 56px;
+      height: 56px;
+      display: grid;
+      place-items: center;
+      font-size: 30px;
+      background: #fff7e0;
+      border: 3px solid var(--peach-deep);
+      border-radius: 50%;
+      box-shadow: 0 4px 0 #b8552a, 0 12px 24px rgba(58,42,28,0.25);
+      animation: bob 4s ease-in-out infinite;
+      z-index: 50;
+      cursor: pointer;
+      pointer-events: none;
+    }
+    @keyframes bob {
+      0%, 100% { transform: translateY(0)   rotate(-4deg); }
+      50%      { transform: translateY(-6px) rotate(4deg); }
+    }
+
+    /* Pretty scrollbar to match the cream theme */
+    ::-webkit-scrollbar { width: 12px; height: 12px; }
+    ::-webkit-scrollbar-track { background: #fdf6e3; }
+    ::-webkit-scrollbar-thumb {
+      background: linear-gradient(180deg, var(--peach), var(--peach-deep));
+      border-radius: 999px;
+      border: 2px solid #fdf6e3;
+    }
+
+    /* Mobile: turn off rotations (they look messy on tiny screens) */
+    @media (max-width: 640px) {
+      .prob-story, .prob-tale, .prob-desc,
+      .sol-mini-story.sol-plain, .sol-mini-story.sol-tale,
+      .sol-approach li, .tp-card, .pattern-card, .edge-list li,
+      .notes-summary, .quote-banner { transform: none !important; }
+      main::after { width: 44px; height: 44px; font-size: 24px; right: 14px; bottom: 14px; }
+    }
   </style>
 </head>
 <body>
