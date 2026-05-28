@@ -2191,32 +2191,6 @@
       margin-left: 2px !important;
     }
 
-    /* Speed slider */
-    html body .viz-speed {
-      display: inline-flex !important;
-      align-items: center !important;
-      gap: 8px !important;
-      font-family: 'Quicksand', sans-serif !important;
-      font-size: 12px !important;
-      font-weight: 700 !important;
-      color: var(--ink-soft) !important;
-      letter-spacing: 0.06em !important;
-      text-transform: uppercase !important;
-      margin-left: 12px !important;
-    }
-    html body .viz-speed input[type=range] {
-      width: 110px !important;
-      accent-color: var(--ocean) !important;
-    }
-    html body .viz-speed #vizSpeedVal {
-      font-family: 'JetBrains Mono', monospace !important;
-      text-transform: none !important;
-      color: var(--ocean-deep) !important;
-      font-weight: 700 !important;
-      min-width: 46px !important;
-      text-align: left !important;
-    }
-
     /* Pointer marker letters inside dark stage */
     html body .viz-stage .ptr-low,
     html body .viz-stage .ptr-mid,
@@ -2232,6 +2206,45 @@
     html body .viz-stage .ptr-mid  { background: rgba(248,81,73,0.18);   color: #f85149; }
     html body .viz-stage .ptr-high { background: rgba(188,140,255,0.18); color: #bc8cff; }
     html body .viz-stage .ptr-ans  { background: rgba(63,185,80,0.20);   color: #3fb950; }
+
+    /* Top control bar — sticky so it never moves below your pointer */
+    html body .viz-controls-top {
+      position: sticky !important;
+      top: 8px !important;
+      z-index: 5 !important;
+      display: flex !important;
+      justify-content: center !important;
+      gap: 10px !important;
+      margin: 0 0 14px 0 !important;
+      padding: 10px 14px !important;
+      background: rgba(252, 253, 252, 0.92) !important;
+      backdrop-filter: blur(6px) !important;
+      border: 1px solid var(--rule) !important;
+      border-radius: 8px !important;
+      box-shadow: 0 4px 14px rgba(28, 37, 48, 0.08) !important;
+    }
+    html body .viz-controls-top button {
+      font-family: 'Quicksand', sans-serif !important;
+      font-weight: 700 !important;
+      font-size: 12px !important;
+      text-transform: uppercase !important;
+      letter-spacing: 0.08em !important;
+      padding: 8px 16px !important;
+      border: 1.5px solid var(--ocean) !important;
+      background: var(--paper-3) !important;
+      color: var(--ocean-deep) !important;
+      border-radius: 6px !important;
+      cursor: pointer !important;
+      transition: all 0.15s ease !important;
+    }
+    html body .viz-controls-top button:hover:not(:disabled) {
+      background: var(--ocean) !important;
+      color: var(--paper-3) !important;
+    }
+    html body .viz-controls-top button:disabled {
+      opacity: 0.35 !important;
+      cursor: default !important;
+    }
 
     /* Scripted-array: per-step banner label and overlay area */
     html body .viz-stage .viz-step-label {
@@ -2403,6 +2416,12 @@
   <div class="tab-panel" id="tab-visualizer">
     <div id="vizEmpty" class="viz-empty">Load a problem first to see its visualizer.</div>
     <div id="vizContent" style="display:none">
+      <div class="viz-controls viz-controls-top">
+        <button id="vizPrev" onclick="vizStep(-1)">← Prev</button>
+        <button id="vizPlay" onclick="vizTogglePlay()">▶ Play</button>
+        <button id="vizNext" onclick="vizStep(1)">Next →</button>
+        <button id="vizReset" onclick="vizReset()">↺ Reset</button>
+      </div>
       <div class="viz-stage" id="vizStage">
         <div class="viz-stage-head">
           <div class="viz-title" id="vizTitle"></div>
@@ -2412,17 +2431,6 @@
         <div class="viz-explanation" id="vizExplanation"></div>
       </div>
       <div class="viz-legend" id="vizLegend"></div>
-      <div class="viz-controls">
-        <button id="vizPrev" onclick="vizStep(-1)">← Prev</button>
-        <button id="vizPlay" onclick="vizTogglePlay()">▶ Play</button>
-        <button id="vizNext" onclick="vizStep(1)">Next →</button>
-        <button id="vizReset" onclick="vizReset()">↺ Reset</button>
-        <label class="viz-speed">
-          Speed
-          <input type="range" id="vizSpeed" min="300" max="2200" step="100" value="950" oninput="vizSpeedChange()">
-          <span id="vizSpeedVal">0.95s</span>
-        </label>
-      </div>
       <div class="viz-footer" id="vizFooter"></div>
     </div>
   </div>
@@ -2809,15 +2817,6 @@
     }).join('');
   }
 
-  function vizSpeedChange() {
-    const v = parseInt(document.getElementById('vizSpeed').value, 10);
-    document.getElementById('vizSpeedVal').textContent = (v/1000).toFixed(2) + 's';
-    if (vizState && vizState.timer) {
-      vizClearTimer();
-      vizState.timer = setInterval(vizAdvance, v);
-    }
-  }
-
   function vizAdvance() {
     if (!vizState) return;
     if (vizState.idx < vizState.steps.length - 1) {
@@ -2859,8 +2858,7 @@
     if (!vizState) return;
     if (vizState.timer) { vizClearTimer(); document.getElementById('vizPlay').textContent = '▶ Play'; return; }
     document.getElementById('vizPlay').textContent = '⏸ Pause';
-    const speed = parseInt(document.getElementById('vizSpeed').value, 10) || 950;
-    vizState.timer = setInterval(vizAdvance, speed);
+    vizState.timer = setInterval(vizAdvance, 1100);
   }
 
   function vizClearTimer() {
