@@ -227,7 +227,7 @@
         ],
         "pseudocode": "hasPathSum(node, target, sum):\n  if node == null: return false\n  sum += node.val\n  if isLeaf(node): return sum == target\n  return hasPathSum(left, target, sum) OR hasPathSum(right, target, sum)",
         "story": "Accumulate sum top-down. At leaf, check if sum matches target.",
-        "code": "public int hasPathSum(TreeNode A, int B) {\n    return hasPathSum(A, B, 0) ? 1 : 0;\n}\n\npublic boolean hasPathSum(TreeNode node, int targetSum, int currentSum) {\n    if (node == null) return false;\n    \n    currentSum += node.val;\n    \n    if (node.left == null && node.right == null) {\n        return currentSum == targetSum;\n    }\n    \n    return hasPathSum(node.left, targetSum, currentSum) ||\n           hasPathSum(node.right, targetSum, currentSum);\n}"
+        "code": "public int hasPathSum(TreeNode A, int B) {\n    return hasPathSum(A, B, 0) ? 1 : 0;\n}\n\npublic boolean hasPathSum(TreeNode node, int targetSum, int currentSum) {\n    if (node == null) {\n        return false;\n    }\n\n    currentSum += node.val;\n\n    if (node.left == null && node.right == null) {\n        return currentSum == targetSum;\n    }\n\n    return hasPathSum(node.left, targetSum, currentSum) ||\n           hasPathSum(node.right, targetSum, currentSum);\n}"
       }
     ],
     "viz": {
@@ -523,7 +523,7 @@
         ],
         "pseudocode": "sumBinaryTreeOrNot(node):\n  if node == null: return 0\n  if node is leaf: return node.val\n  leftSum = sumBinaryTreeOrNot(node.left)\n  rightSum = sumBinaryTreeOrNot(node.right)\n  if leftSum == -1 or rightSum == -1: return -1\n  if leftSum + rightSum == node.val:\n    return leftSum + rightSum + node.val\n  else:\n    return -1",
         "story": "Post-order: children first, parent checks sum, bubble up total or -1.",
-        "code": "public int sumBinaryTreeOrNotMain(TreeNode A) {\n    return (sumBinaryTreeOrNot(A) == -1) ? 0 : 1;\n}\n\npublic int sumBinaryTreeOrNot(TreeNode A) {\n    if (A == null) {\n        return 0;\n    }\n\n    if (A.left == null && A.right == null) {\n        return A.val;\n    }\n\n    int leftSum = sumBinaryTreeOrNot(A.left);\n    int rightSum = sumBinaryTreeOrNot(A.right);\n    if (leftSum == -1 || rightSum == -1) return -1;\n\n    if (leftSum + rightSum == A.val) {\n        return leftSum + rightSum + A.val;\n    } else {\n        return -1;\n    }\n}"
+        "code": "public int sumBinaryTreeOrNotMain(TreeNode A) {\n    return (sumBinaryTreeOrNot(A) == -1) ? 0 : 1;\n}\n\npublic int sumBinaryTreeOrNot(TreeNode A) {\n    if (A == null) {\n        return 0;\n    }\n\n    if (A.left == null && A.right == null) {\n        return A.val;\n    }\n\n    int leftSum = sumBinaryTreeOrNot(A.left);\n    int rightSum = sumBinaryTreeOrNot(A.right);\n    if (leftSum == -1 || rightSum == -1) {\n        return -1;\n    }\n\n    if (leftSum + rightSum == A.val) {\n        return leftSum + rightSum + A.val;\n    } else {\n        return -1;\n    }\n}"
       }
     ],
     "viz": {
@@ -624,7 +624,7 @@
         ],
         "pseudocode": "levelOrder(root):\n  result = []\n  queue.add(root)\n  while queue not empty:\n    levelSize = queue.size()\n    levelList = []\n    for i = 0 to levelSize-1:\n      node = queue.dequeue()\n      levelList.add(node.val)\n      if node.left: queue.add(node.left)\n      if node.right: queue.add(node.right)\n    result.add(levelList)\n  return result",
         "story": "Queue + level-size tracking. Process each level as a batch before moving to the next.",
-        "code": "public ArrayList<ArrayList<Integer>> levelOrderTraversal(TreeNode A) {\n    ArrayList<ArrayList<Integer>> result = new ArrayList<>();\n\n    if (A == null) return result;\n\n    Queue<TreeNode> queue = new LinkedList<>();\n    queue.add(A);\n\n    while (!queue.isEmpty()) {\n        int levelSize = queue.size();\n        ArrayList<Integer> levelNodes = new ArrayList<>();\n\n        for (int i = 0; i < levelSize; i++) {\n            TreeNode node = queue.poll();\n            levelNodes.add(node.val);\n\n            if (node.left != null) queue.add(node.left);\n            if (node.right != null) queue.add(node.right);\n        }\n        result.add(levelNodes);\n    }\n\n    return result;\n}"
+        "code": "public ArrayList<ArrayList<Integer>> levelOrderTraversal(TreeNode A) {\n    ArrayList<ArrayList<Integer>> result = new ArrayList<>();\n\n    if (A == null) {\n        return result;\n    }\n\n    Queue<TreeNode> queue = new LinkedList<>();\n    queue.add(A);\n\n    while (!queue.isEmpty()) {\n        int levelSize = queue.size();\n        ArrayList<Integer> levelNodes = new ArrayList<>();\n\n        for (int i = 0; i < levelSize; i++) {\n            TreeNode node = queue.poll();\n            levelNodes.add(node.val);\n\n            if (node.left != null) {\n                queue.add(node.left);\n            }\n            if (node.right != null) {\n                queue.add(node.right);\n            }\n        }\n        result.add(levelNodes);\n    }\n\n    return result;\n}"
       }
     ],
     "viz": {
@@ -918,7 +918,7 @@
         ],
         "pseudocode": "leftView(root):\n  result = [root.val]\n  queue.add(root)\n  while queue not empty:\n    levelSize = queue.size()\n    leftAdded = false\n    for i = 0 to levelSize-1:\n      node = queue.dequeue()\n      if not leftAdded and node.left:\n        result.add(node.left.val)\n        leftAdded = true\n      if not leftAdded and node.right:\n        result.add(node.right.val)\n        leftAdded = true\n      enqueue children\n  return result",
         "story": "BFS + per-level flag. First node at each level goes into result, rest are skipped.",
-        "code": "public ArrayList<Integer> leftViewOfABinaryTree(TreeNode A) {\n    if (A == null) return null;\n\n    ArrayList<Integer> result = new ArrayList<>();\n    Queue<TreeNode> queue = new LinkedList<>();\n    queue.add(A);\n    result.add(A.val);\n\n    while (!queue.isEmpty()) {\n        int sizeOfThisLevel = queue.size();\n        boolean isLeftMostElementAdded = false;\n\n        for (int i = 0; i < sizeOfThisLevel; i++) {\n            TreeNode temp = queue.poll();\n            TreeNode left = temp.left;\n            TreeNode right = temp.right;\n            if (left != null) {\n\n                if (!isLeftMostElementAdded) {\n                    result.add(left.val);\n                    isLeftMostElementAdded = true;\n                }\n                queue.add(left);\n            }\n            if (right != null) {\n                if (!isLeftMostElementAdded) {\n                    result.add(right.val);\n                    isLeftMostElementAdded = true;\n                }\n                queue.add(right);\n            }\n        }\n    }\n    return result;\n}"
+        "code": "public ArrayList<Integer> leftViewOfABinaryTree(TreeNode A) {\n    if (A == null) {\n        return null;\n    }\n\n    ArrayList<Integer> result = new ArrayList<>();\n    Queue<TreeNode> queue = new LinkedList<>();\n    queue.add(A);\n    result.add(A.val);\n\n    while (!queue.isEmpty()) {\n        int sizeOfThisLevel = queue.size();\n        boolean isLeftMostElementAdded = false;\n\n        for (int i = 0; i < sizeOfThisLevel; i++) {\n            TreeNode temp = queue.poll();\n            TreeNode left = temp.left;\n            TreeNode right = temp.right;\n            if (left != null) {\n                if (!isLeftMostElementAdded) {\n                    result.add(left.val);\n                    isLeftMostElementAdded = true;\n                }\n                queue.add(left);\n            }\n            if (right != null) {\n                if (!isLeftMostElementAdded) {\n                    result.add(right.val);\n                    isLeftMostElementAdded = true;\n                }\n                queue.add(right);\n            }\n        }\n    }\n    return result;\n}"
       }
     ],
     "viz": {
@@ -1216,7 +1216,7 @@
         ],
         "pseudocode": "if A is empty or A[0] == -1: return null\nroot = new TreeNode(A[0])\nqueue = [root]\ni = 1\nwhile queue not empty and i < len(A):\n  cur = queue.pop()\n  leftVal = A[i++]\n  if leftVal != -1:\n    cur.left = new TreeNode(leftVal)\n    queue.enqueue(cur.left)\n  rightVal = A[i++]\n  if rightVal != -1:\n    cur.right = new TreeNode(rightVal)\n    queue.enqueue(cur.right)\nreturn root",
         "story": "BFS reconstruction from a flat array.",
-        "code": "public TreeNode deserialize(ArrayList<Integer> A) {\n    if (A == null || A.isEmpty() || A.get(0) == -1) return null;\n\n    TreeNode root = new TreeNode(A.get(0));\n    Queue<TreeNode> q = new LinkedList<>();\n    q.add(root);\n    int i = 1;\n\n    while (!q.isEmpty() && i < A.size()) {\n        TreeNode cur = q.poll();\n\n        // left child\n        if (i < A.size()) {\n            int leftVal = A.get(i++);\n            if (leftVal != -1) {\n                cur.left = new TreeNode(leftVal);\n                q.add(cur.left);\n            }\n        }\n\n        // right child\n        if (i < A.size()) {\n            int rightVal = A.get(i++);\n            if (rightVal != -1) {\n                cur.right = new TreeNode(rightVal);\n                q.add(cur.right);\n            }\n        }\n    }\n\n    return root;\n}"
+        "code": "public TreeNode deserialize(ArrayList<Integer> A) {\n    if (A == null || A.isEmpty() || A.get(0) == -1) {\n        return null;\n    }\n\n    TreeNode root = new TreeNode(A.get(0));\n    Queue<TreeNode> q = new LinkedList<>();\n    q.add(root);\n    int i = 1;\n\n    while (!q.isEmpty() && i < A.size()) {\n        TreeNode cur = q.poll();\n\n        if (i < A.size()) {\n            int leftVal = A.get(i++);\n            if (leftVal != -1) {\n                cur.left = new TreeNode(leftVal);\n                q.add(cur.left);\n            }\n        }\n\n        if (i < A.size()) {\n            int rightVal = A.get(i++);\n            if (rightVal != -1) {\n                cur.right = new TreeNode(rightVal);\n                q.add(cur.right);\n            }\n        }\n    }\n\n    return root;\n}"
       }
     ],
     "viz": {
@@ -1363,7 +1363,7 @@
         ],
         "pseudocode": "if root == null: return []\nresult = []\nqueue = [root]\nwhile queue not empty:\n  levelSize = queue.size()\n  for i in 0..levelSize-1:\n    node = queue.pop()\n    if i == levelSize - 1: result.append(node.val)\n    if node.left: queue.enqueue(node.left)\n    if node.right: queue.enqueue(node.right)\nreturn result",
         "story": "BFS, capture last node per level.",
-        "code": "public ArrayList<Integer> rightView(TreeNode A) {\n    ArrayList<Integer> result = new ArrayList<>();\n    if (A == null) return result;\n\n    Queue<TreeNode> queue = new LinkedList<>();\n    queue.add(A);\n\n    while (!queue.isEmpty()) {\n        int levelSize = queue.size();\n        TreeNode rightmost = null;\n\n        for (int i = 0; i < levelSize; i++) {\n            TreeNode node = queue.poll();\n            rightmost = node;\n\n            if (node.left != null) queue.add(node.left);\n            if (node.right != null) queue.add(node.right);\n        }\n\n        if (rightmost != null) result.add(rightmost.val);\n    }\n\n    return result;\n}"
+        "code": "public ArrayList<Integer> rightView(TreeNode A) {\n    ArrayList<Integer> result = new ArrayList<>();\n    if (A == null) {\n        return result;\n    }\n\n    Queue<TreeNode> queue = new LinkedList<>();\n    queue.add(A);\n\n    while (!queue.isEmpty()) {\n        int levelSize = queue.size();\n        TreeNode rightmost = null;\n\n        for (int i = 0; i < levelSize; i++) {\n            TreeNode node = queue.poll();\n            rightmost = node;\n\n            if (node.left != null) {\n                queue.add(node.left);\n            }\n            if (node.right != null) {\n                queue.add(node.right);\n            }\n        }\n\n        if (rightmost != null) {\n            result.add(rightmost.val);\n        }\n    }\n\n    return result;\n}"
       }
     ],
     "viz": {
@@ -1709,7 +1709,7 @@
         ],
         "pseudocode": "deleteNode(root, B):\n  if root == null: return null\n  if B < root.val: root.left = deleteNode(root.left, B)\n  else if B > root.val: root.right = deleteNode(root.right, B)\n  else:\n    if root.left == null: return root.right\n    if root.right == null: return root.left\n    pred = findMax(root.left)\n    root.val = pred.val\n    root.left = deleteNode(root.left, pred.val)\n  return root",
         "story": "BST deletion with inorder predecessor replacement.",
-        "code": "public TreeNode deleteNode(TreeNode root, int B) {\n    if (root == null) return null;\n\n    if (B < root.val) {\n        root.left = deleteNode(root.left, B);\n    } else if (B > root.val) {\n        root.right = deleteNode(root.right, B);\n    } else {\n        if (root.left == null) return root.right;\n        if (root.right == null) return root.left;\n\n        TreeNode pred = findMax(root.left);\n        root.val = pred.val;\n        root.left = deleteNode(root.left, pred.val);\n    }\n    return root;\n}\n\nprivate TreeNode findMax(TreeNode node) {\n    while (node.right != null) node = node.right;\n    return node;\n}"
+        "code": "public TreeNode deleteNode(TreeNode root, int B) {\n    if (root == null) {\n        return null;\n    }\n\n    if (B < root.val) {\n        root.left = deleteNode(root.left, B);\n    } else if (B > root.val) {\n        root.right = deleteNode(root.right, B);\n    } else {\n        if (root.left == null) {\n            return root.right;\n        }\n        if (root.right == null) {\n            return root.left;\n        }\n\n        TreeNode pred = findMax(root.left);\n        root.val = pred.val;\n        root.left = deleteNode(root.left, pred.val);\n    }\n    return root;\n}\n\nprivate TreeNode findMax(TreeNode node) {\n    while (node.right != null) {\n        node = node.right;\n    }\n    return node;\n}"
       }
     ],
     "viz": {
@@ -1806,7 +1806,7 @@
         ],
         "pseudocode": "searchInABST(A, B):\n  if A == null: return 0\n  if A.val == B: return 1\n  if A.val > B: return searchInABST(A.left, B)\n  return searchInABST(A.right, B)",
         "story": "Binary search on tree structure.",
-        "code": "public int searchInABST(TreeNode A, int B) {\n    if (A == null) {\n        return 0;\n    }\n    if (A.val == B) return 1;\n    if (A.val > B) {\n        return searchInABST(A.left, B);\n    } else {\n        return searchInABST(A.right, B);\n    }\n}"
+        "code": "public int searchInABST(TreeNode A, int B) {\n    if (A == null) {\n        return 0;\n    }\n    if (A.val == B) {\n        return 1;\n    }\n    if (A.val > B) {\n        return searchInABST(A.left, B);\n    } else {\n        return searchInABST(A.right, B);\n    }\n}"
       }
     ],
     "viz": {
@@ -1905,7 +1905,7 @@
         ],
         "pseudocode": "inorder(root, list):\n  if root == null: return\n  inorder(root.left, list)\n  list.add(root.val)\n  inorder(root.right, list)\n\ntwoSumBST(root, B):\n  list = []\n  inorder(root, list)\n  left = 0, right = list.size() - 1\n  while left < right:\n    sum = list[left] + list[right]\n    if sum == B: return 1\n    if sum < B: left++\n    else: right--\n  return 0",
         "story": "Inorder gives sorted array, then two-pointer scan.",
-        "code": "public int twoSumBST(TreeNode A, int B) {\n    ArrayList<Integer> list = new ArrayList<>();\n    inorder(A, list);\n    int left = 0, right = list.size() - 1;\n    while (left < right) {\n        int sum = list.get(left) + list.get(right);\n        if (sum == B) return 1;\n        if (sum < B) left++;\n        else right--;\n    }\n    return 0;\n}\n\nprivate void inorder(TreeNode root, ArrayList<Integer> list) {\n    if (root == null) return;\n    inorder(root.left, list);\n    list.add(root.val);\n    inorder(root.right, list);\n}"
+        "code": "public int twoSumBST(TreeNode A, int B) {\n    ArrayList<Integer> list = new ArrayList<>();\n    inorder(A, list);\n    int left = 0, right = list.size() - 1;\n    while (left < right) {\n        int sum = list.get(left) + list.get(right);\n        if (sum == B) {\n            return 1;\n        }\n        if (sum < B) {\n            left++;\n        } else {\n            right--;\n        }\n    }\n    return 0;\n}\n\nprivate void inorder(TreeNode root, ArrayList<Integer> list) {\n    if (root == null) {\n        return;\n    }\n    inorder(root.left, list);\n    list.add(root.val);\n    inorder(root.right, list);\n}"
       },
       {
         "label": "HashSet (One Pass)",
@@ -1925,7 +1925,7 @@
         ],
         "pseudocode": "twoSumBSTHashSet(root, B, set):\n  if root == null: return 0\n  if set.contains(B - root.val): return 1\n  set.add(root.val)\n  return twoSumBSTHashSet(root.left, B, set) OR \n         twoSumBSTHashSet(root.right, B, set)",
         "story": "HashSet for complement lookup.",
-        "code": "public int twoSumBSTHashSet(TreeNode A, int B) {\n    HashSet<Integer> set = new HashSet<>();\n    return search(A, B, set);\n}\n\nprivate int search(TreeNode root, int B, HashSet<Integer> set) {\n    if (root == null) return 0;\n    if (set.contains(B - root.val)) return 1;\n    set.add(root.val);\n    int left = search(root.left, B, set);\n    if (left == 1) return 1;\n    return search(root.right, B, set);\n}"
+        "code": "public int twoSumBSTHashSet(TreeNode A, int B) {\n    HashSet<Integer> set = new HashSet<>();\n    return search(A, B, set);\n}\n\nprivate int search(TreeNode root, int B, HashSet<Integer> set) {\n    if (root == null) {\n        return 0;\n    }\n    if (set.contains(B - root.val)) {\n        return 1;\n    }\n    set.add(root.val);\n    int left = search(root.left, B, set);\n    if (left == 1) {\n        return 1;\n    }\n    return search(root.right, B, set);\n}"
       }
     ],
     "viz": {
@@ -2043,7 +2043,7 @@
         ],
         "pseudocode": "checkBSTOneChild(A):\n  for i in 0..N-2:\n    next = A[i+1]\n    if next < A[i]:\n      // all following should be < A[i] (left subtree)\n      for j in i+1..N-1:\n        if A[j] > A[i]: return \"NO\"\n    else:\n      // all following should be > A[i] (right subtree)\n      for j in i+1..N-1:\n        if A[j] < A[i]: return \"NO\"\n  return \"YES\"",
         "story": "Preorder validation with one-child constraint.",
-        "code": "public String checkBSTOneChild(int[] A) {\n    int N = A.length;\n    for (int i = 0; i < N - 1; i++) {\n        int current = A[i];\n        int next = A[i + 1];\n        boolean isLeft = next < current;\n        \n        for (int j = i + 1; j < N; j++) {\n            if (isLeft && A[j] > current) return \"NO\";\n            if (!isLeft && A[j] < current) return \"NO\";\n        }\n    }\n    return \"YES\";\n}"
+        "code": "public String checkBSTOneChild(int[] A) {\n    int N = A.length;\n    for (int i = 0; i < N - 1; i++) {\n        int current = A[i];\n        int next = A[i + 1];\n        boolean isLeft = next < current;\n\n        for (int j = i + 1; j < N; j++) {\n            if (isLeft && A[j] > current) {\n                return \"NO\";\n            }\n            if (!isLeft && A[j] < current) {\n                return \"NO\";\n            }\n        }\n    }\n    return \"YES\";\n}"
       }
     ],
     "viz": {
@@ -2156,7 +2156,7 @@
         ],
         "pseudocode": "countRange(node, B, C):\n  if node == null: return 0\n  if node.val < B: return countRange(node.right, B, C)\n  if node.val > C: return countRange(node.left, B, C)\n  return 1 + countRange(node.left, B, C) + countRange(node.right, B, C)",
         "story": "DFS with BST pruning.",
-        "code": "public int countRangeInBST(TreeNode A, int B, int C) {\n    return countRange(A, B, C);\n}\n\nprivate int countRange(TreeNode node, int B, int C) {\n    if (node == null) return 0;\n    \n    if (node.val < B) {\n        return countRange(node.right, B, C);\n    }\n    if (node.val > C) {\n        return countRange(node.left, B, C);\n    }\n    \n    return 1 + countRange(node.left, B, C) + countRange(node.right, B, C);\n}"
+        "code": "public int countRangeInBST(TreeNode A, int B, int C) {\n    return countRange(A, B, C);\n}\n\nprivate int countRange(TreeNode node, int B, int C) {\n    if (node == null) {\n        return 0;\n    }\n\n    if (node.val < B) {\n        return countRange(node.right, B, C);\n    }\n    if (node.val > C) {\n        return countRange(node.left, B, C);\n    }\n\n    return 1 + countRange(node.left, B, C) + countRange(node.right, B, C);\n}"
       }
     ],
     "viz": {

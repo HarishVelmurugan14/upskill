@@ -36,7 +36,7 @@ Both must be registered in `data/index.json`:
 
 If a topic doesn't exist yet, create both files and register them.
 
-**Currently registered topics** (as of last audit — 67 problems, 556 viz steps, 366 overlays, 48/67 gold-tier):
+**Goal: ALL 67/67 problems gold-tier.** Every revisit or new problem MUST ship at the gold bar defined below — never downgrade. Currently registered topics (as of last audit — 67 problems, 556 viz steps, 366 overlays):
 
 | Topic | Slug | Problems |
 |---|---|---|
@@ -99,6 +99,7 @@ All viz kinds in the dataset are `scripted-array`. All 5 notes files conform to 
 - **`approach`**: ordered array of strings. Each entry = one atomic step the user could execute on paper. 5-9 entries typical. No code, no symbols beyond array notation.
 - **`code` is Java only.** No `import`, no `class` wrapper — just the method(s) plus tiny private helpers.
 - **Always keep `story`** (legacy field) — mirror the first sentence of `plain` if you don't have a separate one.
+- **`description` must mirror the source problem statement verbatim.** When the user provides a problem image, OCR/transcribe it literally — preserve the full prompt, every constraint line, examples, and the input-format/explanation blocks. Do NOT paraphrase, summarise, or drop "obvious" details (e.g. "1 ≤ A[i] ≤ 10^9", "Each test case is a single integer N", input-format/output-format sections). Tidy whitespace only. The `plain` and `tale` fields are where you reword — the `description` is the contract with the original prompt.
 - See `bs-peak-element`, `bs-aggressive-cows`, and `ll-reverse` as the **gold-standard worked examples**.
 
 ---
@@ -113,6 +114,7 @@ All viz kinds in the dataset are `scripted-array`. All 5 notes files conform to 
 - **`long`** when products / sums can overflow int.
 - Greedy / feasibility predicates extracted into `private boolean isXyzPossible(...)` (examples in repo: `canPlaceCows`, `canBeAllotted`, `isPaintingCompletionPossible`).
 - 4-space indentation. Braces on same line. No tabs.
+- **Always use full `{ }` braces** on every `if`, `else`, `for`, `while` — even single-statement branches. NO inline `if (x) y;` or `for (...) a = b;`. NO `else { ... }` on one line. This applies inside the `code` JSON strings too — readability beats compactness.
 
 ---
 
@@ -158,6 +160,7 @@ Each step in the script supports:
 - **2+ overlays** per problem (3+ preferred on richer problems).
 - **Every step has a `label`**.
 - **Every value in `msg` is tied to the actual sample input** and wrapped in `<strong>`.
+- **Sample input must be non-trivial.** Avoid toy inputs like `[1,2,3]` or `[[1,3,5],[2,6,9]]` — they look made-up and don't exercise the algorithm's edges. Prefer scattered, realistic-looking values (e.g. `[5,12,19,27,3,8,14,22]`, matrices that aren't column-sorted, arrays with duplicates in awkward places). The sample should make the BS bounce around (≥4 real iterations), the DP table fill non-uniformly, the stack pop multiple times, etc. The `sampleInput`, `code`-trace, and `viz` must all use the SAME input — keep them in sync.
 - **Every step visually changes** vs the previous (a pointer moves, a cell flips colour, an arrow flips).
 - **Reference these three as the upper bar:** `bs-peak-element`, `bs-aggressive-cows`, `ll-reverse`.
 

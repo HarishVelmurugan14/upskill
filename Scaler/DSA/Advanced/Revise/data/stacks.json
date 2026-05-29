@@ -23,7 +23,7 @@
           "time": "O(N)",
           "space": "O(N)"
         },
-        "plain": "Walk through the tokens left to right. If it's a number, push it onto the stack. If it's an operator, pop two values (b then a), compute a operator b, and push the result. After processing all tokens, the stack has exactly one element\u2014the answer.",
+        "plain": "Walk through the tokens left to right. If it's a number, push it onto the stack. If it's an operator, pop two values (b then a), compute a operator b, and push the result. After processing all tokens, the stack has exactly one element—the answer.",
         "tale": "You are the tower keeper. Each token is a scroll handed to you. If the scroll has a number, you place a stone with that value on the tower. If the scroll has a plus or minus sign, you take the top two stones, combine them according to the sign's rule, and place a single new stone with the combined value. By the time the last scroll is read, only one stone stands atop the tower, holding the truth.",
         "approach": [
           "Initialize an empty stack.",
@@ -50,7 +50,7 @@
           "3",
           "*"
         ],
-        "footer": "Reverse Polish Notation evaluation \u2014 tokens = [\"2\", \"1\", \"+\", \"3\", \"*\"]. Numbers push, operators pop-operate-push.",
+        "footer": "Reverse Polish Notation evaluation — tokens = [\"2\", \"1\", \"+\", \"3\", \"*\"]. Numbers push, operators pop-operate-push.",
         "legend": [
           "c-input",
           "c-active",
@@ -61,42 +61,42 @@
         "script": [
           {
             "label": "SETUP",
-            "msg": "Tokens: <strong>[\"2\", \"1\", \"+\", \"3\", \"*\"]</strong>. Goal: evaluate RPN expression. Numbers \u2192 push to stack. Operators \u2192 pop two, apply, push result.",
-            "html": "<div class='v-label'>TOKENS (INPUT)</div><div class='v-row'><div class='v-cell'>2</div><div class='v-cell'>1</div><div class='v-cell'>+</div><div class='v-cell'>3</div><div class='v-cell'>*</div></div><div class='v-row' style='margin-top:14px;'><div class='v-label'>STACK \u2193</div></div><div style='display:flex;flex-direction:column-reverse;gap:4px;align-items:center;'><div class='v-cell v-null'>EMPTY</div></div>",
+            "msg": "Tokens: <strong>[\"2\", \"1\", \"+\", \"3\", \"*\"]</strong>. Goal: evaluate RPN expression. Numbers → push to stack. Operators → pop two, apply, push result.",
+            "html": "<div class='v-label'>TOKENS (INPUT)</div><div class='v-row'><div class='v-cell'>2</div><div class='v-cell'>1</div><div class='v-cell'>+</div><div class='v-cell'>3</div><div class='v-cell'>*</div></div><div class='v-row' style='margin-top:14px;'><div class='v-label'>STACK ↓</div></div><div style='display:flex;flex-direction:column-reverse;gap:4px;align-items:center;'><div class='v-cell v-null'>EMPTY</div></div>",
             "overlay": "RPN rule: <code>if (isNumber) stack.push(num);</code> <code>else { b=pop(); a=pop(); push(a op b); }</code>"
           },
           {
-            "label": "STEP 1 \u2014 Push 2",
+            "label": "STEP 1 — Push 2",
             "msg": "Token <strong>\"2\"</strong> is a number. Push <strong>2</strong> onto the stack. Stack now: <strong>[2]</strong> (top = 2).",
-            "html": "<div class='v-label'>TOKENS</div><div class='v-row'><div class='v-cell v-eliminated'>2</div><div class='v-cell'>1</div><div class='v-cell'>+</div><div class='v-cell'>3</div><div class='v-cell'>*</div></div><div class='v-row' style='margin-top:14px;'><div class='v-label'>STACK \u2193</div></div><div style='display:flex;flex-direction:column-reverse;gap:4px;align-items:center;'><div class='v-cell v-new'>2 \u2190 TOP</div></div>",
+            "html": "<div class='v-label'>TOKENS</div><div class='v-row'><div class='v-cell v-eliminated'>2</div><div class='v-cell'>1</div><div class='v-cell'>+</div><div class='v-cell'>3</div><div class='v-cell'>*</div></div><div class='v-row' style='margin-top:14px;'><div class='v-label'>STACK ↓</div></div><div style='display:flex;flex-direction:column-reverse;gap:4px;align-items:center;'><div class='v-cell v-new'>2 ← TOP</div></div>",
             "overlay": "Push pattern: <code>stack.push(Integer.parseInt(token));</code>"
           },
           {
-            "label": "STEP 2 \u2014 Push 1",
+            "label": "STEP 2 — Push 1",
             "msg": "Token <strong>\"1\"</strong> is a number. Push <strong>1</strong> onto the stack. Stack now: <strong>[2, 1]</strong> (top = 1).",
-            "html": "<div class='v-label'>TOKENS</div><div class='v-row'><div class='v-cell v-eliminated'>2</div><div class='v-cell v-eliminated'>1</div><div class='v-cell'>+</div><div class='v-cell'>3</div><div class='v-cell'>*</div></div><div class='v-row' style='margin-top:14px;'><div class='v-label'>STACK \u2193</div></div><div style='display:flex;flex-direction:column-reverse;gap:4px;align-items:center;'><div class='v-cell v-new'>1 \u2190 TOP</div><div class='v-cell v-result'>2</div></div>"
+            "html": "<div class='v-label'>TOKENS</div><div class='v-row'><div class='v-cell v-eliminated'>2</div><div class='v-cell v-eliminated'>1</div><div class='v-cell'>+</div><div class='v-cell'>3</div><div class='v-cell'>*</div></div><div class='v-row' style='margin-top:14px;'><div class='v-label'>STACK ↓</div></div><div style='display:flex;flex-direction:column-reverse;gap:4px;align-items:center;'><div class='v-cell v-new'>1 ← TOP</div><div class='v-cell v-result'>2</div></div>"
           },
           {
-            "label": "STEP 3 \u2014 Operator '+'",
+            "label": "STEP 3 — Operator '+'",
             "msg": "Token <strong>\"+\"</strong> is an operator. Pop b=<strong>1</strong>, a=<strong>2</strong>. Compute <strong>2 + 1 = 3</strong>. Push <strong>3</strong>. Stack: <strong>[3]</strong>.",
-            "html": "<div class='v-label'>TOKENS</div><div class='v-row'><div class='v-cell v-eliminated'>2</div><div class='v-cell v-eliminated'>1</div><div class='v-cell v-eliminated'>+</div><div class='v-cell'>3</div><div class='v-cell'>*</div></div><div class='v-row' style='margin-top:14px;'><div class='v-label'>STACK \u2193</div></div><div style='display:flex;flex-direction:column-reverse;gap:4px;align-items:center;'><div class='v-cell v-new'>3 \u2190 TOP</div></div><div class='v-row' style='margin-top:8px;'><span class='v-stat'>operation: <strong>2 + 1 = 3</strong></span></div>",
+            "html": "<div class='v-label'>TOKENS</div><div class='v-row'><div class='v-cell v-eliminated'>2</div><div class='v-cell v-eliminated'>1</div><div class='v-cell v-eliminated'>+</div><div class='v-cell'>3</div><div class='v-cell'>*</div></div><div class='v-row' style='margin-top:14px;'><div class='v-label'>STACK ↓</div></div><div style='display:flex;flex-direction:column-reverse;gap:4px;align-items:center;'><div class='v-cell v-new'>3 ← TOP</div></div><div class='v-row' style='margin-top:8px;'><span class='v-stat'>operation: <strong>2 + 1 = 3</strong></span></div>",
             "overlay": "Operator pattern: <code>int b = stack.pop(); int a = stack.pop();</code> <code>stack.push(a + b);</code>"
           },
           {
-            "label": "STEP 4 \u2014 Push 3",
+            "label": "STEP 4 — Push 3",
             "msg": "Token <strong>\"3\"</strong> is a number. Push <strong>3</strong> onto the stack. Stack now: <strong>[3, 3]</strong> (two 3s).",
-            "html": "<div class='v-label'>TOKENS</div><div class='v-row'><div class='v-cell v-eliminated'>2</div><div class='v-cell v-eliminated'>1</div><div class='v-cell v-eliminated'>+</div><div class='v-cell v-eliminated'>3</div><div class='v-cell'>*</div></div><div class='v-row' style='margin-top:14px;'><div class='v-label'>STACK \u2193</div></div><div style='display:flex;flex-direction:column-reverse;gap:4px;align-items:center;'><div class='v-cell v-new'>3 \u2190 TOP</div><div class='v-cell v-result'>3</div></div>"
+            "html": "<div class='v-label'>TOKENS</div><div class='v-row'><div class='v-cell v-eliminated'>2</div><div class='v-cell v-eliminated'>1</div><div class='v-cell v-eliminated'>+</div><div class='v-cell v-eliminated'>3</div><div class='v-cell'>*</div></div><div class='v-row' style='margin-top:14px;'><div class='v-label'>STACK ↓</div></div><div style='display:flex;flex-direction:column-reverse;gap:4px;align-items:center;'><div class='v-cell v-new'>3 ← TOP</div><div class='v-cell v-result'>3</div></div>"
           },
           {
-            "label": "STEP 5 \u2014 Operator '*'",
+            "label": "STEP 5 — Operator '*'",
             "msg": "Token <strong>\"*\"</strong> is an operator. Pop b=<strong>3</strong>, a=<strong>3</strong>. Compute <strong>3 * 3 = 9</strong>. Push <strong>9</strong>. Stack: <strong>[9]</strong>.",
-            "html": "<div class='v-label'>TOKENS</div><div class='v-row'><div class='v-cell v-eliminated'>2</div><div class='v-cell v-eliminated'>1</div><div class='v-cell v-eliminated'>+</div><div class='v-cell v-eliminated'>3</div><div class='v-cell v-eliminated'>*</div></div><div class='v-row' style='margin-top:14px;'><div class='v-label'>STACK \u2193</div></div><div style='display:flex;flex-direction:column-reverse;gap:4px;align-items:center;'><div class='v-cell v-result'>9 \u2190 TOP</div></div><div class='v-row' style='margin-top:8px;'><span class='v-stat'>operation: <strong>3 * 3 = 9</strong></span></div>",
+            "html": "<div class='v-label'>TOKENS</div><div class='v-row'><div class='v-cell v-eliminated'>2</div><div class='v-cell v-eliminated'>1</div><div class='v-cell v-eliminated'>+</div><div class='v-cell v-eliminated'>3</div><div class='v-cell v-eliminated'>*</div></div><div class='v-row' style='margin-top:14px;'><div class='v-label'>STACK ↓</div></div><div style='display:flex;flex-direction:column-reverse;gap:4px;align-items:center;'><div class='v-cell v-result'>9 ← TOP</div></div><div class='v-row' style='margin-top:8px;'><span class='v-stat'>operation: <strong>3 * 3 = 9</strong></span></div>",
             "overlay": "Multiply: <code>stack.push(a * b);</code>"
           },
           {
             "label": "DONE",
-            "msg": "\u2705 All tokens processed. Stack contains one element: <strong>9</strong>. Return <strong>9</strong> as the final answer.",
-            "html": "<div class='v-label'>RESULT</div><div style='display:flex;flex-direction:column-reverse;gap:4px;align-items:center;'><div class='v-cell v-result'>9 \u2190 ANSWER</div></div><div class='v-row' style='margin-top:12px;'><span class='v-stat'>final: <strong>9</strong></span></div>",
+            "msg": "✅ All tokens processed. Stack contains one element: <strong>9</strong>. Return <strong>9</strong> as the final answer.",
+            "html": "<div class='v-label'>RESULT</div><div style='display:flex;flex-direction:column-reverse;gap:4px;align-items:center;'><div class='v-cell v-result'>9 ← ANSWER</div></div><div class='v-row' style='margin-top:12px;'><span class='v-stat'>final: <strong>9</strong></span></div>",
             "overlay": "Final: <code>return stack.pop();</code>"
           }
         ]
@@ -119,7 +119,7 @@
     "image": "images/stacks/stacks-02.png",
     "story": "Every opening bracket pushes onto the stack, every closing bracket must match the top. The stack is the memory of what's still open.",
     "plain": "Walk through the string character by character. When you see an opening bracket (like '{', '[', or '('), push it onto the stack. When you see a closing bracket, check if the stack's top matches. If it matches, pop and continue. If it doesn't match or the stack is empty, the string is unbalanced. At the end, the stack must be empty for the parentheses to be balanced.",
-    "tale": "Imagine you are a doorman at a grand ballroom with three types of doors\u2014curly, square, and round. As guests arrive, each opens one door type and you place a card for it on your desk. When a guest leaves, they must exit through the matching door, and you remove that card. If someone tries to leave through the wrong door type, or if your desk still has cards when the night ends, the building is in chaos. But if every entry has a matching exit and your desk is clear, the ballroom was perfectly balanced.",
+    "tale": "Imagine you are a doorman at a grand ballroom with three types of doors—curly, square, and round. As guests arrive, each opens one door type and you place a card for it on your desk. When a guest leaves, they must exit through the matching door, and you remove that card. If someone tries to leave through the wrong door type, or if your desk still has cards when the night ends, the building is in chaos. But if every entry has a matching exit and your desk is clear, the ballroom was perfectly balanced.",
     "solutions": [
       {
         "label": "Optimal",
@@ -128,9 +128,9 @@
           "space": "O(N)"
         },
         "plain": "Scan the string left to right. Push every opening bracket onto the stack. When you hit a closing bracket, pop the stack and verify it's the matching opening type. If not, return 0. If you try to pop from an empty stack, return 0. After scanning, return 1 if the stack is empty, else 0.",
-        "tale": "You are the gatekeeper. Each opening bracket is a guest entering, each closing bracket is a guest leaving. You write the entry type on a slip and place it atop a growing pile. When someone leaves, you check the topmost slip\u2014does it match their exit type? If yes, tear up the slip. If no, sound the alarm. When the last guest is processed, if slips remain, the doors never fully closed. Only an empty pile means balance.",
+        "tale": "You are the gatekeeper. Each opening bracket is a guest entering, each closing bracket is a guest leaving. You write the entry type on a slip and place it atop a growing pile. When someone leaves, you check the topmost slip—does it match their exit type? If yes, tear up the slip. If no, sound the alarm. When the last guest is processed, if slips remain, the doors never fully closed. Only an empty pile means balance.",
         "approach": [
-          "Check if the string length is odd. If yes, impossible to balance\u2014return 0 immediately.",
+          "Check if the string length is odd. If yes, impossible to balance—return 0 immediately.",
           "Initialize an empty stack.",
           "Iterate through each character in the string.",
           "If the character is an opening bracket ('{', '[', '('), push it onto the stack.",
@@ -155,7 +155,7 @@
           ")",
           "}"
         ],
-        "footer": "Balanced parentheses validation \u2014 A = \"{([])}\"",
+        "footer": "Balanced parentheses validation — A = \"{([])}\"",
         "legend": [
           "c-input",
           "c-active",
@@ -166,47 +166,47 @@
         "script": [
           {
             "label": "SETUP",
-            "msg": "String: <strong>\"{([])}\"</strong>. Goal: check if brackets are balanced. Opening \u2192 push. Closing \u2192 pop and match.",
-            "html": "<div class='v-label'>INPUT STREAM</div><div class='v-row'><div class='v-cell'>{</div><div class='v-cell'>(</div><div class='v-cell'>[</div><div class='v-cell'>]</div><div class='v-cell'>)</div><div class='v-cell'>}</div></div><div class='v-row' style='margin-top:14px;'><div class='v-label'>STACK \u2193</div></div><div style='display:flex;flex-direction:column-reverse;gap:4px;align-items:center;'><div class='v-cell v-null'>EMPTY</div></div>",
+            "msg": "String: <strong>\"{([])}\"</strong>. Goal: check if brackets are balanced. Opening → push. Closing → pop and match.",
+            "html": "<div class='v-label'>INPUT STREAM</div><div class='v-row'><div class='v-cell'>{</div><div class='v-cell'>(</div><div class='v-cell'>[</div><div class='v-cell'>]</div><div class='v-cell'>)</div><div class='v-cell'>}</div></div><div class='v-row' style='margin-top:14px;'><div class='v-label'>STACK ↓</div></div><div style='display:flex;flex-direction:column-reverse;gap:4px;align-items:center;'><div class='v-cell v-null'>EMPTY</div></div>",
             "overlay": "Rule: <code>if (opening) push;</code> <code>else { pop and match }</code>"
           },
           {
-            "label": "STEP 1 \u2014 Push '{'",
+            "label": "STEP 1 — Push '{'",
             "msg": "Character <strong>'{'</strong> is opening. Push to stack. Stack: <strong>[{]</strong> (top = '{').",
-            "html": "<div class='v-label'>INPUT</div><div class='v-row'><div class='v-cell v-eliminated'>{</div><div class='v-cell'>(</div><div class='v-cell'>[</div><div class='v-cell'>]</div><div class='v-cell'>)</div><div class='v-cell'>}</div></div><div class='v-row' style='margin-top:14px;'><div class='v-label'>STACK \u2193</div></div><div style='display:flex;flex-direction:column-reverse;gap:4px;align-items:center;'><div class='v-cell v-new'>{ \u2190 TOP</div></div>",
+            "html": "<div class='v-label'>INPUT</div><div class='v-row'><div class='v-cell v-eliminated'>{</div><div class='v-cell'>(</div><div class='v-cell'>[</div><div class='v-cell'>]</div><div class='v-cell'>)</div><div class='v-cell'>}</div></div><div class='v-row' style='margin-top:14px;'><div class='v-label'>STACK ↓</div></div><div style='display:flex;flex-direction:column-reverse;gap:4px;align-items:center;'><div class='v-cell v-new'>{ ← TOP</div></div>",
             "overlay": "Opening: <code>stack.push('{');</code>"
           },
           {
-            "label": "STEP 2 \u2014 Push '('",
+            "label": "STEP 2 — Push '('",
             "msg": "Character <strong>'('</strong> is opening. Push to stack. Stack: <strong>[{, (]</strong> (top = '(').",
-            "html": "<div class='v-label'>INPUT</div><div class='v-row'><div class='v-cell v-eliminated'>{</div><div class='v-cell v-eliminated'>(</div><div class='v-cell'>[</div><div class='v-cell'>]</div><div class='v-cell'>)</div><div class='v-cell'>}</div></div><div class='v-row' style='margin-top:14px;'><div class='v-label'>STACK \u2193</div></div><div style='display:flex;flex-direction:column-reverse;gap:4px;align-items:center;'><div class='v-cell v-new'>( \u2190 TOP</div><div class='v-cell v-result'>{</div></div>"
+            "html": "<div class='v-label'>INPUT</div><div class='v-row'><div class='v-cell v-eliminated'>{</div><div class='v-cell v-eliminated'>(</div><div class='v-cell'>[</div><div class='v-cell'>]</div><div class='v-cell'>)</div><div class='v-cell'>}</div></div><div class='v-row' style='margin-top:14px;'><div class='v-label'>STACK ↓</div></div><div style='display:flex;flex-direction:column-reverse;gap:4px;align-items:center;'><div class='v-cell v-new'>( ← TOP</div><div class='v-cell v-result'>{</div></div>"
           },
           {
-            "label": "STEP 3 \u2014 Push '['",
+            "label": "STEP 3 — Push '['",
             "msg": "Character <strong>'['</strong> is opening. Push to stack. Stack: <strong>[{, (, []</strong> (top = '[').",
-            "html": "<div class='v-label'>INPUT</div><div class='v-row'><div class='v-cell v-eliminated'>{</div><div class='v-cell v-eliminated'>(</div><div class='v-cell v-eliminated'>[</div><div class='v-cell'>]</div><div class='v-cell'>)</div><div class='v-cell'>}</div></div><div class='v-row' style='margin-top:14px;'><div class='v-label'>STACK \u2193</div></div><div style='display:flex;flex-direction:column-reverse;gap:4px;align-items:center;'><div class='v-cell v-new'>[ \u2190 TOP</div><div class='v-cell v-result'>(</div><div class='v-cell v-result'>{</div></div>"
+            "html": "<div class='v-label'>INPUT</div><div class='v-row'><div class='v-cell v-eliminated'>{</div><div class='v-cell v-eliminated'>(</div><div class='v-cell v-eliminated'>[</div><div class='v-cell'>]</div><div class='v-cell'>)</div><div class='v-cell'>}</div></div><div class='v-row' style='margin-top:14px;'><div class='v-label'>STACK ↓</div></div><div style='display:flex;flex-direction:column-reverse;gap:4px;align-items:center;'><div class='v-cell v-new'>[ ← TOP</div><div class='v-cell v-result'>(</div><div class='v-cell v-result'>{</div></div>"
           },
           {
-            "label": "STEP 4 \u2014 Pop and match ']'",
-            "msg": "Character <strong>']'</strong> is closing. Pop top = <strong>'['</strong>. Match? \u2713 Yes. Stack: <strong>[{, (]</strong>.",
-            "html": "<div class='v-label'>INPUT</div><div class='v-row'><div class='v-cell v-eliminated'>{</div><div class='v-cell v-eliminated'>(</div><div class='v-cell v-eliminated'>[</div><div class='v-cell v-eliminated'>]</div><div class='v-cell'>)</div><div class='v-cell'>}</div></div><div class='v-row' style='margin-top:14px;'><div class='v-label'>STACK \u2193</div></div><div style='display:flex;flex-direction:column-reverse;gap:4px;align-items:center;'><div class='v-cell v-result'>( \u2190 TOP</div><div class='v-cell v-result'>{</div></div><div class='v-row' style='margin-top:8px;'><span class='v-stat'>matched: <strong>[ and ]</strong></span></div>",
+            "label": "STEP 4 — Pop and match ']'",
+            "msg": "Character <strong>']'</strong> is closing. Pop top = <strong>'['</strong>. Match? ✓ Yes. Stack: <strong>[{, (]</strong>.",
+            "html": "<div class='v-label'>INPUT</div><div class='v-row'><div class='v-cell v-eliminated'>{</div><div class='v-cell v-eliminated'>(</div><div class='v-cell v-eliminated'>[</div><div class='v-cell v-eliminated'>]</div><div class='v-cell'>)</div><div class='v-cell'>}</div></div><div class='v-row' style='margin-top:14px;'><div class='v-label'>STACK ↓</div></div><div style='display:flex;flex-direction:column-reverse;gap:4px;align-items:center;'><div class='v-cell v-result'>( ← TOP</div><div class='v-cell v-result'>{</div></div><div class='v-row' style='margin-top:8px;'><span class='v-stat'>matched: <strong>[ and ]</strong></span></div>",
             "overlay": "Closing: <code>top = stack.pop(); if (pair(']') != top) return 0;</code>"
           },
           {
-            "label": "STEP 5 \u2014 Pop and match ')'",
-            "msg": "Character <strong>')'</strong> is closing. Pop top = <strong>'('</strong>. Match? \u2713 Yes. Stack: <strong>[{]</strong>.",
-            "html": "<div class='v-label'>INPUT</div><div class='v-row'><div class='v-cell v-eliminated'>{</div><div class='v-cell v-eliminated'>(</div><div class='v-cell v-eliminated'>[</div><div class='v-cell v-eliminated'>]</div><div class='v-cell v-eliminated'>)</div><div class='v-cell'>}</div></div><div class='v-row' style='margin-top:14px;'><div class='v-label'>STACK \u2193</div></div><div style='display:flex;flex-direction:column-reverse;gap:4px;align-items:center;'><div class='v-cell v-result'>{ \u2190 TOP</div></div><div class='v-row' style='margin-top:8px;'><span class='v-stat'>matched: <strong>( and )</strong></span></div>"
+            "label": "STEP 5 — Pop and match ')'",
+            "msg": "Character <strong>')'</strong> is closing. Pop top = <strong>'('</strong>. Match? ✓ Yes. Stack: <strong>[{]</strong>.",
+            "html": "<div class='v-label'>INPUT</div><div class='v-row'><div class='v-cell v-eliminated'>{</div><div class='v-cell v-eliminated'>(</div><div class='v-cell v-eliminated'>[</div><div class='v-cell v-eliminated'>]</div><div class='v-cell v-eliminated'>)</div><div class='v-cell'>}</div></div><div class='v-row' style='margin-top:14px;'><div class='v-label'>STACK ↓</div></div><div style='display:flex;flex-direction:column-reverse;gap:4px;align-items:center;'><div class='v-cell v-result'>{ ← TOP</div></div><div class='v-row' style='margin-top:8px;'><span class='v-stat'>matched: <strong>( and )</strong></span></div>"
           },
           {
-            "label": "STEP 6 \u2014 Pop and match '}'",
-            "msg": "Character <strong>'}'</strong> is closing. Pop top = <strong>'{'</strong>. Match? \u2713 Yes. Stack: <strong>EMPTY</strong>.",
-            "html": "<div class='v-label'>INPUT</div><div class='v-row'><div class='v-cell v-eliminated'>{</div><div class='v-cell v-eliminated'>(</div><div class='v-cell v-eliminated'>[</div><div class='v-cell v-eliminated'>]</div><div class='v-cell v-eliminated'>)</div><div class='v-cell v-eliminated'>}</div></div><div class='v-row' style='margin-top:14px;'><div class='v-label'>STACK \u2193</div></div><div style='display:flex;flex-direction:column-reverse;gap:4px;align-items:center;'><div class='v-cell v-null'>EMPTY \u2713</div></div><div class='v-row' style='margin-top:8px;'><span class='v-stat'>matched: <strong>{ and }</strong></span></div>",
+            "label": "STEP 6 — Pop and match '}'",
+            "msg": "Character <strong>'}'</strong> is closing. Pop top = <strong>'{'</strong>. Match? ✓ Yes. Stack: <strong>EMPTY</strong>.",
+            "html": "<div class='v-label'>INPUT</div><div class='v-row'><div class='v-cell v-eliminated'>{</div><div class='v-cell v-eliminated'>(</div><div class='v-cell v-eliminated'>[</div><div class='v-cell v-eliminated'>]</div><div class='v-cell v-eliminated'>)</div><div class='v-cell v-eliminated'>}</div></div><div class='v-row' style='margin-top:14px;'><div class='v-label'>STACK ↓</div></div><div style='display:flex;flex-direction:column-reverse;gap:4px;align-items:center;'><div class='v-cell v-null'>EMPTY ✓</div></div><div class='v-row' style='margin-top:8px;'><span class='v-stat'>matched: <strong>{ and }</strong></span></div>",
             "overlay": "Final check: <code>return stack.isEmpty() ? 1 : 0;</code>"
           },
           {
             "label": "DONE",
-            "msg": "\u2705 Stack is empty. All brackets matched correctly. Return <strong>1</strong> (balanced).",
-            "html": "<div class='v-label'>RESULT</div><div style='display:flex;flex-direction:column-reverse;gap:4px;align-items:center;'><div class='v-cell v-result'>BALANCED \u2713</div></div><div class='v-row' style='margin-top:12px;'><span class='v-stat'>answer: <strong>1</strong></span></div>"
+            "msg": "✅ Stack is empty. All brackets matched correctly. Return <strong>1</strong> (balanced).",
+            "html": "<div class='v-label'>RESULT</div><div style='display:flex;flex-direction:column-reverse;gap:4px;align-items:center;'><div class='v-cell v-result'>BALANCED ✓</div></div><div class='v-row' style='margin-top:12px;'><span class='v-stat'>answer: <strong>1</strong></span></div>"
           }
         ]
       }
@@ -223,12 +223,12 @@
       "Auxiliary Stack"
     ],
     "description": "Design a stack that supports push, pop, top, and retrieve the minimum element in constant time.\n\npush(x) -- Push element x onto stack.\npop() -- Removes the element on top of the stack.\ntop() -- Get the top element.\ngetMin() -- Retrieve the minimum element in the stack.\n\nNOTE:\nAll the operations have to be constant time operations.\ngetMin() should return -1 if the stack is empty.\npop() should return nothing if the stack is empty.\ntop() should return -1 if the stack is empty.",
-    "sampleInput": "push(5)\npush(3)\npush(7)\ngetMin() \u2192 3\npop()\ngetMin() \u2192 3",
+    "sampleInput": "push(5)\npush(3)\npush(7)\ngetMin() → 3\npop()\ngetMin() → 3",
     "sampleOutput": "3",
     "image": "images/stacks/stacks-05.png",
     "story": "Two stacks move together. One holds values, the other holds the current minimum. Both grow and shrink in sync.",
     "plain": "Use two stacks: one for actual values, one for tracking minimums. When you push a value, also push the smaller of that value or the current minimum onto the min stack. When you pop, pop from both stacks. To get the minimum, just peek at the min stack. Both stacks stay the same size, so all operations are O(1).",
-    "tale": "Imagine two towers built side by side. The left tower holds the actual numbers people give you. The right tower is your memory of 'what is the smallest number I've seen so far at each level'. Every time someone adds a number to the left, you look at the right tower's top\u2014if the new number is smaller, you place it on the right tower too. Otherwise, you duplicate the right tower's top. When someone removes from the left, you also remove from the right. This way, the right tower always remembers the answer to 'what is the minimum right now?'",
+    "tale": "Imagine two towers built side by side. The left tower holds the actual numbers people give you. The right tower is your memory of 'what is the smallest number I've seen so far at each level'. Every time someone adds a number to the left, you look at the right tower's top—if the new number is smaller, you place it on the right tower too. Otherwise, you duplicate the right tower's top. When someone removes from the left, you also remove from the right. This way, the right tower always remembers the answer to 'what is the minimum right now?'",
     "solutions": [
       {
         "label": "Optimal",
@@ -259,7 +259,7 @@
           3,
           7
         ],
-        "footer": "Min Stack design \u2014 operations: push(5), push(3), push(7), getMin()",
+        "footer": "Min Stack design — operations: push(5), push(3), push(7), getMin()",
         "legend": [
           "c-input",
           "c-active",
@@ -270,47 +270,47 @@
           {
             "label": "INIT",
             "msg": "Create two empty stacks: <strong>stack</strong> (main) and <strong>minStack</strong> (tracks minimum). Both start empty.",
-            "html": "<div style='display:flex;gap:32px;justify-content:center;'><div><div class='v-label'>STACK \u2193</div><div style='display:flex;flex-direction:column-reverse;gap:4px;align-items:center;'><div class='v-cell v-null'>EMPTY</div></div></div><div><div class='v-label'>MIN_STACK \u2193</div><div style='display:flex;flex-direction:column-reverse;gap:4px;align-items:center;'><div class='v-cell v-null'>EMPTY</div></div></div></div>",
+            "html": "<div style='display:flex;gap:32px;justify-content:center;'><div><div class='v-label'>STACK ↓</div><div style='display:flex;flex-direction:column-reverse;gap:4px;align-items:center;'><div class='v-cell v-null'>EMPTY</div></div></div><div><div class='v-label'>MIN_STACK ↓</div><div style='display:flex;flex-direction:column-reverse;gap:4px;align-items:center;'><div class='v-cell v-null'>EMPTY</div></div></div></div>",
             "overlay": "Init: <code>stack = new Stack<>(); minStack = new Stack<>();</code>"
           },
           {
             "label": "PUSH(5)",
             "msg": "Push <strong>5</strong> to stack. MinStack is empty, so also push <strong>5</strong> to minStack. Current min = <strong>5</strong>.",
-            "html": "<div style='display:flex;gap:32px;justify-content:center;'><div><div class='v-label'>STACK \u2193</div><div style='display:flex;flex-direction:column-reverse;gap:4px;align-items:center;'><div class='v-cell v-new'>5 \u2190 TOP</div></div></div><div><div class='v-label'>MIN_STACK \u2193</div><div style='display:flex;flex-direction:column-reverse;gap:4px;align-items:center;'><div class='v-cell v-new'>5 \u2190 MIN</div></div></div></div><div class='v-row' style='margin-top:8px;'><span class='v-stat'>current min: <strong>5</strong></span></div>",
+            "html": "<div style='display:flex;gap:32px;justify-content:center;'><div><div class='v-label'>STACK ↓</div><div style='display:flex;flex-direction:column-reverse;gap:4px;align-items:center;'><div class='v-cell v-new'>5 ← TOP</div></div></div><div><div class='v-label'>MIN_STACK ↓</div><div style='display:flex;flex-direction:column-reverse;gap:4px;align-items:center;'><div class='v-cell v-new'>5 ← MIN</div></div></div></div><div class='v-row' style='margin-top:8px;'><span class='v-stat'>current min: <strong>5</strong></span></div>",
             "overlay": "Push logic: <code>minStack.push(minStack.isEmpty() ? val : min(val, minStack.peek()));</code>"
           },
           {
             "label": "PUSH(3)",
             "msg": "Push <strong>3</strong> to stack. Compare with minStack.peek()=<strong>5</strong>. Since <strong>3 < 5</strong>, push <strong>3</strong> to minStack. Current min = <strong>3</strong>.",
-            "html": "<div style='display:flex;gap:32px;justify-content:center;'><div><div class='v-label'>STACK \u2193</div><div style='display:flex;flex-direction:column-reverse;gap:4px;align-items:center;'><div class='v-cell v-new'>3 \u2190 TOP</div><div class='v-cell v-result'>5</div></div></div><div><div class='v-label'>MIN_STACK \u2193</div><div style='display:flex;flex-direction:column-reverse;gap:4px;align-items:center;'><div class='v-cell v-new'>3 \u2190 MIN</div><div class='v-cell v-result'>5</div></div></div></div><div class='v-row' style='margin-top:8px;'><span class='v-stat'>current min: <strong>3</strong></span></div>",
+            "html": "<div style='display:flex;gap:32px;justify-content:center;'><div><div class='v-label'>STACK ↓</div><div style='display:flex;flex-direction:column-reverse;gap:4px;align-items:center;'><div class='v-cell v-new'>3 ← TOP</div><div class='v-cell v-result'>5</div></div></div><div><div class='v-label'>MIN_STACK ↓</div><div style='display:flex;flex-direction:column-reverse;gap:4px;align-items:center;'><div class='v-cell v-new'>3 ← MIN</div><div class='v-cell v-result'>5</div></div></div></div><div class='v-row' style='margin-top:8px;'><span class='v-stat'>current min: <strong>3</strong></span></div>",
             "overlay": "Min update: <code>minStack.push(Math.min(3, 5));</code>"
           },
           {
             "label": "PUSH(7)",
             "msg": "Push <strong>7</strong> to stack. Compare with minStack.peek()=<strong>3</strong>. Since <strong>7 > 3</strong>, push <strong>3</strong> again to minStack (keep current min). Current min = <strong>3</strong>.",
-            "html": "<div style='display:flex;gap:32px;justify-content:center;'><div><div class='v-label'>STACK \u2193</div><div style='display:flex;flex-direction:column-reverse;gap:4px;align-items:center;'><div class='v-cell v-new'>7 \u2190 TOP</div><div class='v-cell v-result'>3</div><div class='v-cell v-result'>5</div></div></div><div><div class='v-label'>MIN_STACK \u2193</div><div style='display:flex;flex-direction:column-reverse;gap:4px;align-items:center;'><div class='v-cell v-new'>3 \u2190 MIN</div><div class='v-cell v-result'>3</div><div class='v-cell v-result'>5</div></div></div></div><div class='v-row' style='margin-top:8px;'><span class='v-stat'>current min: <strong>3</strong></span></div>",
+            "html": "<div style='display:flex;gap:32px;justify-content:center;'><div><div class='v-label'>STACK ↓</div><div style='display:flex;flex-direction:column-reverse;gap:4px;align-items:center;'><div class='v-cell v-new'>7 ← TOP</div><div class='v-cell v-result'>3</div><div class='v-cell v-result'>5</div></div></div><div><div class='v-label'>MIN_STACK ↓</div><div style='display:flex;flex-direction:column-reverse;gap:4px;align-items:center;'><div class='v-cell v-new'>3 ← MIN</div><div class='v-cell v-result'>3</div><div class='v-cell v-result'>5</div></div></div></div><div class='v-row' style='margin-top:8px;'><span class='v-stat'>current min: <strong>3</strong></span></div>",
             "overlay": "Duplicate min: <code>minStack.push(Math.min(7, 3)); // pushes 3</code>"
           },
           {
             "label": "GET_MIN()",
-            "msg": "Call <strong>getMin()</strong>. Return <strong>minStack.peek() = 3</strong>. O(1) operation\u2014no iteration needed.",
-            "html": "<div style='display:flex;gap:32px;justify-content:center;'><div><div class='v-label'>STACK \u2193</div><div style='display:flex;flex-direction:column-reverse;gap:4px;align-items:center;'><div class='v-cell v-result'>7</div><div class='v-cell v-result'>3</div><div class='v-cell v-result'>5</div></div></div><div><div class='v-label'>MIN_STACK \u2193</div><div style='display:flex;flex-direction:column-reverse;gap:4px;align-items:center;'><div class='v-cell v-active'>3 \u2190 ANSWER</div><div class='v-cell v-result'>3</div><div class='v-cell v-result'>5</div></div></div></div><div class='v-row' style='margin-top:12px;'><span class='v-stat'>getMin() = <strong>3</strong></span></div>",
+            "msg": "Call <strong>getMin()</strong>. Return <strong>minStack.peek() = 3</strong>. O(1) operation—no iteration needed.",
+            "html": "<div style='display:flex;gap:32px;justify-content:center;'><div><div class='v-label'>STACK ↓</div><div style='display:flex;flex-direction:column-reverse;gap:4px;align-items:center;'><div class='v-cell v-result'>7</div><div class='v-cell v-result'>3</div><div class='v-cell v-result'>5</div></div></div><div><div class='v-label'>MIN_STACK ↓</div><div style='display:flex;flex-direction:column-reverse;gap:4px;align-items:center;'><div class='v-cell v-active'>3 ← ANSWER</div><div class='v-cell v-result'>3</div><div class='v-cell v-result'>5</div></div></div></div><div class='v-row' style='margin-top:12px;'><span class='v-stat'>getMin() = <strong>3</strong></span></div>",
             "overlay": "GetMin: <code>return minStack.peek();</code>"
           },
           {
             "label": "POP()",
             "msg": "Call <strong>pop()</strong>. Pop from both stacks. Remove <strong>7</strong> from stack and <strong>3</strong> from minStack. New min = <strong>3</strong> (next on minStack).",
-            "html": "<div style='display:flex;gap:32px;justify-content:center;'><div><div class='v-label'>STACK \u2193</div><div style='display:flex;flex-direction:column-reverse;gap:4px;align-items:center;'><div class='v-cell v-result'>3 \u2190 TOP</div><div class='v-cell v-result'>5</div></div></div><div><div class='v-label'>MIN_STACK \u2193</div><div style='display:flex;flex-direction:column-reverse;gap:4px;align-items:center;'><div class='v-cell v-result'>3 \u2190 MIN</div><div class='v-cell v-result'>5</div></div></div></div><div class='v-row' style='margin-top:8px;'><span class='v-stat'>after pop, min: <strong>3</strong></span></div>",
+            "html": "<div style='display:flex;gap:32px;justify-content:center;'><div><div class='v-label'>STACK ↓</div><div style='display:flex;flex-direction:column-reverse;gap:4px;align-items:center;'><div class='v-cell v-result'>3 ← TOP</div><div class='v-cell v-result'>5</div></div></div><div><div class='v-label'>MIN_STACK ↓</div><div style='display:flex;flex-direction:column-reverse;gap:4px;align-items:center;'><div class='v-cell v-result'>3 ← MIN</div><div class='v-cell v-result'>5</div></div></div></div><div class='v-row' style='margin-top:8px;'><span class='v-stat'>after pop, min: <strong>3</strong></span></div>",
             "overlay": "Pop both: <code>stack.pop(); minStack.pop();</code>"
           },
           {
             "label": "GET_MIN() Again",
             "msg": "Call <strong>getMin()</strong> again. Return <strong>minStack.peek() = 3</strong>. Still O(1).",
-            "html": "<div style='display:flex;gap:32px;justify-content:center;'><div><div class='v-label'>STACK \u2193</div><div style='display:flex;flex-direction:column-reverse;gap:4px;align-items:center;'><div class='v-cell v-result'>3</div><div class='v-cell v-result'>5</div></div></div><div><div class='v-label'>MIN_STACK \u2193</div><div style='display:flex;flex-direction:column-reverse;gap:4px;align-items:center;'><div class='v-cell v-active'>3 \u2190 ANSWER</div><div class='v-cell v-result'>5</div></div></div></div><div class='v-row' style='margin-top:12px;'><span class='v-stat'>getMin() = <strong>3</strong></span></div>"
+            "html": "<div style='display:flex;gap:32px;justify-content:center;'><div><div class='v-label'>STACK ↓</div><div style='display:flex;flex-direction:column-reverse;gap:4px;align-items:center;'><div class='v-cell v-result'>3</div><div class='v-cell v-result'>5</div></div></div><div><div class='v-label'>MIN_STACK ↓</div><div style='display:flex;flex-direction:column-reverse;gap:4px;align-items:center;'><div class='v-cell v-active'>3 ← ANSWER</div><div class='v-cell v-result'>5</div></div></div></div><div class='v-row' style='margin-top:12px;'><span class='v-stat'>getMin() = <strong>3</strong></span></div>"
           },
           {
             "label": "DONE",
-            "msg": "\u2705 All operations completed in O(1) time. The min stack always knows the current minimum without searching.",
+            "msg": "✅ All operations completed in O(1) time. The min stack always knows the current minimum without searching.",
             "html": "<div class='v-label'>COMPLEXITY</div><div class='v-row' style='margin-top:8px;'><span class='v-stat'>push: <strong>O(1)</strong></span><span class='v-stat'>pop: <strong>O(1)</strong></span><span class='v-stat'>getMin: <strong>O(1)</strong></span></div>",
             "overlay": "Space: <code>O(N)</code> for both stacks"
           }
@@ -332,9 +332,9 @@
     "sampleInput": "A = \"((a+b))\"",
     "sampleOutput": "1",
     "image": "images/stacks/stacks-06.png",
-    "story": "Push everything until you hit a closing bracket. Then unwind\u2014if you never saw an operator, those brackets were useless.",
+    "story": "Push everything until you hit a closing bracket. Then unwind—if you never saw an operator, those brackets were useless.",
     "plain": "Scan the expression left to right, pushing every character onto a stack. When you hit a closing parenthesis, pop characters until you reach the matching opening parenthesis. If you popped at least one operator (+, -, *, /) during that process, the brackets were necessary. If you didn't pop any operator, the brackets were redundant. Return 1 if redundant brackets are found, 0 otherwise.",
-    "tale": "Imagine you are a clerk reading a scroll of instructions. Each symbol goes into a box. When you see a closing parenthesis, you empty the box back to the matching opening parenthesis, counting what you see. If you empty the box and never saw a plus, minus, multiply, or divide sign, those parentheses held nothing but a naked value\u2014they were decorative,not functional. Sound the alarm. But if you saw at least one operator, those parentheses were doing real work.",
+    "tale": "Imagine you are a clerk reading a scroll of instructions. Each symbol goes into a box. When you see a closing parenthesis, you empty the box back to the matching opening parenthesis, counting what you see. If you empty the box and never saw a plus, minus, multiply, or divide sign, those parentheses held nothing but a naked value—they were decorative,not functional. Sound the alarm. But if you saw at least one operator, those parentheses were doing real work.",
     "solutions": [
       {
         "label": "Optimal",
@@ -343,11 +343,11 @@
           "space": "O(N)"
         },
         "plain": "Iterate through the string. Push every character onto the stack. When you encounter a closing bracket ')', start popping and check if you popped at least one operator before hitting '('. If no operator was popped, return 1 (redundant). If you finish the string without finding redundancy, return 0.",
-        "tale": "You are a quality inspector for mathematical expressions. Each symbol is a worker entering a room. When a closing bracket arrives, you call out everyone who entered after the last opening bracket. If among those workers there's at least one operator (a plus, minus, multiply, or divide worker), the brackets earned their keep. But if you only see letter workers (variables), the brackets were redundant\u2014just wrapping a value with no computation. You stamp 'redundant' and return 1.",
+        "tale": "You are a quality inspector for mathematical expressions. Each symbol is a worker entering a room. When a closing bracket arrives, you call out everyone who entered after the last opening bracket. If among those workers there's at least one operator (a plus, minus, multiply, or divide worker), the brackets earned their keep. But if you only see letter workers (variables), the brackets were redundant—just wrapping a value with no computation. You stamp 'redundant' and return 1.",
         "approach": [
           "Initialize an empty stack.",
           "Iterate through each character in the expression string A.",
-          "If the character is ')', it's a closing bracket\u2014time to check.",
+          "If the character is ')', it's a closing bracket—time to check.",
           "Pop characters from the stack until you hit '('.",
           "While popping, track if you saw at least one operator (+, -, *, /).",
           "If you didn't see any operator, return 1 (redundant brackets found).",
@@ -371,7 +371,7 @@
           ")",
           ")"
         ],
-        "footer": "Redundant braces detection \u2014 A = \"((a+b))\"",
+        "footer": "Redundant braces detection — A = \"((a+b))\"",
         "legend": [
           "c-input",
           "c-active",
@@ -383,42 +383,42 @@
           {
             "label": "SETUP",
             "msg": "Expression: <strong>\"((a+b))\"</strong>. Goal: find if any brackets are redundant (contain no operator). Push chars, unwind on ')'.",
-            "html": "<div class='v-label'>INPUT STREAM</div><div class='v-row'><div class='v-cell'>(</div><div class='v-cell'>(</div><div class='v-cell'>a</div><div class='v-cell'>+</div><div class='v-cell'>b</div><div class='v-cell'>)</div><div class='v-cell'>)</div></div><div class='v-row' style='margin-top:14px;'><div class='v-label'>STACK \u2193</div></div><div style='display:flex;flex-direction:column-reverse;gap:4px;align-items:center;'><div class='v-cell v-null'>EMPTY</div></div>",
+            "html": "<div class='v-label'>INPUT STREAM</div><div class='v-row'><div class='v-cell'>(</div><div class='v-cell'>(</div><div class='v-cell'>a</div><div class='v-cell'>+</div><div class='v-cell'>b</div><div class='v-cell'>)</div><div class='v-cell'>)</div></div><div class='v-row' style='margin-top:14px;'><div class='v-label'>STACK ↓</div></div><div style='display:flex;flex-direction:column-reverse;gap:4px;align-items:center;'><div class='v-cell v-null'>EMPTY</div></div>",
             "overlay": "Rule: <code>if (c != ')') push;</code> <code>else unwind to '(' and check for operators</code>"
           },
           {
             "label": "PUSH '('",
             "msg": "Character <strong>'('</strong> is not ')'. Push to stack. Stack: <strong>[(]</strong>.",
-            "html": "<div class='v-label'>INPUT</div><div class='v-row'><div class='v-cell v-eliminated'>(</div><div class='v-cell'>(</div><div class='v-cell'>a</div><div class='v-cell'>+</div><div class='v-cell'>b</div><div class='v-cell'>)</div><div class='v-cell'>)</div></div><div class='v-row' style='margin-top:14px;'><div class='v-label'>STACK \u2193</div></div><div style='display:flex;flex-direction:column-reverse;gap:4px;align-items:center;'><div class='v-cell v-new'>( \u2190 TOP</div></div>"
+            "html": "<div class='v-label'>INPUT</div><div class='v-row'><div class='v-cell v-eliminated'>(</div><div class='v-cell'>(</div><div class='v-cell'>a</div><div class='v-cell'>+</div><div class='v-cell'>b</div><div class='v-cell'>)</div><div class='v-cell'>)</div></div><div class='v-row' style='margin-top:14px;'><div class='v-label'>STACK ↓</div></div><div style='display:flex;flex-direction:column-reverse;gap:4px;align-items:center;'><div class='v-cell v-new'>( ← TOP</div></div>"
           },
           {
             "label": "PUSH '('",
             "msg": "Another <strong>'('</strong>. Push to stack. Stack: <strong>[(, (]</strong>.",
-            "html": "<div class='v-label'>INPUT</div><div class='v-row'><div class='v-cell v-eliminated'>(</div><div class='v-cell v-eliminated'>(</div><div class='v-cell'>a</div><div class='v-cell'>+</div><div class='v-cell'>b</div><div class='v-cell'>)</div><div class='v-cell'>)</div></div><div class='v-row' style='margin-top:14px;'><div class='v-label'>STACK \u2193</div></div><div style='display:flex;flex-direction:column-reverse;gap:4px;align-items:center;'><div class='v-cell v-new'>( \u2190 TOP</div><div class='v-cell v-result'>(</div></div>"
+            "html": "<div class='v-label'>INPUT</div><div class='v-row'><div class='v-cell v-eliminated'>(</div><div class='v-cell v-eliminated'>(</div><div class='v-cell'>a</div><div class='v-cell'>+</div><div class='v-cell'>b</div><div class='v-cell'>)</div><div class='v-cell'>)</div></div><div class='v-row' style='margin-top:14px;'><div class='v-label'>STACK ↓</div></div><div style='display:flex;flex-direction:column-reverse;gap:4px;align-items:center;'><div class='v-cell v-new'>( ← TOP</div><div class='v-cell v-result'>(</div></div>"
           },
           {
             "label": "PUSH 'a', '+', 'b'",
             "msg": "Push <strong>'a'</strong>, <strong>'+'</strong>, <strong>'b'</strong> sequentially. Stack: <strong>[(, (, a, +, b]</strong>.",
-            "html": "<div class='v-label'>INPUT</div><div class='v-row'><div class='v-cell v-eliminated'>(</div><div class='v-cell v-eliminated'>(</div><div class='v-cell v-eliminated'>a</div><div class='v-cell v-eliminated'>+</div><div class='v-cell v-eliminated'>b</div><div class='v-cell'>)</div><div class='v-cell'>)</div></div><div class='v-row' style='margin-top:14px;'><div class='v-label'>STACK \u2193</div></div><div style='display:flex;flex-direction:column-reverse;gap:4px;align-items:center;'><div class='v-cell v-new'>b \u2190 TOP</div><div class='v-cell v-result'>+</div><div class='v-cell v-result'>a</div><div class='v-cell v-result'>(</div><div class='v-cell v-result'>(</div></div>",
+            "html": "<div class='v-label'>INPUT</div><div class='v-row'><div class='v-cell v-eliminated'>(</div><div class='v-cell v-eliminated'>(</div><div class='v-cell v-eliminated'>a</div><div class='v-cell v-eliminated'>+</div><div class='v-cell v-eliminated'>b</div><div class='v-cell'>)</div><div class='v-cell'>)</div></div><div class='v-row' style='margin-top:14px;'><div class='v-label'>STACK ↓</div></div><div style='display:flex;flex-direction:column-reverse;gap:4px;align-items:center;'><div class='v-cell v-new'>b ← TOP</div><div class='v-cell v-result'>+</div><div class='v-cell v-result'>a</div><div class='v-cell v-result'>(</div><div class='v-cell v-result'>(</div></div>",
             "overlay": "Push all: <code>stack.push(c);</code>"
           },
           {
             "label": "UNWIND first ')'",
-            "msg": "Character <strong>')'</strong>. Unwind: pop <strong>'b'</strong> (operand), <strong>'+'</strong> (operator!), <strong>'a'</strong> (operand), then <strong>'('</strong>. Operator found \u2192 inner brackets are NOT redundant.",
-            "html": "<div class='v-label'>INPUT</div><div class='v-row'><div class='v-cell v-eliminated'>(</div><div class='v-cell v-eliminated'>(</div><div class='v-cell v-eliminated'>a</div><div class='v-cell v-eliminated'>+</div><div class='v-cell v-eliminated'>b</div><div class='v-cell v-eliminated'>)</div><div class='v-cell'>)</div></div><div class='v-row' style='margin-top:14px;'><div class='v-label'>STACK \u2193</div></div><div style='display:flex;flex-direction:column-reverse;gap:4px;align-items:center;'><div class='v-cell v-result'>( \u2190 TOP</div></div><div class='v-row' style='margin-top:8px;'><span class='v-stat'>popped: b, <strong>+</strong>, a</span><span class='v-stat'>hasOp: <strong>true</strong></span></div>",
+            "msg": "Character <strong>')'</strong>. Unwind: pop <strong>'b'</strong> (operand), <strong>'+'</strong> (operator!), <strong>'a'</strong> (operand), then <strong>'('</strong>. Operator found → inner brackets are NOT redundant.",
+            "html": "<div class='v-label'>INPUT</div><div class='v-row'><div class='v-cell v-eliminated'>(</div><div class='v-cell v-eliminated'>(</div><div class='v-cell v-eliminated'>a</div><div class='v-cell v-eliminated'>+</div><div class='v-cell v-eliminated'>b</div><div class='v-cell v-eliminated'>)</div><div class='v-cell'>)</div></div><div class='v-row' style='margin-top:14px;'><div class='v-label'>STACK ↓</div></div><div style='display:flex;flex-direction:column-reverse;gap:4px;align-items:center;'><div class='v-cell v-result'>( ← TOP</div></div><div class='v-row' style='margin-top:8px;'><span class='v-stat'>popped: b, <strong>+</strong>, a</span><span class='v-stat'>hasOp: <strong>true</strong></span></div>",
             "overlay": "Unwind check: <code>while (peek() != '(') { if (isOp(pop())) hasOp=true; }</code>"
           },
           {
             "label": "UNWIND second ')'",
-            "msg": "Character <strong>')'</strong>. Unwind: immediately hit <strong>'('</strong> (pop it). No operator popped this time. hasOp = <strong>false</strong> \u2192 REDUNDANT BRACKETS! Return <strong>1</strong>.",
-            "html": "<div class='v-label'>INPUT</div><div class='v-row'><div class='v-cell v-eliminated'>(</div><div class='v-cell v-eliminated'>(</div><div class='v-cell v-eliminated'>a</div><div class='v-cell v-eliminated'>+</div><div class='v-cell v-eliminated'>b</div><div class='v-cell v-eliminated'>)</div><div class='v-cell v-eliminated'>)</div></div><div class='v-row' style='margin-top:14px;'><div class='v-label'>STACK \u2193</div></div><div style='display:flex;flex-direction:column-reverse;gap:4px;align-items:center;'><div class='v-cell v-null'>EMPTY</div></div><div class='v-row' style='margin-top:8px;'><span class='v-stat'>popped: <strong>(</strong> only</span><span class='v-stat'>hasOp: <strong>false</strong></span><span class='v-stat' style='background:#f59e0b;color:#000;'>REDUNDANT!</span></div>",
+            "msg": "Character <strong>')'</strong>. Unwind: immediately hit <strong>'('</strong> (pop it). No operator popped this time. hasOp = <strong>false</strong> → REDUNDANT BRACKETS! Return <strong>1</strong>.",
+            "html": "<div class='v-label'>INPUT</div><div class='v-row'><div class='v-cell v-eliminated'>(</div><div class='v-cell v-eliminated'>(</div><div class='v-cell v-eliminated'>a</div><div class='v-cell v-eliminated'>+</div><div class='v-cell v-eliminated'>b</div><div class='v-cell v-eliminated'>)</div><div class='v-cell v-eliminated'>)</div></div><div class='v-row' style='margin-top:14px;'><div class='v-label'>STACK ↓</div></div><div style='display:flex;flex-direction:column-reverse;gap:4px;align-items:center;'><div class='v-cell v-null'>EMPTY</div></div><div class='v-row' style='margin-top:8px;'><span class='v-stat'>popped: <strong>(</strong> only</span><span class='v-stat'>hasOp: <strong>false</strong></span><span class='v-stat' style='background:#f59e0b;color:#000;'>REDUNDANT!</span></div>",
             "overlay": "Redundant detected: <code>if (!hasOp) return 1;</code>"
           },
           {
             "label": "DONE",
-            "msg": "\u2705 Redundant brackets found! The outer brackets <strong>( )</strong> wrap an entire expression with no additional operation. Return <strong>1</strong>.",
+            "msg": "✅ Redundant brackets found! The outer brackets <strong>( )</strong> wrap an entire expression with no additional operation. Return <strong>1</strong>.",
             "html": "<div class='v-label'>RESULT</div><div class='v-row' style='margin-top:12px;'><span class='v-stat' style='background:#f59e0b;color:#000;'>REDUNDANT BRACES</span></div><div class='v-row' style='margin-top:8px;'><span class='v-stat'>answer: <strong>1</strong></span></div>",
-            "overlay": "Pattern: outer brackets around <code>(a+b)</code> add nothing \u2192 redundant"
+            "overlay": "Pattern: outer brackets around <code>(a+b)</code> add nothing → redundant"
           }
         ]
       }
@@ -438,7 +438,7 @@
     "sampleInput": "A = [2, 1, 5, 6, 2, 3]",
     "sampleOutput": "10",
     "image": "images/stacks/stacks-09.png",
-    "story": "For each bar, find how far left and right it can extend as the shortest. Width \u00d7 height = area. Stack finds boundaries in linear time.",
+    "story": "For each bar, find how far left and right it can extend as the shortest. Width × height = area. Stack finds boundaries in linear time.",
     "plain": "For each bar at index i, we need to find the maximum width rectangle where that bar is the shortest. To do this, find the nearest smaller bar to the left and right. The width is the distance between those boundaries. Use a monotonic stack to compute nearest smaller elements in O(N) time for both directions, then calculate area for each bar and return the maximum.",
     "tale": "Imagine a city skyline where each building can expand its footprint left and right until it hits a shorter building. A tower at height 5 looks left and right: 'How far can I stretch before I meet someone shorter than me?' The answer is the widest rectangle I can claim. You walk the skyline twice with a memory tablet (the stack), once left-to-right recording 'who is your left boundary?', once right-to-left recording 'who is your right boundary?' Then each tower multiplies its height by its width and proclaims its area. The loudest voice wins.",
     "solutions": [
@@ -448,21 +448,21 @@
           "time": "O(N)",
           "space": "O(N)"
         },
-        "plain": "Compute two arrays using monotonic stacks: prevSmaller[i] (index of nearest smaller to left, or -1) and nextSmaller[i] (index of nearest smaller to right, or N). For each bar i, the width it can extend is nextSmaller[i] - prevSmaller[i] - 1. Calculate area[i] = height[i] \u00d7 width[i] for all bars and return the maximum.",
-        "tale": "You are a land surveyor with a magical compass. First pass: walk left to right, and for each bar, the compass points to the last shorter bar you saw (or the edge). Record those indices. Second pass: walk right to left, same rule. Now each bar knows its left and right boundaries. Compute each bar's rectangular footprint. The largest footprint is the answer. The compass is the stack\u2014it only remembers bars in increasing order, discarding taller ones when a shorter arrives.",
+        "plain": "Compute two arrays using monotonic stacks: prevSmaller[i] (index of nearest smaller to left, or -1) and nextSmaller[i] (index of nearest smaller to right, or N). For each bar i, the width it can extend is nextSmaller[i] - prevSmaller[i] - 1. Calculate area[i] = height[i] × width[i] for all bars and return the maximum.",
+        "tale": "You are a land surveyor with a magical compass. First pass: walk left to right, and for each bar, the compass points to the last shorter bar you saw (or the edge). Record those indices. Second pass: walk right to left, same rule. Now each bar knows its left and right boundaries. Compute each bar's rectangular footprint. The largest footprint is the answer. The compass is the stack—it only remembers bars in increasing order, discarding taller ones when a shorter arrives.",
         "approach": [
           "Compute prevSmaller[i] for each i: index of nearest smaller element to the left (or -1 if none).",
           "Compute nextSmaller[i] for each i: index of nearest smaller element to the right (or N if none).",
           "Both computed using monotonic increasing stack in O(N) each.",
           "For each bar i, calculate width = nextSmaller[i] - prevSmaller[i] - 1.",
-          "Calculate area = A[i] \u00d7 width.",
+          "Calculate area = A[i] × width.",
           "Track the maximum area across all bars.",
           "Return the maximum area.",
-          "The stack-based NSE computation is the key insight that reduces brute force O(N\u00b2) to O(N)."
+          "The stack-based NSE computation is the key insight that reduces brute force O(N²) to O(N)."
         ],
         "pseudocode": "prevSmaller = nearestSmallerLeft(A)  // O(N)\nnextSmaller = nearestSmallerRight(A) // O(N)\nmaxArea = 0\nfor i in 0..N-1:\n  width = nextSmaller[i] - prevSmaller[i] - 1\n  area = A[i] * width\n  maxArea = max(maxArea, area)\nreturn maxArea",
-        "story": "Find left and right boundaries using stack, then width \u00d7 height for each bar. Maximum is the answer.",
-        "code": "public int largestRectangleInAHistogram(int[] A) {\n    int N = A.length;\n    int maxArea = -1;\n    int[] prevSmallerElements = nearestSmallerElementsToTheLeft(A);\n    int[] nextSmallerElements = nearestSmallerElementsToTheRight(A);\n    for (int i = 0; i < N; i++) {\n        int height = A[i];\n        int width = nextSmallerElements[i] - prevSmallerElements[i] - 1;\n        int area = height * width;\n        maxArea = Math.max(area, maxArea);\n    }\n    return maxArea;\n}\n\npublic int[] nearestSmallerElementsToTheLeft(int[] A) {\n    int N = A.length;\n    Stack<Integer> stack = new Stack<>();\n    int[] res = new int[N];\n    res[0] = -1;\n    stack.push(0);\n    for (int i = 1; i < N; i++) {\n        while (A[stack.peek()] >= A[i]) {\n            stack.pop();\n            if (stack.isEmpty()) {\n                res[i] = -1;\n                break;\n            }\n        }\n        if (!stack.isEmpty()) res[i] = stack.peek();\n        stack.push(i);\n    }\n    return res;\n}\n\npublic int[] nearestSmallerElementsToTheRight(int[] A) {\n    int N = A.length;\n    Stack<Integer> stack = new Stack<>();\n    int[] res = new int[N];\n    for (int i = N - 1; i >= 0; i--) {\n        while (!stack.isEmpty() && A[stack.peek()] >= A[i]) {\n            stack.pop();\n        }\n        res[i] = stack.isEmpty() ? N : stack.peek();\n        stack.push(i);\n    }\n    return res;\n}"
+        "story": "Find left and right boundaries using stack, then width × height for each bar. Maximum is the answer.",
+        "code": "public int largestRectangleInAHistogram(int[] A) {\n    int N = A.length;\n    int maxArea = -1;\n    int[] prevSmallerElements = nearestSmallerElementsToTheLeft(A);\n    int[] nextSmallerElements = nearestSmallerElementsToTheRight(A);\n    for (int i = 0; i < N; i++) {\n        int height = A[i];\n        int width = nextSmallerElements[i] - prevSmallerElements[i] - 1;\n        int area = height * width;\n        maxArea = Math.max(area, maxArea);\n    }\n    return maxArea;\n}\n\npublic int[] nearestSmallerElementsToTheLeft(int[] A) {\n    int N = A.length;\n    Stack<Integer> stack = new Stack<>();\n    int[] res = new int[N];\n    res[0] = -1;\n    stack.push(0);\n    for (int i = 1; i < N; i++) {\n        while (A[stack.peek()] >= A[i]) {\n            stack.pop();\n            if (stack.isEmpty()) {\n                res[i] = -1;\n                break;\n            }\n        }\n        if (!stack.isEmpty()) {\n            res[i] = stack.peek();\n        }\n        stack.push(i);\n    }\n    return res;\n}\n\npublic int[] nearestSmallerElementsToTheRight(int[] A) {\n    int N = A.length;\n    Stack<Integer> stack = new Stack<>();\n    int[] res = new int[N];\n    for (int i = N - 1; i >= 0; i--) {\n        while (!stack.isEmpty() && A[stack.peek()] >= A[i]) {\n            stack.pop();\n        }\n        res[i] = stack.isEmpty() ? N : stack.peek();\n        stack.push(i);\n    }\n    return res;\n}"
       }
     ],
     "viz": {
@@ -476,7 +476,7 @@
           2,
           3
         ],
-        "footer": "Largest Rectangle in Histogram \u2014 A = [2, 1, 5, 6, 2, 3]. For each bar, find how far it can extend.",
+        "footer": "Largest Rectangle in Histogram — A = [2, 1, 5, 6, 2, 3]. For each bar, find how far it can extend.",
         "legend": [
           "c-input",
           "c-active",
@@ -494,7 +494,7 @@
             "overlay": "Key insight: <code>width[i] = nextSmaller[i] - prevSmaller[i] - 1</code> <code>area[i] = A[i] * width[i]</code>"
           },
           {
-            "label": "PHASE 1 \u2014 Compute prevSmaller",
+            "label": "PHASE 1 — Compute prevSmaller",
             "msg": "Compute <strong>prevSmaller[i]</strong> for each bar: index of nearest smaller bar to the left (or -1 if none). Use monotonic increasing stack.",
             "marks": {},
             "ptrs": {},
@@ -515,7 +515,7 @@
             "overlay": "Interpretation: <code>prevSmaller[2] = 1</code> means bar 2's left boundary is after index 1"
           },
           {
-            "label": "PHASE 2 \u2014 Compute nextSmaller",
+            "label": "PHASE 2 — Compute nextSmaller",
             "msg": "Compute <strong>nextSmaller[i]</strong> for each bar: index of nearest smaller bar to the right (or N=6 if none). Use stack right-to-left.",
             "marks": {},
             "ptrs": {},
@@ -537,7 +537,7 @@
           },
           {
             "label": "BAR 0 (height 2)",
-            "msg": "Bar <strong>0</strong>, height=<strong>2</strong>. prevSmaller=<strong>-1</strong>, nextSmaller=<strong>1</strong>. Width = 1 - (-1) - 1 = <strong>1</strong>. Area = 2\u00d71 = <strong>2</strong>.",
+            "msg": "Bar <strong>0</strong>, height=<strong>2</strong>. prevSmaller=<strong>-1</strong>, nextSmaller=<strong>1</strong>. Width = 1 - (-1) - 1 = <strong>1</strong>. Area = 2×1 = <strong>2</strong>.",
             "marks": {
               "0": "c-active"
             },
@@ -546,7 +546,7 @@
           },
           {
             "label": "BAR 1 (height 1)",
-            "msg": "Bar <strong>1</strong>, height=<strong>1</strong>. prevSmaller=<strong>-1</strong>, nextSmaller=<strong>6</strong>. Width = 6 - (-1) - 1 = <strong>6</strong>. Area = 1\u00d76 = <strong>6</strong>.",
+            "msg": "Bar <strong>1</strong>, height=<strong>1</strong>. prevSmaller=<strong>-1</strong>, nextSmaller=<strong>6</strong>. Width = 6 - (-1) - 1 = <strong>6</strong>. Area = 1×6 = <strong>6</strong>.",
             "marks": {
               "1": "c-active"
             },
@@ -555,7 +555,7 @@
           },
           {
             "label": "BAR 2 (height 5)",
-            "msg": "Bar <strong>2</strong>, height=<strong>5</strong>. prevSmaller=<strong>1</strong>, nextSmaller=<strong>4</strong>. Width = 4 - 1 - 1 = <strong>2</strong>. Area = 5\u00d72 = <strong>10</strong>. \u2190 NEW MAX!",
+            "msg": "Bar <strong>2</strong>, height=<strong>5</strong>. prevSmaller=<strong>1</strong>, nextSmaller=<strong>4</strong>. Width = 4 - 1 - 1 = <strong>2</strong>. Area = 5×2 = <strong>10</strong>. ← NEW MAX!",
             "marks": {
               "2": "c-mid"
             },
@@ -564,7 +564,7 @@
           },
           {
             "label": "BAR 3 (height 6)",
-            "msg": "Bar <strong>3</strong>, height=<strong>6</strong>. prevSmaller=<strong>2</strong>, nextSmaller=<strong>4</strong>. Width = 4 - 2 - 1 = <strong>1</strong>. Area = 6\u00d71 = <strong>6</strong>.",
+            "msg": "Bar <strong>3</strong>, height=<strong>6</strong>. prevSmaller=<strong>2</strong>, nextSmaller=<strong>4</strong>. Width = 4 - 2 - 1 = <strong>1</strong>. Area = 6×1 = <strong>6</strong>.",
             "marks": {
               "3": "c-active"
             },
@@ -573,7 +573,7 @@
           },
           {
             "label": "BAR 4 (height 2)",
-            "msg": "Bar <strong>4</strong>, height=<strong>2</strong>. prevSmaller=<strong>1</strong>, nextSmaller=<strong>6</strong>. Width = 6 - 1 - 1 = <strong>4</strong>. Area = 2\u00d74 = <strong>8</strong>.",
+            "msg": "Bar <strong>4</strong>, height=<strong>2</strong>. prevSmaller=<strong>1</strong>, nextSmaller=<strong>6</strong>. Width = 6 - 1 - 1 = <strong>4</strong>. Area = 2×4 = <strong>8</strong>.",
             "marks": {
               "4": "c-active"
             },
@@ -582,7 +582,7 @@
           },
           {
             "label": "BAR 5 (height 3)",
-            "msg": "Bar <strong>5</strong>, height=<strong>3</strong>. prevSmaller=<strong>4</strong>, nextSmaller=<strong>6</strong>. Width = 6 - 4 - 1 = <strong>1</strong>. Area = 3\u00d71 = <strong>3</strong>.",
+            "msg": "Bar <strong>5</strong>, height=<strong>3</strong>. prevSmaller=<strong>4</strong>, nextSmaller=<strong>6</strong>. Width = 6 - 4 - 1 = <strong>1</strong>. Area = 3×1 = <strong>3</strong>.",
             "marks": {
               "5": "c-active"
             },
@@ -591,7 +591,7 @@
           },
           {
             "label": "DONE",
-            "msg": "\u2705 Maximum area found: <strong>10</strong> (from bar 2 with height 5 spanning width 2). Time: <strong>O(N)</strong>, Space: <strong>O(N)</strong>.",
+            "msg": "✅ Maximum area found: <strong>10</strong> (from bar 2 with height 5 spanning width 2). Time: <strong>O(N)</strong>, Space: <strong>O(N)</strong>.",
             "marks": {
               "2": "c-result"
             },
@@ -618,9 +618,9 @@
     "sampleInput": "A = [4, 5, 2, 10, 8]",
     "sampleOutput": "[-1, 4, -1, 2, 2]",
     "image": "images/stacks/stacks-10.png",
-    "story": "Maintain a stack of increasing values. When you see a new value, pop all larger ones\u2014they'll never be nearest smaller for anyone. The remaining top is your answer.",
+    "story": "Maintain a stack of increasing values. When you see a new value, pop all larger ones—they'll never be nearest smaller for anyone. The remaining top is your answer.",
     "plain": "Scan the array left to right. Keep a stack that holds values in increasing order. For each element, pop stack elements that are greater than or equal to the current element (they can't be the nearest smaller for this element). If the stack is empty after popping, there's no smaller element to the left, so record -1. Otherwise, the stack top is the nearest smaller. Then push the current element onto the stack.",
-    "tale": "You walk through a line of guards, each with a height. You're looking for each guard's 'protector'\u2014the nearest shorter guard to their left. You carry a list (the stack) of guards you've seen so far, sorted shortest to tallest. When you meet a new guard, you remove anyone from your list who is taller or equal height\u2014they're blocked by this new guard and will never protect anyone ahead. The shortest person left on your list is the protector. If the list is empty, this guard has no protector. Add the new guard to your list and continue.",
+    "tale": "You walk through a line of guards, each with a height. You're looking for each guard's 'protector'—the nearest shorter guard to their left. You carry a list (the stack) of guards you've seen so far, sorted shortest to tallest. When you meet a new guard, you remove anyone from your list who is taller or equal height—they're blocked by this new guard and will never protect anyone ahead. The shortest person left on your list is the protector. If the list is empty, this guard has no protector. Add the new guard to your list and continue.",
     "solutions": [
       {
         "label": "Optimal",
@@ -629,7 +629,7 @@
           "space": "O(N)"
         },
         "plain": "Iterate left to right. Maintain a monotonic increasing stack (stores values, not indices). For each A[i], pop while stack.peek() >= A[i]. If stack is empty, record -1. Else record stack.peek(). Push A[i]. Each element is pushed and popped at most once, so O(N) total.",
-        "tale": "Imagine a tower of blocks stacked smallest to largest. As you walk through numbers, you place each new number on the tower. But first, you knock off any blocks that are equal or taller than the incoming number\u2014they're now useless. What remains on top is the nearest smaller. If the tower is empty, no one is smaller. The tower only grows with useful candidates, keeping the operation fast.",
+        "tale": "Imagine a tower of blocks stacked smallest to largest. As you walk through numbers, you place each new number on the tower. But first, you knock off any blocks that are equal or taller than the incoming number—they're now useless. What remains on top is the nearest smaller. If the tower is empty, no one is smaller. The tower only grows with useful candidates, keeping the operation fast.",
         "approach": [
           "Initialize an empty stack and an empty result array of size N.",
           "Set result[0] = -1 (no element before index 0). Push A[0] onto the stack.",
@@ -655,7 +655,7 @@
           10,
           8
         ],
-        "footer": "Nearest Smaller Element \u2014 A = [4, 5, 2, 10, 8]. For each element, find nearest smaller to the left.",
+        "footer": "Nearest Smaller Element — A = [4, 5, 2, 10, 8]. For each element, find nearest smaller to the left.",
         "legend": [
           "c-input",
           "c-active",
@@ -677,7 +677,7 @@
               "0": "c-active"
             },
             "ptrs": {},
-            "html": "<div class='v-row'><div class='v-label'>ARRAY</div></div><div class='v-row'><div class='v-cell v-active'>4</div><div class='v-cell'>5</div><div class='v-cell'>2</div><div class='v-cell'>10</div><div class='v-cell'>8</div></div><div class='v-row' style='margin-top:14px;'><div class='v-label'>STACK \u2193</div></div><div style='display:flex;flex-direction:column-reverse;gap:4px;align-items:center;'><div class='v-cell v-new'>4 \u2190 TOP</div></div><div class='v-row' style='margin-top:8px;'><span class='v-stat'>result[0]: <strong>-1</strong></span></div>",
+            "html": "<div class='v-row'><div class='v-label'>ARRAY</div></div><div class='v-row'><div class='v-cell v-active'>4</div><div class='v-cell'>5</div><div class='v-cell'>2</div><div class='v-cell'>10</div><div class='v-cell'>8</div></div><div class='v-row' style='margin-top:14px;'><div class='v-label'>STACK ↓</div></div><div style='display:flex;flex-direction:column-reverse;gap:4px;align-items:center;'><div class='v-cell v-new'>4 ← TOP</div></div><div class='v-row' style='margin-top:8px;'><span class='v-stat'>result[0]: <strong>-1</strong></span></div>",
             "overlay": "Base case: <code>res[0] = -1; stack.push(A[0]);</code>"
           },
           {
@@ -688,7 +688,7 @@
               "1": "c-active"
             },
             "ptrs": {},
-            "html": "<div class='v-row'><div class='v-label'>ARRAY</div></div><div class='v-row'><div class='v-cell v-result'>4</div><div class='v-cell v-active'>5</div><div class='v-cell'>2</div><div class='v-cell'>10</div><div class='v-cell'>8</div></div><div class='v-row' style='margin-top:14px;'><div class='v-label'>STACK \u2193</div></div><div style='display:flex;flex-direction:column-reverse;gap:4px;align-items:center;'><div class='v-cell v-new'>5 \u2190 TOP</div><div class='v-cell v-result'>4</div></div><div class='v-row' style='margin-top:8px;'><span class='v-stat'>result[1]: <strong>4</strong></span></div>",
+            "html": "<div class='v-row'><div class='v-label'>ARRAY</div></div><div class='v-row'><div class='v-cell v-result'>4</div><div class='v-cell v-active'>5</div><div class='v-cell'>2</div><div class='v-cell'>10</div><div class='v-cell'>8</div></div><div class='v-row' style='margin-top:14px;'><div class='v-label'>STACK ↓</div></div><div style='display:flex;flex-direction:column-reverse;gap:4px;align-items:center;'><div class='v-cell v-new'>5 ← TOP</div><div class='v-cell v-result'>4</div></div><div class='v-row' style='margin-top:8px;'><span class='v-stat'>result[1]: <strong>4</strong></span></div>",
             "overlay": "Stack maintained: <code>4 < 5</code>, so keep 4 and push 5"
           },
           {
@@ -700,7 +700,7 @@
               "2": "c-active"
             },
             "ptrs": {},
-            "html": "<div class='v-row'><div class='v-label'>ARRAY</div></div><div class='v-row'><div class='v-cell v-eliminated'>4</div><div class='v-cell v-eliminated'>5</div><div class='v-cell v-active'>2</div><div class='v-cell'>10</div><div class='v-cell'>8</div></div><div class='v-row' style='margin-top:14px;'><div class='v-label'>STACK \u2193</div></div><div style='display:flex;flex-direction:column-reverse;gap:4px;align-items:center;'><div class='v-cell v-new'>2 \u2190 TOP</div></div><div class='v-row' style='margin-top:8px;'><span class='v-stat'>popped 5, 4</span><span class='v-stat'>result[2]: <strong>-1</strong></span></div>",
+            "html": "<div class='v-row'><div class='v-label'>ARRAY</div></div><div class='v-row'><div class='v-cell v-eliminated'>4</div><div class='v-cell v-eliminated'>5</div><div class='v-cell v-active'>2</div><div class='v-cell'>10</div><div class='v-cell'>8</div></div><div class='v-row' style='margin-top:14px;'><div class='v-label'>STACK ↓</div></div><div style='display:flex;flex-direction:column-reverse;gap:4px;align-items:center;'><div class='v-cell v-new'>2 ← TOP</div></div><div class='v-row' style='margin-top:8px;'><span class='v-stat'>popped 5, 4</span><span class='v-stat'>result[2]: <strong>-1</strong></span></div>",
             "overlay": "Pop all >= 2: <code>while (stack.peek() >= 2) pop</code>"
           },
           {
@@ -711,7 +711,7 @@
               "3": "c-active"
             },
             "ptrs": {},
-            "html": "<div class='v-row'><div class='v-label'>ARRAY</div></div><div class='v-row'><div class='v-cell v-eliminated'>4</div><div class='v-cell v-eliminated'>5</div><div class='v-cell v-result'>2</div><div class='v-cell v-active'>10</div><div class='v-cell'>8</div></div><div class='v-row' style='margin-top:14px;'><div class='v-label'>STACK \u2193</div></div><div style='display:flex;flex-direction:column-reverse;gap:4px;align-items:center;'><div class='v-cell v-new'>10 \u2190 TOP</div><div class='v-cell v-result'>2</div></div><div class='v-row' style='margin-top:8px;'><span class='v-stat'>result[3]: <strong>2</strong></span></div>",
+            "html": "<div class='v-row'><div class='v-label'>ARRAY</div></div><div class='v-row'><div class='v-cell v-eliminated'>4</div><div class='v-cell v-eliminated'>5</div><div class='v-cell v-result'>2</div><div class='v-cell v-active'>10</div><div class='v-cell'>8</div></div><div class='v-row' style='margin-top:14px;'><div class='v-label'>STACK ↓</div></div><div style='display:flex;flex-direction:column-reverse;gap:4px;align-items:center;'><div class='v-cell v-new'>10 ← TOP</div><div class='v-cell v-result'>2</div></div><div class='v-row' style='margin-top:8px;'><span class='v-stat'>result[3]: <strong>2</strong></span></div>",
             "overlay": "Keep 2: <code>2 < 10</code>, push 10"
           },
           {
@@ -723,12 +723,12 @@
               "4": "c-active"
             },
             "ptrs": {},
-            "html": "<div class='v-row'><div class='v-label'>ARRAY</div></div><div class='v-row'><div class='v-cell v-eliminated'>4</div><div class='v-cell v-eliminated'>5</div><div class='v-cell v-result'>2</div><div class='v-cell v-eliminated'>10</div><div class='v-cell v-active'>8</div></div><div class='v-row' style='margin-top:14px;'><div class='v-label'>STACK \u2193</div></div><div style='display:flex;flex-direction:column-reverse;gap:4px;align-items:center;'><div class='v-cell v-new'>8 \u2190 TOP</div><div class='v-cell v-result'>2</div></div><div class='v-row' style='margin-top:8px;'><span class='v-stat'>popped 10</span><span class='v-stat'>result[4]: <strong>2</strong></span></div>",
+            "html": "<div class='v-row'><div class='v-label'>ARRAY</div></div><div class='v-row'><div class='v-cell v-eliminated'>4</div><div class='v-cell v-eliminated'>5</div><div class='v-cell v-result'>2</div><div class='v-cell v-eliminated'>10</div><div class='v-cell v-active'>8</div></div><div class='v-row' style='margin-top:14px;'><div class='v-label'>STACK ↓</div></div><div style='display:flex;flex-direction:column-reverse;gap:4px;align-items:center;'><div class='v-cell v-new'>8 ← TOP</div><div class='v-cell v-result'>2</div></div><div class='v-row' style='margin-top:8px;'><span class='v-stat'>popped 10</span><span class='v-stat'>result[4]: <strong>2</strong></span></div>",
             "overlay": "Pop 10: <code>10 >= 8</code>, keep 2, push 8"
           },
           {
             "label": "DONE",
-            "msg": "\u2705 Result: <strong>[-1, 4, -1, 2, 2]</strong>. Each element found its nearest smaller to the left in <strong>O(N)</strong> time using monotonic stack.",
+            "msg": "✅ Result: <strong>[-1, 4, -1, 2, 2]</strong>. Each element found its nearest smaller to the left in <strong>O(N)</strong> time using monotonic stack.",
             "marks": {
               "0": "c-result",
               "1": "c-result",
@@ -759,7 +759,7 @@
     "image": "images/stacks/stacks-03.png",
     "story": "Stack eliminates consecutive duplicates. Push if different from top, pop if same. What remains is the cleansed string.",
     "plain": "Scan the string left to right. Maintain a stack of characters. For each character, if the stack is empty or the top is different, push the character. If the top matches the current character, pop (they cancel out). After processing all characters, pop the stack into a string to get the result. The stack automatically removes all consecutive identical pairs.",
-    "tale": "Imagine you're stacking letter tiles on a table. Each time you pick a new tile, you compare it to the top of your stack. If they're the same letter, you throw both away\u2014they annihilate like matter and antimatter. If they're different, you place the new tile on the stack. By the time you finish, only tiles that survived the annihilation remain, forming the final word.",
+    "tale": "Imagine you're stacking letter tiles on a table. Each time you pick a new tile, you compare it to the top of your stack. If they're the same letter, you throw both away—they annihilate like matter and antimatter. If they're different, you place the new tile on the stack. By the time you finish, only tiles that survived the annihilation remain, forming the final word.",
     "solutions": [
       {
         "label": "Optimal",
@@ -795,7 +795,7 @@
           "b",
           "c"
         ],
-        "footer": "Double Character Trouble \u2014 A = \"abccbc\". Remove consecutive identical pairs iteratively.",
+        "footer": "Double Character Trouble — A = \"abccbc\". Remove consecutive identical pairs iteratively.",
         "legend": [
           "c-input",
           "c-active",
@@ -807,44 +807,44 @@
           {
             "label": "SETUP",
             "msg": "String: <strong>\"abccbc\"</strong>. Goal: remove consecutive identical pairs. Stack: push if different from top, pop if same. What remains is the answer.",
-            "html": "<div class='v-label'>INPUT STRING</div><div class='v-row'><div class='v-cell'>a</div><div class='v-cell'>b</div><div class='v-cell'>c</div><div class='v-cell'>c</div><div class='v-cell'>b</div><div class='v-cell'>c</div></div><div class='v-row' style='margin-top:14px;'><div class='v-label'>STACK \u2193</div></div><div style='display:flex;flex-direction:column-reverse;gap:4px;align-items:center;'><div class='v-cell v-null'>EMPTY</div></div>",
+            "html": "<div class='v-label'>INPUT STRING</div><div class='v-row'><div class='v-cell'>a</div><div class='v-cell'>b</div><div class='v-cell'>c</div><div class='v-cell'>c</div><div class='v-cell'>b</div><div class='v-cell'>c</div></div><div class='v-row' style='margin-top:14px;'><div class='v-label'>STACK ↓</div></div><div style='display:flex;flex-direction:column-reverse;gap:4px;align-items:center;'><div class='v-cell v-null'>EMPTY</div></div>",
             "overlay": "Rule: <code>if (stack.peek() == c) pop; else push;</code>"
           },
           {
             "label": "CHAR 'a'",
             "msg": "Character <strong>'a'</strong>. Stack empty. Push <strong>'a'</strong>. Stack: <strong>[a]</strong>.",
-            "html": "<div class='v-label'>INPUT</div><div class='v-row'><div class='v-cell v-eliminated'>a</div><div class='v-cell'>b</div><div class='v-cell'>c</div><div class='v-cell'>c</div><div class='v-cell'>b</div><div class='v-cell'>c</div></div><div class='v-row' style='margin-top:14px;'><div class='v-label'>STACK \u2193</div></div><div style='display:flex;flex-direction:column-reverse;gap:4px;align-items:center;'><div class='v-cell v-new'>a \u2190 TOP</div></div>",
+            "html": "<div class='v-label'>INPUT</div><div class='v-row'><div class='v-cell v-eliminated'>a</div><div class='v-cell'>b</div><div class='v-cell'>c</div><div class='v-cell'>c</div><div class='v-cell'>b</div><div class='v-cell'>c</div></div><div class='v-row' style='margin-top:14px;'><div class='v-label'>STACK ↓</div></div><div style='display:flex;flex-direction:column-reverse;gap:4px;align-items:center;'><div class='v-cell v-new'>a ← TOP</div></div>",
             "overlay": "Push: <code>stack.push('a');</code>"
           },
           {
             "label": "CHAR 'b'",
-            "msg": "Character <strong>'b'</strong>. Stack top = <strong>'a' \u2260 'b'</strong>. Push <strong>'b'</strong>. Stack: <strong>[a, b]</strong>.",
-            "html": "<div class='v-label'>INPUT</div><div class='v-row'><div class='v-cell v-eliminated'>a</div><div class='v-cell v-eliminated'>b</div><div class='v-cell'>c</div><div class='v-cell'>c</div><div class='v-cell'>b</div><div class='v-cell'>c</div></div><div class='v-row' style='margin-top:14px;'><div class='v-label'>STACK \u2193</div></div><div style='display:flex;flex-direction:column-reverse;gap:4px;align-items:center;'><div class='v-cell v-new'>b \u2190 TOP</div><div class='v-cell v-result'>a</div></div>",
-            "overlay": "Different: <code>'a' \u2260 'b'</code> \u2192 push"
+            "msg": "Character <strong>'b'</strong>. Stack top = <strong>'a' ≠ 'b'</strong>. Push <strong>'b'</strong>. Stack: <strong>[a, b]</strong>.",
+            "html": "<div class='v-label'>INPUT</div><div class='v-row'><div class='v-cell v-eliminated'>a</div><div class='v-cell v-eliminated'>b</div><div class='v-cell'>c</div><div class='v-cell'>c</div><div class='v-cell'>b</div><div class='v-cell'>c</div></div><div class='v-row' style='margin-top:14px;'><div class='v-label'>STACK ↓</div></div><div style='display:flex;flex-direction:column-reverse;gap:4px;align-items:center;'><div class='v-cell v-new'>b ← TOP</div><div class='v-cell v-result'>a</div></div>",
+            "overlay": "Different: <code>'a' ≠ 'b'</code> → push"
           },
           {
             "label": "CHAR 'c' (1st)",
-            "msg": "Character <strong>'c'</strong>. Stack top = <strong>'b' \u2260 'c'</strong>. Push <strong>'c'</strong>. Stack: <strong>[a, b, c]</strong>.",
-            "html": "<div class='v-label'>INPUT</div><div class='v-row'><div class='v-cell v-eliminated'>a</div><div class='v-cell v-eliminated'>b</div><div class='v-cell v-eliminated'>c</div><div class='v-cell'>c</div><div class='v-cell'>b</div><div class='v-cell'>c</div></div><div class='v-row' style='margin-top:14px;'><div class='v-label'>STACK \u2193</div></div><div style='display:flex;flex-direction:column-reverse;gap:4px;align-items:center;'><div class='v-cell v-new'>c \u2190 TOP</div><div class='v-cell v-result'>b</div><div class='v-cell v-result'>a</div></div>",
-            "overlay": "Different: <code>'b' \u2260 'c'</code> \u2192 push"
+            "msg": "Character <strong>'c'</strong>. Stack top = <strong>'b' ≠ 'c'</strong>. Push <strong>'c'</strong>. Stack: <strong>[a, b, c]</strong>.",
+            "html": "<div class='v-label'>INPUT</div><div class='v-row'><div class='v-cell v-eliminated'>a</div><div class='v-cell v-eliminated'>b</div><div class='v-cell v-eliminated'>c</div><div class='v-cell'>c</div><div class='v-cell'>b</div><div class='v-cell'>c</div></div><div class='v-row' style='margin-top:14px;'><div class='v-label'>STACK ↓</div></div><div style='display:flex;flex-direction:column-reverse;gap:4px;align-items:center;'><div class='v-cell v-new'>c ← TOP</div><div class='v-cell v-result'>b</div><div class='v-cell v-result'>a</div></div>",
+            "overlay": "Different: <code>'b' ≠ 'c'</code> → push"
           },
           {
             "label": "CHAR 'c' (2nd)",
             "msg": "Character <strong>'c'</strong>. Stack top = <strong>'c' = 'c'</strong>. MATCH! Pop <strong>'c'</strong>. Stack: <strong>[a, b]</strong>. Consecutive pair removed.",
-            "html": "<div class='v-label'>INPUT</div><div class='v-row'><div class='v-cell v-eliminated'>a</div><div class='v-cell v-eliminated'>b</div><div class='v-cell v-eliminated'>c</div><div class='v-cell v-eliminated'>c</div><div class='v-cell'>b</div><div class='v-cell'>c</div></div><div class='v-row' style='margin-top:14px;'><div class='v-label'>STACK \u2193</div></div><div style='display:flex;flex-direction:column-reverse;gap:4px;align-items:center;'><div class='v-cell v-result'>b \u2190 TOP</div><div class='v-cell v-result'>a</div></div><div class='v-row' style='margin-top:8px;'><span class='v-stat'>removed: <strong>c, c</strong></span></div>",
-            "overlay": "Match: <code>'c' == 'c'</code> \u2192 pop"
+            "html": "<div class='v-label'>INPUT</div><div class='v-row'><div class='v-cell v-eliminated'>a</div><div class='v-cell v-eliminated'>b</div><div class='v-cell v-eliminated'>c</div><div class='v-cell v-eliminated'>c</div><div class='v-cell'>b</div><div class='v-cell'>c</div></div><div class='v-row' style='margin-top:14px;'><div class='v-label'>STACK ↓</div></div><div style='display:flex;flex-direction:column-reverse;gap:4px;align-items:center;'><div class='v-cell v-result'>b ← TOP</div><div class='v-cell v-result'>a</div></div><div class='v-row' style='margin-top:8px;'><span class='v-stat'>removed: <strong>c, c</strong></span></div>",
+            "overlay": "Match: <code>'c' == 'c'</code> → pop"
           },
           {
             "label": "CHAR 'b'",
             "msg": "Character <strong>'b'</strong>. Stack top = <strong>'b' = 'b'</strong>. MATCH! Pop <strong>'b'</strong>. Stack: <strong>[a]</strong>. Another pair removed.",
-            "html": "<div class='v-label'>INPUT</div><div class='v-row'><div class='v-cell v-eliminated'>a</div><div class='v-cell v-eliminated'>b</div><div class='v-cell v-eliminated'>c</div><div class='v-cell v-eliminated'>c</div><div class='v-cell v-eliminated'>b</div><div class='v-cell'>c</div></div><div class='v-row' style='margin-top:14px;'><div class='v-label'>STACK \u2193</div></div><div style='display:flex;flex-direction:column-reverse;gap:4px;align-items:center;'><div class='v-cell v-result'>a \u2190 TOP</div></div><div class='v-row' style='margin-top:8px;'><span class='v-stat'>removed: <strong>b, b</strong></span></div>",
-            "overlay": "Match: <code>'b' == 'b'</code> \u2192 pop"
+            "html": "<div class='v-label'>INPUT</div><div class='v-row'><div class='v-cell v-eliminated'>a</div><div class='v-cell v-eliminated'>b</div><div class='v-cell v-eliminated'>c</div><div class='v-cell v-eliminated'>c</div><div class='v-cell v-eliminated'>b</div><div class='v-cell'>c</div></div><div class='v-row' style='margin-top:14px;'><div class='v-label'>STACK ↓</div></div><div style='display:flex;flex-direction:column-reverse;gap:4px;align-items:center;'><div class='v-cell v-result'>a ← TOP</div></div><div class='v-row' style='margin-top:8px;'><span class='v-stat'>removed: <strong>b, b</strong></span></div>",
+            "overlay": "Match: <code>'b' == 'b'</code> → pop"
           },
           {
             "label": "CHAR 'c'",
-            "msg": "Character <strong>'c'</strong>. Stack top = <strong>'a' \u2260 'c'</strong>. Push <strong>'c'</strong>. Stack: <strong>[a, c]</strong>.",
-            "html": "<div class='v-label'>INPUT</div><div class='v-row'><div class='v-cell v-eliminated'>a</div><div class='v-cell v-eliminated'>b</div><div class='v-cell v-eliminated'>c</div><div class='v-cell v-eliminated'>c</div><div class='v-cell v-eliminated'>b</div><div class='v-cell v-eliminated'>c</div></div><div class='v-row' style='margin-top:14px;'><div class='v-label'>STACK \u2193</div></div><div style='display:flex;flex-direction:column-reverse;gap:4px;align-items:center;'><div class='v-cell v-new'>c \u2190 TOP</div><div class='v-cell v-result'>a</div></div>",
-            "overlay": "Different: <code>'a' \u2260 'c'</code> \u2192 push"
+            "msg": "Character <strong>'c'</strong>. Stack top = <strong>'a' ≠ 'c'</strong>. Push <strong>'c'</strong>. Stack: <strong>[a, c]</strong>.",
+            "html": "<div class='v-label'>INPUT</div><div class='v-row'><div class='v-cell v-eliminated'>a</div><div class='v-cell v-eliminated'>b</div><div class='v-cell v-eliminated'>c</div><div class='v-cell v-eliminated'>c</div><div class='v-cell v-eliminated'>b</div><div class='v-cell v-eliminated'>c</div></div><div class='v-row' style='margin-top:14px;'><div class='v-label'>STACK ↓</div></div><div style='display:flex;flex-direction:column-reverse;gap:4px;align-items:center;'><div class='v-cell v-new'>c ← TOP</div><div class='v-cell v-result'>a</div></div>",
+            "overlay": "Different: <code>'a' ≠ 'c'</code> → push"
           },
           {
             "label": "BUILD RESULT",
@@ -854,7 +854,7 @@
           },
           {
             "label": "DONE",
-            "msg": "\u2705 Final result: <strong>\"ac\"</strong>. All consecutive identical pairs removed. Time: <strong>O(N)</strong>, Space: <strong>O(N)</strong>.",
+            "msg": "✅ Final result: <strong>\"ac\"</strong>. All consecutive identical pairs removed. Time: <strong>O(N)</strong>, Space: <strong>O(N)</strong>.",
             "html": "<div class='v-row'><div class='v-label'>RESULT</div></div><div class='v-row' style='margin-top:12px;'><span class='v-stat'>input: <strong>\"abccbc\"</strong></span><span class='v-stat'>output: <strong>\"ac\"</strong></span></div>",
             "overlay": "Pattern: stack auto-removes consecutive duplicates in single pass"
           }
@@ -872,13 +872,13 @@
       "Forward",
       "Back"
     ],
-    "description": "There is a football event going on in your city. In this event, you are given A passes and players having ids between 1 and 10\u2076.\n\nInitially, some player with a given id had the ball in his possession. You have to make a program to display the id of the player who possessed the ball after exactly A passes.\n\nThere are two kinds of passes:\n1) ID\n2) 0\n\nFor the first kind of pass, the player in possession of the ball passes the ball \"forward\" to the player with id = ID.\nFor the second kind of pass, the player in possession of the ball passes the ball back to the player who had forwarded the ball to him.\n\nIn the second kind of pass \"0\" just means Back Pass.\nReturn the ID of the player who currently possesses the ball.",
+    "description": "There is a football event going on in your city. In this event, you are given A passes and players having ids between 1 and 10⁶.\n\nInitially, some player with a given id had the ball in his possession. You have to make a program to display the id of the player who possessed the ball after exactly A passes.\n\nThere are two kinds of passes:\n1) ID\n2) 0\n\nFor the first kind of pass, the player in possession of the ball passes the ball \"forward\" to the player with id = ID.\nFor the second kind of pass, the player in possession of the ball passes the ball back to the player who had forwarded the ball to him.\n\nIn the second kind of pass \"0\" just means Back Pass.\nReturn the ID of the player who currently possesses the ball.",
     "sampleInput": "A = 10, B = 23, C = [86, 63, 60, 0, 47, 0, 99, 9, 0, 0]",
     "sampleOutput": "63",
     "image": "images/stacks/stacks-04.png",
     "story": "Forward pass pushes new player to stack. Back pass (0) pops current, reveals previous. Stack tracks possession chain.",
-    "plain": "Start with the initial player B on the stack. Process each pass in array C. If C[i] is a player ID (not 0), it's a forward pass\u2014push that player ID onto the stack. If C[i] is 0, it's a back pass\u2014pop the stack to remove the current player, and the new top is who now has the ball. After all A passes, return the top of the stack (current ball holder).",
-    "tale": "Imagine a chain of football players passing a ball. You keep a notebook (the stack) listing who currently holds the ball and who passed to them. When player X passes forward to player Y, you write Y's name on a new page on top. When someone shouts 'back pass!', you tear off the top page\u2014the ball returns to the player whose name is now visible. After all passes, the top page shows the final ball holder.",
+    "plain": "Start with the initial player B on the stack. Process each pass in array C. If C[i] is a player ID (not 0), it's a forward pass—push that player ID onto the stack. If C[i] is 0, it's a back pass—pop the stack to remove the current player, and the new top is who now has the ball. After all A passes, return the top of the stack (current ball holder).",
+    "tale": "Imagine a chain of football players passing a ball. You keep a notebook (the stack) listing who currently holds the ball and who passed to them. When player X passes forward to player Y, you write Y's name on a new page on top. When someone shouts 'back pass!', you tear off the top page—the ball returns to the player whose name is now visible. After all passes, the top page shows the final ball holder.",
     "solutions": [
       {
         "label": "Optimal",
@@ -898,7 +898,7 @@
           "Each pass is O(1), giving O(A) total time."
         ],
         "pseudocode": "stack = empty\nstack.push(B)\ncurrentPlayer = B\nfor i = 0 to A-1:\n  if C[i] == 0:\n    stack.pop()\n    currentPlayer = stack.peek()\n  else:\n    currentPlayer = C[i]\n    stack.push(C[i])\nreturn currentPlayer",
-        "story": "Stack simulates possession chain. Forward pass \u2192 push. Back pass (0) \u2192 pop, peek. O(A) time.",
+        "story": "Stack simulates possession chain. Forward pass → push. Back pass (0) → pop, peek. O(A) time.",
         "code": "public int passingGameOfBall(int A, int B, int[] C) {\n    Stack<Integer> stack = new Stack<>();\n    stack.push(B);\n    int currentPlayer = B;\n    for (int i = 0; i < A; i++) {\n        if (C[i] == 0) {\n            stack.pop();\n            currentPlayer = stack.peek();\n        } else {\n            currentPlayer = C[i];\n            stack.push(C[i]);\n        }\n    }\n    return currentPlayer;\n}"
       }
     ],
@@ -911,7 +911,7 @@
           0,
           4
         ],
-        "footer": "Passing Game \u2014 start=1, passes=[2,3,0,4]. Forward pass pushes, back pass (0) pops.",
+        "footer": "Passing Game — start=1, passes=[2,3,0,4]. Forward pass pushes, back pass (0) pops.",
         "legend": [
           "c-input",
           "c-active",
@@ -922,38 +922,38 @@
         "script": [
           {
             "label": "SETUP",
-            "msg": "Starting player: <strong>1</strong>. Passes: <strong>[2, 3, 0, 4]</strong>. Goal: find who has the ball after all passes. Forward pass \u2192 push. Back pass (0) \u2192 pop.",
-            "html": "<div class='v-label'>PASSES (INPUT)</div><div class='v-row'><div class='v-cell'>2</div><div class='v-cell'>3</div><div class='v-cell'>0</div><div class='v-cell'>4</div></div><div class='v-row' style='margin-top:14px;'><div class='v-label'>STACK (POSSESSION CHAIN) \u2193</div></div><div style='display:flex;flex-direction:column-reverse;gap:4px;align-items:center;'><div class='v-cell v-result'>1 \u2190 START</div></div>",
+            "msg": "Starting player: <strong>1</strong>. Passes: <strong>[2, 3, 0, 4]</strong>. Goal: find who has the ball after all passes. Forward pass → push. Back pass (0) → pop.",
+            "html": "<div class='v-label'>PASSES (INPUT)</div><div class='v-row'><div class='v-cell'>2</div><div class='v-cell'>3</div><div class='v-cell'>0</div><div class='v-cell'>4</div></div><div class='v-row' style='margin-top:14px;'><div class='v-label'>STACK (POSSESSION CHAIN) ↓</div></div><div style='display:flex;flex-direction:column-reverse;gap:4px;align-items:center;'><div class='v-cell v-result'>1 ← START</div></div>",
             "overlay": "Rules: <code>if (pass != 0) push(pass);</code> <code>else { pop(); ball = peek(); }</code>"
           },
           {
-            "label": "PASS 1 \u2192 Forward to 2",
+            "label": "PASS 1 → Forward to 2",
             "msg": "Pass <strong>2</strong>. Forward pass. Player <strong>1</strong> passes to <strong>2</strong>. Push <strong>2</strong>. Stack: <strong>[1, 2]</strong>. Ball with <strong>2</strong>.",
-            "html": "<div class='v-label'>PASSES</div><div class='v-row'><div class='v-cell v-eliminated'>2</div><div class='v-cell'>3</div><div class='v-cell'>0</div><div class='v-cell'>4</div></div><div class='v-row' style='margin-top:14px;'><div class='v-label'>STACK \u2193</div></div><div style='display:flex;flex-direction:column-reverse;gap:4px;align-items:center;'><div class='v-cell v-new'>2 \u2190 BALL</div><div class='v-cell v-result'>1</div></div>",
+            "html": "<div class='v-label'>PASSES</div><div class='v-row'><div class='v-cell v-eliminated'>2</div><div class='v-cell'>3</div><div class='v-cell'>0</div><div class='v-cell'>4</div></div><div class='v-row' style='margin-top:14px;'><div class='v-label'>STACK ↓</div></div><div style='display:flex;flex-direction:column-reverse;gap:4px;align-items:center;'><div class='v-cell v-new'>2 ← BALL</div><div class='v-cell v-result'>1</div></div>",
             "overlay": "Forward: <code>stack.push(2); currentPlayer = 2;</code>"
           },
           {
-            "label": "PASS 2 \u2192 Forward to 3",
+            "label": "PASS 2 → Forward to 3",
             "msg": "Pass <strong>3</strong>. Forward pass. Player <strong>2</strong> passes to <strong>3</strong>. Push <strong>3</strong>. Stack: <strong>[1, 2, 3]</strong>. Ball with <strong>3</strong>.",
-            "html": "<div class='v-label'>PASSES</div><div class='v-row'><div class='v-cell v-eliminated'>2</div><div class='v-cell v-eliminated'>3</div><div class='v-cell'>0</div><div class='v-cell'>4</div></div><div class='v-row' style='margin-top:14px;'><div class='v-label'>STACK \u2193</div></div><div style='display:flex;flex-direction:column-reverse;gap:4px;align-items:center;'><div class='v-cell v-new'>3 \u2190 BALL</div><div class='v-cell v-result'>2</div><div class='v-cell v-result'>1</div></div>",
+            "html": "<div class='v-label'>PASSES</div><div class='v-row'><div class='v-cell v-eliminated'>2</div><div class='v-cell v-eliminated'>3</div><div class='v-cell'>0</div><div class='v-cell'>4</div></div><div class='v-row' style='margin-top:14px;'><div class='v-label'>STACK ↓</div></div><div style='display:flex;flex-direction:column-reverse;gap:4px;align-items:center;'><div class='v-cell v-new'>3 ← BALL</div><div class='v-cell v-result'>2</div><div class='v-cell v-result'>1</div></div>",
             "overlay": "Forward: <code>stack.push(3); currentPlayer = 3;</code>"
           },
           {
-            "label": "PASS 3 \u2192 Back Pass (0)",
+            "label": "PASS 3 → Back Pass (0)",
             "msg": "Pass <strong>0</strong>. Back pass! Player <strong>3</strong> passes back. Pop <strong>3</strong>. Stack: <strong>[1, 2]</strong>. Ball returns to <strong>2</strong>.",
-            "html": "<div class='v-label'>PASSES</div><div class='v-row'><div class='v-cell v-eliminated'>2</div><div class='v-cell v-eliminated'>3</div><div class='v-cell v-eliminated'>0</div><div class='v-cell'>4</div></div><div class='v-row' style='margin-top:14px;'><div class='v-label'>STACK \u2193</div></div><div style='display:flex;flex-direction:column-reverse;gap:4px;align-items:center;'><div class='v-cell v-active'>2 \u2190 BALL</div><div class='v-cell v-result'>1</div></div><div class='v-row' style='margin-top:8px;'><span class='v-stat'>popped: <strong>3</strong></span></div>",
+            "html": "<div class='v-label'>PASSES</div><div class='v-row'><div class='v-cell v-eliminated'>2</div><div class='v-cell v-eliminated'>3</div><div class='v-cell v-eliminated'>0</div><div class='v-cell'>4</div></div><div class='v-row' style='margin-top:14px;'><div class='v-label'>STACK ↓</div></div><div style='display:flex;flex-direction:column-reverse;gap:4px;align-items:center;'><div class='v-cell v-active'>2 ← BALL</div><div class='v-cell v-result'>1</div></div><div class='v-row' style='margin-top:8px;'><span class='v-stat'>popped: <strong>3</strong></span></div>",
             "overlay": "Back: <code>stack.pop(); currentPlayer = stack.peek();</code>"
           },
           {
-            "label": "PASS 4 \u2192 Forward to 4",
+            "label": "PASS 4 → Forward to 4",
             "msg": "Pass <strong>4</strong>. Forward pass. Player <strong>2</strong> passes to <strong>4</strong>. Push <strong>4</strong>. Stack: <strong>[1, 2, 4]</strong>. Ball with <strong>4</strong>.",
-            "html": "<div class='v-label'>PASSES</div><div class='v-row'><div class='v-cell v-eliminated'>2</div><div class='v-cell v-eliminated'>3</div><div class='v-cell v-eliminated'>0</div><div class='v-cell v-eliminated'>4</div></div><div class='v-row' style='margin-top:14px;'><div class='v-label'>STACK \u2193</div></div><div style='display:flex;flex-direction:column-reverse;gap:4px;align-items:center;'><div class='v-cell v-new'>4 \u2190 BALL</div><div class='v-cell v-result'>2</div><div class='v-cell v-result'>1</div></div>",
+            "html": "<div class='v-label'>PASSES</div><div class='v-row'><div class='v-cell v-eliminated'>2</div><div class='v-cell v-eliminated'>3</div><div class='v-cell v-eliminated'>0</div><div class='v-cell v-eliminated'>4</div></div><div class='v-row' style='margin-top:14px;'><div class='v-label'>STACK ↓</div></div><div style='display:flex;flex-direction:column-reverse;gap:4px;align-items:center;'><div class='v-cell v-new'>4 ← BALL</div><div class='v-cell v-result'>2</div><div class='v-cell v-result'>1</div></div>",
             "overlay": "Forward: <code>stack.push(4); currentPlayer = 4;</code>"
           },
           {
             "label": "DONE",
-            "msg": "\u2705 All passes processed. Stack top: <strong>4</strong>. Player <strong>4</strong> has the ball. Return <strong>4</strong>. Time: <strong>O(A)</strong>, Space: <strong>O(A)</strong>.",
-            "html": "<div class='v-label'>FINAL STACK</div><div style='display:flex;flex-direction:column-reverse;gap:4px;align-items:center;'><div class='v-cell v-result'>4 \u2190 ANSWER</div><div class='v-cell v-result'>2</div><div class='v-cell v-result'>1</div></div><div class='v-row' style='margin-top:12px;'><span class='v-stat'>final player: <strong>4</strong></span></div>",
+            "msg": "✅ All passes processed. Stack top: <strong>4</strong>. Player <strong>4</strong> has the ball. Return <strong>4</strong>. Time: <strong>O(A)</strong>, Space: <strong>O(A)</strong>.",
+            "html": "<div class='v-label'>FINAL STACK</div><div style='display:flex;flex-direction:column-reverse;gap:4px;align-items:center;'><div class='v-cell v-result'>4 ← ANSWER</div><div class='v-cell v-result'>2</div><div class='v-cell v-result'>1</div></div><div class='v-row' style='margin-top:12px;'><span class='v-stat'>final player: <strong>4</strong></span></div>",
             "overlay": "Return: <code>return stack.peek();</code>"
           }
         ]
@@ -975,7 +975,7 @@
     "sampleOutput": "1",
     "image": "images/stacks/stacks-07.png",
     "story": "Track cumulative sign for each variable through nested brackets. Two expressions are identical if all variables have the same effective sign.",
-    "plain": "Walk through each expression and track the effective sign of each variable (a-z) considering nested brackets. Use a stack to remember the cumulative sign at each bracket level. When you enter a bracket, push the inherited sign. When you exit, pop. Record each variable's final sign. Compare sign arrays\u2014if identical, the expressions are equivalent.",
+    "plain": "Walk through each expression and track the effective sign of each variable (a-z) considering nested brackets. Use a stack to remember the cumulative sign at each bracket level. When you enter a bracket, push the inherited sign. When you exit, pop. Record each variable's final sign. Compare sign arrays—if identical, the expressions are equivalent.",
     "tale": "Imagine two scribes writing equations in different handwriting. You decode each scribe's work by walking through their symbols with a memory tablet (the stack). The tablet remembers 'am I in a positive or negative context?' When a bracket opens, you write down the new context. When it closes, you erase that layer. Each letter gets stamped with its final sign. If both scribes' stamps match for all 26 letters, their equations say the same thing, just differently dressed.",
     "solutions": [
       {
@@ -984,21 +984,21 @@
           "time": "O(N + M)",
           "space": "O(26) = O(1)"
         },
-        "plain": "Parse both expressions using a stack-based sign tracker. For each character: '+' sets current sign to +1, '-' sets it to -1, '(' pushes the inherited context onto the stack, ')' pops it, and a-z records the effective sign (stack.peek() \u00d7 currentSign). After parsing both, compare the 26-element sign arrays. If all match, return 1. Otherwise, return 0.",
-        "tale": "You are a sign detective. For each expression, you carry a stack of context clues\u2014'are we inside a negated region?' As you read symbols, you note each letter's true sign by multiplying the stack's top context with the immediate sign. Opening brackets inherit and deepen context; closing brackets lighten it. At the end, you compare your two sign tables. If they match letter-by-letter, the expressions are twins.",
+        "plain": "Parse both expressions using a stack-based sign tracker. For each character: '+' sets current sign to +1, '-' sets it to -1, '(' pushes the inherited context onto the stack, ')' pops it, and a-z records the effective sign (stack.peek() × currentSign). After parsing both, compare the 26-element sign arrays. If all match, return 1. Otherwise, return 0.",
+        "tale": "You are a sign detective. For each expression, you carry a stack of context clues—'are we inside a negated region?' As you read symbols, you note each letter's true sign by multiplying the stack's top context with the immediate sign. Opening brackets inherit and deepen context; closing brackets lighten it. At the end, you compare your two sign tables. If they match letter-by-letter, the expressions are twins.",
         "approach": [
           "Initialize a sign array of size 26 for each expression (one per letter a-z).",
           "Use a stack to track cumulative sign context. Start with stack containing +1 (positive context).",
           "Set currentSign = 1 (positive by default).",
           "For each character: if '+', set currentSign = 1; if '-', set currentSign = -1.",
-          "If '(', push stack.peek() \u00d7 currentSign onto stack (inherit outer sign), then reset currentSign = 1.",
+          "If '(', push stack.peek() × currentSign onto stack (inherit outer sign), then reset currentSign = 1.",
           "If ')', pop the stack (exit bracket context).",
-          "If a-z, record sign[char - 'a'] = stack.peek() \u00d7 currentSign.",
+          "If a-z, record sign[char - 'a'] = stack.peek() × currentSign.",
           "After parsing both expressions, compare their sign arrays element by element.",
           "If all 26 elements match, return 1. Otherwise, return 0."
         ],
         "pseudocode": "signA = parseSigns(A)\nsignB = parseSigns(B)\nfor i = 0 to 25:\n  if signA[i] != signB[i]: return 0\nreturn 1\n\nparseSigns(expr):\n  sign[26] = 0\n  stack = [1]\n  currentSign = 1\n  for c in expr:\n    if c == '+': currentSign = 1\n    elif c == '-': currentSign = -1\n    elif c == '(': stack.push(stack.peek() * currentSign); currentSign = 1\n    elif c == ')': stack.pop()\n    else: sign[c-'a'] = stack.peek() * currentSign\n  return sign",
-        "story": "Parse both expressions with sign-tracking stack. Compare 26-element sign arrays. Match \u2192 1, mismatch \u2192 0.",
+        "story": "Parse both expressions with sign-tracking stack. Compare 26-element sign arrays. Match → 1, mismatch → 0.",
         "code": "public int checkTwoBracketExpressions(String A, String B) {\n    int[] first = build(A);\n    int[] second = build(B);\n    for (int i = 0; i < 26; i++) {\n        if (first[i] != second[i]) {\n            return 0;\n        }\n    }\n    return 1;\n}\n\npublic int[] build(String X) {\n    int[] sign = new int[26];\n    Stack<Integer> stack = new Stack<>();\n    int currentSign = 1;\n    stack.push(1);\n    for (char c : X.toCharArray()) {\n        if (c == '+') {\n            currentSign = 1;\n        } else if (c == '-') {\n            currentSign = -1;\n        } else if (c == '(') {\n            stack.push(stack.peek() * currentSign);\n            currentSign = 1;\n        } else if (c == ')') {\n            stack.pop();\n        } else {\n            sign[c - 'a'] = stack.peek() * currentSign;\n        }\n    }\n    return sign;\n}"
       }
     ],
@@ -1009,7 +1009,7 @@
           "-(a+b+c)",
           "-a-b-c"
         ],
-        "footer": "Check Two Bracket Expressions \u2014 compare effective signs of variables across nested brackets",
+        "footer": "Check Two Bracket Expressions — compare effective signs of variables across nested brackets",
         "legend": [
           "c-input",
           "c-active",
@@ -1024,65 +1024,65 @@
             "overlay": "Key insight: <code>sign[var] = stack.peek() * currentSign</code> <code>'(' inherits: stack.push(stack.peek() * currentSign)</code>"
           },
           {
-            "label": "PARSE A \u2014 Start",
+            "label": "PARSE A — Start",
             "msg": "Parse <strong>\"-(a+b+c)\"</strong>. Initialize: stack=<strong>[+1]</strong> (outer positive context), currentSign=<strong>+1</strong>. Sign array: <strong>[0,0,0,...]</strong> (26 zeros).",
             "html": "<div class='v-row'><div class='v-label'>PARSING A</div></div><div class='v-row'><div class='v-cell'>-(a+b+c)</div></div><div class='v-row' style='margin-top:8px;'><span class='v-stat'>stack: <strong>[+1]</strong></span><span class='v-stat'>currentSign: <strong>+1</strong></span></div>",
             "overlay": "Init: <code>stack = [1]; currentSign = 1;</code>"
           },
           {
-            "label": "PARSE A \u2014 '-'",
+            "label": "PARSE A — '-'",
             "msg": "Character <strong>'-'</strong>. Set currentSign = <strong>-1</strong>. Stack unchanged: <strong>[+1]</strong>.",
             "html": "<div class='v-row'><div class='v-label'>PARSING A</div></div><div class='v-row'><div class='v-cell v-eliminated'>-</div><div class='v-cell'>(a+b+c)</div></div><div class='v-row' style='margin-top:8px;'><span class='v-stat'>stack: <strong>[+1]</strong></span><span class='v-stat'>currentSign: <strong>-1</strong></span></div>",
             "overlay": "Operator: <code>if (c == '-') currentSign = -1;</code>"
           },
           {
-            "label": "PARSE A \u2014 '('",
-            "msg": "Character <strong>'('</strong>. Push inherited sign: stack.peek() \u00d7 currentSign = <strong>+1 \u00d7 (-1) = -1</strong>. Push <strong>-1</strong>. Reset currentSign=<strong>+1</strong>. Stack: <strong>[+1, -1]</strong>.",
+            "label": "PARSE A — '('",
+            "msg": "Character <strong>'('</strong>. Push inherited sign: stack.peek() × currentSign = <strong>+1 × (-1) = -1</strong>. Push <strong>-1</strong>. Reset currentSign=<strong>+1</strong>. Stack: <strong>[+1, -1]</strong>.",
             "html": "<div class='v-row'><div class='v-label'>PARSING A</div></div><div class='v-row'><div class='v-cell v-eliminated'>-</div><div class='v-cell v-eliminated'>(</div><div class='v-cell'>a+b+c)</div></div><div class='v-row' style='margin-top:8px;'><span class='v-stat'>stack: <strong>[+1, -1]</strong></span><span class='v-stat'>currentSign: <strong>+1</strong></span></div>",
             "overlay": "Open bracket: <code>stack.push(stack.peek() * currentSign); currentSign = 1;</code>"
           },
           {
-            "label": "PARSE A \u2014 'a'",
-            "msg": "Variable <strong>'a'</strong>. Effective sign = stack.peek() \u00d7 currentSign = <strong>-1 \u00d7 1 = -1</strong>. Record sign[a] = <strong>-1</strong>. CurrentSign stays <strong>+1</strong>.",
+            "label": "PARSE A — 'a'",
+            "msg": "Variable <strong>'a'</strong>. Effective sign = stack.peek() × currentSign = <strong>-1 × 1 = -1</strong>. Record sign[a] = <strong>-1</strong>. CurrentSign stays <strong>+1</strong>.",
             "html": "<div class='v-row'><div class='v-label'>PARSING A</div></div><div class='v-row'><div class='v-cell v-eliminated'>-(</div><div class='v-cell v-eliminated'>a</div><div class='v-cell'>+b+c)</div></div><div class='v-row' style='margin-top:8px;'><span class='v-stat'>sign[a]: <strong>-1</strong></span><span class='v-stat'>stack: <strong>[+1, -1]</strong></span></div>",
             "overlay": "Variable: <code>sign[c - 'a'] = stack.peek() * currentSign;</code>"
           },
           {
-            "label": "PARSE A \u2014 '+', 'b'",
-            "msg": "Character <strong>'+'</strong> sets currentSign=<strong>+1</strong>. Variable <strong>'b'</strong>: sign[b] = -1 \u00d7 1 = <strong>-1</strong>.",
+            "label": "PARSE A — '+', 'b'",
+            "msg": "Character <strong>'+'</strong> sets currentSign=<strong>+1</strong>. Variable <strong>'b'</strong>: sign[b] = -1 × 1 = <strong>-1</strong>.",
             "html": "<div class='v-row'><div class='v-label'>PARSING A</div></div><div class='v-row'><div class='v-cell v-eliminated'>-(a+</div><div class='v-cell v-eliminated'>b</div><div class='v-cell'>+c)</div></div><div class='v-row' style='margin-top:8px;'><span class='v-stat'>sign[a]: <strong>-1</strong></span><span class='v-stat'>sign[b]: <strong>-1</strong></span></div>"
           },
           {
-            "label": "PARSE A \u2014 '+', 'c', ')'",
-            "msg": "Character <strong>'+'</strong> sets currentSign=<strong>+1</strong>. Variable <strong>'c'</strong>: sign[c] = -1 \u00d7 1 = <strong>-1</strong>. Character <strong>')'</strong>: pop stack. Stack: <strong>[+1]</strong>.",
+            "label": "PARSE A — '+', 'c', ')'",
+            "msg": "Character <strong>'+'</strong> sets currentSign=<strong>+1</strong>. Variable <strong>'c'</strong>: sign[c] = -1 × 1 = <strong>-1</strong>. Character <strong>')'</strong>: pop stack. Stack: <strong>[+1]</strong>.",
             "html": "<div class='v-row'><div class='v-label'>PARSING A</div></div><div class='v-row'><div class='v-cell v-eliminated'>-(a+b+c)</div></div><div class='v-row' style='margin-top:8px;'><span class='v-stat'>sign[a,b,c]: <strong>-1, -1, -1</strong></span><span class='v-stat'>stack: <strong>[+1]</strong></span></div>",
             "overlay": "Result A: <code>sign = {a:-1, b:-1, c:-1, d-z:0}</code>"
           },
           {
-            "label": "PARSE B \u2014 Start",
+            "label": "PARSE B — Start",
             "msg": "Parse <strong>\"-a-b-c\"</strong>. Initialize: stack=<strong>[+1]</strong>, currentSign=<strong>+1</strong>.",
             "html": "<div class='v-row'><div class='v-label'>PARSING B</div></div><div class='v-row'><div class='v-cell'>-a-b-c</div></div><div class='v-row' style='margin-top:8px;'><span class='v-stat'>stack: <strong>[+1]</strong></span><span class='v-stat'>currentSign: <strong>+1</strong></span></div>"
           },
           {
-            "label": "PARSE B \u2014 '-', 'a'",
-            "msg": "Character <strong>'-'</strong>: currentSign=<strong>-1</strong>. Variable <strong>'a'</strong>: sign[a] = +1 \u00d7 (-1) = <strong>-1</strong>.",
+            "label": "PARSE B — '-', 'a'",
+            "msg": "Character <strong>'-'</strong>: currentSign=<strong>-1</strong>. Variable <strong>'a'</strong>: sign[a] = +1 × (-1) = <strong>-1</strong>.",
             "html": "<div class='v-row'><div class='v-label'>PARSING B</div></div><div class='v-row'><div class='v-cell v-eliminated'>-a</div><div class='v-cell'>-b-c</div></div><div class='v-row' style='margin-top:8px;'><span class='v-stat'>sign[a]: <strong>-1</strong></span></div>"
           },
           {
-            "label": "PARSE B \u2014 '-', 'b', '-', 'c'",
+            "label": "PARSE B — '-', 'b', '-', 'c'",
             "msg": "Character <strong>'-'</strong>: currentSign=<strong>-1</strong>. Variable <strong>'b'</strong>: sign[b] = <strong>-1</strong>. Repeat for <strong>'c'</strong>: sign[c] = <strong>-1</strong>.",
             "html": "<div class='v-row'><div class='v-label'>PARSING B</div></div><div class='v-row'><div class='v-cell v-eliminated'>-a-b-c</div></div><div class='v-row' style='margin-top:8px;'><span class='v-stat'>sign[a,b,c]: <strong>-1, -1, -1</strong></span></div>",
             "overlay": "Result B: <code>sign = {a:-1, b:-1, c:-1, d-z:0}</code>"
           },
           {
             "label": "COMPARE",
-            "msg": "Compare sign arrays: A: <strong>{a:-1, b:-1, c:-1, rest:0}</strong>. B: <strong>{a:-1, b:-1, c:-1, rest:0}</strong>. \u2713 All match!",
-            "html": "<div class='v-row'><div class='v-label'>COMPARISON</div></div><div class='v-row' style='margin-top:8px;'><span class='v-stat'>A[a,b,c]: <strong>-1,-1,-1</strong></span><span class='v-stat'>B[a,b,c]: <strong>-1,-1,-1</strong></span><span class='v-stat' style='background:#22c55e;color:#000;'>MATCH \u2713</span></div>",
+            "msg": "Compare sign arrays: A: <strong>{a:-1, b:-1, c:-1, rest:0}</strong>. B: <strong>{a:-1, b:-1, c:-1, rest:0}</strong>. ✓ All match!",
+            "html": "<div class='v-row'><div class='v-label'>COMPARISON</div></div><div class='v-row' style='margin-top:8px;'><span class='v-stat'>A[a,b,c]: <strong>-1,-1,-1</strong></span><span class='v-stat'>B[a,b,c]: <strong>-1,-1,-1</strong></span><span class='v-stat' style='background:#22c55e;color:#000;'>MATCH ✓</span></div>",
             "overlay": "Compare: <code>for i in 0..25: if signA[i] != signB[i] return 0;</code>"
           },
           {
             "label": "DONE",
-            "msg": "\u2705 Both expressions have identical sign arrays. Return <strong>1</strong> (expressions are similar).",
+            "msg": "✅ Both expressions have identical sign arrays. Return <strong>1</strong> (expressions are similar).",
             "html": "<div class='v-row'><div class='v-label'>RESULT</div></div><div class='v-row' style='margin-top:12px;'><span class='v-stat' style='background:#22c55e;color:#000;'>EXPRESSIONS ARE IDENTICAL</span></div><div class='v-row' style='margin-top:8px;'><span class='v-stat'>answer: <strong>1</strong></span></div>",
             "overlay": "Final: <code>return 1;</code>"
           }
@@ -1106,7 +1106,7 @@
     "image": "images/stacks/stacks-08.png",
     "story": "Operands go straight to output. Operators wait on a stack, popped by higher precedence. Brackets create walls that operators can't cross.",
     "plain": "Scan the infix expression left to right. Operands (letters/digits) go directly to the output. When you see an operator, pop from the stack all operators with greater or equal precedence and append them to output, then push the current operator. Opening brackets push as walls. Closing brackets pop everything until the matching opening bracket. After scanning, pop remaining operators. The result is the postfix expression.",
-    "tale": "Imagine a conveyor belt carrying symbols. Operands slide straight into the output box. Operators wait in a tower (the stack), but only if they're stronger than the one on top\u2014weaker operators must wait for their turn and get ejected first. Parentheses are magic doors: opening doors create a sealed room where operators hide, and closing doors flush everyone out of that room. By the end, the tower is empty and the output box holds the reordered expression.",
+    "tale": "Imagine a conveyor belt carrying symbols. Operands slide straight into the output box. Operators wait in a tower (the stack), but only if they're stronger than the one on top—weaker operators must wait for their turn and get ejected first. Parentheses are magic doors: opening doors create a sealed room where operators hide, and closing doors flush everyone out of that room. By the end, the tower is empty and the output box holds the reordered expression.",
     "solutions": [
       {
         "label": "Optimal",
@@ -1115,7 +1115,7 @@
           "space": "O(N)"
         },
         "plain": "Iterate through the string. If the character is an operand, append to output. If it's '(', push to stack. If it's ')', pop and append until '(' is found, then discard '('. If it's an operator, pop all operators from stack with precedence >= current operator's precedence (but don't pop past '('), then push current operator. After the loop, pop all remaining operators. Return the output string.",
-        "tale": "You are a train conductor rerouting cargo. Letters (operands) go straight to the destination. Symbols (operators) wait at a station (stack) sorted by priority. When a new operator arrives, all operators with equal or higher priority must leave first\u2014they go to the destination. Opening brackets build a wall at the station; closing brackets tear it down, sending everyone behind the wall to the destination. At journey's end, all operators at the station board the final train.",
+        "tale": "You are a train conductor rerouting cargo. Letters (operands) go straight to the destination. Symbols (operators) wait at a station (stack) sorted by priority. When a new operator arrives, all operators with equal or higher priority must leave first—they go to the destination. Opening brackets build a wall at the station; closing brackets tear it down, sending everyone behind the wall to the destination. At journey's end, all operators at the station board the final train.",
         "approach": [
           "Initialize an empty stack and an empty output string.",
           "Iterate through each character in the infix expression.",
@@ -1128,7 +1128,7 @@
           "Precedence: ^ = 3, * and / = 2, + and - = 1."
         ],
         "pseudocode": "output = \"\"\nstack = empty\nfor c in A:\n  if isOperand(c): output += c\n  elif c == '(': stack.push(c)\n  elif c == ')':\n    while stack.peek() != '(': output += stack.pop()\n    stack.pop()  // remove '('\n  else:  // operator\n    while !stack.isEmpty() && stack.peek() != '(' && prec(stack.peek()) >= prec(c):\n      output += stack.pop()\n    stack.push(c)\nwhile !stack.isEmpty(): output += stack.pop()\nreturn output",
-        "story": "Operands \u2192 output. Operators \u2192 stack (pop >= precedence first). '(' \u2192 wall. ')' \u2192 flush until '('. O(N) time.",
+        "story": "Operands → output. Operators → stack (pop >= precedence first). '(' → wall. ')' → flush until '('. O(N) time.",
         "code": "public String infixToPostfix(String A) {\n    StringBuilder postfix = new StringBuilder();\n    Stack<Character> stk = new Stack<>();\n    for (char c : A.toCharArray()) {\n        if (Character.isLetterOrDigit(c)) {\n            postfix.append(c);\n        } else if (c == '(') {\n            stk.push(c);\n        } else if (c == ')') {\n            while (!stk.isEmpty() && stk.peek() != '(') {\n                postfix.append(stk.pop());\n            }\n            stk.pop();\n        } else {\n            while (!stk.isEmpty() && stk.peek() != '(' && precedence(stk.peek()) >= precedence(c)) {\n                postfix.append(stk.pop());\n            }\n            stk.push(c);\n        }\n    }\n    while (!stk.isEmpty()) {\n        postfix.append(stk.pop());\n    }\n    return postfix.toString();\n}\n\nprivate int precedence(char c) {\n    switch (c) {\n        case '^': return 3;\n        case '*':\n        case '/': return 2;\n        case '+':\n        case '-': return 1;\n        default: return 0;\n    }\n}"
       }
     ],
@@ -1142,7 +1142,7 @@
           "*",
           "c"
         ],
-        "footer": "Infix to Postfix \u2014 A = \"a+b*c\" \u2192 \"abc*+\". Operator precedence controls stack order.",
+        "footer": "Infix to Postfix — A = \"a+b*c\" → \"abc*+\". Operator precedence controls stack order.",
         "legend": [
           "c-input",
           "c-active",
@@ -1152,47 +1152,47 @@
         "script": [
           {
             "label": "SETUP",
-            "msg": "Infix: <strong>\"a+b*c\"</strong>. Goal: convert to postfix. Operands \u2192 output. Operators \u2192 stack (respect precedence). Output so far: <strong>\"\"</strong>.",
-            "html": "<div class='v-row'><div class='v-label'>INPUT (INFIX)</div></div><div class='v-row'><div class='v-cell'>a</div><div class='v-cell'>+</div><div class='v-cell'>b</div><div class='v-cell'>*</div><div class='v-cell'>c</div></div><div class='v-row' style='margin-top:14px;'><div class='v-label'>STACK \u2193</div></div><div style='display:flex;flex-direction:column-reverse;gap:4px;align-items:center;'><div class='v-cell v-null'>EMPTY</div></div><div class='v-row' style='margin-top:14px;'><div class='v-label'>OUTPUT (POSTFIX)</div></div><div class='v-row'><div class='v-cell v-null'>empty</div></div>",
-            "overlay": "Rules: <code>operand \u2192 output</code> <code>operator \u2192 pop >= prec, then push</code>"
+            "msg": "Infix: <strong>\"a+b*c\"</strong>. Goal: convert to postfix. Operands → output. Operators → stack (respect precedence). Output so far: <strong>\"\"</strong>.",
+            "html": "<div class='v-row'><div class='v-label'>INPUT (INFIX)</div></div><div class='v-row'><div class='v-cell'>a</div><div class='v-cell'>+</div><div class='v-cell'>b</div><div class='v-cell'>*</div><div class='v-cell'>c</div></div><div class='v-row' style='margin-top:14px;'><div class='v-label'>STACK ↓</div></div><div style='display:flex;flex-direction:column-reverse;gap:4px;align-items:center;'><div class='v-cell v-null'>EMPTY</div></div><div class='v-row' style='margin-top:14px;'><div class='v-label'>OUTPUT (POSTFIX)</div></div><div class='v-row'><div class='v-cell v-null'>empty</div></div>",
+            "overlay": "Rules: <code>operand → output</code> <code>operator → pop >= prec, then push</code>"
           },
           {
             "label": "CHAR 'a'",
             "msg": "Character <strong>'a'</strong> is operand. Append to output. Output: <strong>\"a\"</strong>. Stack: <strong>[]</strong>.",
-            "html": "<div class='v-row'><div class='v-label'>INPUT</div></div><div class='v-row'><div class='v-cell v-eliminated'>a</div><div class='v-cell'>+</div><div class='v-cell'>b</div><div class='v-cell'>*</div><div class='v-cell'>c</div></div><div class='v-row' style='margin-top:14px;'><div class='v-label'>STACK \u2193</div></div><div style='display:flex;flex-direction:column-reverse;gap:4px;align-items:center;'><div class='v-cell v-null'>EMPTY</div></div><div class='v-row' style='margin-top:14px;'><div class='v-label'>OUTPUT</div></div><div class='v-row'><div class='v-cell v-new'>a</div></div>",
+            "html": "<div class='v-row'><div class='v-label'>INPUT</div></div><div class='v-row'><div class='v-cell v-eliminated'>a</div><div class='v-cell'>+</div><div class='v-cell'>b</div><div class='v-cell'>*</div><div class='v-cell'>c</div></div><div class='v-row' style='margin-top:14px;'><div class='v-label'>STACK ↓</div></div><div style='display:flex;flex-direction:column-reverse;gap:4px;align-items:center;'><div class='v-cell v-null'>EMPTY</div></div><div class='v-row' style='margin-top:14px;'><div class='v-label'>OUTPUT</div></div><div class='v-row'><div class='v-cell v-new'>a</div></div>",
             "overlay": "Operand: <code>if (isOperand(c)) output.append(c);</code>"
           },
           {
             "label": "CHAR '+'",
-            "msg": "Character <strong>'+'</strong> is operator. Stack empty \u2192 push <strong>'+'</strong>. Output: <strong>\"a\"</strong>. Stack: <strong>[+]</strong>.",
-            "html": "<div class='v-row'><div class='v-label'>INPUT</div></div><div class='v-row'><div class='v-cell v-eliminated'>a</div><div class='v-cell v-eliminated'>+</div><div class='v-cell'>b</div><div class='v-cell'>*</div><div class='v-cell'>c</div></div><div class='v-row' style='margin-top:14px;'><div class='v-label'>STACK \u2193</div></div><div style='display:flex;flex-direction:column-reverse;gap:4px;align-items:center;'><div class='v-cell v-new'>+ \u2190 TOP</div></div><div class='v-row' style='margin-top:14px;'><div class='v-label'>OUTPUT</div></div><div class='v-row'><div class='v-cell v-result'>a</div></div>",
+            "msg": "Character <strong>'+'</strong> is operator. Stack empty → push <strong>'+'</strong>. Output: <strong>\"a\"</strong>. Stack: <strong>[+]</strong>.",
+            "html": "<div class='v-row'><div class='v-label'>INPUT</div></div><div class='v-row'><div class='v-cell v-eliminated'>a</div><div class='v-cell v-eliminated'>+</div><div class='v-cell'>b</div><div class='v-cell'>*</div><div class='v-cell'>c</div></div><div class='v-row' style='margin-top:14px;'><div class='v-label'>STACK ↓</div></div><div style='display:flex;flex-direction:column-reverse;gap:4px;align-items:center;'><div class='v-cell v-new'>+ ← TOP</div></div><div class='v-row' style='margin-top:14px;'><div class='v-label'>OUTPUT</div></div><div class='v-row'><div class='v-cell v-result'>a</div></div>",
             "overlay": "Operator: <code>while (prec(top) >= prec(c)) pop; push(c);</code>"
           },
           {
             "label": "CHAR 'b'",
             "msg": "Character <strong>'b'</strong> is operand. Append to output. Output: <strong>\"ab\"</strong>. Stack: <strong>[+]</strong>.",
-            "html": "<div class='v-row'><div class='v-label'>INPUT</div></div><div class='v-row'><div class='v-cell v-eliminated'>a</div><div class='v-cell v-eliminated'>+</div><div class='v-cell v-eliminated'>b</div><div class='v-cell'>*</div><div class='v-cell'>c</div></div><div class='v-row' style='margin-top:14px;'><div class='v-label'>STACK \u2193</div></div><div style='display:flex;flex-direction:column-reverse;gap:4px;align-items:center;'><div class='v-cell v-result'>+</div></div><div class='v-row' style='margin-top:14px;'><div class='v-label'>OUTPUT</div></div><div class='v-row'><div class='v-cell v-result'>a</div><div class='v-cell v-new'>b</div></div>"
+            "html": "<div class='v-row'><div class='v-label'>INPUT</div></div><div class='v-row'><div class='v-cell v-eliminated'>a</div><div class='v-cell v-eliminated'>+</div><div class='v-cell v-eliminated'>b</div><div class='v-cell'>*</div><div class='v-cell'>c</div></div><div class='v-row' style='margin-top:14px;'><div class='v-label'>STACK ↓</div></div><div style='display:flex;flex-direction:column-reverse;gap:4px;align-items:center;'><div class='v-cell v-result'>+</div></div><div class='v-row' style='margin-top:14px;'><div class='v-label'>OUTPUT</div></div><div class='v-row'><div class='v-cell v-result'>a</div><div class='v-cell v-new'>b</div></div>"
           },
           {
             "label": "CHAR '*'",
             "msg": "Character <strong>'*'</strong> is operator. Precedence(*) = <strong>2</strong> > precedence(+) = <strong>1</strong>. Don't pop. Push <strong>'*'</strong>. Stack: <strong>[+, *]</strong>. Output: <strong>\"ab\"</strong>.",
-            "html": "<div class='v-row'><div class='v-label'>INPUT</div></div><div class='v-row'><div class='v-cell v-eliminated'>a+b</div><div class='v-cell v-eliminated'>*</div><div class='v-cell'>c</div></div><div class='v-row' style='margin-top:14px;'><div class='v-label'>STACK \u2193</div></div><div style='display:flex;flex-direction:column-reverse;gap:4px;align-items:center;'><div class='v-cell v-new'>* \u2190 TOP</div><div class='v-cell v-result'>+</div></div><div class='v-row' style='margin-top:14px;'><div class='v-label'>OUTPUT</div></div><div class='v-row'><div class='v-cell v-result'>a</div><div class='v-cell v-result'>b</div></div><div class='v-row' style='margin-top:8px;'><span class='v-stat'>prec(*): <strong>2</strong></span><span class='v-stat'>prec(+): <strong>1</strong></span></div>",
-            "overlay": "Higher precedence: <code>prec(*) > prec(+)</code> \u2192 push without popping"
+            "html": "<div class='v-row'><div class='v-label'>INPUT</div></div><div class='v-row'><div class='v-cell v-eliminated'>a+b</div><div class='v-cell v-eliminated'>*</div><div class='v-cell'>c</div></div><div class='v-row' style='margin-top:14px;'><div class='v-label'>STACK ↓</div></div><div style='display:flex;flex-direction:column-reverse;gap:4px;align-items:center;'><div class='v-cell v-new'>* ← TOP</div><div class='v-cell v-result'>+</div></div><div class='v-row' style='margin-top:14px;'><div class='v-label'>OUTPUT</div></div><div class='v-row'><div class='v-cell v-result'>a</div><div class='v-cell v-result'>b</div></div><div class='v-row' style='margin-top:8px;'><span class='v-stat'>prec(*): <strong>2</strong></span><span class='v-stat'>prec(+): <strong>1</strong></span></div>",
+            "overlay": "Higher precedence: <code>prec(*) > prec(+)</code> → push without popping"
           },
           {
             "label": "CHAR 'c'",
             "msg": "Character <strong>'c'</strong> is operand. Append to output. Output: <strong>\"abc\"</strong>. Stack: <strong>[+, *]</strong>.",
-            "html": "<div class='v-row'><div class='v-label'>INPUT</div></div><div class='v-row'><div class='v-cell v-eliminated'>a+b*c</div></div><div class='v-row' style='margin-top:14px;'><div class='v-label'>STACK \u2193</div></div><div style='display:flex;flex-direction:column-reverse;gap:4px;align-items:center;'><div class='v-cell v-result'>*</div><div class='v-cell v-result'>+</div></div><div class='v-row' style='margin-top:14px;'><div class='v-label'>OUTPUT</div></div><div class='v-row'><div class='v-cell v-result'>a</div><div class='v-cell v-result'>b</div><div class='v-cell v-new'>c</div></div>"
+            "html": "<div class='v-row'><div class='v-label'>INPUT</div></div><div class='v-row'><div class='v-cell v-eliminated'>a+b*c</div></div><div class='v-row' style='margin-top:14px;'><div class='v-label'>STACK ↓</div></div><div style='display:flex;flex-direction:column-reverse;gap:4px;align-items:center;'><div class='v-cell v-result'>*</div><div class='v-cell v-result'>+</div></div><div class='v-row' style='margin-top:14px;'><div class='v-label'>OUTPUT</div></div><div class='v-row'><div class='v-cell v-result'>a</div><div class='v-cell v-result'>b</div><div class='v-cell v-new'>c</div></div>"
           },
           {
-            "label": "END \u2014 Pop All",
-            "msg": "Input exhausted. Pop all operators from stack and append to output. Pop <strong>'*'</strong> \u2192 output: <strong>\"abc*\"</strong>. Pop <strong>'+'</strong> \u2192 output: <strong>\"abc*+\"</strong>.",
-            "html": "<div class='v-row'><div class='v-label'>STACK \u2193</div></div><div style='display:flex;flex-direction:column-reverse;gap:4px;align-items:center;'><div class='v-cell v-null'>EMPTY</div></div><div class='v-row' style='margin-top:14px;'><div class='v-label'>OUTPUT (POSTFIX)</div></div><div class='v-row'><div class='v-cell v-result'>a</div><div class='v-cell v-result'>b</div><div class='v-cell v-result'>c</div><div class='v-cell v-new'>*</div><div class='v-cell v-new'>+</div></div>",
+            "label": "END — Pop All",
+            "msg": "Input exhausted. Pop all operators from stack and append to output. Pop <strong>'*'</strong> → output: <strong>\"abc*\"</strong>. Pop <strong>'+'</strong> → output: <strong>\"abc*+\"</strong>.",
+            "html": "<div class='v-row'><div class='v-label'>STACK ↓</div></div><div style='display:flex;flex-direction:column-reverse;gap:4px;align-items:center;'><div class='v-cell v-null'>EMPTY</div></div><div class='v-row' style='margin-top:14px;'><div class='v-label'>OUTPUT (POSTFIX)</div></div><div class='v-row'><div class='v-cell v-result'>a</div><div class='v-cell v-result'>b</div><div class='v-cell v-result'>c</div><div class='v-cell v-new'>*</div><div class='v-cell v-new'>+</div></div>",
             "overlay": "Final flush: <code>while (!stack.isEmpty()) output += stack.pop();</code>"
           },
           {
             "label": "DONE",
-            "msg": "\u2705 Postfix expression: <strong>\"abc*+\"</strong>. Infix <strong>\"a+b*c\"</strong> \u2192 Postfix <strong>\"abc*+\"</strong>. Operator precedence preserved in O(N) time.",
+            "msg": "✅ Postfix expression: <strong>\"abc*+\"</strong>. Infix <strong>\"a+b*c\"</strong> → Postfix <strong>\"abc*+\"</strong>. Operator precedence preserved in O(N) time.",
             "html": "<div class='v-row'><div class='v-label'>RESULT</div></div><div class='v-row' style='margin-top:12px;'><span class='v-stat'>infix: <strong>\"a+b*c\"</strong></span><span class='v-stat'>postfix: <strong>\"abc*+\"</strong></span></div>",
             "overlay": "Conversion complete: <code>return postfix.toString();</code>"
           }
@@ -1211,12 +1211,12 @@
       "NGE",
       "Subarrays"
     ],
-    "description": "Given an array of integers A.\n\nThe value of an array is computed as the difference between the maximum element in the array and the minimum element in the array A.\n\nCalculate and return the sum of values of all possible subarrays of A modulo 10\u2079+7.",
+    "description": "Given an array of integers A.\n\nThe value of an array is computed as the difference between the maximum element in the array and the minimum element in the array A.\n\nCalculate and return the sum of values of all possible subarrays of A modulo 10⁹+7.",
     "sampleInput": "A = [1]",
     "sampleOutput": "0",
     "image": "images/stacks/stacks-11.png",
     "story": "Each element contributes as MAX in some subarrays and MIN in others. Count both contributions using monotonic stacks.",
-    "plain": "For each element, count how many subarrays have it as the maximum (it contributes positively) and how many have it as the minimum (it contributes negatively). Use four arrays computed via monotonic stacks: prevSmaller, nextSmaller (to count MIN contributions), prevGreater, nextGreater (to count MAX contributions). For element i, its contribution = A[i] \u00d7 (count as MAX) - A[i] \u00d7 (count as MIN). Sum all contributions modulo 10\u2079+7.",
+    "plain": "For each element, count how many subarrays have it as the maximum (it contributes positively) and how many have it as the minimum (it contributes negatively). Use four arrays computed via monotonic stacks: prevSmaller, nextSmaller (to count MIN contributions), prevGreater, nextGreater (to count MAX contributions). For element i, its contribution = A[i] × (count as MAX) - A[i] × (count as MIN). Sum all contributions modulo 10⁹+7.",
     "tale": "Imagine each number in the array is a village elder with a height. You ask each elder: 'In how many village gatherings are you the tallest?' and 'In how many are you the shortest?' The answer depends on how far left and right they can see before hitting someone taller or shorter. You use four compass readings (the stacks) to find these boundaries quickly. Each elder's pride (positive contribution) minus their humility (negative contribution) is tallied. The sum of all egos is the answer.",
     "solutions": [
       {
@@ -1225,7 +1225,7 @@
           "time": "O(N)",
           "space": "O(N)"
         },
-        "plain": "Compute four arrays: prevSmaller[i] (index of nearest smaller to left, or -1), nextSmaller[i] (index of nearest smaller to right, or N), prevGreater[i] (index of nearest greater to left, or -1), nextGreater[i] (index of nearest greater to right, or N). All computed in O(N) using monotonic stacks. For each element i, count as MAX = (i - prevGreater[i]) \u00d7 (nextGreater[i] - i), count as MIN = (i - prevSmaller[i]) \u00d7 (nextSmaller[i] - i). Contribution[i] = A[i] \u00d7 countAsMax - A[i] \u00d7 countAsMin. Sum all contributions modulo 10\u2079+7.",
+        "plain": "Compute four arrays: prevSmaller[i] (index of nearest smaller to left, or -1), nextSmaller[i] (index of nearest smaller to right, or N), prevGreater[i] (index of nearest greater to left, or -1), nextGreater[i] (index of nearest greater to right, or N). All computed in O(N) using monotonic stacks. For each element i, count as MAX = (i - prevGreater[i]) × (nextGreater[i] - i), count as MIN = (i - prevSmaller[i]) × (nextSmaller[i] - i). Contribution[i] = A[i] × countAsMax - A[i] × countAsMin. Sum all contributions modulo 10⁹+7.",
         "tale": "You are an accountant for a kingdom where each number is a merchant. Each merchant trades in multiple markets (subarrays). In some markets they're the richest (maximum), in others the poorest (minimum). You hire four scouts with telescopes (the stacks) to find how many markets each merchant dominates or trails in. For each merchant, you credit their wealth times their dominance count, and debit their wealth times their trailing count. The kingdom's total balance is the sum of all ledgers.",
         "approach": [
           "Compute prevSmaller[i] for all i using monotonic increasing stack (left to right).",
@@ -1233,14 +1233,14 @@
           "Compute prevGreater[i] for all i using monotonic decreasing stack (left to right).",
           "Compute nextGreater[i] for all i using monotonic decreasing stack (right to left).",
           "For each element i:",
-          "countAsMax = (i - prevGreater[i]) \u00d7 (nextGreater[i] - i) \u2014 subarrays where A[i] is maximum.",
-          "countAsMin = (i - prevSmaller[i]) \u00d7 (nextSmaller[i] - i) \u2014 subarrays where A[i] is minimum.",
-          "contribution[i] = A[i] \u00d7 countAsMax - A[i] \u00d7 countAsMin.",
-          "Sum all contributions modulo 10\u2079+7 and return."
+          "countAsMax = (i - prevGreater[i]) × (nextGreater[i] - i) — subarrays where A[i] is maximum.",
+          "countAsMin = (i - prevSmaller[i]) × (nextSmaller[i] - i) — subarrays where A[i] is minimum.",
+          "contribution[i] = A[i] × countAsMax - A[i] × countAsMin.",
+          "Sum all contributions modulo 10⁹+7 and return."
         ],
         "pseudocode": "prevSmaller = computePrevSmaller(A)\nnextSmaller = computeNextSmaller(A)\nprevGreater = computePrevGreater(A)\nnextGreater = computeNextGreater(A)\nsum = 0\nfor i = 0 to N-1:\n  countMax = (i - prevGreater[i]) * (nextGreater[i] - i)\n  countMin = (i - prevSmaller[i]) * (nextSmaller[i] - i)\n  sum += A[i] * countMax - A[i] * countMin\n  sum %= MOD\nreturn sum",
-        "story": "Four stacks compute boundaries. Each element's contribution = value \u00d7 (max_count - min_count). Sum all contributions.",
-        "code": "public int maxAndMin(int[] A) {\n    int N = A.length;\n    int[] prevSmaller = new int[N];\n    int[] prevGreater = new int[N];\n    int[] nextSmaller = new int[N];\n    int[] nextGreater = new int[N];\n    Stack<Integer> stack = new Stack<>();\n    stack.push(0);\n    prevSmaller[0] = -1;\n    for (int i = 1; i < N; i++) {\n        while (A[stack.peek()] >= A[i]) {\n            stack.pop();\n            if (stack.isEmpty()) {\n                prevSmaller[i] = -1;\n                break;\n            }\n        }\n        if (!stack.isEmpty()) prevSmaller[i] = stack.peek();\n        stack.push(i);\n    }\n    stack = new Stack<>();\n    stack.push(0);\n    prevGreater[0] = -1;\n    for (int i = 1; i < N; i++) {\n        while (A[stack.peek()] <= A[i]) {\n            stack.pop();\n            if (stack.isEmpty()) {\n                prevGreater[i] = -1;\n                break;\n            }\n        }\n        if (!stack.isEmpty()) prevGreater[i] = stack.peek();\n        stack.push(i);\n    }\n    stack = new Stack<>();\n    stack.push(N - 1);\n    nextSmaller[N - 1] = N;\n    for (int i = N - 2; i >= 0; i--) {\n        while (A[stack.peek()] > A[i]) {\n            stack.pop();\n            if (stack.isEmpty()) {\n                nextSmaller[i] = N;\n                break;\n            }\n        }\n        if (!stack.isEmpty()) nextSmaller[i] = stack.peek();\n        stack.push(i);\n    }\n    stack = new Stack<>();\n    stack.push(N - 1);\n    nextGreater[N - 1] = N;\n    for (int i = N - 2; i >= 0; i--) {\n        while (A[stack.peek()] < A[i]) {\n            stack.pop();\n            if (stack.isEmpty()) {\n                nextGreater[i] = N;\n                break;\n            }\n        }\n        if (!stack.isEmpty()) nextGreater[i] = stack.peek();\n        stack.push(i);\n    }\n    long sum = 0;\n    long MOD = 1000000007;\n    for (int i = 0; i < N; i++) {\n        long positive = (long) (i - prevGreater[i]) * (nextGreater[i] - i);\n        sum += (positive * A[i]) % MOD;\n        long negative = (long) (i - prevSmaller[i]) * (nextSmaller[i] - i);\n        sum -= (negative * A[i]) % MOD;\n        sum = (sum % MOD + MOD) % MOD;\n    }\n    return (int) sum;\n}"
+        "story": "Four stacks compute boundaries. Each element's contribution = value × (max_count - min_count). Sum all contributions.",
+        "code": "public int maxAndMin(int[] A) {\n    int N = A.length;\n    int[] prevSmaller = new int[N];\n    int[] prevGreater = new int[N];\n    int[] nextSmaller = new int[N];\n    int[] nextGreater = new int[N];\n    Stack<Integer> stack = new Stack<>();\n    stack.push(0);\n    prevSmaller[0] = -1;\n    for (int i = 1; i < N; i++) {\n        while (A[stack.peek()] >= A[i]) {\n            stack.pop();\n            if (stack.isEmpty()) {\n                prevSmaller[i] = -1;\n                break;\n            }\n        }\n        if (!stack.isEmpty()) {\n            prevSmaller[i] = stack.peek();\n        }\n        stack.push(i);\n    }\n    stack = new Stack<>();\n    stack.push(0);\n    prevGreater[0] = -1;\n    for (int i = 1; i < N; i++) {\n        while (A[stack.peek()] <= A[i]) {\n            stack.pop();\n            if (stack.isEmpty()) {\n                prevGreater[i] = -1;\n                break;\n            }\n        }\n        if (!stack.isEmpty()) {\n            prevGreater[i] = stack.peek();\n        }\n        stack.push(i);\n    }\n    stack = new Stack<>();\n    stack.push(N - 1);\n    nextSmaller[N - 1] = N;\n    for (int i = N - 2; i >= 0; i--) {\n        while (A[stack.peek()] > A[i]) {\n            stack.pop();\n            if (stack.isEmpty()) {\n                nextSmaller[i] = N;\n                break;\n            }\n        }\n        if (!stack.isEmpty()) {\n            nextSmaller[i] = stack.peek();\n        }\n        stack.push(i);\n    }\n    stack = new Stack<>();\n    stack.push(N - 1);\n    nextGreater[N - 1] = N;\n    for (int i = N - 2; i >= 0; i--) {\n        while (A[stack.peek()] < A[i]) {\n            stack.pop();\n            if (stack.isEmpty()) {\n                nextGreater[i] = N;\n                break;\n            }\n        }\n        if (!stack.isEmpty()) {\n            nextGreater[i] = stack.peek();\n        }\n        stack.push(i);\n    }\n    long sum = 0;\n    long MOD = 1000000007;\n    for (int i = 0; i < N; i++) {\n        long positive = (long) (i - prevGreater[i]) * (nextGreater[i] - i);\n        sum += (positive * A[i]) % MOD;\n        long negative = (long) (i - prevSmaller[i]) * (nextSmaller[i] - i);\n        sum -= (negative * A[i]) % MOD;\n        sum = (sum % MOD + MOD) % MOD;\n    }\n    return (int) sum;\n}"
       }
     ],
     "viz": {
@@ -1252,7 +1252,7 @@
           3,
           8
         ],
-        "footer": "MAX and MIN \u2014 A = [4, 7, 3, 8]. Each element contributes as max and min across subarrays.",
+        "footer": "MAX and MIN — A = [4, 7, 3, 8]. Each element contributes as max and min across subarrays.",
         "legend": [
           "c-input",
           "c-active",
@@ -1268,7 +1268,7 @@
             "overlay": "Key: <code>contribution[i] = A[i] * countAsMax - A[i] * countAsMin</code>"
           },
           {
-            "label": "PHASE 1 \u2014 Boundaries",
+            "label": "PHASE 1 — Boundaries",
             "msg": "Compute 4 arrays: <strong>prevSmaller, nextSmaller, prevGreater, nextGreater</strong> for each element using monotonic stacks. O(N) per array.",
             "marks": {},
             "ptrs": {},
@@ -1276,7 +1276,7 @@
           },
           {
             "label": "ELEMENT 0 (A[0]=4)",
-            "msg": "Element <strong>A[0]=4</strong>. prevSmaller=<strong>-1</strong>, nextSmaller=<strong>2</strong>. prevGreater=<strong>-1</strong>, nextGreater=<strong>1</strong>. countAsMax=(0-(-1))\u00d7(1-0)=<strong>1</strong>. countAsMin=(0-(-1))\u00d7(2-0)=<strong>2</strong>. Contribution=4\u00d71-4\u00d72=<strong>-4</strong>.",
+            "msg": "Element <strong>A[0]=4</strong>. prevSmaller=<strong>-1</strong>, nextSmaller=<strong>2</strong>. prevGreater=<strong>-1</strong>, nextGreater=<strong>1</strong>. countAsMax=(0-(-1))×(1-0)=<strong>1</strong>. countAsMin=(0-(-1))×(2-0)=<strong>2</strong>. Contribution=4×1-4×2=<strong>-4</strong>.",
             "marks": {
               "0": "c-active"
             },
@@ -1286,7 +1286,7 @@
           },
           {
             "label": "ELEMENT 1 (A[1]=7)",
-            "msg": "Element <strong>A[1]=7</strong>. prevSmaller=<strong>0</strong>, nextSmaller=<strong>2</strong>. prevGreater=<strong>-1</strong>, nextGreater=<strong>3</strong>. countAsMax=(1-(-1))\u00d7(3-1)=<strong>4</strong>. countAsMin=(1-0)\u00d7(2-1)=<strong>1</strong>. Contribution=7\u00d74-7\u00d71=<strong>21</strong>.",
+            "msg": "Element <strong>A[1]=7</strong>. prevSmaller=<strong>0</strong>, nextSmaller=<strong>2</strong>. prevGreater=<strong>-1</strong>, nextGreater=<strong>3</strong>. countAsMax=(1-(-1))×(3-1)=<strong>4</strong>. countAsMin=(1-0)×(2-1)=<strong>1</strong>. Contribution=7×4-7×1=<strong>21</strong>.",
             "marks": {
               "1": "c-active"
             },
@@ -1296,7 +1296,7 @@
           },
           {
             "label": "ELEMENT 2 (A[2]=3)",
-            "msg": "Element <strong>A[2]=3</strong>. prevSmaller=<strong>-1</strong>, nextSmaller=<strong>4</strong>. prevGreater=<strong>1</strong>, nextGreater=<strong>3</strong>. countAsMax=(2-1)\u00d7(3-2)=<strong>1</strong>. countAsMin=(2-(-1))\u00d7(4-2)=<strong>6</strong>. Contribution=3\u00d71-3\u00d76=<strong>-15</strong>.",
+            "msg": "Element <strong>A[2]=3</strong>. prevSmaller=<strong>-1</strong>, nextSmaller=<strong>4</strong>. prevGreater=<strong>1</strong>, nextGreater=<strong>3</strong>. countAsMax=(2-1)×(3-2)=<strong>1</strong>. countAsMin=(2-(-1))×(4-2)=<strong>6</strong>. Contribution=3×1-3×6=<strong>-15</strong>.",
             "marks": {
               "2": "c-active"
             },
@@ -1306,7 +1306,7 @@
           },
           {
             "label": "ELEMENT 3 (A[3]=8)",
-            "msg": "Element <strong>A[3]=8</strong>. prevSmaller=<strong>2</strong>, nextSmaller=<strong>4</strong>. prevGreater=<strong>-1</strong>, nextGreater=<strong>4</strong>. countAsMax=(3-(-1))\u00d7(4-3)=<strong>4</strong>. countAsMin=(3-2)\u00d7(4-3)=<strong>1</strong>. Contribution=8\u00d74-8\u00d71=<strong>24</strong>.",
+            "msg": "Element <strong>A[3]=8</strong>. prevSmaller=<strong>2</strong>, nextSmaller=<strong>4</strong>. prevGreater=<strong>-1</strong>, nextGreater=<strong>4</strong>. countAsMax=(3-(-1))×(4-3)=<strong>4</strong>. countAsMin=(3-2)×(4-3)=<strong>1</strong>. Contribution=8×4-8×1=<strong>24</strong>.",
             "marks": {
               "3": "c-active"
             },
@@ -1316,7 +1316,7 @@
           },
           {
             "label": "SUM",
-            "msg": "Sum contributions: <strong>-4 + 21 + (-15) + 24 = 26</strong>. Apply modulo 10\u2079+7. Return <strong>26</strong>.",
+            "msg": "Sum contributions: <strong>-4 + 21 + (-15) + 24 = 26</strong>. Apply modulo 10⁹+7. Return <strong>26</strong>.",
             "marks": {
               "0": "c-result",
               "1": "c-result",
@@ -1329,7 +1329,7 @@
           },
           {
             "label": "DONE",
-            "msg": "\u2705 Total sum: <strong>26</strong>. Each element contributed based on how many subarrays it dominated (max) vs trailed (min). O(N) time using 4 monotonic stacks.",
+            "msg": "✅ Total sum: <strong>26</strong>. Each element contributed based on how many subarrays it dominated (max) vs trailed (min). O(N) time using 4 monotonic stacks.",
             "marks": {},
             "ptrs": {},
             "overlay": "Time: <code>O(N)</code>, Space: <code>O(N)</code>"
@@ -1359,11 +1359,11 @@
       {
         "label": "Optimal",
         "complexity": {
-          "time": "O(N \u00d7 M)",
+          "time": "O(N × M)",
           "space": "O(M)"
         },
         "plain": "Initialize a height array of size M (columns). Iterate through each row. For each column j, if A[i][j] == 1, increment height[j], else reset height[j] = 0. After updating heights for row i, run largestRectangleInHistogram(height) to get the max area rectangle with row i as the base. Track the overall maximum across all rows. The largestRectangleInHistogram function uses stacks to find nearest smaller elements in O(M) time.",
-        "tale": "You are an architect with a blueprint of a binary city. You walk down each floor. On each floor, you update your height map\u2014each column's tower grows if it's a 1, collapses if it's a 0. After updating, you call your assistant (the histogram algorithm) to find the largest rectangle that can be drawn using those tower heights. Your assistant uses a magic stack to solve it instantly. You record the best rectangle found on any floor. By the time you reach the basement, you have the largest rectangular area in the entire city.",
+        "tale": "You are an architect with a blueprint of a binary city. You walk down each floor. On each floor, you update your height map—each column's tower grows if it's a 1, collapses if it's a 0. After updating, you call your assistant (the histogram algorithm) to find the largest rectangle that can be drawn using those tower heights. Your assistant uses a magic stack to solve it instantly. You record the best rectangle found on any floor. By the time you reach the basement, you have the largest rectangular area in the entire city.",
         "approach": [
           "Initialize height array of size M (number of columns), all zeros.",
           "Iterate through each row i from 0 to N-1:",
@@ -1376,8 +1376,8 @@
           "largestRectangleInHistogram uses stacks to find prevSmaller and nextSmaller in O(M)."
         ],
         "pseudocode": "height[M] = {0}\nmaxArea = 0\nfor i = 0 to N-1:\n  for j = 0 to M-1:\n    if A[i][j] == 1: height[j]++\n    else: height[j] = 0\n  currentArea = largestRectangleInHistogram(height)\n  maxArea = max(maxArea, currentArea)\nreturn maxArea",
-        "story": "Row-by-row histogram. Update heights (1 \u2192 grow, 0 \u2192 collapse). Run histogram area for each row. Track max. O(N\u00d7M).",
-        "code": "public int maxRectangleInBinaryMatrix(int[][] A) {\n    int N = A.length;\n    int M = A[0].length;\n    int[] height = new int[M];\n    int maxArea = 0;\n    for (int i = 0; i < N; i++) {\n        for (int j = 0; j < M; j++) {\n            if (A[i][j] == 1) {\n                height[j]++;\n            } else {\n                height[j] = 0;\n            }\n        }\n        int currentArea = largestRectangleInHistogram(height);\n        maxArea = Math.max(maxArea, currentArea);\n    }\n    return maxArea;\n}\n\nprivate int largestRectangleInHistogram(int[] heights) {\n    int N = heights.length;\n    int maxArea = 0;\n    int[] prevSmaller = new int[N];\n    int[] nextSmaller = new int[N];\n    Stack<Integer> stack = new Stack<>();\n    prevSmaller[0] = -1;\n    stack.push(0);\n    for (int i = 1; i < N; i++) {\n        while (heights[stack.peek()] >= heights[i]) {\n            stack.pop();\n            if (stack.isEmpty()) {\n                prevSmaller[i] = -1;\n                break;\n            }\n        }\n        if (!stack.isEmpty()) prevSmaller[i] = stack.peek();\n        stack.push(i);\n    }\n    stack = new Stack<>();\n    nextSmaller[N - 1] = N;\n    stack.push(N - 1);\n    for (int i = N - 2; i >= 0; i--) {\n        while (!stack.isEmpty() && heights[stack.peek()] >= heights[i]) {\n            stack.pop();\n        }\n        nextSmaller[i] = stack.isEmpty() ? N : stack.peek();\n        stack.push(i);\n    }\n    for (int i = 0; i < N; i++) {\n        int width = nextSmaller[i] - prevSmaller[i] - 1;\n        int area = heights[i] * width;\n        maxArea = Math.max(area, maxArea);\n    }\n    return maxArea;\n}"
+        "story": "Row-by-row histogram. Update heights (1 → grow, 0 → collapse). Run histogram area for each row. Track max. O(N×M).",
+        "code": "public int maxRectangleInBinaryMatrix(int[][] A) {\n    int N = A.length;\n    int M = A[0].length;\n    int[] height = new int[M];\n    int maxArea = 0;\n    for (int i = 0; i < N; i++) {\n        for (int j = 0; j < M; j++) {\n            if (A[i][j] == 1) {\n                height[j]++;\n            } else {\n                height[j] = 0;\n            }\n        }\n        int currentArea = largestRectangleInHistogram(height);\n        maxArea = Math.max(maxArea, currentArea);\n    }\n    return maxArea;\n}\n\nprivate int largestRectangleInHistogram(int[] heights) {\n    int N = heights.length;\n    int maxArea = 0;\n    int[] prevSmaller = new int[N];\n    int[] nextSmaller = new int[N];\n    Stack<Integer> stack = new Stack<>();\n    prevSmaller[0] = -1;\n    stack.push(0);\n    for (int i = 1; i < N; i++) {\n        while (heights[stack.peek()] >= heights[i]) {\n            stack.pop();\n            if (stack.isEmpty()) {\n                prevSmaller[i] = -1;\n                break;\n            }\n        }\n        if (!stack.isEmpty()) {\n            prevSmaller[i] = stack.peek();\n        }\n        stack.push(i);\n    }\n    stack = new Stack<>();\n    nextSmaller[N - 1] = N;\n    stack.push(N - 1);\n    for (int i = N - 2; i >= 0; i--) {\n        while (!stack.isEmpty() && heights[stack.peek()] >= heights[i]) {\n            stack.pop();\n        }\n        nextSmaller[i] = stack.isEmpty() ? N : stack.peek();\n        stack.push(i);\n    }\n    for (int i = 0; i < N; i++) {\n        int width = nextSmaller[i] - prevSmaller[i] - 1;\n        int area = heights[i] * width;\n        maxArea = Math.max(area, maxArea);\n    }\n    return maxArea;\n}"
       }
     ],
     "viz": {
@@ -1400,7 +1400,7 @@
             0
           ]
         ],
-        "footer": "Max Rectangle in Binary Matrix \u2014 build histogram row by row, find max rectangle at each level",
+        "footer": "Max Rectangle in Binary Matrix — build histogram row by row, find max rectangle at each level",
         "legend": [
           "c-input",
           "c-active",
@@ -1410,51 +1410,51 @@
         "script": [
           {
             "label": "SETUP",
-            "msg": "Matrix: <strong>3\u00d73 binary</strong>. Goal: find largest rectangle of 1s. Strategy: treat each row as histogram base, compute heights of consecutive 1s, run histogram area algorithm.",
+            "msg": "Matrix: <strong>3×3 binary</strong>. Goal: find largest rectangle of 1s. Strategy: treat each row as histogram base, compute heights of consecutive 1s, run histogram area algorithm.",
             "html": "<div class='v-label'>MATRIX</div><div class='v-matrix'><div class='v-row'><div class='v-cell'>1</div><div class='v-cell'>1</div><div class='v-cell'>1</div></div><div class='v-row'><div class='v-cell'>0</div><div class='v-cell'>1</div><div class='v-cell'>1</div></div><div class='v-row'><div class='v-cell'>1</div><div class='v-cell'>0</div><div class='v-cell'>0</div></div></div>",
             "overlay": "Pattern: <code>if (A[i][j] == 1) height[j]++; else height[j] = 0;</code> <code>maxArea = max(maxArea, histogram(height));</code>"
           },
           {
-            "label": "ROW 0 \u2014 Build Heights",
-            "msg": "Process row <strong>0</strong>: [1, 1, 1]. All 1s \u2192 heights = <strong>[1, 1, 1]</strong> (each column has 1 consecutive one from top).",
+            "label": "ROW 0 — Build Heights",
+            "msg": "Process row <strong>0</strong>: [1, 1, 1]. All 1s → heights = <strong>[1, 1, 1]</strong> (each column has 1 consecutive one from top).",
             "html": "<div class='v-label'>ROW 0</div><div class='v-row'><div class='v-cell v-active'>1</div><div class='v-cell v-active'>1</div><div class='v-cell v-active'>1</div></div><div class='v-row' style='margin-top:8px;'><div class='v-label'>HEIGHT HISTOGRAM</div></div><div class='v-row'><div class='v-cell v-new'>1</div><div class='v-cell v-new'>1</div><div class='v-cell v-new'>1</div></div>",
             "overlay": "Heights: <code>[1, 1, 1]</code>"
           },
           {
-            "label": "ROW 0 \u2014 Histogram Area",
+            "label": "ROW 0 — Histogram Area",
             "msg": "Run histogram algorithm on <strong>[1, 1, 1]</strong>. Max rectangle: width=<strong>3</strong>, height=<strong>1</strong>, area=<strong>3</strong>. Current max: <strong>3</strong>.",
             "html": "<div class='v-label'>HISTOGRAM [1,1,1]</div><div class='v-row'><div class='v-cell v-result'>1</div><div class='v-cell v-result'>1</div><div class='v-cell v-result'>1</div></div><div class='v-row' style='margin-top:8px;'><span class='v-stat'>area: <strong>3</strong></span><span class='v-stat'>maxArea: <strong>3</strong></span></div>",
-            "overlay": "Area: <code>1 \u00d7 3 = 3</code>"
+            "overlay": "Area: <code>1 × 3 = 3</code>"
           },
           {
-            "label": "ROW 1 \u2014 Build Heights",
-            "msg": "Process row <strong>1</strong>: [0, 1, 1]. Column 0: 0 \u2192 height[0]=<strong>0</strong> (reset). Columns 1,2: 1 \u2192 heights[1]=<strong>2</strong>, heights[2]=<strong>2</strong> (grow). Heights: <strong>[0, 2, 2]</strong>.",
+            "label": "ROW 1 — Build Heights",
+            "msg": "Process row <strong>1</strong>: [0, 1, 1]. Column 0: 0 → height[0]=<strong>0</strong> (reset). Columns 1,2: 1 → heights[1]=<strong>2</strong>, heights[2]=<strong>2</strong> (grow). Heights: <strong>[0, 2, 2]</strong>.",
             "html": "<div class='v-label'>ROW 1</div><div class='v-row'><div class='v-cell v-eliminated'>0</div><div class='v-cell v-active'>1</div><div class='v-cell v-active'>1</div></div><div class='v-row' style='margin-top:8px;'><div class='v-label'>HEIGHT HISTOGRAM</div></div><div class='v-row'><div class='v-cell v-eliminated'>0</div><div class='v-cell v-new'>2</div><div class='v-cell v-new'>2</div></div>",
-            "overlay": "Heights: <code>[0, 2, 2]</code> \u2014 column 0 collapsed, columns 1-2 grew"
+            "overlay": "Heights: <code>[0, 2, 2]</code> — column 0 collapsed, columns 1-2 grew"
           },
           {
-            "label": "ROW 1 \u2014 Histogram Area",
-            "msg": "Run histogram algorithm on <strong>[0, 2, 2]</strong>. Max rectangle: width=<strong>2</strong>, height=<strong>2</strong>, area=<strong>4</strong>. Update max: <strong>4</strong>. \u2190 NEW MAX!",
+            "label": "ROW 1 — Histogram Area",
+            "msg": "Run histogram algorithm on <strong>[0, 2, 2]</strong>. Max rectangle: width=<strong>2</strong>, height=<strong>2</strong>, area=<strong>4</strong>. Update max: <strong>4</strong>. ← NEW MAX!",
             "html": "<div class='v-label'>HISTOGRAM [0,2,2]</div><div class='v-row'><div class='v-cell v-eliminated'>0</div><div class='v-cell v-result'>2</div><div class='v-cell v-result'>2</div></div><div class='v-row' style='margin-top:8px;'><span class='v-stat'>area: <strong>4</strong></span><span class='v-stat'>maxArea: <strong>4</strong></span></div>",
-            "overlay": "Area: <code>2 \u00d7 2 = 4</code> \u2014 best so far!"
+            "overlay": "Area: <code>2 × 2 = 4</code> — best so far!"
           },
           {
-            "label": "ROW 2 \u2014 Build Heights",
-            "msg": "Process row <strong>2</strong>: [1, 0, 0]. Column 0: 1 \u2192 height[0]=<strong>1</strong> (restart). Columns 1,2: 0 \u2192 heights[1]=<strong>0</strong>, heights[2]=<strong>0</strong> (collapse). Heights: <strong>[1, 0, 0]</strong>.",
+            "label": "ROW 2 — Build Heights",
+            "msg": "Process row <strong>2</strong>: [1, 0, 0]. Column 0: 1 → height[0]=<strong>1</strong> (restart). Columns 1,2: 0 → heights[1]=<strong>0</strong>, heights[2]=<strong>0</strong> (collapse). Heights: <strong>[1, 0, 0]</strong>.",
             "html": "<div class='v-label'>ROW 2</div><div class='v-row'><div class='v-cell v-active'>1</div><div class='v-cell v-eliminated'>0</div><div class='v-cell v-eliminated'>0</div></div><div class='v-row' style='margin-top:8px;'><div class='v-label'>HEIGHT HISTOGRAM</div></div><div class='v-row'><div class='v-cell v-new'>1</div><div class='v-cell v-eliminated'>0</div><div class='v-cell v-eliminated'>0</div></div>",
             "overlay": "Heights: <code>[1, 0, 0]</code>"
           },
           {
-            "label": "ROW 2 \u2014 Histogram Area",
+            "label": "ROW 2 — Histogram Area",
             "msg": "Run histogram algorithm on <strong>[1, 0, 0]</strong>. Max rectangle: width=<strong>1</strong>, height=<strong>1</strong>, area=<strong>1</strong>. Max stays: <strong>4</strong>.",
             "html": "<div class='v-label'>HISTOGRAM [1,0,0]</div><div class='v-row'><div class='v-cell v-result'>1</div><div class='v-cell v-eliminated'>0</div><div class='v-cell v-eliminated'>0</div></div><div class='v-row' style='margin-top:8px;'><span class='v-stat'>area: <strong>1</strong></span><span class='v-stat'>maxArea: <strong>4</strong></span></div>",
-            "overlay": "Area: <code>1 \u00d7 1 = 1</code>"
+            "overlay": "Area: <code>1 × 1 = 1</code>"
           },
           {
             "label": "DONE",
-            "msg": "\u2705 Maximum rectangle area: <strong>4</strong> (2\u00d72 rectangle from rows 0-1, columns 1-2). Time: <strong>O(N\u00d7M)</strong>, Space: <strong>O(M)</strong>.",
+            "msg": "✅ Maximum rectangle area: <strong>4</strong> (2×2 rectangle from rows 0-1, columns 1-2). Time: <strong>O(N×M)</strong>, Space: <strong>O(M)</strong>.",
             "html": "<div class='v-label'>MATRIX (RESULT)</div><div class='v-matrix'><div class='v-row'><div class='v-cell'>1</div><div class='v-cell v-result'>1</div><div class='v-cell v-result'>1</div></div><div class='v-row'><div class='v-cell'>0</div><div class='v-cell v-result'>1</div><div class='v-cell v-result'>1</div></div><div class='v-row'><div class='v-cell'>1</div><div class='v-cell'>0</div><div class='v-cell'>0</div></div></div><div class='v-row' style='margin-top:12px;'><span class='v-stat'>max area: <strong>4</strong></span></div>",
-            "overlay": "Winner: <code>2\u00d72 rectangle = 4</code>"
+            "overlay": "Winner: <code>2×2 rectangle = 4</code>"
           }
         ]
       }
@@ -1474,9 +1474,9 @@
     "sampleInput": "A = [4, 5, 2, 10, 8]",
     "sampleOutput": "[5, 10, 10, -1, -1]",
     "image": "images/stacks/stacks-13.png",
-    "story": "Scan right to left with a monotonic decreasing stack. Pop smaller or equal elements\u2014they're blocked. The remaining top is the next greater.",
+    "story": "Scan right to left with a monotonic decreasing stack. Pop smaller or equal elements—they're blocked. The remaining top is the next greater.",
     "plain": "Traverse the array from right to left. Maintain a stack that holds values in decreasing order. For each element, pop stack values that are less than or equal to the current element (they can't be next greater). If the stack is empty, no greater element exists (record -1). Otherwise, the stack top is the next greater. Push the current element onto the stack. This ensures each element is processed once, giving O(N) time.",
-    "tale": "Imagine you're walking backwards through a line of sentries, each with a height. For each sentry, you ask: 'Who is the next taller sentry ahead of me?' You keep a memory list (the stack) of sentries ahead, sorted tallest at bottom. When you meet a new sentry, you discard anyone on your list who is shorter or equal\u2014this new sentry blocks them. Whoever remains on top of your list is the next taller. If the list is empty, no one ahead is taller. Add the new sentry to your list and step back.",
+    "tale": "Imagine you're walking backwards through a line of sentries, each with a height. For each sentry, you ask: 'Who is the next taller sentry ahead of me?' You keep a memory list (the stack) of sentries ahead, sorted tallest at bottom. When you meet a new sentry, you discard anyone on your list who is shorter or equal—this new sentry blocks them. Whoever remains on top of your list is the next taller. If the list is empty, no one ahead is taller. Add the new sentry to your list and step back.",
     "solutions": [
       {
         "label": "Optimal",
@@ -1511,7 +1511,7 @@
           10,
           8
         ],
-        "footer": "Next Greater Element \u2014 A = [4, 5, 2, 10, 8]. For each element, find next greater to the right.",
+        "footer": "Next Greater Element — A = [4, 5, 2, 10, 8]. For each element, find next greater to the right.",
         "legend": [
           "c-input",
           "c-active",
@@ -1533,7 +1533,7 @@
               "4": "c-active"
             },
             "ptrs": {},
-            "html": "<div class='v-row'><div class='v-label'>ARRAY</div></div><div class='v-row'><div class='v-cell'>4</div><div class='v-cell'>5</div><div class='v-cell'>2</div><div class='v-cell'>10</div><div class='v-cell v-active'>8</div></div><div class='v-row' style='margin-top:14px;'><div class='v-label'>STACK \u2193</div></div><div style='display:flex;flex-direction:column-reverse;gap:4px;align-items:center;'><div class='v-cell v-new'>8 \u2190 TOP</div></div><div class='v-row' style='margin-top:8px;'><span class='v-stat'>result[4]: <strong>-1</strong></span></div>",
+            "html": "<div class='v-row'><div class='v-label'>ARRAY</div></div><div class='v-row'><div class='v-cell'>4</div><div class='v-cell'>5</div><div class='v-cell'>2</div><div class='v-cell'>10</div><div class='v-cell v-active'>8</div></div><div class='v-row' style='margin-top:14px;'><div class='v-label'>STACK ↓</div></div><div style='display:flex;flex-direction:column-reverse;gap:4px;align-items:center;'><div class='v-cell v-new'>8 ← TOP</div></div><div class='v-row' style='margin-top:8px;'><span class='v-stat'>result[4]: <strong>-1</strong></span></div>",
             "overlay": "Base case: <code>res[N-1] = -1; stack.push(A[N-1]);</code>"
           },
           {
@@ -1544,7 +1544,7 @@
               "4": "c-result"
             },
             "ptrs": {},
-            "html": "<div class='v-row'><div class='v-label'>ARRAY</div></div><div class='v-row'><div class='v-cell'>4</div><div class='v-cell'>5</div><div class='v-cell'>2</div><div class='v-cell v-active'>10</div><div class='v-cell v-result'>8</div></div><div class='v-row' style='margin-top:14px;'><div class='v-label'>STACK \u2193</div></div><div style='display:flex;flex-direction:column-reverse;gap:4px;align-items:center;'><div class='v-cell v-new'>10 \u2190 TOP</div></div><div class='v-row' style='margin-top:8px;'><span class='v-stat'>popped 8</span><span class='v-stat'>result[3]: <strong>-1</strong></span></div>",
+            "html": "<div class='v-row'><div class='v-label'>ARRAY</div></div><div class='v-row'><div class='v-cell'>4</div><div class='v-cell'>5</div><div class='v-cell'>2</div><div class='v-cell v-active'>10</div><div class='v-cell v-result'>8</div></div><div class='v-row' style='margin-top:14px;'><div class='v-label'>STACK ↓</div></div><div style='display:flex;flex-direction:column-reverse;gap:4px;align-items:center;'><div class='v-cell v-new'>10 ← TOP</div></div><div class='v-row' style='margin-top:8px;'><span class='v-stat'>popped 8</span><span class='v-stat'>result[3]: <strong>-1</strong></span></div>",
             "overlay": "Pop smaller: <code>while (8 <= 10) pop</code>"
           },
           {
@@ -1556,7 +1556,7 @@
               "4": "c-result"
             },
             "ptrs": {},
-            "html": "<div class='v-row'><div class='v-label'>ARRAY</div></div><div class='v-row'><div class='v-cell'>4</div><div class='v-cell'>5</div><div class='v-cell v-active'>2</div><div class='v-cell v-result'>10</div><div class='v-cell v-result'>8</div></div><div class='v-row' style='margin-top:14px;'><div class='v-label'>STACK \u2193</div></div><div style='display:flex;flex-direction:column-reverse;gap:4px;align-items:center;'><div class='v-cell v-new'>2 \u2190 TOP</div><div class='v-cell v-result'>10</div></div><div class='v-row' style='margin-top:8px;'><span class='v-stat'>result[2]: <strong>10</strong></span></div>",
+            "html": "<div class='v-row'><div class='v-label'>ARRAY</div></div><div class='v-row'><div class='v-cell'>4</div><div class='v-cell'>5</div><div class='v-cell v-active'>2</div><div class='v-cell v-result'>10</div><div class='v-cell v-result'>8</div></div><div class='v-row' style='margin-top:14px;'><div class='v-label'>STACK ↓</div></div><div style='display:flex;flex-direction:column-reverse;gap:4px;align-items:center;'><div class='v-cell v-new'>2 ← TOP</div><div class='v-cell v-result'>10</div></div><div class='v-row' style='margin-top:8px;'><span class='v-stat'>result[2]: <strong>10</strong></span></div>",
             "overlay": "Keep 10: <code>10 > 2</code>, push 2"
           },
           {
@@ -1569,7 +1569,7 @@
               "4": "c-result"
             },
             "ptrs": {},
-            "html": "<div class='v-row'><div class='v-label'>ARRAY</div></div><div class='v-row'><div class='v-cell'>4</div><div class='v-cell v-active'>5</div><div class='v-cell v-eliminated'>2</div><div class='v-cell v-result'>10</div><div class='v-cell v-result'>8</div></div><div class='v-row' style='margin-top:14px;'><div class='v-label'>STACK \u2193</div></div><div style='display:flex;flex-direction:column-reverse;gap:4px;align-items:center;'><div class='v-cell v-new'>5 \u2190 TOP</div><div class='v-cell v-result'>10</div></div><div class='v-row' style='margin-top:8px;'><span class='v-stat'>popped 2</span><span class='v-stat'>result[1]: <strong>10</strong></span></div>",
+            "html": "<div class='v-row'><div class='v-label'>ARRAY</div></div><div class='v-row'><div class='v-cell'>4</div><div class='v-cell v-active'>5</div><div class='v-cell v-eliminated'>2</div><div class='v-cell v-result'>10</div><div class='v-cell v-result'>8</div></div><div class='v-row' style='margin-top:14px;'><div class='v-label'>STACK ↓</div></div><div style='display:flex;flex-direction:column-reverse;gap:4px;align-items:center;'><div class='v-cell v-new'>5 ← TOP</div><div class='v-cell v-result'>10</div></div><div class='v-row' style='margin-top:8px;'><span class='v-stat'>popped 2</span><span class='v-stat'>result[1]: <strong>10</strong></span></div>",
             "overlay": "Pop 2: <code>2 <= 5</code>, keep 10, push 5"
           },
           {
@@ -1583,12 +1583,12 @@
               "4": "c-result"
             },
             "ptrs": {},
-            "html": "<div class='v-row'><div class='v-label'>ARRAY</div></div><div class='v-row'><div class='v-cell v-active'>4</div><div class='v-cell v-result'>5</div><div class='v-cell v-eliminated'>2</div><div class='v-cell v-result'>10</div><div class='v-cell v-result'>8</div></div><div class='v-row' style='margin-top:14px;'><div class='v-label'>STACK \u2193</div></div><div style='display:flex;flex-direction:column-reverse;gap:4px;align-items:center;'><div class='v-cell v-new'>4 \u2190 TOP</div><div class='v-cell v-result'>5</div><div class='v-cell v-result'>10</div></div><div class='v-row' style='margin-top:8px;'><span class='v-stat'>result[0]: <strong>5</strong></span></div>",
+            "html": "<div class='v-row'><div class='v-label'>ARRAY</div></div><div class='v-row'><div class='v-cell v-active'>4</div><div class='v-cell v-result'>5</div><div class='v-cell v-eliminated'>2</div><div class='v-cell v-result'>10</div><div class='v-cell v-result'>8</div></div><div class='v-row' style='margin-top:14px;'><div class='v-label'>STACK ↓</div></div><div style='display:flex;flex-direction:column-reverse;gap:4px;align-items:center;'><div class='v-cell v-new'>4 ← TOP</div><div class='v-cell v-result'>5</div><div class='v-cell v-result'>10</div></div><div class='v-row' style='margin-top:8px;'><span class='v-stat'>result[0]: <strong>5</strong></span></div>",
             "overlay": "Keep 5: <code>5 > 4</code>, push 4"
           },
           {
             "label": "DONE",
-            "msg": "\u2705 Result: <strong>[5, 10, 10, -1, -1]</strong>. Each element found its next greater to the right in <strong>O(N)</strong> time using monotonic decreasing stack.",
+            "msg": "✅ Result: <strong>[5, 10, 10, -1, -1]</strong>. Each element found its next greater to the right in <strong>O(N)</strong> time using monotonic decreasing stack.",
             "marks": {
               "0": "c-result",
               "1": "c-result",
@@ -1623,7 +1623,7 @@
       {
         "label": "Optimal",
         "complexity": {
-          "time": "O(N\u00b2)",
+          "time": "O(N²)",
           "space": "O(N)"
         },
         "plain": "Pop elements from input one by one. For each element, compare with sorted's top. If sorted is empty or sorted.peek() <= element, push element onto sorted. Otherwise, pop from sorted and push back to input until you find the correct position (or sorted becomes empty), then push element onto sorted. Continue until input is empty. Finally, pop all from sorted into a result array (largest to smallest), then reverse to get ascending order.",
@@ -1642,7 +1642,7 @@
           "Return the result array."
         ],
         "pseudocode": "// Load input stack\ninput = stack from A\nsorted = empty\nwhile !input.isEmpty():\n  x = input.pop()\n  count = 0\n  while !sorted.isEmpty() && sorted.peek() > x:\n    input.push(sorted.pop())\n    count++\n  sorted.push(x)\n  while count > 0:\n    sorted.push(input.pop())\n    count--\n// Convert sorted to array\nres = []\nfor i = N-1 downto 0:\n  res[i] = sorted.pop()\nreturn res",
-        "story": "Transfer from input to sorted, moving larger elements back temporarily. O(N\u00b2) time, O(N) space.",
+        "story": "Transfer from input to sorted, moving larger elements back temporarily. O(N²) time, O(N) space.",
         "code": "public int[] sortStackUsingAnotherStack(int[] A) {\n    int N = A.length;\n    Stack<Integer> stack = new Stack<>();\n    Stack<Integer> sorted = new Stack<>();\n    for (int x : A) {\n        stack.push(x);\n    }\n    while (!stack.isEmpty()) {\n        int x = stack.pop();\n        if (sorted.isEmpty()) {\n            sorted.push(x);\n        } else if (sorted.peek() <= x) {\n            sorted.push(x);\n        } else {\n            int count = 0;\n            while (!sorted.isEmpty() && sorted.peek() >= x) {\n                count++;\n                stack.push(sorted.pop());\n            }\n            sorted.push(x);\n            while (count != 0) {\n                sorted.push(stack.pop());\n                count--;\n            }\n        }\n    }\n    int[] ans = new int[N];\n    for (int i = N - 1; i >= 0; i--) {\n        ans[i] = sorted.pop();\n    }\n    return ans;\n}"
       }
     ],
@@ -1656,7 +1656,7 @@
           2,
           1
         ],
-        "footer": "Sort Stack Using Another Stack \u2014 transfer elements maintaining sorted order in auxiliary stack",
+        "footer": "Sort Stack Using Another Stack — transfer elements maintaining sorted order in auxiliary stack",
         "legend": [
           "c-input",
           "c-active",
@@ -1667,48 +1667,48 @@
           {
             "label": "SETUP",
             "msg": "Input: <strong>[5, 4, 3, 2, 1]</strong>. Goal: sort using two stacks. Left stack (input) holds unsorted. Right stack (sorted) will hold sorted (bottom=smallest, top=largest).",
-            "html": "<div style='display:flex;gap:32px;justify-content:center;'><div><div class='v-label'>INPUT \u2193</div><div style='display:flex;flex-direction:column-reverse;gap:4px;align-items:center;'><div class='v-cell'>1 \u2190 TOP</div><div class='v-cell'>2</div><div class='v-cell'>3</div><div class='v-cell'>4</div><div class='v-cell'>5</div></div></div><div><div class='v-label'>SORTED \u2193</div><div style='display:flex;flex-direction:column-reverse;gap:4px;align-items:center;'><div class='v-cell v-null'>EMPTY</div></div></div></div>",
+            "html": "<div style='display:flex;gap:32px;justify-content:center;'><div><div class='v-label'>INPUT ↓</div><div style='display:flex;flex-direction:column-reverse;gap:4px;align-items:center;'><div class='v-cell'>1 ← TOP</div><div class='v-cell'>2</div><div class='v-cell'>3</div><div class='v-cell'>4</div><div class='v-cell'>5</div></div></div><div><div class='v-label'>SORTED ↓</div><div style='display:flex;flex-direction:column-reverse;gap:4px;align-items:center;'><div class='v-cell v-null'>EMPTY</div></div></div></div>",
             "overlay": "Algorithm: <code>while (!input.isEmpty()) { x = pop; transfer to sorted }</code>"
           },
           {
-            "label": "STEP 1 \u2014 Pop 1",
+            "label": "STEP 1 — Pop 1",
             "msg": "Pop <strong>1</strong> from input. Sorted is empty. Push <strong>1</strong> to sorted. Sorted: <strong>[1]</strong>. Input: <strong>[5,4,3,2]</strong>.",
-            "html": "<div style='display:flex;gap:32px;justify-content:center;'><div><div class='v-label'>INPUT \u2193</div><div style='display:flex;flex-direction:column-reverse;gap:4px;align-items:center;'><div class='v-cell v-result'>2 \u2190 TOP</div><div class='v-cell v-result'>3</div><div class='v-cell v-result'>4</div><div class='v-cell v-result'>5</div></div></div><div><div class='v-label'>SORTED \u2193</div><div style='display:flex;flex-direction:column-reverse;gap:4px;align-items:center;'><div class='v-cell v-new'>1 \u2190 TOP</div></div></div></div><div class='v-row' style='margin-top:8px;'><span class='v-stat'>popped: <strong>1</strong></span></div>",
+            "html": "<div style='display:flex;gap:32px;justify-content:center;'><div><div class='v-label'>INPUT ↓</div><div style='display:flex;flex-direction:column-reverse;gap:4px;align-items:center;'><div class='v-cell v-result'>2 ← TOP</div><div class='v-cell v-result'>3</div><div class='v-cell v-result'>4</div><div class='v-cell v-result'>5</div></div></div><div><div class='v-label'>SORTED ↓</div><div style='display:flex;flex-direction:column-reverse;gap:4px;align-items:center;'><div class='v-cell v-new'>1 ← TOP</div></div></div></div><div class='v-row' style='margin-top:8px;'><span class='v-stat'>popped: <strong>1</strong></span></div>",
             "overlay": "Push directly: <code>sorted.push(1);</code>"
           },
           {
-            "label": "STEP 2 \u2014 Pop 2",
+            "label": "STEP 2 — Pop 2",
             "msg": "Pop <strong>2</strong> from input. Sorted.peek() = <strong>1 <= 2</strong>. Push <strong>2</strong> to sorted. Sorted: <strong>[1, 2]</strong>. Input: <strong>[5,4,3]</strong>.",
-            "html": "<div style='display:flex;gap:32px;justify-content:center;'><div><div class='v-label'>INPUT \u2193</div><div style='display:flex;flex-direction:column-reverse;gap:4px;align-items:center;'><div class='v-cell v-result'>3 \u2190 TOP</div><div class='v-cell v-result'>4</div><div class='v-cell v-result'>5</div></div></div><div><div class='v-label'>SORTED \u2193</div><div style='display:flex;flex-direction:column-reverse;gap:4px;align-items:center;'><div class='v-cell v-new'>2 \u2190 TOP</div><div class='v-cell v-result'>1</div></div></div></div><div class='v-row' style='margin-top:8px;'><span class='v-stat'>popped: <strong>2</strong></span></div>",
+            "html": "<div style='display:flex;gap:32px;justify-content:center;'><div><div class='v-label'>INPUT ↓</div><div style='display:flex;flex-direction:column-reverse;gap:4px;align-items:center;'><div class='v-cell v-result'>3 ← TOP</div><div class='v-cell v-result'>4</div><div class='v-cell v-result'>5</div></div></div><div><div class='v-label'>SORTED ↓</div><div style='display:flex;flex-direction:column-reverse;gap:4px;align-items:center;'><div class='v-cell v-new'>2 ← TOP</div><div class='v-cell v-result'>1</div></div></div></div><div class='v-row' style='margin-top:8px;'><span class='v-stat'>popped: <strong>2</strong></span></div>",
             "overlay": "In order: <code>1 <= 2</code>, push 2"
           },
           {
-            "label": "STEP 3 \u2014 Pop 3",
+            "label": "STEP 3 — Pop 3",
             "msg": "Pop <strong>3</strong> from input. Sorted.peek() = <strong>2 <= 3</strong>. Push <strong>3</strong> to sorted. Sorted: <strong>[1, 2, 3]</strong>. Input: <strong>[5,4]</strong>.",
-            "html": "<div style='display:flex;gap:32px;justify-content:center;'><div><div class='v-label'>INPUT \u2193</div><div style='display:flex;flex-direction:column-reverse;gap:4px;align-items:center;'><div class='v-cell v-result'>4 \u2190 TOP</div><div class='v-cell v-result'>5</div></div></div><div><div class='v-label'>SORTED \u2193</div><div style='display:flex;flex-direction:column-reverse;gap:4px;align-items:center;'><div class='v-cell v-new'>3 \u2190 TOP</div><div class='v-cell v-result'>2</div><div class='v-cell v-result'>1</div></div></div></div><div class='v-row' style='margin-top:8px;'><span class='v-stat'>popped: <strong>3</strong></span></div>",
+            "html": "<div style='display:flex;gap:32px;justify-content:center;'><div><div class='v-label'>INPUT ↓</div><div style='display:flex;flex-direction:column-reverse;gap:4px;align-items:center;'><div class='v-cell v-result'>4 ← TOP</div><div class='v-cell v-result'>5</div></div></div><div><div class='v-label'>SORTED ↓</div><div style='display:flex;flex-direction:column-reverse;gap:4px;align-items:center;'><div class='v-cell v-new'>3 ← TOP</div><div class='v-cell v-result'>2</div><div class='v-cell v-result'>1</div></div></div></div><div class='v-row' style='margin-top:8px;'><span class='v-stat'>popped: <strong>3</strong></span></div>",
             "overlay": "In order: <code>2 <= 3</code>, push 3"
           },
           {
-            "label": "STEP 4 \u2014 Pop 4",
+            "label": "STEP 4 — Pop 4",
             "msg": "Pop <strong>4</strong> from input. Sorted.peek() = <strong>3 <= 4</strong>. Push <strong>4</strong> to sorted. Sorted: <strong>[1, 2, 3, 4]</strong>. Input: <strong>[5]</strong>.",
-            "html": "<div style='display:flex;gap:32px;justify-content:center;'><div><div class='v-label'>INPUT \u2193</div><div style='display:flex;flex-direction:column-reverse;gap:4px;align-items:center;'><div class='v-cell v-result'>5 \u2190 TOP</div></div></div><div><div class='v-label'>SORTED \u2193</div><div style='display:flex;flex-direction:column-reverse;gap:4px;align-items:center;'><div class='v-cell v-new'>4 \u2190 TOP</div><div class='v-cell v-result'>3</div><div class='v-cell v-result'>2</div><div class='v-cell v-result'>1</div></div></div></div><div class='v-row' style='margin-top:8px;'><span class='v-stat'>popped: <strong>4</strong></span></div>",
+            "html": "<div style='display:flex;gap:32px;justify-content:center;'><div><div class='v-label'>INPUT ↓</div><div style='display:flex;flex-direction:column-reverse;gap:4px;align-items:center;'><div class='v-cell v-result'>5 ← TOP</div></div></div><div><div class='v-label'>SORTED ↓</div><div style='display:flex;flex-direction:column-reverse;gap:4px;align-items:center;'><div class='v-cell v-new'>4 ← TOP</div><div class='v-cell v-result'>3</div><div class='v-cell v-result'>2</div><div class='v-cell v-result'>1</div></div></div></div><div class='v-row' style='margin-top:8px;'><span class='v-stat'>popped: <strong>4</strong></span></div>",
             "overlay": "In order: <code>3 <= 4</code>, push 4"
           },
           {
-            "label": "STEP 5 \u2014 Pop 5",
+            "label": "STEP 5 — Pop 5",
             "msg": "Pop <strong>5</strong> from input. Sorted.peek() = <strong>4 <= 5</strong>. Push <strong>5</strong> to sorted. Sorted: <strong>[1, 2, 3, 4, 5]</strong>. Input: <strong>EMPTY</strong>.",
-            "html": "<div style='display:flex;gap:32px;justify-content:center;'><div><div class='v-label'>INPUT \u2193</div><div style='display:flex;flex-direction:column-reverse;gap:4px;align-items:center;'><div class='v-cell v-null'>EMPTY</div></div></div><div><div class='v-label'>SORTED \u2193</div><div style='display:flex;flex-direction:column-reverse;gap:4px;align-items:center;'><div class='v-cell v-new'>5 \u2190 TOP</div><div class='v-cell v-result'>4</div><div class='v-cell v-result'>3</div><div class='v-cell v-result'>2</div><div class='v-cell v-result'>1</div></div></div></div><div class='v-row' style='margin-top:8px;'><span class='v-stat'>popped: <strong>5</strong></span></div>",
+            "html": "<div style='display:flex;gap:32px;justify-content:center;'><div><div class='v-label'>INPUT ↓</div><div style='display:flex;flex-direction:column-reverse;gap:4px;align-items:center;'><div class='v-cell v-null'>EMPTY</div></div></div><div><div class='v-label'>SORTED ↓</div><div style='display:flex;flex-direction:column-reverse;gap:4px;align-items:center;'><div class='v-cell v-new'>5 ← TOP</div><div class='v-cell v-result'>4</div><div class='v-cell v-result'>3</div><div class='v-cell v-result'>2</div><div class='v-cell v-result'>1</div></div></div></div><div class='v-row' style='margin-top:8px;'><span class='v-stat'>popped: <strong>5</strong></span></div>",
             "overlay": "In order: <code>4 <= 5</code>, push 5"
           },
           {
-            "label": "CONVERT \u2014 Pop to Array",
+            "label": "CONVERT — Pop to Array",
             "msg": "Input empty. Pop sorted stack into array (top to bottom): <strong>[5, 4, 3, 2, 1]</strong>. Reverse to get ascending: <strong>[1, 2, 3, 4, 5]</strong>.",
-            "html": "<div class='v-row'><div class='v-label'>SORTED STACK \u2192 ARRAY</div></div><div class='v-row'><div class='v-cell v-result'>5</div><div class='v-cell v-result'>4</div><div class='v-cell v-result'>3</div><div class='v-cell v-result'>2</div><div class='v-cell v-result'>1</div></div><div class='v-row' style='margin-top:12px;'><div class='v-label'>REVERSED (FINAL)</div></div><div class='v-row'><div class='v-cell v-result'>1</div><div class='v-cell v-result'>2</div><div class='v-cell v-result'>3</div><div class='v-cell v-result'>4</div><div class='v-cell v-result'>5</div></div>",
+            "html": "<div class='v-row'><div class='v-label'>SORTED STACK → ARRAY</div></div><div class='v-row'><div class='v-cell v-result'>5</div><div class='v-cell v-result'>4</div><div class='v-cell v-result'>3</div><div class='v-cell v-result'>2</div><div class='v-cell v-result'>1</div></div><div class='v-row' style='margin-top:12px;'><div class='v-label'>REVERSED (FINAL)</div></div><div class='v-row'><div class='v-cell v-result'>1</div><div class='v-cell v-result'>2</div><div class='v-cell v-result'>3</div><div class='v-cell v-result'>4</div><div class='v-cell v-result'>5</div></div>",
             "overlay": "Convert: <code>for i = N-1 downto 0: ans[i] = sorted.pop();</code>"
           },
           {
             "label": "DONE",
-            "msg": "\u2705 Stack sorted: <strong>[1, 2, 3, 4, 5]</strong>. Used one auxiliary stack. Time: <strong>O(N\u00b2)</strong>, Space: <strong>O(N)</strong>.",
+            "msg": "✅ Stack sorted: <strong>[1, 2, 3, 4, 5]</strong>. Used one auxiliary stack. Time: <strong>O(N²)</strong>, Space: <strong>O(N)</strong>.",
             "html": "<div class='v-row'><div class='v-label'>RESULT (SORTED)</div></div><div class='v-row'><div class='v-cell v-result'>1</div><div class='v-cell v-result'>2</div><div class='v-cell v-result'>3</div><div class='v-cell v-result'>4</div><div class='v-cell v-result'>5</div></div>",
             "overlay": "Final: <code>return [1, 2, 3, 4, 5];</code>"
           }

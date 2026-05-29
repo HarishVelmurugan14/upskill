@@ -3,7 +3,13 @@
     "id": "queues-parking-ice-cream-truck",
     "title": "Parking Ice Cream Truck (Sliding Window Maximum)",
     "subTopic": "Deque for Sliding Window Max",
-    "tags": ["Queue", "Deque", "Sliding Window", "Monotonic Deque", "Maximum"],
+    "tags": [
+      "Queue",
+      "Deque",
+      "Sliding Window",
+      "Monotonic Deque",
+      "Maximum"
+    ],
     "description": "Imagine you're an ice cream truck driver in a beachside town. The beach is divided into several sections, and each section has varying numbers of beachgoers wanting ice cream given by the array of integers A.\n\nFor simplicity, let's say the beach is divided into 8 sections. One day, you note down the number of potential customers in each section: [5, 12, 3, 4, 8, 10, 2, 7]. This means there are 5 people in the first section, 12 in the second, and so on.\n\nYou can only stop your truck in B consecutive sections at a time because of parking restrictions. To maximize sales, you want to park where the most customers are clustered together.\n\nFor all B consecutive sections, identify the busiest stretch to park your ice cream truck and serve the most customers. Return an array C, where C[i] is the busiest section in each of the B consecutive sections.\n\nNOTE: If B > length of the array, return 1 element with the max of the array.",
     "sampleInput": "A = [5, 12, 3, 4, 8, 10, 2, 7]\nB = 3",
     "sampleOutput": "[12, 12, 8, 10, 10, 10]",
@@ -14,7 +20,10 @@
     "solutions": [
       {
         "label": "Optimal",
-        "complexity": { "time": "O(N)", "space": "O(B)" },
+        "complexity": {
+          "time": "O(N)",
+          "space": "O(B)"
+        },
         "plain": "Use a deque to maintain indices of array elements in decreasing order. For each element, remove all indices from the back whose values are smaller than the current element, then add the current index. When the window is fully formed (i >= B-1), the front of the deque holds the max for that window. Before moving to the next window, remove the front if it's about to leave the window.",
         "tale": "The vendor walks the boardwalk with the magic notebook. At each step, the vendor glances at the new section entering the window. If this section is busier than the last few scribbled notes, the vendor erases those notes — they are now irrelevant. The vendor then writes the new section at the bottom. The note at the top of the page is always the busiest section currently in view. When the window slides forward, the vendor checks: is the top note about to leave the window? If yes, tear it off.",
         "approach": [
@@ -33,9 +42,25 @@
     "viz": {
       "kind": "scripted-array",
       "data": {
-        "A": [5, 12, 3, 4, 8, 10, 2, 7],
+        "A": [
+          5,
+          12,
+          3,
+          4,
+          8,
+          10,
+          2,
+          7
+        ],
         "footer": "Sliding window maximum using deque — A = [5, 12, 3, 4, 8, 10, 2, 7], B = 3. Deque maintains indices in decreasing order of values.",
-        "legend": ["c-input", "c-active", "c-low", "c-high", "c-result", "c-eliminated"],
+        "legend": [
+          "c-input",
+          "c-active",
+          "c-low",
+          "c-high",
+          "c-result",
+          "c-eliminated"
+        ],
         "script": [
           {
             "label": "SETUP",
@@ -44,53 +69,82 @@
           },
           {
             "label": "i=0 — Add first section",
-            "marks": {"0": "c-active"},
+            "marks": {
+              "0": "c-active"
+            },
             "msg": "Section <strong>0</strong>: A[0] = <strong>5</strong>. Deque is empty, add index <strong>0</strong>. Window not yet formed (need 3 elements).",
             "html": "<div class='v-label'>ARRAY</div><div class='v-row'><div class='v-cell v-active'>5</div><div class='v-cell'>12</div><div class='v-cell'>3</div><div class='v-cell'>4</div><div class='v-cell'>8</div><div class='v-cell'>10</div><div class='v-cell'>2</div><div class='v-cell'>7</div></div><div class='v-label' style='margin-top:12px;'>DEQUE (indices)</div><div class='v-row'><div class='v-cell v-active'>0</div></div><div class='v-row' style='margin-top:8px;'><span class='v-stat'>window incomplete</span></div>",
             "overlay": "<code>deque = [0]</code> // storing indices, not values"
           },
           {
             "label": "i=1 — Section 12 enters",
-            "marks": {"0": "c-eliminated", "1": "c-active"},
+            "marks": {
+              "0": "c-eliminated",
+              "1": "c-active"
+            },
             "msg": "Section <strong>1</strong>: A[1] = <strong>12</strong>. Compare with deque back: A[0]=5 &lt; 12, so <strong>remove index 0</strong> (it can never be max now). Add index <strong>1</strong>. Window still incomplete.",
             "html": "<div class='v-label'>ARRAY</div><div class='v-row'><div class='v-cell v-eliminated'>5</div><div class='v-cell v-active'>12</div><div class='v-cell'>3</div><div class='v-cell'>4</div><div class='v-cell'>8</div><div class='v-cell'>10</div><div class='v-cell'>2</div><div class='v-cell'>7</div></div><div class='v-label' style='margin-top:12px;'>DEQUE (indices)</div><div class='v-row'><div class='v-cell v-active'>1</div></div><div class='v-row' style='margin-top:8px;'><span class='v-stat'>deque values: [12]</span></div>",
             "overlay": "Eviction rule: <code>while A[i] &gt;= A[deque.back()], deque.pop_back()</code>"
           },
           {
             "label": "i=2 — First window complete",
-            "marks": {"0": "c-low", "1": "c-result", "2": "c-high"},
+            "marks": {
+              "0": "c-low",
+              "1": "c-result",
+              "2": "c-high"
+            },
             "msg": "Section <strong>2</strong>: A[2] = <strong>3</strong>. Compare: 3 &lt; 12, so keep index 1 and add index <strong>2</strong>. Window <strong>[0, 1, 2]</strong> is complete! Front of deque = index <strong>1</strong> → max = <strong>A[1] = 12</strong>. Record <strong>12</strong> as first answer.",
             "html": "<div class='v-label'>WINDOW [0-2]</div><div class='v-row'><div class='v-cell v-low'>5</div><div class='v-cell v-result'>12</div><div class='v-cell v-high'>3</div><div class='v-cell'>4</div><div class='v-cell'>8</div><div class='v-cell'>10</div><div class='v-cell'>2</div><div class='v-cell'>7</div></div><div class='v-label' style='margin-top:12px;'>DEQUE (indices)</div><div class='v-row'><div class='v-cell v-result'>1</div><div class='v-cell'>2</div></div><div class='v-row' style='margin-top:8px;'><span class='v-stat'>result[0] = <strong>12</strong></span></div>",
             "overlay": "<code>deque.front() = 1</code> → <code>A[1] = 12</code> is the max for window [0, 2]"
           },
           {
             "label": "i=3 — Window slides",
-            "marks": {"1": "c-low", "2": "c-active", "3": "c-high"},
+            "marks": {
+              "1": "c-low",
+              "2": "c-active",
+              "3": "c-high"
+            },
             "msg": "Section <strong>3</strong>: A[3] = <strong>4</strong>. Compare: 4 &gt; 3, so <strong>remove index 2</strong>. Add index <strong>3</strong>. Window <strong>[1, 2, 3]</strong>. Front = index <strong>1</strong> → max = <strong>12</strong>. Index 0 already out of window.",
             "html": "<div class='v-label'>WINDOW [1-3]</div><div class='v-row'><div class='v-cell'>5</div><div class='v-cell v-low'>12</div><div class='v-cell v-eliminated'>3</div><div class='v-cell v-high'>4</div><div class='v-cell'>8</div><div class='v-cell'>10</div><div class='v-cell'>2</div><div class='v-cell'>7</div></div><div class='v-label' style='margin-top:12px;'>DEQUE</div><div class='v-row'><div class='v-cell v-result'>1</div><div class='v-cell'>3</div></div><div class='v-row' style='margin-top:8px;'><span class='v-stat'>result[1] = <strong>12</strong></span></div>"
           },
           {
             "label": "i=4 — Section 8 enters",
-            "marks": {"2": "c-low", "3": "c-active", "4": "c-high"},
+            "marks": {
+              "2": "c-low",
+              "3": "c-active",
+              "4": "c-high"
+            },
             "msg": "Section <strong>4</strong>: A[4] = <strong>8</strong>. Compare: 8 &lt; 12 but 8 &gt; 4, so <strong>remove index 3</strong>. Add index <strong>4</strong>. Window <strong>[2, 3, 4]</strong>. Front = index <strong>1</strong>, but index 1 is now <strong>out of window</strong> → remove it! New front = index <strong>4</strong> → max = <strong>8</strong>.",
             "html": "<div class='v-label'>WINDOW [2-4]</div><div class='v-row'><div class='v-cell'>5</div><div class='v-cell'>12</div><div class='v-cell v-low'>3</div><div class='v-cell v-eliminated'>4</div><div class='v-cell v-high'>8</div><div class='v-cell'>10</div><div class='v-cell'>2</div><div class='v-cell'>7</div></div><div class='v-label' style='margin-top:12px;'>DEQUE</div><div class='v-row'><div class='v-cell v-result'>4</div></div><div class='v-row' style='margin-top:8px;'><span class='v-stat'>result[2] = <strong>8</strong></span></div>",
             "overlay": "Check: <code>if deque.front() &lt; i - B + 1, deque.pop_front()</code> // remove stale indices"
           },
           {
             "label": "i=5 — Section 10 enters",
-            "marks": {"3": "c-low", "4": "c-eliminated", "5": "c-high"},
+            "marks": {
+              "3": "c-low",
+              "4": "c-eliminated",
+              "5": "c-high"
+            },
             "msg": "Section <strong>5</strong>: A[5] = <strong>10</strong>. Compare: 10 &gt; 8, so <strong>remove index 4</strong>. Add index <strong>5</strong>. Window <strong>[3, 4, 5]</strong>. Front = index <strong>5</strong> → max = <strong>10</strong>.",
             "html": "<div class='v-label'>WINDOW [3-5]</div><div class='v-row'><div class='v-cell'>5</div><div class='v-cell'>12</div><div class='v-cell'>3</div><div class='v-cell v-low'>4</div><div class='v-cell v-eliminated'>8</div><div class='v-cell v-high'>10</div><div class='v-cell'>2</div><div class='v-cell'>7</div></div><div class='v-label' style='margin-top:12px;'>DEQUE</div><div class='v-row'><div class='v-cell v-result'>5</div></div><div class='v-row' style='margin-top:8px;'><span class='v-stat'>result[3] = <strong>10</strong></span></div>"
           },
           {
             "label": "i=6 — Section 2 enters",
-            "marks": {"4": "c-low", "5": "c-active", "6": "c-high"},
+            "marks": {
+              "4": "c-low",
+              "5": "c-active",
+              "6": "c-high"
+            },
             "msg": "Section <strong>6</strong>: A[6] = <strong>2</strong>. Compare: 2 &lt; 10, so keep index 5 and add index <strong>6</strong>. Window <strong>[4, 5, 6]</strong>. Front = index <strong>5</strong> → max = <strong>10</strong>.",
             "html": "<div class='v-label'>WINDOW [4-6]</div><div class='v-row'><div class='v-cell'>5</div><div class='v-cell'>12</div><div class='v-cell'>3</div><div class='v-cell'>4</div><div class='v-cell v-low'>8</div><div class='v-cell v-result'>10</div><div class='v-cell v-high'>2</div><div class='v-cell'>7</div></div><div class='v-label' style='margin-top:12px;'>DEQUE</div><div class='v-row'><div class='v-cell v-result'>5</div><div class='v-cell'>6</div></div><div class='v-row' style='margin-top:8px;'><span class='v-stat'>result[4] = <strong>10</strong></span></div>"
           },
           {
             "label": "i=7 — Last window",
-            "marks": {"5": "c-low", "6": "c-active", "7": "c-high"},
+            "marks": {
+              "5": "c-low",
+              "6": "c-active",
+              "7": "c-high"
+            },
             "msg": "Section <strong>7</strong>: A[7] = <strong>7</strong>. Compare: 7 &gt; 2, so <strong>remove index 6</strong>. Add index <strong>7</strong>. Window <strong>[5, 6, 7]</strong>. Front = index <strong>5</strong> → max = <strong>10</strong>.",
             "html": "<div class='v-label'>WINDOW [5-7]</div><div class='v-row'><div class='v-cell'>5</div><div class='v-cell'>12</div><div class='v-cell'>3</div><div class='v-cell'>4</div><div class='v-cell'>8</div><div class='v-cell v-low'>10</div><div class='v-cell v-eliminated'>2</div><div class='v-cell v-high'>7</div></div><div class='v-label' style='margin-top:12px;'>DEQUE</div><div class='v-row'><div class='v-cell v-result'>5</div><div class='v-cell'>7</div></div><div class='v-row' style='margin-top:8px;'><span class='v-stat'>result[5] = <strong>10</strong></span></div>"
           },
@@ -108,7 +162,13 @@
     "id": "queues-implement-using-stacks",
     "title": "Implement Queue Using Two Stacks",
     "subTopic": "Queue Implementation",
-    "tags": ["Queue", "Stack", "Design", "Two Stacks", "Amortized O(1)"],
+    "tags": [
+      "Queue",
+      "Stack",
+      "Design",
+      "Two Stacks",
+      "Amortized O(1)"
+    ],
     "description": "Implement a First In First Out (FIFO) queue using stacks only.\n\nThe implemented queue should support all the functions of a normal queue (push, peek, pop, and empty).\n\nImplement the UserQueue class:\n• void push(int X): Pushes element X to the back of the queue.\n• int pop(): Removes the element from the front of the queue and returns it.\n• int peek(): Returns the element at the front of the queue.\n• boolean empty(): Returns true if the queue is empty, false otherwise.\n\nNOTES:\n• You must use only standard operations of a stack, which means only push to top, peek/pop from top, size, and is empty operations are valid.\n• Depending on your language, the stack may not be supported natively. You may simulate a stack using a list or deque (double-ended queue) as long as you use only a stack's standard operations.",
     "sampleInput": "UserQueue q = new UserQueue();\nq.push(3);\nq.push(4);\nq.push(5);\nq.push(6);\nq.peek();  // returns 3\nq.pop();   // returns 3\nq.push(7);\nq.peek();  // returns 4",
     "sampleOutput": "3\n3\n4",
@@ -119,7 +179,10 @@
     "solutions": [
       {
         "label": "Optimal",
-        "complexity": { "time": "O(1) amortized", "space": "O(N)" },
+        "complexity": {
+          "time": "O(1) amortized",
+          "space": "O(N)"
+        },
         "plain": "Maintain two stacks: inputStack for new elements, outputStack for serving. Push always goes to inputStack. Pop and peek take from outputStack; if outputStack is empty, transfer all elements from inputStack to outputStack (this reverses the order). Each element is moved at most twice, making all operations amortized O(1).",
         "tale": "The helper stands between two counters. New orders always land on the left counter. When a customer asks for their food, the helper looks at the right counter. If it's empty, the helper grabs the whole left pile and flips it to the right — in one smooth motion, reversing the stack. Now the oldest order is on top of the right pile, ready to serve. The helper serves it and hands it to the customer. If the right counter already had orders, the helper just serves the top one without touching the left counter.",
         "approach": [
@@ -138,9 +201,19 @@
     "viz": {
       "kind": "scripted-array",
       "data": {
-        "A": [3, 4, 5, 6],
+        "A": [
+          3,
+          4,
+          5,
+          6
+        ],
         "footer": "Queue using two stacks — operations: push(3,4,5,6), peek(), pop(), push(7), peek(). Amortized O(1) per operation.",
-        "legend": ["c-input", "c-active", "c-result", "c-eliminated"],
+        "legend": [
+          "c-input",
+          "c-active",
+          "c-result",
+          "c-eliminated"
+        ],
         "script": [
           {
             "label": "SETUP",
@@ -197,7 +270,12 @@
     "id": "queues-n-integers-containing-123",
     "title": "N Integers Containing Only 1, 2, and 3",
     "subTopic": "BFS Generation with Queue",
-    "tags": ["Queue", "BFS", "Number Generation", "Level Order"],
+    "tags": [
+      "Queue",
+      "BFS",
+      "Number Generation",
+      "Level Order"
+    ],
     "description": "Given an integer A. Find and Return first positive A integers in ascending order containing only digits 1, 2, and 3.\n\nNOTE: All the A integers will fit in 32-bit integers.",
     "sampleInput": "A = 3",
     "sampleOutput": "[1, 2, 3]",
@@ -208,7 +286,10 @@
     "solutions": [
       {
         "label": "Optimal",
-        "complexity": { "time": "O(A)", "space": "O(A)" },
+        "complexity": {
+          "time": "O(A)",
+          "space": "O(A)"
+        },
         "plain": "Initialize a queue with 1, 2, 3. Repeat A times: pop the front element (this is the next answer), then push three new elements formed by appending 1, 2, or 3 to the popped number (multiply by 10 and add). The queue naturally maintains ascending order because smaller numbers are enqueued first.",
         "tale": "The magician puts doors 1, 2, 3 in the queue. The magician opens door 1, writes it down, and adds doors 11, 12, 13 to the back of the queue. Then opens door 2, writes it down, adds doors 21, 22, 23. Then door 3, adding 31, 32, 33. The queue now holds [11, 12, 13, 21, 22, 23, 31, 32, 33] in order. The magician continues until the scroll has A numbers.",
         "approach": [
@@ -227,9 +308,23 @@
     "viz": {
       "kind": "scripted-array",
       "data": {
-        "A": [1, 2, 3, 11, 12, 13, 21, 22],
+        "A": [
+          1,
+          2,
+          3,
+          11,
+          12,
+          13,
+          21,
+          22
+        ],
         "footer": "BFS generation with queue — generate first 8 integers containing only 1, 2, 3. Queue maintains ascending order.",
-        "legend": ["c-input", "c-active", "c-result", "c-new"],
+        "legend": [
+          "c-input",
+          "c-active",
+          "c-result",
+          "c-new"
+        ],
         "script": [
           {
             "label": "SETUP",
@@ -294,7 +389,13 @@
     "id": "queues-unique-letter",
     "title": "First Non-Repeating Character in Stream",
     "subTopic": "Queue + HashMap for Stream Processing",
-    "tags": ["Queue", "Streaming", "HashMap", "First Non-Repeating", "Character Stream"],
+    "tags": [
+      "Queue",
+      "Streaming",
+      "HashMap",
+      "First Non-Repeating",
+      "Character Stream"
+    ],
     "description": "Imagine you're a teacher. You ask students to call out a letter one by one. After each letter, you jot down the very first letter that's only been called out once. If all letters have been repeated, you write \"#\".\n\nHere's a scenario:\n\nA student says \"a\". It's the first letter. You write \"a\".\nNext, a student says \"b\", \"a\" is still unique, so you add \"a\". Now it's \"aa\".\nA student says \"a\" again. Now, \"b\" is the unique one. You add \"b\", making it \"aab\".\nA student says \"b\". All letters so far are repeated. You add \"#\". It becomes \"aab#\".\nA student says \"c\". \"c\" is unique. You add \"c\". The final is \"aab#c\".\n\nYour task? Given the sequence the students call out A, determine the string on the board.",
     "sampleInput": "A = \"abadbc\"",
     "sampleOutput": "\"aabbdd\"",
@@ -305,7 +406,10 @@
     "solutions": [
       {
         "label": "Optimal",
-        "complexity": { "time": "O(N)", "space": "O(N)" },
+        "complexity": {
+          "time": "O(N)",
+          "space": "O(N)"
+        },
         "plain": "Use a HashMap to count character frequencies and a deque to track the order of first appearances. For each character in the stream, increment its frequency and add it to the deque if it's new. Then, repeatedly remove characters from the front of the deque while their frequency is greater than 1. The front of the cleaned deque is the first non-repeating character; if the deque is empty, append '#' to the result.",
         "tale": "The teacher processes letters one by one. For each new letter, the teacher updates the ledger and adds the name card to the queue if it's fresh. Then the teacher sweeps the front of the queue, removing any cards whose owners have spoken multiple times. Whatever card remains at the front represents the first unique letter. The teacher writes it on the board. If the queue is empty, the teacher writes '#'. The board accumulates the history of first-unique letters at every step.",
         "approach": [
@@ -325,9 +429,21 @@
     "viz": {
       "kind": "scripted-array",
       "data": {
-        "A": ["a", "b", "a", "d", "b", "c"],
+        "A": [
+          "a",
+          "b",
+          "a",
+          "d",
+          "b",
+          "c"
+        ],
         "footer": "First non-repeating character in stream — input 'abadbc'. Queue + HashMap pattern.",
-        "legend": ["c-input", "c-active", "c-result", "c-eliminated"],
+        "legend": [
+          "c-input",
+          "c-active",
+          "c-result",
+          "c-eliminated"
+        ],
         "script": [
           {
             "label": "SETUP",
@@ -336,39 +452,51 @@
           },
           {
             "label": "char='a' — First letter",
-            "marks": {"0": "c-active"},
+            "marks": {
+              "0": "c-active"
+            },
             "msg": "Character <strong>'a'</strong> arrives. Frequency: <strong>a=1</strong>. Add <strong>'a'</strong> to deque. Deque front = <strong>'a'</strong> (frequency 1) → output <strong>'a'</strong>.",
             "html": "<div class='v-label'>STREAM</div><div class='v-row'><div class='v-cell v-active'>a</div><div class='v-cell'>b</div><div class='v-cell'>a</div><div class='v-cell'>d</div><div class='v-cell'>b</div><div class='v-cell'>c</div></div><div class='v-label' style='margin-top:12px;'>DEQUE (candidates)</div><div class='v-row'><div class='v-cell v-active'>a</div></div><div class='v-label' style='margin-top:12px;'>FREQUENCY MAP</div><div class='v-row'><span class='v-stat'>a:<strong>1</strong></span></div><div class='v-label' style='margin-top:12px;'>OUTPUT</div><div class='v-row'><span class='v-stat'><strong>a</strong></span></div>",
             "overlay": "<code>map['a'] = 1</code>, <code>deque = ['a']</code>, output = <code>'a'</code>"
           },
           {
             "label": "char='b' — Second letter",
-            "marks": {"1": "c-active"},
+            "marks": {
+              "1": "c-active"
+            },
             "msg": "Character <strong>'b'</strong> arrives. Frequency: <strong>b=1</strong>. Add <strong>'b'</strong> to deque. Deque front = <strong>'a'</strong> (still frequency 1) → output <strong>'a'</strong> again.",
             "html": "<div class='v-label'>STREAM</div><div class='v-row'><div class='v-cell v-result'>a</div><div class='v-cell v-active'>b</div><div class='v-cell'>a</div><div class='v-cell'>d</div><div class='v-cell'>b</div><div class='v-cell'>c</div></div><div class='v-label' style='margin-top:12px;'>DEQUE</div><div class='v-row'><div class='v-cell v-result'>a</div><div class='v-cell v-active'>b</div></div><div class='v-label' style='margin-top:12px;'>FREQUENCY MAP</div><div class='v-row'><span class='v-stat'>a:<strong>1</strong></span><span class='v-stat'>b:<strong>1</strong></span></div><div class='v-label' style='margin-top:12px;'>OUTPUT</div><div class='v-row'><span class='v-stat'><strong>aa</strong></span></div>"
           },
           {
             "label": "char='a' — 'a' repeats",
-            "marks": {"2": "c-active"},
+            "marks": {
+              "2": "c-active"
+            },
             "msg": "Character <strong>'a'</strong> arrives again. Frequency: <strong>a=2</strong>. Do NOT add to deque (already there). Clean deque: front = <strong>'a'</strong> with frequency 2 → <strong>remove 'a'</strong>. New front = <strong>'b'</strong> (frequency 1) → output <strong>'b'</strong>.",
             "html": "<div class='v-label'>STREAM</div><div class='v-row'><div class='v-cell v-result'>a</div><div class='v-cell v-result'>b</div><div class='v-cell v-active'>a</div><div class='v-cell'>d</div><div class='v-cell'>b</div><div class='v-cell'>c</div></div><div class='v-label' style='margin-top:12px;'>DEQUE (after cleaning)</div><div class='v-row'><div class='v-cell v-result'>b</div></div><div class='v-label' style='margin-top:12px;'>FREQUENCY MAP</div><div class='v-row'><span class='v-stat'>a:<strong>2</strong></span><span class='v-stat'>b:<strong>1</strong></span></div><div class='v-label' style='margin-top:12px;'>OUTPUT</div><div class='v-row'><span class='v-stat'><strong>aab</strong></span></div>",
             "overlay": "Cleaning rule: <code>while (!deque.isEmpty() && map[deque.front()] > 1) deque.pop_front()</code>"
           },
           {
             "label": "char='d' — New letter",
-            "marks": {"3": "c-active"},
+            "marks": {
+              "3": "c-active"
+            },
             "msg": "Character <strong>'d'</strong> arrives. Frequency: <strong>d=1</strong>. Add <strong>'d'</strong> to deque. Deque front = <strong>'b'</strong> (frequency 1) → output <strong>'b'</strong>.",
             "html": "<div class='v-label'>STREAM</div><div class='v-row'><div class='v-cell v-result'>a</div><div class='v-cell v-result'>b</div><div class='v-cell v-result'>a</div><div class='v-cell v-active'>d</div><div class='v-cell'>b</div><div class='v-cell'>c</div></div><div class='v-label' style='margin-top:12px;'>DEQUE</div><div class='v-row'><div class='v-cell v-result'>b</div><div class='v-cell v-active'>d</div></div><div class='v-label' style='margin-top:12px;'>FREQUENCY MAP</div><div class='v-row'><span class='v-stat'>a:<strong>2</strong></span><span class='v-stat'>b:<strong>1</strong></span><span class='v-stat'>d:<strong>1</strong></span></div><div class='v-label' style='margin-top:12px;'>OUTPUT</div><div class='v-row'><span class='v-stat'><strong>aabb</strong></span></div>"
           },
           {
             "label": "char='b' — 'b' repeats",
-            "marks": {"4": "c-active"},
+            "marks": {
+              "4": "c-active"
+            },
             "msg": "Character <strong>'b'</strong> arrives again. Frequency: <strong>b=2</strong>. Clean deque: front = <strong>'b'</strong> with frequency 2 → <strong>remove 'b'</strong>. New front = <strong>'d'</strong> (frequency 1) → output <strong>'d'</strong>.",
             "html": "<div class='v-label'>STREAM</div><div class='v-row'><div class='v-cell v-result'>a</div><div class='v-cell v-result'>b</div><div class='v-cell v-result'>a</div><div class='v-cell v-result'>d</div><div class='v-cell v-active'>b</div><div class='v-cell'>c</div></div><div class='v-label' style='margin-top:12px;'>DEQUE (after cleaning)</div><div class='v-row'><div class='v-cell v-result'>d</div></div><div class='v-label' style='margin-top:12px;'>FREQUENCY MAP</div><div class='v-row'><span class='v-stat'>a:<strong>2</strong></span><span class='v-stat'>b:<strong>2</strong></span><span class='v-stat'>d:<strong>1</strong></span></div><div class='v-label' style='margin-top:12px;'>OUTPUT</div><div class='v-row'><span class='v-stat'><strong>aabbd</strong></span></div>"
           },
           {
             "label": "char='c' — New letter",
-            "marks": {"5": "c-active"},
+            "marks": {
+              "5": "c-active"
+            },
             "msg": "Character <strong>'c'</strong> arrives. Frequency: <strong>c=1</strong>. Add <strong>'c'</strong> to deque. Deque front = <strong>'d'</strong> (frequency 1) → output <strong>'d'</strong>.",
             "html": "<div class='v-label'>STREAM</div><div class='v-row'><div class='v-cell v-result'>a</div><div class='v-cell v-result'>b</div><div class='v-cell v-result'>a</div><div class='v-cell v-result'>d</div><div class='v-cell v-result'>b</div><div class='v-cell v-active'>c</div></div><div class='v-label' style='margin-top:12px;'>DEQUE</div><div class='v-row'><div class='v-cell v-result'>d</div><div class='v-cell v-active'>c</div></div><div class='v-label' style='margin-top:12px;'>FREQUENCY MAP</div><div class='v-row'><span class='v-stat'>a:<strong>2</strong></span><span class='v-stat'>b:<strong>2</strong></span><span class='v-stat'>d:<strong>1</strong></span><span class='v-stat'>c:<strong>1</strong></span></div><div class='v-label' style='margin-top:12px;'>OUTPUT</div><div class='v-row'><span class='v-stat'><strong>aabbdd</strong></span></div>"
           },
@@ -386,7 +514,13 @@
     "id": "queues-sum-of-min-max",
     "title": "Sum of Min and Max in All Subarrays",
     "subTopic": "Sliding Window with Two Deques",
-    "tags": ["Queue", "Deque", "Sliding Window", "Min-Max Tracking", "Two Deques"],
+    "tags": [
+      "Queue",
+      "Deque",
+      "Sliding Window",
+      "Min-Max Tracking",
+      "Two Deques"
+    ],
     "description": "Given an array A of both positive and negative integers.\n\nYour task is to compute the sum of minimum and maximum elements of all sub-array of size B.\n\nNOTE: Since the answer can be very large, you are required to return the sum modulo 10^9 + 7.",
     "sampleInput": "A = [2, 5, -1, 7, -3, -1, -2]\nB = 4",
     "sampleOutput": "18",
@@ -397,7 +531,10 @@
     "solutions": [
       {
         "label": "Optimal",
-        "complexity": { "time": "O(N)", "space": "O(B)" },
+        "complexity": {
+          "time": "O(N)",
+          "space": "O(B)"
+        },
         "plain": "Use two deques: maxDeque maintains indices in decreasing order of values (front = max), minDeque in increasing order (front = min). For each element, remove smaller elements from maxDeque back, remove larger elements from minDeque back. Add the current index to both. Remove indices that fall out of the window from the front of both deques. When the window is fully formed (i >= B-1), add A[maxDeque.front()] + A[minDeque.front()] to the result modulo 10^9+7.",
         "tale": "The watchman walks with two scribes. The first scribe's slate erases weaker towers as stronger ones appear, keeping the strongest on top. The second scribe's slate erases taller towers as shorter ones appear, keeping the shortest on top. Both scribes also erase the first entry if it's about to leave the window. At each window position, the watchman adds the top of both slates to the running total. The magic of the slates ensures the sum is computed in one pass.",
         "approach": [
@@ -412,15 +549,29 @@
         ],
         "pseudocode": "maxDeque = [], minDeque = [], sum = 0\nfor i in 0..N-1:\n  while maxDeque not empty AND A[i] >= A[maxDeque.back()]:\n    maxDeque.pop_back()\n  while minDeque not empty AND A[i] <= A[minDeque.back()]:\n    minDeque.pop_back()\n  maxDeque.push_back(i)\n  minDeque.push_back(i)\n  while maxDeque.front() < i-B+1: maxDeque.pop_front()\n  while minDeque.front() < i-B+1: minDeque.pop_front()\n  if i >= B-1:\n    sum = (sum + A[maxDeque.front()] + A[minDeque.front()]) % MOD\nreturn sum",
         "story": "Two deques, one for max, one for min. Same sliding window, different monotonic properties.",
-        "code": "public int sumOfMinAndMax(int[] A, int B) {\n    int n = A.length;\n    long MOD = 1_000_000_007L;\n    long sum = 0;\n\n    Deque<Integer> maxDeque = new ArrayDeque<>();\n    Deque<Integer> minDeque = new ArrayDeque<>();\n\n    for (int i = 0; i < n; i++) {\n        while (!maxDeque.isEmpty() && A[maxDeque.peekLast()] <= A[i])\n            maxDeque.pollLast();\n        maxDeque.addLast(i);\n\n        while (!minDeque.isEmpty() && A[minDeque.peekLast()] >= A[i])\n            minDeque.pollLast();\n        minDeque.addLast(i);\n\n        while (maxDeque.peekFirst() < i - B + 1) maxDeque.pollFirst();\n        while (minDeque.peekFirst() < i - B + 1) minDeque.pollFirst();\n\n        if (i >= B - 1) {\n            sum = (sum + A[maxDeque.peekFirst()] + A[minDeque.peekFirst()]) % MOD;\n        }\n    }\n\n    sum = (sum + MOD) % MOD;\n    return (int) sum;\n}"
+        "code": "public int sumOfMinAndMax(int[] A, int B) {\n    int n = A.length;\n    long MOD = 1_000_000_007L;\n    long sum = 0;\n\n    Deque<Integer> maxDeque = new ArrayDeque<>();\n    Deque<Integer> minDeque = new ArrayDeque<>();\n\n    for (int i = 0; i < n; i++) {\n        while (!maxDeque.isEmpty() && A[maxDeque.peekLast()] <= A[i]) {\n            maxDeque.pollLast();\n        }\n        maxDeque.addLast(i);\n\n        while (!minDeque.isEmpty() && A[minDeque.peekLast()] >= A[i]) {\n            minDeque.pollLast();\n        }\n        minDeque.addLast(i);\n\n        while (maxDeque.peekFirst() < i - B + 1) {\n            maxDeque.pollFirst();\n        }\n        while (minDeque.peekFirst() < i - B + 1) {\n            minDeque.pollFirst();\n        }\n\n        if (i >= B - 1) {\n            sum = (sum + A[maxDeque.peekFirst()] + A[minDeque.peekFirst()]) % MOD;\n        }\n    }\n\n    sum = (sum + MOD) % MOD;\n    return (int) sum;\n}"
       }
     ],
     "viz": {
       "kind": "scripted-array",
       "data": {
-        "A": [2, 5, -1, 7, -3, -1, -2],
+        "A": [
+          2,
+          5,
+          -1,
+          7,
+          -3,
+          -1,
+          -2
+        ],
         "footer": "Sliding window min+max sum — A = [2, 5, -1, 7, -3, -1, -2], B = 4. Two deques track max and min.",
-        "legend": ["c-input", "c-active", "c-low", "c-high", "c-result"],
+        "legend": [
+          "c-input",
+          "c-active",
+          "c-low",
+          "c-high",
+          "c-result"
+        ],
         "script": [
           {
             "label": "SETUP",
@@ -429,32 +580,56 @@
           },
           {
             "label": "i=0,1,2 — Build window",
-            "marks": {"0": "c-low", "1": "c-active", "2": "c-high"},
+            "marks": {
+              "0": "c-low",
+              "1": "c-active",
+              "2": "c-high"
+            },
             "msg": "Add indices <strong>0, 1, 2</strong> to both deques while maintaining monotonic properties. Window <strong>[2, 5, -1]</strong> not yet complete (need 4 elements).",
             "html": "<div class='v-label'>ARRAY</div><div class='v-row'><div class='v-cell v-low'>2</div><div class='v-cell v-active'>5</div><div class='v-cell v-high'>-1</div><div class='v-cell'>7</div><div class='v-cell'>-3</div><div class='v-cell'>-1</div><div class='v-cell'>-2</div></div><div class='v-label' style='margin-top:12px;'>maxDeque (indices)</div><div class='v-row'><div class='v-cell'>1</div><div class='v-cell'>2</div></div><div class='v-label' style='margin-top:12px;'>minDeque (indices)</div><div class='v-row'><div class='v-cell'>2</div></div><div class='v-row' style='margin-top:8px;'><span class='v-stat'>window incomplete</span></div>",
             "overlay": "maxDeque: [1, 2] → values [5, -1] (decreasing). minDeque: [2] → value [-1] (increasing)."
           },
           {
             "label": "i=3 — First window [2,5,-1,7]",
-            "marks": {"0": "c-low", "1": "c-active", "2": "c-active", "3": "c-high"},
+            "marks": {
+              "0": "c-low",
+              "1": "c-active",
+              "2": "c-active",
+              "3": "c-high"
+            },
             "msg": "Add index <strong>3</strong> (value 7). maxDeque: 7 &gt; all → clear and add 3. minDeque: -1 is still min. Window <strong>[2, 5, -1, 7]</strong> complete. max=<strong>7</strong>, min=<strong>-1</strong> → sum += <strong>7 + (-1) = 6</strong>.",
             "html": "<div class='v-label'>WINDOW [0-3]</div><div class='v-row'><div class='v-cell v-low'>2</div><div class='v-cell'>5</div><div class='v-cell'>-1</div><div class='v-cell v-high'>7</div><div class='v-cell'>-3</div><div class='v-cell'>-1</div><div class='v-cell'>-2</div></div><div class='v-label' style='margin-top:12px;'>maxDeque</div><div class='v-row'><div class='v-cell v-result'>3</div></div><div class='v-label' style='margin-top:12px;'>minDeque</div><div class='v-row'><div class='v-cell v-result'>2</div></div><div class='v-row' style='margin-top:8px;'><span class='v-stat'>max=<strong>7</strong>, min=<strong>-1</strong>, sum=<strong>6</strong></span></div>"
           },
           {
             "label": "i=4 — Window [5,-1,7,-3]",
-            "marks": {"1": "c-low", "2": "c-active", "3": "c-active", "4": "c-high"},
+            "marks": {
+              "1": "c-low",
+              "2": "c-active",
+              "3": "c-active",
+              "4": "c-high"
+            },
             "msg": "Add index <strong>4</strong> (value -3). maxDeque: remove 3 if out of window (it's not), add 4. minDeque: -3 &lt; -1 → remove 2, add 4. Window <strong>[5, -1, 7, -3]</strong>. max=<strong>7</strong>, min=<strong>-3</strong> → sum += <strong>7 + (-3) = 4</strong>. Total = <strong>6 + 4 = 10</strong>.",
             "html": "<div class='v-label'>WINDOW [1-4]</div><div class='v-row'><div class='v-cell'>2</div><div class='v-cell v-low'>5</div><div class='v-cell'>-1</div><div class='v-cell'>7</div><div class='v-cell v-high'>-3</div><div class='v-cell'>-1</div><div class='v-cell'>-2</div></div><div class='v-label' style='margin-top:12px;'>maxDeque</div><div class='v-row'><div class='v-cell v-result'>3</div><div class='v-cell'>4</div></div><div class='v-label' style='margin-top:12px;'>minDeque</div><div class='v-row'><div class='v-cell v-result'>4</div></div><div class='v-row' style='margin-top:8px;'><span class='v-stat'>max=<strong>7</strong>, min=<strong>-3</strong>, sum=<strong>10</strong></span></div>"
           },
           {
             "label": "i=5 — Window [-1,7,-3,-1]",
-            "marks": {"2": "c-low", "3": "c-active", "4": "c-active", "5": "c-high"},
+            "marks": {
+              "2": "c-low",
+              "3": "c-active",
+              "4": "c-active",
+              "5": "c-high"
+            },
             "msg": "Add index <strong>5</strong> (value -1). maxDeque: -1 &lt; 7, keep 3, add 5. minDeque: -1 &gt; -3, keep 4, add 5. Window <strong>[-1, 7, -3, -1]</strong>. max=<strong>7</strong>, min=<strong>-3</strong> → sum += <strong>7 + (-3) = 4</strong>. Total = <strong>10 + 4 = 14</strong>.",
             "html": "<div class='v-label'>WINDOW [2-5]</div><div class='v-row'><div class='v-cell'>2</div><div class='v-cell'>5</div><div class='v-cell v-low'>-1</div><div class='v-cell'>7</div><div class='v-cell'>-3</div><div class='v-cell v-high'>-1</div><div class='v-cell'>-2</div></div><div class='v-label' style='margin-top:12px;'>maxDeque</div><div class='v-row'><div class='v-cell v-result'>3</div><div class='v-cell'>4</div><div class='v-cell'>5</div></div><div class='v-label' style='margin-top:12px;'>minDeque</div><div class='v-row'><div class='v-cell v-result'>4</div><div class='v-cell'>5</div></div><div class='v-row' style='margin-top:8px;'><span class='v-stat'>max=<strong>7</strong>, min=<strong>-3</strong>, sum=<strong>14</strong></span></div>"
           },
           {
             "label": "i=6 — Window [7,-3,-1,-2]",
-            "marks": {"3": "c-low", "4": "c-active", "5": "c-active", "6": "c-high"},
+            "marks": {
+              "3": "c-low",
+              "4": "c-active",
+              "5": "c-active",
+              "6": "c-high"
+            },
             "msg": "Add index <strong>6</strong> (value -2). maxDeque: 7 is now out of window → remove 3. New front = 4 → max = <strong>-1</strong>. minDeque: -2 &gt; -3, keep 4, add 6. Window <strong>[7, -3, -1, -2]</strong>. max=<strong>7</strong>, min=<strong>-3</strong> → sum += <strong>7 + (-3) = 4</strong>. Total = <strong>14 + 4 = 18</strong>.",
             "html": "<div class='v-label'>WINDOW [3-6]</div><div class='v-row'><div class='v-cell'>2</div><div class='v-cell'>5</div><div class='v-cell'>-1</div><div class='v-cell v-low'>7</div><div class='v-cell'>-3</div><div class='v-cell'>-1</div><div class='v-cell v-high'>-2</div></div><div class='v-label' style='margin-top:12px;'>maxDeque (after cleaning)</div><div class='v-row'><div class='v-cell v-result'>3</div><div class='v-cell'>4</div><div class='v-cell'>5</div><div class='v-cell'>6</div></div><div class='v-label' style='margin-top:12px;'>minDeque</div><div class='v-row'><div class='v-cell v-result'>4</div><div class='v-cell'>5</div><div class='v-cell'>6</div></div><div class='v-row' style='margin-top:8px;'><span class='v-stat'>max=<strong>7</strong>, min=<strong>-3</strong>, sum=<strong>18</strong></span></div>",
             "overlay": "Window cleaning: <code>while (deque.front() &lt; i - B + 1) deque.pop_front()</code>"
