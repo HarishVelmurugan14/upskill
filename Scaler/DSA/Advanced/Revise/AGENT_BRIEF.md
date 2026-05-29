@@ -36,7 +36,7 @@ Both must be registered in `data/index.json`:
 
 If a topic doesn't exist yet, create both files and register them.
 
-**Currently registered topics** (as of last audit — 67 problems, 556 viz steps, 366 overlays, 47/67 gold-tier):
+**Currently registered topics** (as of last audit — 67 problems, 556 viz steps, 366 overlays, 48/67 gold-tier):
 
 | Topic | Slug | Problems |
 |---|---|---|
