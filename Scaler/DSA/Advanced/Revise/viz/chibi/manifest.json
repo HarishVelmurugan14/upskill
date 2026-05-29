@@ -1,0 +1,82 @@
+[
+  {
+    "name": "Naruto",
+    "file": "chibi/naruto.jpg"
+  },
+  {
+    "name": "Sasuke",
+    "file": "chibi/sasuke.jpg"
+  },
+  {
+    "name": "Kakashi",
+    "file": "chibi/kakashi.jpg"
+  },
+  {
+    "name": "Itachi",
+    "file": "chibi/itachi.jpg"
+  },
+  {
+    "name": "Goku",
+    "file": "chibi/goku.jpg"
+  },
+  {
+    "name": "Vegeta",
+    "file": "chibi/vegeta.jpg"
+  },
+  {
+    "name": "Luffy",
+    "file": "chibi/luffy.jpg"
+  },
+  {
+    "name": "Zoro",
+    "file": "chibi/zoro.jpg"
+  },
+  {
+    "name": "Sanji",
+    "file": "chibi/sanji.jpg"
+  },
+  {
+    "name": "Mikey",
+    "file": "chibi/mikey.jpg"
+  },
+  {
+    "name": "Draken",
+    "file": "chibi/draken.jpg"
+  },
+  {
+    "name": "Eren",
+    "file": "chibi/eren.jpg"
+  },
+  {
+    "name": "Mikasa",
+    "file": "chibi/mikasa.jpg"
+  },
+  {
+    "name": "Levi",
+    "file": "chibi/levi.jpg"
+  },
+  {
+    "name": "Tanjiro",
+    "file": "chibi/tanjiro.jpg"
+  },
+  {
+    "name": "Nezuko",
+    "file": "chibi/nezuko.jpg"
+  },
+  {
+    "name": "Zenitsu",
+    "file": "chibi/zenitsu.jpg"
+  },
+  {
+    "name": "Inosuke",
+    "file": "chibi/inosuke.jpg"
+  },
+  {
+    "name": "Killua",
+    "file": "chibi/killua.jpg"
+  },
+  {
+    "name": "Gon",
+    "file": "chibi/gon.jpg"
+  }
+]

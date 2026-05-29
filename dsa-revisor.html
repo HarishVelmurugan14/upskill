@@ -1809,13 +1809,17 @@
       display: grid !important;
       place-items: center !important;
     }
-    html body .chibi-mascot svg { width: 90% !important; height: 90% !important; display: block !important; }
+    html body .chibi-mascot img {
+      width: 100% !important; height: 100% !important;
+      object-fit: cover !important; display: block !important;
+      border-radius: 50% !important;
+    }
     html body .chibi-mascot::after {
-      content: attr(data-name);
+      content: attr(data-franchise);
       position: absolute;
-      bottom: -22px; left: 50%; transform: translateX(-50%);
+      bottom: -20px; left: 50%; transform: translateX(-50%);
       font-family: 'Quicksand', sans-serif;
-      font-size: 10px; font-weight: 700;
+      font-size: 9px; font-weight: 700;
       color: var(--ink-soft);
       text-transform: uppercase; letter-spacing: 0.1em;
       white-space: nowrap;
@@ -2380,6 +2384,53 @@
       padding: 4px 10px; border-radius: 4px; margin: 0 4px;
     }
     html body .viz-stage .v-stat strong { color: #ffa657; }
+
+    /* ════════════════════════════════════════════════════════════
+       🌙 DARK MODE — stealth palette for office use
+       Toggled via <body class="dark-mode">. Swaps paper vars to dark.
+       ════════════════════════════════════════════════════════════ */
+    body.dark-mode {
+      --paper:        #0d1117 !important;
+      --paper-2:      #21262d !important;
+      --paper-3:      #161b22 !important;
+      --ink:          #e6edf3 !important;
+      --ink-soft:     #9ba3ad !important;
+      --rule:         #30363d !important;
+      --coral-soft:   #3a1e16 !important;
+      --sage-soft:    #1a3320 !important;
+      --ocean-soft:   #15324a !important;
+      --plum-soft:    #2c1d3a !important;
+      --honey-soft:   #3a2a0f !important;
+      --rose-soft:    #3d1a26 !important;
+    }
+    html body.dark-mode {
+      background: var(--paper) !important;
+      background-image: none !important;
+    }
+    /* Soften saturated picture-book accents in dark mode */
+    body.dark-mode {
+      --coral: #ff8a65 !important;
+      --sage:  #8fd19a !important;
+      --ocean: #79c0ff !important;
+      --plum:  #d2a8ff !important;
+      --honey: #e9c46a !important;
+      --rose:  #f29bb0 !important;
+    }
+
+    /* Theme toggle button (header) */
+    .theme-toggle {
+      margin-left: auto;
+      background: transparent;
+      border: 1.5px solid var(--rule);
+      color: var(--ink-soft);
+      padding: 6px 12px; border-radius: 999px;
+      font: 700 11px/1 'Quicksand', sans-serif;
+      letter-spacing: 0.08em; text-transform: uppercase;
+      cursor: pointer; transition: all 0.15s;
+      display: inline-flex; align-items: center; gap: 6px;
+    }
+    .theme-toggle:hover { color: var(--ink); border-color: var(--coral); }
+    .theme-toggle .ti { font-size: 14px; }
   </style>
 </head>
 <body>
@@ -2390,6 +2441,9 @@
     <a href="index.html">Home</a><span class="sep">/</span>
     <span class="cur">DSA Revisor</span>
   </nav>
+  <button class="theme-toggle" id="themeToggle" type="button" aria-label="Toggle theme">
+    <span class="ti" id="themeIcon">🌙</span><span id="themeLabel">Dark</span>
+  </button>
 </header>
 
 <div class="sec-nav">
@@ -2458,10 +2512,6 @@
       <div class="prob-story" id="probStory"></div>
       <div class="prob-tale" id="probTale"></div>
       <div class="prob-desc" id="probDesc"></div>
-      <div class="prob-image-wrap" id="probImageWrap" style="display:none">
-        <div class="prob-image-label">Original problem screenshot</div>
-        <img class="prob-image" id="probImage" alt="problem screenshot" loading="lazy">
-      </div>
 
       <div class="io-grid">
         <div class="io-box">
@@ -2572,6 +2622,31 @@
 <script src="Scaler/DSA/Advanced/Revise/viz/viz-kinds.js"></script>
 <script src="Scaler/DSA/Advanced/Revise/viz/chibi-mascot.js"></script>
 <script>
+  // ─────────────────────────────────────────────────────────────────────
+  //  THEME TOGGLE — paper (default) ⇄ dark (stealth)
+  // ─────────────────────────────────────────────────────────────────────
+  (function () {
+    const KEY = 'dsa-revisor-theme';
+    const btn = document.getElementById('themeToggle');
+    const icon = document.getElementById('themeIcon');
+    const label = document.getElementById('themeLabel');
+    function apply(mode) {
+      if (mode === 'dark') {
+        document.body.classList.add('dark-mode');
+        icon.textContent = '☀️'; label.textContent = 'Light';
+      } else {
+        document.body.classList.remove('dark-mode');
+        icon.textContent = '🌙'; label.textContent = 'Dark';
+      }
+    }
+    apply(localStorage.getItem(KEY) || 'paper');
+    btn.addEventListener('click', () => {
+      const next = document.body.classList.contains('dark-mode') ? 'paper' : 'dark';
+      localStorage.setItem(KEY, next);
+      apply(next);
+    });
+  })();
+
   // ─────────────────────────────────────────────────────────────────────
   //  STATE
   // ─────────────────────────────────────────────────────────────────────
@@ -2769,15 +2844,6 @@
       taleProbEl.style.display = pTale ? '' : 'none';
     }
     document.getElementById('probDesc').textContent = p.description || '';
-    var imgWrap = document.getElementById('probImageWrap');
-    var imgEl = document.getElementById('probImage');
-    if (p.image) {
-      imgEl.src = 'Scaler/DSA/Advanced/Revise/data/' + p.image;
-      imgWrap.style.display = '';
-    } else {
-      imgEl.removeAttribute('src');
-      imgWrap.style.display = 'none';
-    }
     document.getElementById('sampleIn').textContent = p.sampleInput || '';
     document.getElementById('sampleOut').textContent = p.sampleOutput || '';
 
