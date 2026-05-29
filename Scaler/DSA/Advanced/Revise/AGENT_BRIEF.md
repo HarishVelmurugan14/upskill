@@ -36,6 +36,18 @@ Both must be registered in `data/index.json`:
 
 If a topic doesn't exist yet, create both files and register them.
 
+**Currently registered topics** (as of last audit — 67 problems, 556 viz steps, 366 overlays, 47/67 gold-tier):
+
+| Topic | Slug | Problems |
+|---|---|---|
+| Binary Search | `binary-search` | 18 |
+| Linked List | `linked-list` | 9 |
+| Stacks | `stacks` | 14 |
+| Queues | `queues` | 5 |
+| Trees | `trees` | 21 |
+
+All viz kinds in the dataset are `scripted-array`. All 5 notes files conform to §7.
+
 ---
 
 ## 3. Problem JSON schema (mandatory fields)
@@ -80,13 +92,14 @@ If a topic doesn't exist yet, create both files and register them.
 ### Rules
 
 - **Always include Optimal.** Add Brute/Better only if they teach something distinct.
-- **`plain`, `tale`, and `approach`** are MANDATORY on every solution. They drive the parchment cards the user actually reads.
+- **`plain`, `tale`, and `approach`** are STRONGLY PREFERRED on every new problem and solution. They drive the parchment cards the user actually reads. The page renderer falls back to `story` if `plain` is absent and shows an empty storybook card if `tale` is absent — so missing them degrades silently rather than breaking.
+- **Current dataset reality:** most problems ship with only the legacy `story` field. New authoring SHOULD add `plain` + `tale`; revisits SHOULD upgrade.
 - **`plain` voice**: 6th-grade English. Short sentences. No metaphors. Describe the mechanism.
 - **`tale` voice**: childhood-storybook narrator. Concrete character (hiker, watchman, blindfolded farmer, three friends Past/Present/Future, etc). Specific verbs. Italic serif on screen — write so it reads aloud well.
 - **`approach`**: ordered array of strings. Each entry = one atomic step the user could execute on paper. 5-9 entries typical. No code, no symbols beyond array notation.
 - **`code` is Java only.** No `import`, no `class` wrapper — just the method(s) plus tiny private helpers.
-- **Keep `story`** (legacy field) so old viewers don't break — mirror the first sentence of `plain` if you don't have a separate one.
-- See `bs-peak-element`, `bs-aggressive-cows`, and `ll-reverse` as the **gold-standard worked examples** of the dual-story + approach schema.
+- **Always keep `story`** (legacy field) — mirror the first sentence of `plain` if you don't have a separate one.
+- See `bs-peak-element`, `bs-aggressive-cows`, and `ll-reverse` as the **gold-standard worked examples**.
 
 ---
 
@@ -140,13 +153,15 @@ Each step in the script supports:
 - `overlay` — yellow callout HTML after the visual. Use for rules / formulas with `<code>` tags.
 - `html` — escape hatch: raw HTML using the `v-*` CSS vocabulary (cells, arrows, rows, labels, number-lines, stats). Use for matrices, linked lists, trees, custom layouts.
 
-**Quality bar (mandatory, no exceptions):**
+**Quality bar (mandatory for new viz, no exceptions):**
 - **8 to 12 steps minimum** per problem. Setup + every meaningful iteration + Done.
 - **3+ overlays** per problem.
 - **Every step has a `label`**.
 - **Every value in `msg` is tied to the actual sample input** and wrapped in `<strong>`.
 - **Every step visually changes** vs the previous (a pointer moves, a cell flips colour, an arrow flips).
 - **Reference these three as the bar:** `bs-peak-element`, `bs-aggressive-cows`, `ll-reverse` in `binary-search.json` and `linked-list.json`.
+
+**Known thin viz (acceptable but earmarked for upgrade — 20 of 67):** `bs-aggressive-cows` (7,2 — original gold ref, leave); `stacks-eval-rpn`, `stacks-redundant-braces`, `stacks-nearest-smaller`, `stacks-passing-game`, `stacks-next-greater`; `queues-sum-of-min-max`; `trees-postorder-traversal`, `trees-balanced`, `trees-left-view`, `trees-serialize-level-order`, `trees-deserialize-level-order`, `trees-right-view`, `trees-valid-bst`, `trees-sorted-array-to-bst`, `trees-delete-bst-node`, `trees-search-bst`, `trees-two-sum-bst`, `trees-bst-one-child`, `trees-bst-nodes-in-range`.
 
 **`v-*` CSS vocabulary** (already defined in `dsa-revisor.html`, do NOT add CSS):
 
@@ -229,7 +244,7 @@ When the user adds the FIRST problem to a new topic, also create the notes file.
    - Build the problem object per §3 + §4.
    - Pick the right `viz.kind` per §6 (or add a new one).
 5. If a new topic: create `<slug>.notes.json` per §7.
-6. Validate: `node -e "JSON.parse(require('fs').readFileSync('Scaler/DSA/Advanced/Revise/data/<slug>.json'))"`.
+6. Validate: `python3 -c "import json; json.load(open('Scaler/DSA/Advanced/Revise/data/<slug>.json')); json.load(open('Scaler/DSA/Advanced/Revise/data/<slug>.notes.json'))"`.
 7. Report file paths + count summary back to the user. Don't dump JSON in chat.
 
 ---
@@ -282,7 +297,7 @@ Use this as the calibration anchor for tone, density, and code style. Every new 
       "code": "public int peakElement(int[] A) {\n    int N = A.length;\n    if (N == 1) return A[0];\n    if (A[0]     >= A[1])     return A[0];\n    if (A[N - 1] >= A[N - 2]) return A[N - 1];\n\n    int low = 1, high = N - 2;\n    while (low <= high) {\n        int mid = low + ((high - low) / 2);\n        if (A[mid] > A[mid + 1] && A[mid] > A[mid - 1]) return A[mid];\n        else if (A[mid] > A[mid - 1]) low  = mid + 1;\n        else                          high = mid - 1;\n    }\n    return -1;\n}"
     }
   ],
-  "viz": { "kind": "bs-peak", "data": { "A": [5, 17, 100, 11] } }
+  "viz": { "kind": "scripted-array", "data": { "A": [5, 17, 100, 11], "script": [/* see bs-peak-element in binary-search.json — 9 hand-authored steps */] } }
 }
 ```
 
@@ -302,4 +317,20 @@ Use this as the calibration anchor for tone, density, and code style. Every new 
 - ❌ Java comments inside `code` strings (`// Complexity: …`). Complexity lives in the `complexity` field.
 - ❌ Pseudocode written in pseudo-Java with semicolons and braces. Keep it human.
 - ❌ More than 4 solutions. Brute + Better + Optimal + maybe one Alternative is the ceiling.
-- ❌ A `viz.kind` that doesn't exist in `viz/viz-kinds.js`. Either reuse or add one.
+- ❌ A `viz.kind` that doesn't exist in `viz/viz-kinds.js`. Use `scripted-array` for all new problems.
+
+---
+
+## 12. Mascot system
+
+`viz/chibi-mascot.js` mounts a 72px round card bottom-right with one of 6 inline-SVG chibi anime heads picked at random per page load:
+Naruto, Goku, Luffy (One Piece), Mikey (Tokyo Revengers), Eren (Attack on Titan), Tanjiro (Demon Slayer).
+The character's franchise tag is rendered as a tiny caption under the card via `.chibi-mascot::after`. Do not add a fox emoji or other mascot elements — the chibi system supersedes it.
+
+---
+
+## 13. Image rules
+
+- Input problem screenshots live in `data/images/<slug>/` and are **gitignored** (`.gitignore` excludes the whole `data/images/` tree). They are local-only references.
+- The page renders `p.image` as a small reference thumbnail under the problem description. Use the relative-to-data path: `"images/<slug>/<slug>-NN.png"`.
+- Do NOT commit screenshots.
