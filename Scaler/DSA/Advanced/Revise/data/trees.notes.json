@@ -1,0 +1,144 @@
+{
+  "topic": "Trees",
+  "summary": "Trees are hierarchical data structures with a root node and children forming subtrees. Binary trees have at most 2 children per node. Binary Search Trees (BST) maintain the invariant: left < node < right, enabling O(log N) operations. Key traversals include inorder (left-root-right, gives sorted order in BST), preorder (root-left-right, useful for cloning/serialization), postorder (left-right-root, useful for deletion), and level-order (BFS, processes level-by-level). Most tree problems use recursion (DFS) or queue-based iteration (BFS). BST operations leverage the ordering property to prune search space.",
+  "thoughtProcess": [
+    {
+      "title": "1. Identify the Tree Type",
+      "body": "Is it a generic binary tree, BST, balanced tree, or complete tree? BST problems can exploit the left < node < right property to prune branches. Balanced trees have height O(log N). Complete trees can use array-based indexing (parent at i, children at 2i+1 and 2i+2)."
+    },
+    {
+      "title": "2. Choose Traversal Strategy",
+      "body": "DFS (recursion or stack) for problems requiring depth-first exploration: preorder for cloning, inorder for sorted order in BST, postorder for deletion. BFS (queue) for level-by-level problems: level-order traversal, right/left view, serialize/deserialize. DFS space = O(H), BFS space = O(W) where W is max width."
+    },
+    {
+      "title": "3. Define Recursive Subproblem",
+      "body": "Most tree problems have elegant recursive structure. Ask: what do I need from left subtree? From right subtree? How do I combine them at this node? Define return type carefully (int for count/height, boolean for validation, TreeNode for construction). Base case is almost always null node."
+    },
+    {
+      "title": "4. Exploit BST Property",
+      "body": "In BST problems, use the ordering to prune: if target < node, ignore right subtree. If target > node, ignore left subtree. This reduces search space from O(N) to O(H). For validation, pass min/max bounds down recursively. For range queries, prune branches outside range."
+    },
+    {
+      "title": "5. Handle Edge Cases Early",
+      "body": "Check null root at the start. For BST, handle empty tree, single node, and duplicate values (clarify if allowed). For serialization, decide how to represent nulls (-1, 'N', etc). For deletion, cover 3 cases: leaf, one child, two children (use inorder predecessor/successor)."
+    },
+    {
+      "title": "6. Track State Across Levels",
+      "body": "For BFS, process nodes level-by-level using queue size snapshot. For views (left/right), track first/last node per level. For serialization, enqueue nulls to preserve structure. For parent-tracking problems, pass parent reference or use a map."
+    }
+  ],
+  "commonMistakes": [
+    {
+      "title": "Forgetting Null Checks",
+      "wrong": "if (root.left.val < root.val) ...",
+      "right": "if (root.left != null && root.left.val < root.val) ...",
+      "why": "Accessing .val on null causes NullPointerException. Always check node != null before accessing fields."
+    },
+    {
+      "title": "BST Validation with Node Values Only",
+      "wrong": "boolean isValidBST(TreeNode node) {\n  if (node == null) return true;\n  if (node.left != null && node.left.val >= node.val) return false;\n  if (node.right != null && node.right.val <= node.val) return false;\n  return isValidBST(node.left) && isValidBST(node.right);\n}",
+      "right": "boolean isValidBST(TreeNode node, long min, long max) {\n  if (node == null) return true;\n  if (node.val <= min || node.val >= max) return false;\n  return isValidBST(node.left, min, node.val) &&\n         isValidBST(node.right, node.val, max);\n}",
+      "why": "BST property is global, not local. A node must be less than ALL ancestors on the right path, not just its parent. Pass min/max bounds down recursively."
+    },
+    {
+      "title": "Integer Overflow in Min/Max",
+      "wrong": "isValidBST(root, Integer.MIN_VALUE, Integer.MAX_VALUE)",
+      "right": "isValidBST(root, Long.MIN_VALUE, Long.MAX_VALUE)",
+      "why": "If a node's value is Integer.MIN_VALUE or Integer.MAX_VALUE, the boundary check fails. Use Long to avoid overflow."
+    },
+    {
+      "title": "Not Enqueuing Nulls in Serialization",
+      "wrong": "while (!queue.isEmpty()) {\n  TreeNode node = queue.poll();\n  result.add(node.val);\n  if (node.left != null) queue.add(node.left);\n  if (node.right != null) queue.add(node.right);\n}",
+      "right": "while (!queue.isEmpty()) {\n  TreeNode node = queue.poll();\n  if (node == null) { result.add(-1); continue; }\n  result.add(node.val);\n  queue.add(node.left);  // add even if null\n  queue.add(node.right); // add even if null\n}",
+      "why": "Skipping nulls loses tree structure information. Deserialization won't know where gaps are. Always enqueue children even if null, mark them as -1 in output."
+    },
+    {
+      "title": "Incorrect Inorder Predecessor/Successor",
+      "wrong": "TreeNode pred = root.left; // wrong",
+      "right": "TreeNode pred = root.left;\nwhile (pred.right != null) pred = pred.right;",
+      "why": "Inorder predecessor is the RIGHTMOST node in the left subtree, not just the left child. Must traverse to the max of left subtree."
+    },
+    {
+      "title": "Modifying Tree During Traversal Without Care",
+      "wrong": "// Deleting nodes while iterating can skip nodes or crash",
+      "right": "// Use postorder (process children before parent) for deletion, or mark nodes for deletion and clean up in a second pass",
+      "why": "Deleting a node invalidates references to its children. Process children fully before deleting parent (postorder), or collect nodes to delete and remove them afterward."
+    },
+    {
+      "title": "Forgetting to Return Updated Root in BST Deletion",
+      "wrong": "public void deleteNode(TreeNode root, int val) {\n  // modifies tree but doesn't return new root\n}",
+      "right": "public TreeNode deleteNode(TreeNode root, int val) {\n  if (root == null) return null;\n  // ... deletion logic ...\n  return root; // return potentially new root\n}",
+      "why": "Deleting the root changes the tree's root. Must return the new root so caller can update their reference."
+    },
+    {
+      "title": "Off-by-One in Level-Order Tracking",
+      "wrong": "while (!queue.isEmpty()) {\n  for (int i = 0; i < queue.size(); i++) { ... }\n}",
+      "right": "while (!queue.isEmpty()) {\n  int levelSize = queue.size(); // snapshot size before loop\n  for (int i = 0; i < levelSize; i++) { ... }\n}",
+      "why": "Queue size changes as you add children during iteration. Capture size before loop to process exactly one level."
+    }
+  ],
+  "keyPatterns": [
+    {
+      "name": "DFS Recursive Template",
+      "when": "Any problem that can be broken into left-subtree + right-subtree + current-node logic.",
+      "template": "public ReturnType dfs(TreeNode node) {\n    if (node == null) return baseCase;\n    ReturnType left = dfs(node.left);\n    ReturnType right = dfs(node.right);\n    return combine(node.val, left, right);\n}",
+      "examples": ["Height", "Diameter", "Path Sum", "Balanced Check", "Serialize"]
+    },
+    {
+      "name": "BFS Level-Order Template",
+      "when": "Problems requiring level-by-level processing: views, level traversal, shortest path in tree.",
+      "template": "Queue<TreeNode> q = new LinkedList<>();\nq.add(root);\nwhile (!q.isEmpty()) {\n    int levelSize = q.size();\n    for (int i = 0; i < levelSize; i++) {\n        TreeNode node = q.poll();\n        process(node);\n        if (node.left != null) q.add(node.left);\n        if (node.right != null) q.add(node.right);\n    }\n}",
+      "examples": ["Level Order Traversal", "Right View", "Left View", "Serialize"]
+    },
+    {
+      "name": "BST Search/Insert/Delete",
+      "when": "BST operations: search in O(H), insert while maintaining order, delete with 3 cases.",
+      "template": "public TreeNode search(TreeNode node, int val) {\n    if (node == null || node.val == val) return node;\n    if (val < node.val) return search(node.left, val);\n    return search(node.right, val);\n}\n\npublic TreeNode delete(TreeNode node, int val) {\n    if (node == null) return null;\n    if (val < node.val) node.left = delete(node.left, val);\n    else if (val > node.val) node.right = delete(node.right, val);\n    else {\n        if (node.left == null) return node.right;\n        if (node.right == null) return node.left;\n        TreeNode pred = findMax(node.left);\n        node.val = pred.val;\n        node.left = delete(node.left, pred.val);\n    }\n    return node;\n}",
+      "examples": ["Search in BST", "Insert in BST", "Delete Node", "Validate BST"]
+    },
+    {
+      "name": "BST Validation with Min/Max",
+      "when": "Check if a binary tree is a valid BST. Must verify global property, not just local.",
+      "template": "public boolean isValidBST(TreeNode node, long min, long max) {\n    if (node == null) return true;\n    if (node.val <= min || node.val >= max) return false;\n    return isValidBST(node.left, min, node.val) &&\n           isValidBST(node.right, node.val, max);\n}",
+      "examples": ["Valid BST", "BST with One Child"]
+    },
+    {
+      "name": "Inorder Traversal (BST Sorted Order)",
+      "when": "Get sorted array from BST, find kth smallest, two-sum in BST.",
+      "template": "public void inorder(TreeNode node, List<Integer> result) {\n    if (node == null) return;\n    inorder(node.left, result);\n    result.add(node.val);\n    inorder(node.right, result);\n}",
+      "examples": ["Two Sum BST", "Kth Smallest", "BST Iterator"]
+    },
+    {
+      "name": "Tree Construction from Traversals",
+      "when": "Build tree from inorder + preorder, or inorder + postorder. Inorder splits left/right, other traversal gives root.",
+      "template": "public TreeNode build(int[] inorder, int[] preorder, int inStart, int inEnd, int preStart, int preEnd) {\n    if (inStart > inEnd) return null;\n    int rootVal = preorder[preStart];\n    TreeNode root = new TreeNode(rootVal);\n    int rootIndex = findIndex(inorder, rootVal, inStart, inEnd);\n    int leftSize = rootIndex - inStart;\n    root.left = build(inorder, preorder, inStart, rootIndex - 1, preStart + 1, preStart + leftSize);\n    root.right = build(inorder, preorder, rootIndex + 1, inEnd, preStart + leftSize + 1, preEnd);\n    return root;\n}",
+      "examples": ["Build Tree from Inorder + Preorder", "Build Tree from Inorder + Postorder"]
+    },
+    {
+      "name": "Parent Tracking / Path Problems",
+      "when": "LCA, path from root to node, node-to-node distance. Track parent pointers or pass path down.",
+      "template": "public boolean findPath(TreeNode node, int target, List<TreeNode> path) {\n    if (node == null) return false;\n    path.add(node);\n    if (node.val == target) return true;\n    if (findPath(node.left, target, path) || findPath(node.right, target, path)) return true;\n    path.remove(path.size() - 1); // backtrack\n    return false;\n}",
+      "examples": ["Lowest Common Ancestor", "Distance Between Nodes", "Path Sum II"]
+    },
+    {
+      "name": "BST Range Query with Pruning",
+      "when": "Count/collect nodes in a range [B, C]. Use BST property to skip entire subtrees.",
+      "template": "public int countRange(TreeNode node, int B, int C) {\n    if (node == null) return 0;\n    if (node.val < B) return countRange(node.right, B, C);\n    if (node.val > C) return countRange(node.left, B, C);\n    return 1 + countRange(node.left, B, C) + countRange(node.right, B, C);\n}",
+      "examples": ["BST Nodes in Range", "Range Sum BST", "Trim BST"]
+    }
+  ],
+  "edgeCases": [
+    "Empty tree (root = null) — return base case (0, null, empty list, etc.)",
+    "Single node tree — no children, many operations trivially return the node or its value",
+    "All nodes in left subtree or all in right (skewed tree) — O(N) height, not O(log N)",
+    "Duplicate values in BST — clarify if allowed; if yes, decide left vs right placement convention",
+    "Integer overflow in BST bounds — use Long.MIN_VALUE and Long.MAX_VALUE for validation",
+    "Null children in serialization — must represent explicitly (e.g., -1) to preserve structure",
+    "Deleting root node — must return new root; caller needs to update reference",
+    "Leaf node deletion — simply return null; parent's pointer becomes null",
+    "Node with one child deletion — return that child; parent points directly to grandchild",
+    "Node with two children deletion — find inorder predecessor (max in left) or successor (min in right), copy value, recursively delete the pred/succ",
+    "Level-order queue size changing during iteration — snapshot size before loop to process one level",
+    "Negative node values — affects range queries and two-sum; ensure comparisons handle negatives correctly"
+  ]
+}

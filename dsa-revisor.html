@@ -1365,6 +1365,33 @@
       color: var(--ink) !important;
     }
 
+    html body .prob-image-wrap {
+      margin: 14px 0 18px !important;
+      padding: 12px !important;
+      background: var(--paper-3) !important;
+      border: 1px dashed var(--rule) !important;
+      border-radius: 8px !important;
+    }
+    html body .prob-image-label {
+      font-family: 'Quicksand', sans-serif !important;
+      font-size: 10px !important;
+      font-weight: 700 !important;
+      letter-spacing: 0.14em !important;
+      text-transform: uppercase !important;
+      color: var(--ink-soft) !important;
+      margin-bottom: 8px !important;
+    }
+    html body .prob-image {
+      display: block !important;
+      max-width: 100% !important;
+      height: auto !important;
+      border-radius: 6px !important;
+      box-shadow: 0 4px 14px rgba(28, 37, 48, 0.10) !important;
+      opacity: 0.92 !important;
+      transition: opacity 0.2s ease !important;
+    }
+    html body .prob-image:hover { opacity: 1 !important; }
+
     html body .prob-story {
       background: var(--coral-soft) !important;
       border: 3px solid var(--coral) !important;
@@ -2431,6 +2458,10 @@
       <div class="prob-story" id="probStory"></div>
       <div class="prob-tale" id="probTale"></div>
       <div class="prob-desc" id="probDesc"></div>
+      <div class="prob-image-wrap" id="probImageWrap" style="display:none">
+        <div class="prob-image-label">Original problem screenshot</div>
+        <img class="prob-image" id="probImage" alt="problem screenshot" loading="lazy">
+      </div>
 
       <div class="io-grid">
         <div class="io-box">
@@ -2738,6 +2769,15 @@
       taleProbEl.style.display = pTale ? '' : 'none';
     }
     document.getElementById('probDesc').textContent = p.description || '';
+    var imgWrap = document.getElementById('probImageWrap');
+    var imgEl = document.getElementById('probImage');
+    if (p.image) {
+      imgEl.src = 'Scaler/DSA/Advanced/Revise/data/' + p.image;
+      imgWrap.style.display = '';
+    } else {
+      imgEl.removeAttribute('src');
+      imgWrap.style.display = 'none';
+    }
     document.getElementById('sampleIn').textContent = p.sampleInput || '';
     document.getElementById('sampleOut').textContent = p.sampleOutput || '';
 

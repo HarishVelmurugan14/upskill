@@ -9,6 +9,21 @@
       "name": "Linked List",
       "file": "linked-list.json",
       "notesFile": "linked-list.notes.json"
+    },
+    {
+      "name": "Stacks",
+      "file": "stacks.json",
+      "notesFile": "stacks.notes.json"
+    },
+    {
+      "name": "Queues",
+      "file": "queues.json",
+      "notesFile": "queues.notes.json"
+    },
+    {
+      "name": "Trees",
+      "file": "trees.json",
+      "notesFile": "trees.notes.json"
     }
   ]
 }

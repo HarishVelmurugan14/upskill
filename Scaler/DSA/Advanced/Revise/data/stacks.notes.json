@@ -1,0 +1,146 @@
+{
+  "topic": "Stacks",
+  "summary": "Stacks are LIFO (Last In, First Out) data structures fundamental to expression evaluation, parsing, and monotonic sequence problems. Key patterns: balanced parentheses validation, infix/postfix conversion, nearest smaller/greater element computation (monotonic stacks), histogram-based area problems, and sign/operator tracking through nested contexts. Stacks excel at tracking state through recursive-like iterations, eliminating elements that become irrelevant, and maintaining sorted or bounded sequences in linear time.",
+  "thoughtProcess": [
+    {
+      "title": "1. When to Think Stack",
+      "body": "Use a stack when: (a) you need to match or validate nested structures (parentheses, brackets, tags), (b) you're traversing a sequence and need to 'look back' at recent elements that may become irrelevant, (c) you need nearest smaller/greater element to left or right, (d) you're converting or evaluating expressions with operator precedence, (e) you need to track cumulative state through nested contexts (like sign tracking through brackets), or (f) you're simulating recursion iteratively. If the problem mentions 'most recent', 'matching pairs', 'eliminate', or 'next/prev greater/smaller', think stack."
+    },
+    {
+      "title": "2. Monotonic Stack Pattern",
+      "body": "A monotonic stack maintains elements in increasing or decreasing order. When a new element violates the order, pop until restored, then push the new element. This eliminates 'useless' candidates in O(1) amortized per element. Monotonic increasing stack finds nearest smaller elements (left: iterate left-to-right, right: iterate right-to-left). Monotonic decreasing stack finds nearest greater elements. Key insight: each element is pushed and popped at most once, giving O(N) total time. Store indices (not values) when you need distance/position information (e.g., histogram width calculation). Store values when you only need the value itself (e.g., next greater element)."
+    },
+    {
+      "title": "3. Histogram Pattern",
+      "body": "For histogram-based max rectangle problems: for each bar i, find the maximum width where it is the shortest bar. Compute prevSmaller[i] (nearest smaller bar to left, or -1) and nextSmaller[i] (nearest smaller bar to right, or N) using monotonic stacks. Width = nextSmaller[i] - prevSmaller[i] - 1. Area = height[i] × width. Track max area. For binary matrix rectangles, treat each row as histogram base: height[j] = consecutive 1s from current row upward in column j. Run histogram algorithm for each row. Key: reuse the histogram machinery—don't reinvent max rectangle logic."
+    },
+    {
+      "title": "4. Expression Parsing & Conversion",
+      "body": "For balanced parentheses: push opening brackets, pop and match on closing brackets. If stack empty on close or mismatch, return invalid. For infix to postfix: operands → output immediately; operators → pop all from stack with >= precedence (don't pop past '('), then push current operator; '(' → push as wall; ')' → pop until '(' found, discard '('. For expression comparison (e.g., check two bracket expressions): track cumulative sign through nested brackets using stack. Stack holds context (current sign multiplier). '(' inherits context: stack.push(stack.peek() × currentSign). Variable records: sign[var] = stack.peek() × currentSign. Compare sign arrays for equivalence."
+    },
+    {
+      "title": "5. Contribution Technique",
+      "body": "For subarray contribution problems (e.g., sum of max-min across all subarrays): each element contributes to multiple subarrays. Count how many subarrays have element i as max/min. Use four monotonic stacks to compute prevSmaller, nextSmaller, prevGreater, nextGreater. Count as max = (i - prevGreater[i]) × (nextGreater[i] - i). Count as min = (i - prevSmaller[i]) × (nextSmaller[i] - i). Contribution[i] = A[i] × (count as max - count as min). Sum all contributions modulo MOD. This reduces brute force O(N²) or O(N³) to O(N)."
+    },
+    {
+      "title": "6. Two-Stack Design Patterns",
+      "body": "Min Stack: maintain two parallel stacks—main stack holds values, min stack holds running minimum. On push(val), push val to main, push min(val, minStack.peek()) to min stack. On pop, pop from both. getMin() returns minStack.peek(). All ops O(1). Sort Stack: use auxiliary sorted stack. Pop from input, find correct position in sorted (pop larger elements back to input temporarily), push element, restore elements from input to sorted. O(N²) time but O(N) space. Key: sorted stack maintains invariant—always ascending/descending. Transfer logic handles insertion sort behavior."
+    }
+  ],
+  "commonMistakes": [
+    {
+      "title": "Forgetting to Check Empty Stack Before Peek/Pop",
+      "wrong": "while (stack.peek() >= A[i]) {\n    stack.pop();\n}",
+      "right": "while (!stack.isEmpty() && stack.peek() >= A[i]) {\n    stack.pop();\n}",
+      "why": "Peek or pop on empty stack throws EmptyStackException. Always guard with isEmpty() check before accessing stack top. Common in monotonic stack loops where you pop until condition fails—condition must short-circuit if stack is empty."
+    },
+    {
+      "title": "Using Values Instead of Indices in Histogram/Contribution Problems",
+      "wrong": "Stack<Integer> stack = new Stack<>();\nstack.push(A[i]);  // pushing value",
+      "right": "Stack<Integer> stack = new Stack<>();\nstack.push(i);  // pushing index",
+      "why": "For problems requiring distance or width calculation (histogram, contribution), store indices in the stack. When you pop, you can compute distance = current_index - popped_index. If you store values, you lose position information. Use values only when you need the value itself (e.g., next greater element value)."
+    },
+    {
+      "title": "Wrong Precedence Comparison in Infix to Postfix",
+      "wrong": "while (!stack.isEmpty() && precedence(stack.peek()) > precedence(op)) {\n    output += stack.pop();\n}",
+      "right": "while (!stack.isEmpty() && stack.peek() != '(' && precedence(stack.peek()) >= precedence(op)) {\n    output += stack.pop();\n}",
+      "why": "Use >= not >. For left-associative operators (all except ^), equal precedence operators must pop first. Example: a-b+c should give ab-c+, not abc+-. Also, never pop past '(' (opening bracket is a wall). Both conditions are mandatory."
+    },
+    {
+      "title": "Not Resetting Height on 0 in Binary Matrix Histogram",
+      "wrong": "if (A[i][j] == 1) {\n    height[j]++;\n}\n// missing else: height[j] = 0",
+      "right": "if (A[i][j] == 1) {\n    height[j]++;\n} else {\n    height[j] = 0;\n}",
+      "why": "When converting binary matrix to histogram, 0 breaks the vertical sequence of 1s. Height must reset to 0, not retain previous value. Missing the else clause causes height to carry over incorrectly, yielding wrong max rectangle area."
+    },
+    {
+      "title": "Ignoring Modulo in Contribution Problems",
+      "wrong": "sum += A[i] * countAsMax;\nsum -= A[i] * countAsMin;",
+      "right": "sum += (positive * A[i]) % MOD;\nsum -= (negative * A[i]) % MOD;\nsum = (sum % MOD + MOD) % MOD;",
+      "why": "Contribution problems often involve large sums. Apply modulo at each step: after each multiplication and after each addition/subtraction. Use (sum % MOD + MOD) % MOD to handle negative intermediate values correctly. Forgetting modulo causes overflow or wrong answer."
+    },
+    {
+      "title": "Confusing prevSmaller Boundary: -1 vs 0",
+      "wrong": "prevSmaller[0] = 0;  // wrong default",
+      "right": "prevSmaller[0] = -1;  // no element to left",
+      "why": "For the first element (index 0), there's no element to the left, so prevSmaller[0] = -1 (sentinel value). Similarly, nextSmaller[N-1] = N (no element to right). These boundaries are critical for width calculation: width = nextSmaller[i] - prevSmaller[i] - 1. Using 0 instead of -1 gives width = nextSmaller[i] - 1, missing one position."
+    },
+    {
+      "title": "Wrong Direction in Monotonic Stack for Next Greater",
+      "wrong": "// iterate left to right for next greater\nfor (int i = 0; i < N; i++) { ... }",
+      "right": "// iterate right to left for next greater\nfor (int i = N - 1; i >= 0; i--) { ... }",
+      "why": "For next greater (element to the right), iterate right to left so you've already seen all candidates to the right when processing current element. For prev smaller (element to the left), iterate left to right. Direction matters: next/prev tells you which direction to scan, smaller/greater tells you stack order (increasing/decreasing)."
+    },
+    {
+      "title": "Not Handling Count for Sort Stack Transfer",
+      "wrong": "while (sorted.peek() > x) {\n    stack.push(sorted.pop());\n}\nsorted.push(x);\n// forgot to move back",
+      "right": "int count = 0;\nwhile (!sorted.isEmpty() && sorted.peek() > x) {\n    stack.push(sorted.pop());\n    count++;\n}\nsorted.push(x);\nwhile (count > 0) {\n    sorted.push(stack.pop());\n    count--;\n}",
+      "why": "When sorting stack using another stack, after moving larger elements from sorted back to input and pushing current element, you must move those larger elements back to sorted. Track count of moved elements, then restore them. Forgetting this step leaves elements stranded in input stack."
+    }
+  ],
+  "keyPatterns": [
+    {
+      "name": "Monotonic Increasing Stack (Nearest Smaller)",
+      "when": "Find nearest smaller element to left or right. Also used for histogram max rectangle (prevSmaller, nextSmaller).",
+      "template": "Stack<Integer> stack = new Stack<>();\nint[] res = new int[N];\nres[0] = -1;  // or N for next\nstack.push(0);  // push index\nfor (int i = 1; i < N; i++) {\n    while (!stack.isEmpty() && A[stack.peek()] >= A[i]) {\n        stack.pop();\n    }\n    res[i] = stack.isEmpty() ? -1 : stack.peek();\n    stack.push(i);\n}\n// For next smaller: iterate right to left, change boundary to N",
+      "examples": ["Nearest Smaller Element", "Largest Rectangle in Histogram", "MAX and MIN (prevSmaller, nextSmaller)"]
+    },
+    {
+      "name": "Monotonic Decreasing Stack (Nearest Greater)",
+      "when": "Find nearest greater element to left or right. Used in contribution problems (prevGreater, nextGreater).",
+      "template": "Stack<Integer> stack = new Stack<>();\nint[] res = new int[N];\nres[N-1] = -1;  // for next greater\nstack.push(A[N-1]);  // push value (or index if needed)\nfor (int i = N - 2; i >= 0; i--) {\n    while (!stack.isEmpty() && stack.peek() <= A[i]) {\n        stack.pop();\n    }\n    res[i] = stack.isEmpty() ? -1 : stack.peek();\n    stack.push(A[i]);\n}\n// For prev greater: iterate left to right",
+      "examples": ["Next Greater Element", "MAX and MIN (prevGreater, nextGreater)"]
+    },
+    {
+      "name": "Balanced Parentheses Validation",
+      "when": "Check if brackets/parentheses are properly nested and matched. Works for (), {}, [], or mixed.",
+      "template": "Stack<Character> stack = new Stack<>();\nfor (char c : s.toCharArray()) {\n    if (isOpening(c)) {\n        stack.push(c);\n    } else {  // closing bracket\n        if (stack.isEmpty()) return false;\n        char top = stack.pop();\n        if (!matches(top, c)) return false;\n    }\n}\nreturn stack.isEmpty();\n\nboolean matches(char open, char close) {\n    return (open == '(' && close == ')') ||\n           (open == '{' && close == '}') ||\n           (open == '[' && close == ']');\n}",
+      "examples": ["Balanced Parenthesis", "Redundant Braces"]
+    },
+    {
+      "name": "Infix to Postfix Conversion",
+      "when": "Convert infix expressions (a+b*c) to postfix (abc*+) for evaluation without parentheses. Respects operator precedence.",
+      "template": "StringBuilder output = new StringBuilder();\nStack<Character> stack = new Stack<>();\nfor (char c : infix.toCharArray()) {\n    if (Character.isLetterOrDigit(c)) {\n        output.append(c);  // operand → output\n    } else if (c == '(') {\n        stack.push(c);  // wall\n    } else if (c == ')') {\n        while (stack.peek() != '(') {\n            output.append(stack.pop());\n        }\n        stack.pop();  // discard '('\n    } else {  // operator\n        while (!stack.isEmpty() && stack.peek() != '(' &&\n               prec(stack.peek()) >= prec(c)) {\n            output.append(stack.pop());\n        }\n        stack.push(c);\n    }\n}\nwhile (!stack.isEmpty()) {\n    output.append(stack.pop());\n}\nreturn output.toString();",
+      "examples": ["Infix to Postfix", "Evaluate Expression (RPN)"]
+    },
+    {
+      "name": "Sign Tracking Through Nested Brackets",
+      "when": "Determine effective sign of variables in expressions with nested parentheses and +/- operators. Used to compare expressions.",
+      "template": "int[] sign = new int[26];  // a-z\nStack<Integer> stack = new Stack<>();\nint currentSign = 1;\nstack.push(1);  // outer context = positive\nfor (char c : expr.toCharArray()) {\n    if (c == '+') {\n        currentSign = 1;\n    } else if (c == '-') {\n        currentSign = -1;\n    } else if (c == '(') {\n        stack.push(stack.peek() * currentSign);  // inherit\n        currentSign = 1;  // reset\n    } else if (c == ')') {\n        stack.pop();  // exit context\n    } else {  // variable a-z\n        sign[c - 'a'] = stack.peek() * currentSign;\n    }\n}\n// Compare sign arrays for equivalence",
+      "examples": ["Check Two Bracket Expressions"]
+    },
+    {
+      "name": "Histogram Max Rectangle",
+      "when": "Find largest rectangle in a histogram. Reusable pattern for binary matrix max rectangle (treat each row as histogram base).",
+      "template": "int largestRectangle(int[] heights) {\n    int N = heights.length;\n    int[] prevSmaller = computePrevSmaller(heights);\n    int[] nextSmaller = computeNextSmaller(heights);\n    int maxArea = 0;\n    for (int i = 0; i < N; i++) {\n        int width = nextSmaller[i] - prevSmaller[i] - 1;\n        int area = heights[i] * width;\n        maxArea = Math.max(area, maxArea);\n    }\n    return maxArea;\n}\n// prevSmaller: monotonic increasing, left to right, default -1\n// nextSmaller: monotonic increasing, right to left, default N",
+      "examples": ["Largest Rectangle in Histogram", "Max Rectangle in Binary Matrix"]
+    },
+    {
+      "name": "Contribution Technique (Sum of Max-Min)",
+      "when": "Calculate sum of (max - min) or similar aggregate over all subarrays. Each element contributes to multiple subarrays—count its contribution.",
+      "template": "int[] prevSmaller = computePrevSmaller(A);\nint[] nextSmaller = computeNextSmaller(A);\nint[] prevGreater = computePrevGreater(A);\nint[] nextGreater = computeNextGreater(A);\nlong sum = 0;\nlong MOD = 1000000007;\nfor (int i = 0; i < N; i++) {\n    long countAsMax = (long)(i - prevGreater[i]) * (nextGreater[i] - i);\n    long countAsMin = (long)(i - prevSmaller[i]) * (nextSmaller[i] - i);\n    sum += (countAsMax * A[i]) % MOD;\n    sum -= (countAsMin * A[i]) % MOD;\n    sum = (sum % MOD + MOD) % MOD;\n}\nreturn (int)sum;",
+      "examples": ["MAX and MIN (sum of max-min across all subarrays)"]
+    },
+    {
+      "name": "Min Stack (O(1) getMin)",
+      "when": "Design a stack supporting push, pop, top, and getMin in O(1). Use auxiliary min stack mirroring main stack.",
+      "template": "Stack<Integer> stack = new Stack<>();\nStack<Integer> minStack = new Stack<>();\n\nvoid push(int val) {\n    stack.push(val);\n    if (minStack.isEmpty()) {\n        minStack.push(val);\n    } else {\n        minStack.push(Math.min(val, minStack.peek()));\n    }\n}\n\nvoid pop() {\n    if (!stack.isEmpty()) {\n        stack.pop();\n        minStack.pop();\n    }\n}\n\nint getMin() {\n    return minStack.isEmpty() ? -1 : minStack.peek();\n}",
+      "examples": ["Min Stack"]
+    }
+  ],
+  "edgeCases": [
+    "Empty stack: always check isEmpty() before peek() or pop(). Guard all stack accesses.",
+    "Single element array: prevSmaller[0] = -1, nextSmaller[0] may be 1 or N. Handle boundary indices carefully.",
+    "All elements equal: monotonic stack pops all equal elements. Ensure >= or <= condition, not > or <, depending on problem requirements.",
+    "Histogram with zeros: bars with height 0 break continuity. prevSmaller and nextSmaller handle this naturally—0 is smaller than any positive height.",
+    "Binary matrix all zeros: height array stays all zeros, histogram returns 0 area for each row. Max area = 0.",
+    "Negative numbers in contribution problems: intermediate sum can go negative before modulo. Use (sum % MOD + MOD) % MOD to normalize.",
+    "Overflow in contribution counts: (i - prevGreater[i]) * (nextGreater[i] - i) can overflow int if N is large. Cast to long before multiplication.",
+    "Operator precedence ties: in infix to postfix, operators with equal precedence must pop each other (left-associative). Use >= not >.",
+    "Nested brackets with no operators: redundant braces problem—brackets around operands with no operator inside are redundant.",
+    "Unmatched parentheses: balanced parens fails if stack non-empty at end (unclosed opening) or empty during closing (too many closings).",
+    "Expression with spaces: if input can have spaces, strip them first or handle in parsing loop.",
+    "Multiple stacks growing: in sort stack problem, ensure you move elements back correctly—count how many you moved, restore them.",
+    "Min stack with duplicates: min stack may have repeated values at different levels—this is correct. Each level tracks min up to that point.",
+    "Histogram width calculation: width = nextSmaller[i] - prevSmaller[i] - 1, not nextSmaller[i] - prevSmaller[i]. The -1 accounts for i itself."
+  ]
+}

@@ -1,0 +1,159 @@
+{
+  "topic": "Queues",
+  "summary": "Queues are FIFO (First In First Out) data structures fundamental to level-order traversal, sliding window optimization, and stream processing. The core power comes from the deque (double-ended queue), which supports O(1) operations at both ends. Key applications: maintaining sliding window min/max with monotonic deques, implementing queues using stacks (amortized O(1)), BFS generation (level-order tree exploration), and stream processing with frequency tracking. Queues excel when you need to preserve insertion order while efficiently tracking extremes (min/max) or processing elements in arrival sequence.",
+  "thoughtProcess": [
+    {
+      "title": "1. When to Use a Queue vs Deque",
+      "body": "Use a plain queue (FIFO only) for simple BFS, level-order traversal, or task scheduling where you only need push-back and pop-front. Use a deque (double-ended) when you need to access or modify both ends: sliding window problems (remove from front as window slides, add to back), monotonic deque patterns (evict from back when maintaining max/min), or implementing queue with stacks (transfer elements by reversing). Deque is the Swiss Army knife — use it by default unless you're certain you only need one end."
+    },
+    {
+      "title": "2. Monotonic Deque Pattern (Sliding Window Max/Min)",
+      "body": "For sliding window maximum: maintain deque in DECREASING order of values. When a new element arrives, remove all smaller elements from the back (they can never be max anymore). The front always holds the max. For minimum: maintain INCREASING order and remove larger elements. Use indices, not values, so you can check if the front is out of the window. This pattern converts O(N·K) brute force (N windows, K elements each) to O(N) (each element enters/leaves deque once). The key insight: when a larger element arrives, all smaller elements before it become irrelevant for future windows."
+    },
+    {
+      "title": "3. Queue Using Two Stacks (Amortized O(1))",
+      "body": "Two stacks simulate a queue: inputStack (receives pushes), outputStack (serves pops/peeks). Push goes to inputStack. Pop/peek from outputStack; if empty, transfer all elements from inputStack to outputStack (this reverses the stack, making LIFO → FIFO). Each element is moved at most twice (input → output), so all operations are amortized O(1). The lazy transfer (only when output is empty) is crucial for amortization. This pattern is essential when you need queue behavior but only have stack primitives (or when designing data structures with limited operations)."
+    },
+    {
+      "title": "4. BFS Generation with Queue (Number/String Generation)",
+      "body": "Think of the problem as exploring an implicit tree level by level. Start with seed values in the queue. For each dequeue, that's the next answer — then generate children and enqueue them. The queue's FIFO property ensures you explore levels in order, which often translates to ascending order (numbers) or lexicographic order (strings). Example: generating numbers with digits 1,2,3 → seeds [1,2,3], each spawns [X1, X2, X3] by appending. Queue naturally maintains sorted order because smaller numbers are enqueued earlier."
+    },
+    {
+      "title": "5. Stream Processing (First Non-Repeating Character)",
+      "body": "For stream problems (process elements one by one, answer query after each): combine a deque (maintains order of candidates) with a HashMap (tracks frequencies). Add new elements to the deque if they're fresh. After each addition, clean the deque front by removing elements whose frequency > threshold (e.g., > 1 for non-repeating). The cleaned front is the answer. This lazy deletion pattern is O(N) total because each element enters and leaves the deque at most once. The deque holds potential answers, the map filters them."
+    },
+    {
+      "title": "6. Two-Deque Pattern (Simultaneous Min and Max)",
+      "body": "For problems needing both min and max in a sliding window, use two independent deques in parallel: one decreasing (max), one increasing (min). Both use the same window maintenance logic (remove stale indices from front, add new index to back, evict incompatible elements from back). At each window position, front of maxDeque = max, front of minDeque = min. This pattern is O(N) because each element enters/leaves each deque once. Common in problems asking for sum/product/range of min+max across all windows."
+    }
+  ],
+  "commonMistakes": [
+    {
+      "title": "Storing values instead of indices in monotonic deque",
+      "wrong": "deque.offerLast(A[i]);  // storing value",
+      "right": "deque.offerLast(i);  // storing index\n// Later: A[deque.peekFirst()] to get value",
+      "why": "You need indices to check if the front element is out of the sliding window (deque.peekFirst() < i - B + 1). If you store values, you can't determine position. Always store indices, look up values when needed."
+    },
+    {
+      "title": "Forgetting to remove stale indices from deque front",
+      "wrong": "if (i >= B - 1) {\n  result[i-B+1] = A[deque.peekFirst()];\n  // Missing: remove front if out of window\n}",
+      "right": "if (i >= B - 1) {\n  result[i-B+1] = A[deque.peekFirst()];\n  if (deque.peekFirst() == i - B + 1) {\n    deque.removeFirst();\n  }\n}",
+      "why": "The front index might be leaving the window on the next iteration. If you don't remove it now, it will contaminate the next window's answer. Check after recording the result."
+    },
+    {
+      "title": "Wrong inequality in monotonic deque eviction",
+      "wrong": "// For max: removing when A[i] > A[deque.peekLast()]\nwhile (!deque.isEmpty() && A[i] > A[deque.peekLast()]) {\n  deque.removeLast();\n}",
+      "right": "// For max: use >= to handle duplicates\nwhile (!deque.isEmpty() && A[i] >= A[deque.peekLast()]) {\n  deque.removeLast();\n}",
+      "why": "Use >= (not >) to remove equal elements. If you keep duplicates, the deque grows unnecessarily. For max, you want the newest occurrence of a value (rightmost), so evict older equal values. For min, same logic with inverted comparison."
+    },
+    {
+      "title": "Transferring stacks in queue implementation on every operation",
+      "wrong": "public int pop() {\n  // Transfer every time\n  while (!inputStack.isEmpty()) {\n    outputStack.push(inputStack.pop());\n  }\n  return outputStack.pop();\n}",
+      "right": "public int pop() {\n  if (outputStack.isEmpty()) {  // Only transfer when empty\n    while (!inputStack.isEmpty()) {\n      outputStack.push(inputStack.pop());\n    }\n  }\n  return outputStack.pop();\n}",
+      "why": "The LAZY transfer is what makes it amortized O(1). If you transfer every time, you're doing O(N) work per pop. Only transfer when outputStack is empty — elements stay in outputStack until all are consumed, then you flip the inputStack once."
+    },
+    {
+      "title": "Not using long for BFS generation (overflow)",
+      "wrong": "Queue<Integer> queue = new LinkedList<>();\nqueue.add(1);\nfor (int i = 0; i < A; i++) {\n  int num = queue.poll();\n  result[i] = num;\n  queue.add(num * 10 + 1);  // Overflow for large nums\n}",
+      "right": "Queue<Long> queue = new LinkedList<>();\nqueue.add(1L);\nfor (int i = 0; i < A; i++) {\n  long num = queue.poll();\n  result[i] = (int) num;\n  queue.add(num * 10 + 1);\n}",
+      "why": "When generating numbers by appending digits (multiply by 10), intermediate values can exceed int range even if the first A results fit in 32 bits. Use long in the queue, cast to int only when storing the result."
+    },
+    {
+      "title": "Adding characters to deque on every occurrence (stream processing)",
+      "wrong": "for (char x : A.toCharArray()) {\n  map.put(x, map.getOrDefault(x, 0) + 1);\n  deque.offerLast(x);  // Always add\n  // Clean front...\n}",
+      "right": "for (char x : A.toCharArray()) {\n  if (!map.containsKey(x)) {\n    deque.offerLast(x);  // Only add on first occurrence\n    map.put(x, 1);\n  } else {\n    map.put(x, map.get(x) + 1);\n  }\n  // Clean front...\n}",
+      "why": "You only want each character to appear ONCE in the deque (the first time it's seen). If you add it every time, the deque will have duplicates and cleaning the front won't work. The deque holds the ORDER of first appearances, not every occurrence."
+    },
+    {
+      "title": "Forgetting modulo in sum accumulation (not just final result)",
+      "wrong": "long sum = 0;\nfor (...) {\n  sum += A[maxDeque.peekFirst()] + A[minDeque.peekFirst()];\n}\nreturn (int) (sum % MOD);  // Overflow before modulo",
+      "right": "long sum = 0;\nfor (...) {\n  sum = (sum + A[maxDeque.peekFirst()] + A[minDeque.peekFirst()]) % MOD;\n}\nreturn (int) sum;",
+      "why": "If you accumulate without modulo, sum can overflow long before you apply modulo at the end. Apply modulo after each addition to keep values bounded. Also handle negative sums: (sum + MOD) % MOD at the end."
+    },
+    {
+      "title": "Using Queue instead of Deque for sliding window",
+      "wrong": "Queue<Integer> queue = new LinkedList<>();\n// Can't remove from back for monotonic property",
+      "right": "Deque<Integer> deque = new LinkedList<>();\n// Can remove from both ends: removeFirst(), removeLast()",
+      "why": "Queue interface only supports poll() (remove front) and offer() (add back). Sliding window max/min requires removing from the BACK when maintaining monotonic property. You need Deque for pollLast() / removeLast(). Use Deque for all queue-like patterns unless you're certain you only need FIFO."
+    }
+  ],
+  "keyPatterns": [
+    {
+      "name": "Sliding Window Maximum (Monotonic Deque)",
+      "when": "Find max/min in every subarray of size K. 'Busiest section', 'maximum in sliding window', 'smallest element in each window'.",
+      "template": "Deque<Integer> deque = new LinkedList<>();\nfor (int i = 0; i < N; i++) {\n  // Remove smaller elements from back (for max)\n  while (!deque.isEmpty() && A[i] >= A[deque.peekLast()]) {\n    deque.removeLast();\n  }\n  deque.offerLast(i);\n  \n  // Remove front if out of window\n  while (deque.peekFirst() < i - K + 1) {\n    deque.removeFirst();\n  }\n  \n  // Window fully formed?\n  if (i >= K - 1) {\n    result[i-K+1] = A[deque.peekFirst()];\n  }\n}",
+      "examples": [
+        "Parking Ice Cream Truck (sliding window max)",
+        "LC 239 - Sliding Window Maximum",
+        "Smallest element in each window"
+      ]
+    },
+    {
+      "name": "Queue Using Two Stacks (Amortized O(1))",
+      "when": "Implement queue with stack primitives. 'FIFO using LIFO', 'simulate queue', 'limited to stack operations'.",
+      "template": "Stack<Integer> inputStack = new Stack<>();\nStack<Integer> outputStack = new Stack<>();\n\nvoid push(int X) {\n  inputStack.push(X);\n}\n\nint pop() {\n  transferIfNeeded();\n  return outputStack.pop();\n}\n\nint peek() {\n  transferIfNeeded();\n  return outputStack.peek();\n}\n\nvoid transferIfNeeded() {\n  if (outputStack.isEmpty()) {\n    while (!inputStack.isEmpty()) {\n      outputStack.push(inputStack.pop());\n    }\n  }\n}",
+      "examples": [
+        "Implement Queue Using Stacks",
+        "LC 232 - Implement Queue using Stacks",
+        "Design FIFO with LIFO primitives"
+      ]
+    },
+    {
+      "name": "BFS Generation (Level-Order Exploration)",
+      "when": "Generate numbers/strings with constraints in ascending/lexicographic order. 'First N numbers', 'integers containing only digits X, Y, Z', 'lexicographically smallest'.",
+      "template": "Queue<Long> queue = new LinkedList<>();\n// Seed with initial valid values\nqueue.add(1L);\nqueue.add(2L);\nqueue.add(3L);\n\nfor (int i = 0; i < A; i++) {\n  long num = queue.poll();\n  result[i] = (int) num;\n  \n  // Generate children by transformation\n  queue.add(num * 10 + 1);\n  queue.add(num * 10 + 2);\n  queue.add(num * 10 + 3);\n}",
+      "examples": [
+        "N Integers Containing 1, 2, 3",
+        "Generate binary strings with no consecutive 1s",
+        "Ugly Numbers (multiples of 2, 3, 5 only)"
+      ]
+    },
+    {
+      "name": "Stream Processing (Deque + HashMap)",
+      "when": "Process stream element by element, query after each. 'First non-repeating character', 'unique letter after each addition', 'stream of integers, find median'.",
+      "template": "HashMap<Character, Integer> map = new HashMap<>();\nDeque<Character> deque = new LinkedList<>();\nStringBuilder result = new StringBuilder();\n\nfor (char x : stream.toCharArray()) {\n  // Update frequency\n  map.put(x, map.getOrDefault(x, 0) + 1);\n  \n  // Add to deque on first occurrence\n  if (map.get(x) == 1) {\n    deque.offerLast(x);\n  }\n  \n  // Clean front: remove repeated characters\n  while (!deque.isEmpty() && map.get(deque.peekFirst()) > 1) {\n    deque.removeFirst();\n  }\n  \n  // Answer: front of deque or default\n  result.append(deque.isEmpty() ? '#' : deque.peekFirst());\n}",
+      "examples": [
+        "First Non-Repeating Character in Stream",
+        "LC 387 - First Unique Character in a String",
+        "Stream of characters, find first non-repeating"
+      ]
+    },
+    {
+      "name": "Two Deques (Simultaneous Min and Max)",
+      "when": "Need both min AND max in sliding window. 'Sum of min+max', 'range = max-min', 'difference between extremes'.",
+      "template": "Deque<Integer> maxDeque = new ArrayDeque<>();\nDeque<Integer> minDeque = new ArrayDeque<>();\n\nfor (int i = 0; i < N; i++) {\n  // Maintain decreasing deque for max\n  while (!maxDeque.isEmpty() && A[i] >= A[maxDeque.peekLast()])\n    maxDeque.pollLast();\n  maxDeque.addLast(i);\n  \n  // Maintain increasing deque for min\n  while (!minDeque.isEmpty() && A[i] <= A[minDeque.peekLast()])\n    minDeque.pollLast();\n  minDeque.addLast(i);\n  \n  // Remove stale indices from both\n  while (maxDeque.peekFirst() < i - K + 1) maxDeque.pollFirst();\n  while (minDeque.peekFirst() < i - K + 1) minDeque.pollFirst();\n  \n  if (i >= K - 1) {\n    int max = A[maxDeque.peekFirst()];\n    int min = A[minDeque.peekFirst()];\n    // Use max and min...\n  }\n}",
+      "examples": [
+        "Sum of Min and Max in All Subarrays",
+        "LC 1438 - Longest Continuous Subarray With Absolute Diff <= Limit",
+        "Maximum of min(A[i..j]) + max(A[i..j])"
+      ]
+    },
+    {
+      "name": "BFS Level-Order Traversal (Standard Queue)",
+      "when": "Process tree/graph level by level. 'Shortest path', 'level-order traversal', '0-1 BFS'.",
+      "template": "Queue<Node> queue = new LinkedList<>();\nqueue.add(root);\nboolean[] visited = new boolean[N];\nvisited[root] = true;\n\nwhile (!queue.isEmpty()) {\n  Node node = queue.poll();\n  // Process node\n  \n  for (Node neighbor : node.neighbors) {\n    if (!visited[neighbor]) {\n      visited[neighbor] = true;\n      queue.add(neighbor);\n    }\n  }\n}",
+      "examples": [
+        "Binary Tree Level Order Traversal",
+        "Shortest path in unweighted graph",
+        "Minimum steps to reach target (BFS)"
+      ]
+    }
+  ],
+  "edgeCases": [
+    "Window size B = 1 (every element is its own window — deque has only 1 element always)",
+    "Window size B >= N (only one window covering entire array — return single result)",
+    "Empty array or N = 0 (return empty result)",
+    "All elements equal (deque front never changes for max/min)",
+    "Array with only one element (N = 1, B = 1 → return that element)",
+    "Negative numbers in sliding window (min can be negative, handle modulo correctly for sum)",
+    "Stream with no unique characters (deque becomes empty, output all '#')",
+    "Stream with all unique characters (deque grows to size N, every character is unique)",
+    "BFS generation with A = 0 (return empty array)",
+    "BFS generation with A = 1 (return [seed_value])",
+    "Queue using stacks: pop/peek when both stacks are empty (should never happen per problem constraints, but check)",
+    "Deque front index equals window start (deque.peekFirst() == i - B + 1) — must remove on THAT iteration",
+    "Integer overflow in BFS generation (use long for intermediate values)",
+    "Modulo sum becomes negative when all array values are negative (apply (sum + MOD) % MOD at end)",
+    "Duplicate elements at window boundary (deque eviction must use >= or <= to handle duplicates)"
+  ]
+}

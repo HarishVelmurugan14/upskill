@@ -27,43 +27,53 @@
     "viz": {
       "kind": "scripted-array",
       "data": {
-        "A": [
-          1,
-          2,
-          3
-        ],
-        "footer": "Linked list traversal \u2014 1\u21922\u21923\u2192NULL. Walk with a pointer, print each value.",
-        "legend": [
-          "c-input",
-          "c-active",
-          "c-result"
-        ],
+        "A": [1, 2, 3],
+        "footer": "Linked list traversal \u2014 1\u21922\u21923\u2192\u2205. Walk with a pointer, print each value. O(N) time, O(1) space.",
+        "legend": ["c-input", "c-active", "c-result"],
         "script": [
           {
-            "label": "SETUP",
-            "msg": "Linked list: <strong>1 \u2192 2 \u2192 3 \u2192 NULL</strong>. Task: walk the list and print each node's value followed by a space. Use a pointer <strong>curr</strong> that advances node by node.",
-            "html": "<div class='v-label'>LINKED LIST</div><div class='v-row'><div class='v-cell'>1</div><span class='v-arrow'>\u2192</span><div class='v-cell'>2</div><span class='v-arrow'>\u2192</span><div class='v-cell'>3</div><span class='v-arrow'>\u2192</span><div class='v-cell v-null'>NULL</div></div>"
+            "label": "SETUP \u2014 the problem",
+            "msg": "Linked list: <strong>1 \u2192 2 \u2192 3 \u2192 \u2205</strong>. Task: walk the list and print each node's value followed by a space. Use a pointer <strong>curr</strong> that advances node by node until we reach <strong>null</strong>.",
+            "html": "<div class='v-label'>LINKED LIST</div><div class='v-row'><div class='v-cell'>1</div><span class='v-arrow'>\u2192</span><div class='v-cell'>2</div><span class='v-arrow'>\u2192</span><div class='v-cell'>3</div><span class='v-arrow'>\u2192</span><div class='v-cell v-null'>\u2205</div></div>"
           },
           {
-            "label": "STEP 1 \u2014 curr at node 1",
-            "msg": "Initialize <strong>curr = head</strong>. curr points to <strong>node 1</strong>. Print <strong>1</strong>, then advance: <strong>curr = curr.next</strong>.",
-            "html": "<div class='v-label'>curr \u2192 1</div><div class='v-row'><div class='v-cell v-current'>1</div><span class='v-arrow'>\u2192</span><div class='v-cell'>2</div><span class='v-arrow'>\u2192</span><div class='v-cell'>3</div><span class='v-arrow'>\u2192</span><div class='v-cell v-null'>NULL</div></div><div class='v-row' style='margin-top:8px;'><span class='v-stat'>output: <strong>1</strong></span></div>",
-            "overlay": "Loop pattern: <code>while (curr != null) { print(curr.val); curr = curr.next; }</code>"
+            "label": "INITIALIZE POINTER",
+            "msg": "Set <strong>curr = head</strong>. The pointer curr now references the first node (<strong>node 1</strong>). We'll use this pointer to walk through the entire list, printing each node's value as we go.",
+            "html": "<div class='v-row' style='align-items:flex-end;'><div style='display:flex;flex-direction:column;align-items:center;gap:4px;'><span style='font-size:10px;color:#bc8cff;font-weight:700;letter-spacing:.1em;'>CURR</span><div class='v-cell v-current'><strong>1</strong></div></div><span class='v-arrow'>\u2192</span><div class='v-cell'><strong>2</strong></div><span class='v-arrow'>\u2192</span><div class='v-cell'><strong>3</strong></div><span class='v-arrow'>\u2192</span><div class='v-cell v-null'>\u2205</div></div>",
+            "overlay": "Loop condition: <code>while (curr != null)</code><br>Inside loop: <code>print(curr.val + ' '); curr = curr.next;</code>"
           },
           {
-            "label": "STEP 2 \u2014 curr at node 2",
-            "msg": "curr now points to <strong>node 2</strong>. Print <strong>2</strong>, advance to <strong>node 3</strong>.",
-            "html": "<div class='v-label'>curr \u2192 2</div><div class='v-row'><div class='v-cell v-result'>1</div><span class='v-arrow'>\u2192</span><div class='v-cell v-current'>2</div><span class='v-arrow'>\u2192</span><div class='v-cell'>3</div><span class='v-arrow'>\u2192</span><div class='v-cell v-null'>NULL</div></div><div class='v-row' style='margin-top:8px;'><span class='v-stat'>output: 1 <strong>2</strong></span></div>"
+            "label": "ITERATION 1 \u2014 print node 1",
+            "msg": "curr points to <strong>node 1</strong> (value <strong>1</strong>). Print '<strong>1 </strong>' to output. Then advance the pointer: <strong>curr = curr.next</strong>, so curr now points to <strong>node 2</strong>.",
+            "html": "<div class='v-row' style='align-items:flex-end;'><div class='v-cell v-result'><strong>1</strong></div><span class='v-arrow'>\u2192</span><div style='display:flex;flex-direction:column;align-items:center;gap:4px;'><span style='font-size:10px;color:#bc8cff;font-weight:700;letter-spacing:.1em;'>CURR</span><div class='v-cell v-current'><strong>2</strong></div></div><span class='v-arrow'>\u2192</span><div class='v-cell'><strong>3</strong></div><span class='v-arrow'>\u2192</span><div class='v-cell v-null'>\u2205</div></div><div class='v-row' style='margin-top:8px;'><span class='v-stat'>output: <strong>1</strong> </span></div>",
+            "overlay": "The pattern repeats: <code>print(curr.val)</code> then <code>curr = curr.next</code>"
           },
           {
-            "label": "STEP 3 \u2014 curr at node 3",
-            "msg": "curr points to <strong>node 3</strong>. Print <strong>3</strong>, advance. Now <strong>curr = NULL</strong> \u2192 loop exits.",
-            "html": "<div class='v-label'>curr \u2192 3</div><div class='v-row'><div class='v-cell v-result'>1</div><span class='v-arrow'>\u2192</span><div class='v-cell v-result'>2</div><span class='v-arrow'>\u2192</span><div class='v-cell v-current'>3</div><span class='v-arrow'>\u2192</span><div class='v-cell v-null'>NULL</div></div><div class='v-row' style='margin-top:8px;'><span class='v-stat'>output: 1 2 <strong>3</strong></span></div>"
+            "label": "ITERATION 2 \u2014 print node 2",
+            "msg": "curr points to <strong>node 2</strong> (value <strong>2</strong>). Print '<strong>2 </strong>' to output. Advance again: <strong>curr = curr.next</strong>, so curr now points to <strong>node 3</strong>.",
+            "html": "<div class='v-row' style='align-items:flex-end;'><div class='v-cell v-result'><strong>1</strong></div><span class='v-arrow'>\u2192</span><div class='v-cell v-result'><strong>2</strong></div><span class='v-arrow'>\u2192</span><div style='display:flex;flex-direction:column;align-items:center;gap:4px;'><span style='font-size:10px;color:#bc8cff;font-weight:700;letter-spacing:.1em;'>CURR</span><div class='v-cell v-current'><strong>3</strong></div></div><span class='v-arrow'>\u2192</span><div class='v-cell v-null'>\u2205</div></div><div class='v-row' style='margin-top:8px;'><span class='v-stat'>output: 1 <strong>2</strong> </span></div>"
           },
           {
-            "label": "DONE",
-            "msg": "\u2705 <strong>Output: 1 2 3</strong>. The pointer walked all nodes in <strong>O(N)</strong> time, <strong>O(1)</strong> space. This traversal pattern is the foundation of every linked list algorithm.",
-            "html": "<div class='v-label'>RESULT</div><div class='v-row'><div class='v-cell v-result'>1</div><span class='v-arrow'>\u2192</span><div class='v-cell v-result'>2</div><span class='v-arrow'>\u2192</span><div class='v-cell v-result'>3</div><span class='v-arrow'>\u2192</span><div class='v-cell v-null'>NULL</div></div><div class='v-row' style='margin-top:8px;'><span class='v-stat'>output: <strong>1 2 3</strong></span></div>"
+            "label": "ITERATION 3 \u2014 print node 3",
+            "msg": "curr points to <strong>node 3</strong> (value <strong>3</strong>). Print '<strong>3 </strong>' to output. Advance: <strong>curr = curr.next</strong>. Now <strong>curr = \u2205</strong> (null). The loop condition <code>curr != null</code> becomes <strong>false</strong>, so the loop exits.",
+            "html": "<div class='v-row' style='align-items:flex-end;'><div class='v-cell v-result'><strong>1</strong></div><span class='v-arrow'>\u2192</span><div class='v-cell v-result'><strong>2</strong></div><span class='v-arrow'>\u2192</span><div class='v-cell v-result'><strong>3</strong></div><span class='v-arrow'>\u2192</span><div style='display:flex;flex-direction:column;align-items:center;gap:4px;'><span style='font-size:10px;color:#bc8cff;font-weight:700;letter-spacing:.1em;'>CURR</span><div class='v-cell v-null'>\u2205</div></div></div><div class='v-row' style='margin-top:8px;'><span class='v-stat'>output: 1 2 <strong>3</strong> </span></div>",
+            "overlay": "When <code>curr == null</code> the loop terminates. Every node has been visited exactly once."
+          },
+          {
+            "label": "LOOP EXITS \u2014 print newline",
+            "msg": "Loop exits because <strong>curr = \u2205</strong>. Print a newline character to complete the output. The traversal is finished \u2014 we visited all <strong>3 nodes</strong> in sequence.",
+            "html": "<div class='v-label'>TRAVERSED LIST</div><div class='v-row'><div class='v-cell v-result'><strong>1</strong></div><span class='v-arrow'>\u2192</span><div class='v-cell v-result'><strong>2</strong></div><span class='v-arrow'>\u2192</span><div class='v-cell v-result'><strong>3</strong></div><span class='v-arrow'>\u2192</span><div class='v-cell v-null'>\u2205</div></div><div class='v-row' style='margin-top:8px;'><span class='v-stat'>output: <strong>1 2 3</strong> (+ newline)</span></div>"
+          },
+          {
+            "label": "COMPLEXITY ANALYSIS",
+            "msg": "\u2705 <strong>Time: O(N)</strong> \u2014 we visit each of the N nodes exactly once. <strong>Space: O(1)</strong> \u2014 we only use a single pointer variable (curr), no matter how long the list is. This single-pointer traversal is the foundation of every linked list algorithm.",
+            "html": "<div class='v-row' style='gap:16px;'><span class='v-stat' style='background:#1e3a8a;'>Time: <strong>O(N)</strong></span><span class='v-stat' style='background:#166534;'>Space: <strong>O(1)</strong></span></div><div class='v-row' style='margin-top:12px;'><div class='v-label'>FINAL OUTPUT</div></div><div class='v-row' style='margin-top:4px;'><span style='font-family:monospace;color:#22c55e;font-size:14px;'><strong>1 2 3</strong></span></div>",
+            "overlay": "Core pattern: <code>ListNode c = head;<br>while (c != null) {<br>&nbsp;&nbsp;process(c.val);<br>&nbsp;&nbsp;c = c.next;<br>}</code>"
+          },
+          {
+            "label": "DONE \u2014 muscle memory",
+            "msg": "This traversal pattern is so fundamental that you should be able to write it without thinking. Every linked list algorithm starts with '<strong>walk the list</strong>' \u2014 either once (O(N)) or in nested loops. Master this pattern first.",
+            "html": "<div class='v-label'>MASTER THIS PATTERN</div><div class='v-row'><div class='v-cell v-result'><strong>1</strong></div><span class='v-arrow'>\u2192</span><div class='v-cell v-result'><strong>2</strong></div><span class='v-arrow'>\u2192</span><div class='v-cell v-result'><strong>3</strong></div><span class='v-arrow'>\u2192</span><div class='v-cell v-null'>\u2205</div></div><div style='margin-top:12px;padding:8px;background:#1e293b;border-left:3px solid #3b82f6;'><div style='font-size:11px;color:#94a3b8;'>If you can write this loop from muscle memory, you're ready for reverse, merge, cycle-detection, and every other linked list problem.</div></div>"
           }
         ]
       }
@@ -135,32 +145,64 @@
           4,
           5
         ],
-        "footer": "In-place linked list reversal \u2014 1\u21922\u21923\u21924\u21925\u2192NULL. Three-pointer dance.",
+        "footer": "In-place reverse of 1→2→3→4→5→∅ using the three-pointer trick (prev, curr, next). O(N) time, O(1) space.",
         "legend": [
           "c-input",
           "c-active",
-          "c-result"
+          "c-result",
+          "c-eliminated"
         ],
         "script": [
           {
-            "label": "SETUP",
-            "msg": "List: <strong>1\u21922\u21923\u21924\u21925\u2192NULL</strong>. Reverse in-place. Three pointers: <strong>prev=null, curr=head, next=temp</strong>. At each node: save next, flip arrow, slide.",
-            "html": "<div class='v-label'>ORIGINAL</div><div class='v-row'><div class='v-cell'>1</div><span class='v-arrow'>\u2192</span><div class='v-cell'>2</div><span class='v-arrow'>\u2192</span><div class='v-cell'>3</div><span class='v-arrow'>\u2192</span><div class='v-cell'>4</div><span class='v-arrow'>\u2192</span><div class='v-cell'>5</div><span class='v-arrow'>\u2192</span><div class='v-cell v-null'>NULL</div></div>"
+            "label": "SETUP — what we are doing",
+            "msg": "We have a singly linked list <strong>1→2→3→4→5→∅</strong>. We want to reverse all the arrows so it becomes <strong>5→4→3→2→1→∅</strong>. We cannot allocate a new list — we must rewire the existing nodes in place.",
+            "html": "<div class='v-label'>ORIGINAL LIST</div><div class='v-row'><div class='v-cell'>1</div><span class='v-arrow'>→</span><div class='v-cell'>2</div><span class='v-arrow'>→</span><div class='v-cell'>3</div><span class='v-arrow'>→</span><div class='v-cell'>4</div><span class='v-arrow'>→</span><div class='v-cell'>5</div><span class='v-arrow'>→</span><div class='v-cell v-null'>∅</div></div>",
+            "overlay": "The trick: at every node we only need to do <strong>3 things</strong> — <code>save next</code>, <code>flip current arrow backward</code>, <code>slide forward</code>. Repeat until we fall off the end."
           },
           {
-            "label": "FLIP NODE 1",
-            "msg": "<strong>curr=1, prev=NULL</strong>. Save next=2, flip 1\u2192NULL, slide prev=1, curr=2.",
-            "html": "<div class='v-row'><div class='v-cell v-null'>NULL</div><span class='v-arrow v-rev'>\u2190</span><div class='v-cell v-result'>1</div><span style='margin:0 8px;'>\u22ef</span><div class='v-cell v-current'>2</div><span class='v-arrow'>\u2192</span><div class='v-cell'>3</div><span class='v-arrow'>\u2192</span><div class='v-cell'>4</div><span class='v-arrow'>\u2192</span><div class='v-cell'>5</div><span class='v-arrow'>\u2192</span><div class='v-cell v-null'>NULL</div></div>"
+            "label": "INITIALISE THREE POINTERS",
+            "msg": "Set <strong>prev = ∅</strong> (nothing has been reversed yet), <strong>curr = head = node 1</strong> (the node we are about to flip), and we'll use <strong>next</strong> as a scratch variable inside the loop to remember where to walk to.",
+            "html": "<div class='v-row' style='align-items:flex-end;'><div style='display:flex;flex-direction:column;align-items:center;gap:4px;'><span style='font-size:10px;color:#79c0ff;font-weight:700;letter-spacing:.1em;'>PREV</span><div class='v-cell v-null'>∅</div></div><span style='visibility:hidden;'>→</span><div style='display:flex;flex-direction:column;align-items:center;gap:4px;'><span style='font-size:10px;color:#bc8cff;font-weight:700;letter-spacing:.1em;'>CURR</span><div class='v-cell v-current'>1</div></div><span class='v-arrow'>→</span><div class='v-cell'>2</div><span class='v-arrow'>→</span><div class='v-cell'>3</div><span class='v-arrow'>→</span><div class='v-cell'>4</div><span class='v-arrow'>→</span><div class='v-cell'>5</div><span class='v-arrow'>→</span><div class='v-cell v-null'>∅</div></div>",
+            "overlay": "<code>ListNode prev = null;</code><br><code>ListNode curr = head;</code><br>Loop condition: <code>while (curr != null)</code>"
           },
           {
-            "label": "FLIP NODES 2-5",
-            "msg": "Continue flipping each node's arrow backward. After 5 iterations, all arrows reversed.",
-            "html": "<div class='v-row'><div class='v-cell v-null'>NULL</div><span class='v-arrow v-rev'>\u2190</span><div class='v-cell v-result'>1</div><span class='v-arrow v-rev'>\u2190</span><div class='v-cell v-result'>2</div><span class='v-arrow v-rev'>\u2190</span><div class='v-cell v-result'>3</div><span class='v-arrow v-rev'>\u2190</span><div class='v-cell v-result'>4</div><span class='v-arrow v-rev'>\u2190</span><div class='v-cell v-result'>5</div></div>"
+            "label": "ITERATION 1 — flip node 1",
+            "msg": "Save <strong>next = curr.next = node 2</strong> (else we lose access to the rest!). Flip <strong>curr.next = prev</strong>, so <strong>1.next now points to ∅</strong>. Slide <strong>prev = curr = 1</strong>, then <strong>curr = next = 2</strong>.",
+            "html": "<div class='v-row' style='align-items:flex-end;'><div class='v-cell v-null'>∅</div><span class='v-arrow v-rev'>←</span><div style='display:flex;flex-direction:column;align-items:center;gap:4px;'><span style='font-size:10px;color:#79c0ff;font-weight:700;letter-spacing:.1em;'>PREV</span><div class='v-cell v-result'>1</div></div><span style='visibility:hidden;'>→</span><div style='display:flex;flex-direction:column;align-items:center;gap:4px;'><span style='font-size:10px;color:#bc8cff;font-weight:700;letter-spacing:.1em;'>CURR</span><div class='v-cell v-current'>2</div></div><span class='v-arrow'>→</span><div class='v-cell'>3</div><span class='v-arrow'>→</span><div class='v-cell'>4</div><span class='v-arrow'>→</span><div class='v-cell'>5</div><span class='v-arrow'>→</span><div class='v-cell v-null'>∅</div></div>",
+            "overlay": "<code>ListNode next = curr.next;</code> &nbsp;// = 2<br><code>curr.next = prev;</code> &nbsp;&nbsp;&nbsp;// 1 → ∅<br><code>prev = curr;</code> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;// prev = 1<br><code>curr = next;</code> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;// curr = 2"
           },
           {
-            "label": "DONE",
-            "msg": "\u2705 <strong>Reversed: 5\u21924\u21923\u21922\u21921\u2192NULL</strong>. O(N) time, O(1) space.",
-            "html": "<div class='v-label'>REVERSED</div><div class='v-row'><div class='v-cell v-result'>5</div><span class='v-arrow'>\u2192</span><div class='v-cell v-result'>4</div><span class='v-arrow'>\u2192</span><div class='v-cell v-result'>3</div><span class='v-arrow'>\u2192</span><div class='v-cell v-result'>2</div><span class='v-arrow'>\u2192</span><div class='v-cell v-result'>1</div><span class='v-arrow'>\u2192</span><div class='v-cell v-null'>NULL</div></div>"
+            "label": "ITERATION 2 — flip node 2",
+            "msg": "Save <strong>next = curr.next = node 3</strong>. Flip <strong>curr.next = prev</strong>, so <strong>2.next now points to 1</strong>. Slide <strong>prev = 2</strong>, <strong>curr = 3</strong>.",
+            "html": "<div class='v-row' style='align-items:flex-end;'><div class='v-cell v-null'>∅</div><span class='v-arrow v-rev'>←</span><div class='v-cell v-result'>1</div><span class='v-arrow v-rev'>←</span><div style='display:flex;flex-direction:column;align-items:center;gap:4px;'><span style='font-size:10px;color:#79c0ff;font-weight:700;letter-spacing:.1em;'>PREV</span><div class='v-cell v-result'>2</div></div><span style='visibility:hidden;'>→</span><div style='display:flex;flex-direction:column;align-items:center;gap:4px;'><span style='font-size:10px;color:#bc8cff;font-weight:700;letter-spacing:.1em;'>CURR</span><div class='v-cell v-current'>3</div></div><span class='v-arrow'>→</span><div class='v-cell'>4</div><span class='v-arrow'>→</span><div class='v-cell'>5</div><span class='v-arrow'>→</span><div class='v-cell v-null'>∅</div></div>",
+            "overlay": "Notice: the link <strong>2→3</strong> is gone — replaced by <strong>2→1</strong>. We saved 3 in <code>next</code> first, so we can still reach it."
+          },
+          {
+            "label": "ITERATION 3 — flip node 3",
+            "msg": "Save <strong>next = node 4</strong>. Flip <strong>3.next = 2</strong>. Slide <strong>prev = 3</strong>, <strong>curr = 4</strong>.",
+            "html": "<div class='v-row' style='align-items:flex-end;'><div class='v-cell v-null'>∅</div><span class='v-arrow v-rev'>←</span><div class='v-cell v-result'>1</div><span class='v-arrow v-rev'>←</span><div class='v-cell v-result'>2</div><span class='v-arrow v-rev'>←</span><div style='display:flex;flex-direction:column;align-items:center;gap:4px;'><span style='font-size:10px;color:#79c0ff;font-weight:700;letter-spacing:.1em;'>PREV</span><div class='v-cell v-result'>3</div></div><span style='visibility:hidden;'>→</span><div style='display:flex;flex-direction:column;align-items:center;gap:4px;'><span style='font-size:10px;color:#bc8cff;font-weight:700;letter-spacing:.1em;'>CURR</span><div class='v-cell v-current'>4</div></div><span class='v-arrow'>→</span><div class='v-cell'>5</div><span class='v-arrow'>→</span><div class='v-cell v-null'>∅</div></div>"
+          },
+          {
+            "label": "ITERATION 4 — flip node 4",
+            "msg": "Save <strong>next = node 5</strong>. Flip <strong>4.next = 3</strong>. Slide <strong>prev = 4</strong>, <strong>curr = 5</strong>.",
+            "html": "<div class='v-row' style='align-items:flex-end;'><div class='v-cell v-null'>∅</div><span class='v-arrow v-rev'>←</span><div class='v-cell v-result'>1</div><span class='v-arrow v-rev'>←</span><div class='v-cell v-result'>2</div><span class='v-arrow v-rev'>←</span><div class='v-cell v-result'>3</div><span class='v-arrow v-rev'>←</span><div style='display:flex;flex-direction:column;align-items:center;gap:4px;'><span style='font-size:10px;color:#79c0ff;font-weight:700;letter-spacing:.1em;'>PREV</span><div class='v-cell v-result'>4</div></div><span style='visibility:hidden;'>→</span><div style='display:flex;flex-direction:column;align-items:center;gap:4px;'><span style='font-size:10px;color:#bc8cff;font-weight:700;letter-spacing:.1em;'>CURR</span><div class='v-cell v-current'>5</div></div><span class='v-arrow'>→</span><div class='v-cell v-null'>∅</div></div>"
+          },
+          {
+            "label": "ITERATION 5 — flip node 5 (the last one)",
+            "msg": "Save <strong>next = 5.next = ∅</strong>. Flip <strong>5.next = 4</strong>. Slide <strong>prev = 5</strong>, <strong>curr = ∅</strong>. Now curr is null — the loop will exit.",
+            "html": "<div class='v-row' style='align-items:flex-end;'><div class='v-cell v-null'>∅</div><span class='v-arrow v-rev'>←</span><div class='v-cell v-result'>1</div><span class='v-arrow v-rev'>←</span><div class='v-cell v-result'>2</div><span class='v-arrow v-rev'>←</span><div class='v-cell v-result'>3</div><span class='v-arrow v-rev'>←</span><div class='v-cell v-result'>4</div><span class='v-arrow v-rev'>←</span><div style='display:flex;flex-direction:column;align-items:center;gap:4px;'><span style='font-size:10px;color:#79c0ff;font-weight:700;letter-spacing:.1em;'>PREV</span><div class='v-cell v-result'>5</div></div><span style='visibility:hidden;'>→</span><div style='display:flex;flex-direction:column;align-items:center;gap:4px;'><span style='font-size:10px;color:#bc8cff;font-weight:700;letter-spacing:.1em;'>CURR</span><div class='v-cell v-null'>∅</div></div></div>",
+            "overlay": "Why this works on the last node: <code>next = ∅</code>, so when we set <code>curr = next</code> the loop condition <code>curr != null</code> becomes false."
+          },
+          {
+            "label": "LOOP EXITS — prev is the new head",
+            "msg": "Loop exits because <strong>curr = ∅</strong>. The variable <strong>prev still points to node 5</strong>, which is now the head of the reversed list. Return <strong>prev</strong>.",
+            "html": "<div class='v-row' style='align-items:flex-end;'><div class='v-cell v-null'>∅</div><span class='v-arrow v-rev'>←</span><div class='v-cell v-result'>1</div><span class='v-arrow v-rev'>←</span><div class='v-cell v-result'>2</div><span class='v-arrow v-rev'>←</span><div class='v-cell v-result'>3</div><span class='v-arrow v-rev'>←</span><div class='v-cell v-result'>4</div><span class='v-arrow v-rev'>←</span><div style='display:flex;flex-direction:column;align-items:center;gap:4px;'><span style='font-size:10px;color:#79c0ff;font-weight:700;letter-spacing:.1em;'>NEW HEAD ← PREV</span><div class='v-cell v-result'>5</div></div></div>",
+            "overlay": "<code>return prev;</code> &nbsp;// = node 5"
+          },
+          {
+            "label": "DONE — re-read in the natural direction",
+            "msg": "✅ Reading from the returned head <strong>5</strong> following the (now-flipped) next pointers: <strong>5 → 4 → 3 → 2 → 1 → ∅</strong>. The list is fully reversed in <strong>O(N)</strong> time, <strong>O(1)</strong> extra space.",
+            "html": "<div class='v-label'>REVERSED LIST</div><div class='v-row'><div class='v-cell v-result'>5</div><span class='v-arrow'>→</span><div class='v-cell v-result'>4</div><span class='v-arrow'>→</span><div class='v-cell v-result'>3</div><span class='v-arrow'>→</span><div class='v-cell v-result'>2</div><span class='v-arrow'>→</span><div class='v-cell v-result'>1</div><span class='v-arrow'>→</span><div class='v-cell v-null'>∅</div></div>"
           }
         ]
       }
@@ -205,40 +247,64 @@
     "viz": {
       "kind": "scripted-array",
       "data": {
-        "A": [
-          1,
-          2,
-          3,
-          4,
-          5
-        ],
-        "footer": "Deep copy with random pointers \u2014 interweaving or HashMap approach.",
-        "legend": [
-          "c-input",
-          "c-active",
-          "c-result"
-        ],
+        "A": [1, 2, 3, 4, 5],
+        "footer": "Deep copy with random pointers \u2014 interweaving approach (O(1) space). Three passes: interleave clones, wire randoms, separate.",
+        "legend": ["c-input", "c-active", "c-result", "c-new"],
         "script": [
           {
-            "label": "SETUP",
-            "msg": "List with random pointers: 1\u21922\u21923\u21924\u21925. Each node has a random pointer to any node (or null). Deep copy preserves both next and random.",
-            "html": "<div class='v-row'><div class='v-cell'>1</div><span class='v-arrow'>\u2192</span><div class='v-cell'>2</div><span class='v-arrow'>\u2192</span><div class='v-cell'>3</div><span class='v-arrow'>\u2192</span><div class='v-cell'>4</div><span class='v-arrow'>\u2192</span><div class='v-cell'>5</div><span class='v-arrow'>\u2192</span><div class='v-cell v-null'>NULL</div></div>"
+            "label": "SETUP \u2014 the problem",
+            "msg": "Original list: <strong>1\u21922\u21923\u21924\u21925\u2192\u2205</strong>. Each node has a <strong>random pointer</strong> to any other node (or null). Randoms: [<strong>3, 1, 5, null, 2</strong>]. We need a <strong>deep copy</strong>: new nodes with same values and same structure. Interweaving approach uses <strong>O(1)</strong> extra space.",
+            "html": "<div class='v-label'>ORIGINAL LIST</div><div class='v-row'><div class='v-cell'><strong>1</strong></div><span class='v-arrow'>\u2192</span><div class='v-cell'><strong>2</strong></div><span class='v-arrow'>\u2192</span><div class='v-cell'><strong>3</strong></div><span class='v-arrow'>\u2192</span><div class='v-cell'><strong>4</strong></div><span class='v-arrow'>\u2192</span><div class='v-cell'><strong>5</strong></div><span class='v-arrow'>\u2192</span><div class='v-cell v-null'>\u2205</div></div><div style='margin-top:8px;font-size:11px;color:#94a3b8;'>random[1]=3, random[2]=1, random[3]=5, random[4]=null, random[5]=2</div>",
+            "overlay": "Three-pass algorithm: <code>1. Interleave clones<br>2. Wire random pointers<br>3. Separate the two lists</code>"
           },
           {
-            "label": "PASS 1 \u2014 Clone nodes",
-            "msg": "Create clones: for each node, create new node with same value. Use HashMap: <code>map[original] = clone</code>.",
-            "html": "<div class='v-label'>ORIGINAL</div><div class='v-row'><div class='v-cell'>1</div><span class='v-arrow'>\u2192</span><div class='v-cell'>2</div><span class='v-arrow'>\u2192</span><div class='v-cell'>3</div><span class='v-arrow'>\u2192</span><div class='v-cell'>4</div><span class='v-arrow'>\u2192</span><div class='v-cell'>5</div></div><div class='v-label' style='margin-top:12px;'>CLONES (disconnected)</div><div class='v-row'><div class='v-cell v-new'>1</div><div class='v-cell v-new'>2</div><div class='v-cell v-new'>3</div><div class='v-cell v-new'>4</div><div class='v-cell v-new'>5</div></div>",
-            "overlay": "HashMap stores original\u2192clone mapping for wiring."
+            "label": "PASS 1 SETUP \u2014 interleave clones",
+            "msg": "For each original node, create a clone and insert it <strong>immediately after</strong> the original. The list becomes: <strong>1\u21921'\u21922\u21922'\u21923\u21923'\u21924\u21924'\u21925\u21925'\u2192\u2205</strong>. This lets us find a node's clone as <code>original.next</code> without a HashMap.",
+            "html": "<div class='v-label'>INTERLEAVING CLONES</div><div style='font-size:11px;color:#94a3b8;margin-bottom:8px;'>For each node: <code>clone = new Node(orig.val); clone.next = orig.next; orig.next = clone;</code></div><div class='v-row' style='align-items:flex-end;'><div style='display:flex;flex-direction:column;align-items:center;gap:4px;'><span style='font-size:10px;color:#79c0ff;font-weight:700;'>ORIG</span><div class='v-cell'><strong>1</strong></div></div><span class='v-arrow v-new'>\u2192</span><div style='display:flex;flex-direction:column;align-items:center;gap:4px;'><span style='font-size:10px;color:#a5d6ff;font-weight:700;'>CLONE</span><div class='v-cell v-new'><strong>1</strong></div></div><span class='v-arrow'>\u2192</span><div style='display:flex;flex-direction:column;align-items:center;gap:4px;'><span style='font-size:10px;color:#79c0ff;font-weight:700;'>ORIG</span><div class='v-cell'><strong>2</strong></div></div><span class='v-arrow v-new'>\u2192</span><div style='display:flex;flex-direction:column;align-items:center;gap:4px;'><span style='font-size:10px;color:#a5d6ff;font-weight:700;'>CLONE</span><div class='v-cell v-new'><strong>2</strong></div></div><span style='margin:0 4px;'>\u2026</span></div>",
+            "overlay": "Interleaving trick: <code>original.next = clone</code> means we can always find the clone without a hash map."
           },
           {
-            "label": "PASS 2 \u2014 Wire pointers",
-            "msg": "For each original node, set <code>clone.next = map[original.next]</code> and <code>clone.random = map[original.random]</code>.",
-            "html": "<div class='v-label'>CLONED LIST (wired)</div><div class='v-row'><div class='v-cell v-result'>1</div><span class='v-arrow'>\u2192</span><div class='v-cell v-result'>2</div><span class='v-arrow'>\u2192</span><div class='v-cell v-result'>3</div><span class='v-arrow'>\u2192</span><div class='v-cell v-result'>4</div><span class='v-arrow'>\u2192</span><div class='v-cell v-result'>5</div><span class='v-arrow'>\u2192</span><div class='v-cell v-null'>NULL</div></div>"
+            "label": "PASS 1 COMPLETE \u2014 fully interleaved",
+            "msg": "After pass 1, the list is fully interleaved: <strong>1\u21921'\u21922\u21922'\u21923\u21923'\u21924\u21924'\u21925\u21925'\u2192\u2205</strong>. Every original node is followed by its clone. Note: clone nodes have no random pointers set yet (all null).",
+            "html": "<div class='v-label'>INTERLEAVED LIST (after pass 1)</div><div class='v-row' style='flex-wrap:wrap;'><div class='v-cell'><strong>1</strong></div><span class='v-arrow'>\u2192</span><div class='v-cell v-new'><strong>1'</strong></div><span class='v-arrow'>\u2192</span><div class='v-cell'><strong>2</strong></div><span class='v-arrow'>\u2192</span><div class='v-cell v-new'><strong>2'</strong></div><span class='v-arrow'>\u2192</span><div class='v-cell'><strong>3</strong></div><span class='v-arrow'>\u2192</span><div class='v-cell v-new'><strong>3'</strong></div><span class='v-arrow'>\u2192</span><div class='v-cell'><strong>4</strong></div><span class='v-arrow'>\u2192</span><div class='v-cell v-new'><strong>4'</strong></div><span class='v-arrow'>\u2192</span><div class='v-cell'><strong>5</strong></div><span class='v-arrow'>\u2192</span><div class='v-cell v-new'><strong>5'</strong></div><span class='v-arrow'>\u2192</span><div class='v-cell v-null'>\u2205</div></div><div style='margin-top:8px;font-size:11px;color:#94a3b8;'>Original nodes: 1,2,3,4,5 | Clone nodes: 1',2',3',4',5'</div>"
           },
           {
-            "label": "DONE",
-            "msg": "\u2705 Deep copy complete. O(N) time, O(N) space (HashMap). Alternative: interweaving O(1) space.",
-            "html": "<div class='v-row'><span class='v-stat'>Deep copy complete</span></div>"
+            "label": "PASS 2 SETUP \u2014 wire random pointers",
+            "msg": "Now wire the <strong>random pointers</strong> for each clone. Key insight: if <strong>original.random = X</strong>, then <strong>clone.random = X.next</strong> (because X.next is X's clone in our interleaved structure). For example, <strong>1.random = 3</strong>, so <strong>1'.random = 3.next = 3'</strong>.",
+            "html": "<div style='padding:8px;background:#1e293b;border-left:3px solid #f59e0b;margin-bottom:8px;'><div style='font-size:11px;color:#fbbf24;font-weight:700;'>INSIGHT</div><div style='font-size:11px;color:#e2e8f0;margin-top:4px;'>If <code>orig.random</code> points to node X, then <code>clone.random = orig.random.next</code> (which is X's clone)</div></div><div class='v-row' style='gap:16px;'><span class='v-stat'>Wiring random pointers\u2026</span></div>",
+            "overlay": "Pass 2 logic: <code>if (orig.random != null)<br>&nbsp;&nbsp;clone.random = orig.random.next;</code>"
+          },
+          {
+            "label": "PASS 2 IN PROGRESS \u2014 example: node 1",
+            "msg": "Original node <strong>1</strong> has <strong>random = node 3</strong>. So clone <strong>1'</strong> should have <strong>random = 3'</strong>. We find 3' as <strong>3.next</strong>. Set <strong>1'.random = 3.next = 3'</strong>. Repeat for all original nodes (step by 2 in the interleaved list).",
+            "html": "<div class='v-label'>WIRING EXAMPLE: node 1</div><div class='v-row'><div class='v-cell v-active'><strong>1</strong></div><span class='v-arrow'>\u2192</span><div class='v-cell v-new'><strong>1'</strong></div><span style='margin:0 8px;'>\u2026</span><div class='v-cell'><strong>3</strong></div><span class='v-arrow'>\u2192</span><div class='v-cell v-new v-active'><strong>3'</strong></div></div><div style='margin-top:8px;font-size:11px;color:#94a3b8;'>1.random = 3 \u2192 1'.random = 3.next = 3'</div>"
+          },
+          {
+            "label": "PASS 2 COMPLETE \u2014 all randoms wired",
+            "msg": "All clone nodes now have correct <strong>random pointers</strong>. The list is still interleaved (<strong>1\u21921'\u21922\u21922'\u21923\u21923'\u21924\u21924'\u21925\u21925'</strong>) but now both original and clone sub-lists have proper next + random structure.",
+            "html": "<div class='v-label'>INTERLEAVED WITH RANDOMS (after pass 2)</div><div class='v-row' style='flex-wrap:wrap;'><div class='v-cell'><strong>1</strong></div><span class='v-arrow'>\u2192</span><div class='v-cell v-new'><strong>1'</strong></div><span class='v-arrow'>\u2192</span><div class='v-cell'><strong>2</strong></div><span class='v-arrow'>\u2192</span><div class='v-cell v-new'><strong>2'</strong></div><span class='v-arrow'>\u2192</span><div class='v-cell'><strong>3</strong></div><span class='v-arrow'>\u2192</span><div class='v-cell v-new'><strong>3'</strong></div><span class='v-arrow'>\u2192</span><div class='v-cell'><strong>4</strong></div><span class='v-arrow'>\u2192</span><div class='v-cell v-new'><strong>4'</strong></div><span class='v-arrow'>\u2192</span><div class='v-cell'><strong>5</strong></div><span class='v-arrow'>\u2192</span><div class='v-cell v-new'><strong>5'</strong></div><span class='v-arrow'>\u2192</span><div class='v-cell v-null'>\u2205</div></div><div style='margin-top:8px;font-size:11px;color:#94a3b8;'>\u2713 All clones have next (temporarily interleaved) and random (correct)</div>",
+            "overlay": "Now we have two lists zipper-merged: original and clone. Next: unzip them."
+          },
+          {
+            "label": "PASS 3 \u2014 separate the two lists",
+            "msg": "Un-interleave the two lists. Restore the original list (<strong>1\u21922\u21923\u21924\u21925</strong>) and extract the clone list (<strong>1'\u21922'\u21923'\u21924'\u21925'</strong>). Walk the interleaved list, alternating: attach originals to originals, clones to clones.",
+            "html": "<div style='padding:8px;background:#1e293b;border-left:3px solid #3b82f6;margin-bottom:8px;'><div style='font-size:11px;color:#3b82f6;font-weight:700;'>SEPARATION LOGIC</div><div style='font-size:11px;color:#e2e8f0;margin-top:4px;'><code>orig.next = orig.next.next;<br>clone.next = clone.next.next;</code> (skip every other node)</div></div><div class='v-row' style='gap:16px;'><span class='v-stat'>Unzipping lists\u2026</span></div>"
+          },
+          {
+            "label": "PASS 3 COMPLETE \u2014 two separate lists",
+            "msg": "After pass 3, we have two separate lists. Original list: <strong>1\u21922\u21923\u21924\u21925\u2192\u2205</strong> (restored). Clone list: <strong>1'\u21922'\u21923'\u21924'\u21925'\u2192\u2205</strong> (deep copy complete). Both have correct next and random pointers.",
+            "html": "<div class='v-label'>ORIGINAL (restored)</div><div class='v-row'><div class='v-cell'><strong>1</strong></div><span class='v-arrow'>\u2192</span><div class='v-cell'><strong>2</strong></div><span class='v-arrow'>\u2192</span><div class='v-cell'><strong>3</strong></div><span class='v-arrow'>\u2192</span><div class='v-cell'><strong>4</strong></div><span class='v-arrow'>\u2192</span><div class='v-cell'><strong>5</strong></div><span class='v-arrow'>\u2192</span><div class='v-cell v-null'>\u2205</div></div><div class='v-label' style='margin-top:12px;'>CLONE (deep copy)</div><div class='v-row'><div class='v-cell v-result'><strong>1'</strong></div><span class='v-arrow'>\u2192</span><div class='v-cell v-result'><strong>2'</strong></div><span class='v-arrow'>\u2192</span><div class='v-cell v-result'><strong>3'</strong></div><span class='v-arrow'>\u2192</span><div class='v-cell v-result'><strong>4'</strong></div><span class='v-arrow'>\u2192</span><div class='v-cell v-result'><strong>5'</strong></div><span class='v-arrow'>\u2192</span><div class='v-cell v-null'>\u2205</div></div><div style='margin-top:8px;font-size:11px;color:#94a3b8;'>Both lists now independent with correct next + random pointers</div>",
+            "overlay": "Complexity: <code>Time: O(N)</code> \u2014 three passes over the list.<br><code>Space: O(1)</code> \u2014 no HashMap, interleaving uses existing structure."
+          },
+          {
+            "label": "VERIFY \u2014 random pointers in clone",
+            "msg": "Verify the clone's random pointers match the original structure: <strong>1'\u21923', 2'\u21921', 3'\u21925', 4'\u2192null, 5'\u21922'</strong>. Same pattern as original randoms [<strong>3, 1, 5, null, 2</strong>]. \u2705 Deep copy successful.",
+            "html": "<div class='v-label'>CLONE WITH RANDOMS</div><div class='v-row'><div class='v-cell v-result'><strong>1'</strong></div><span class='v-arrow'>\u2192</span><div class='v-cell v-result'><strong>2'</strong></div><span class='v-arrow'>\u2192</span><div class='v-cell v-result'><strong>3'</strong></div><span class='v-arrow'>\u2192</span><div class='v-cell v-result'><strong>4'</strong></div><span class='v-arrow'>\u2192</span><div class='v-cell v-result'><strong>5'</strong></div><span class='v-arrow'>\u2192</span><div class='v-cell v-null'>\u2205</div></div><div style='margin-top:8px;font-size:11px;color:#22c55e;'>\u2713 random[1']=3', random[2']=1', random[3']=5', random[4']=null, random[5']=2'</div>"
+          },
+          {
+            "label": "DONE \u2014 O(1) space deep copy",
+            "msg": "\u2705 Deep copy complete with <strong>O(1) extra space</strong>. The interweaving trick avoids a HashMap by temporarily merging the two lists. Return the clone list head. Alternative: HashMap approach uses <strong>O(N) space</strong> but is simpler to code (two passes: create clones, wire both pointers).",
+            "html": "<div class='v-row' style='gap:16px;'><span class='v-stat' style='background:#1e3a8a;'>Time: <strong>O(N)</strong></span><span class='v-stat' style='background:#166534;'>Space: <strong>O(1)</strong></span></div><div style='margin-top:12px;padding:8px;background:#1e293b;border-left:3px solid #22c55e;'><div style='font-size:11px;color:#22c55e;font-weight:700;'>WHY THIS WORKS</div><div style='font-size:11px;color:#e2e8f0;margin-top:4px;'>Interleaving makes <code>original.next</code> point to its clone, so we can wire randoms without a map. Three clean passes do the job.</div></div>"
           }
         ]
       }
@@ -272,33 +338,59 @@
     "viz": {
       "kind": "scripted-array",
       "data": {
-        "A": [
-          1,
-          2
-        ],
-        "footer": "Insert node at position \u2014 1\u21922, insert 3 at pos 1.",
-        "legend": [
-          "c-input",
-          "c-active",
-          "c-result",
-          "c-new"
-        ],
+        "A": [1, 2],
+        "footer": "Insert node at position \u2014 1\u21922, insert value 3 at position 0 (head insertion). Uses dummy node technique.",
+        "legend": ["c-input", "c-active", "c-result", "c-new"],
         "script": [
           {
-            "label": "SETUP",
-            "msg": "List: <strong>1\u21922\u2192NULL</strong>. Insert <strong>value=3</strong> at <strong>position=1</strong> (0-indexed). Walk to predecessor, splice in.",
-            "html": "<div class='v-row'><div class='v-cell'>1</div><span class='v-arrow'>\u2192</span><div class='v-cell'>2</div><span class='v-arrow'>\u2192</span><div class='v-cell v-null'>NULL</div></div>"
+            "label": "SETUP \u2014 the problem",
+            "msg": "Original list: <strong>1 \u2192 2 \u2192 \u2205</strong>. Task: insert a new node with value <strong>B = 3</strong> at position <strong>C = 0</strong> (0-indexed, meaning insert at the head). Final result should be <strong>3 \u2192 1 \u2192 2 \u2192 \u2205</strong>.",
+            "html": "<div class='v-label'>ORIGINAL LIST</div><div class='v-row'><div class='v-cell'><strong>1</strong></div><span class='v-arrow'>\u2192</span><div class='v-cell'><strong>2</strong></div><span class='v-arrow'>\u2192</span><div class='v-cell v-null'>\u2205</div></div><div style='margin-top:8px;font-size:11px;color:#94a3b8;'>Insert value=<strong>3</strong> at position=<strong>0</strong> (head)</div>"
+          },
+          {
+            "label": "CREATE DUMMY NODE",
+            "msg": "Use a <strong>dummy node</strong> pointing to head. This eliminates the special case for inserting at the head \u2014 we can treat all positions uniformly. Set <strong>dummy.next = head</strong>, so dummy points to <strong>node 1</strong>.",
+            "html": "<div class='v-label'>DUMMY NODE TECHNIQUE</div><div class='v-row' style='align-items:flex-end;'><div style='display:flex;flex-direction:column;align-items:center;gap:4px;'><span style='font-size:10px;color:#79c0ff;font-weight:700;letter-spacing:.1em;'>DUMMY</span><div class='v-cell' style='background:#1e293b;border:1px dashed #475569;'><strong>0</strong></div></div><span class='v-arrow'>\u2192</span><div class='v-cell'><strong>1</strong></div><span class='v-arrow'>\u2192</span><div class='v-cell'><strong>2</strong></div><span class='v-arrow'>\u2192</span><div class='v-cell v-null'>\u2205</div></div><div style='margin-top:8px;font-size:11px;color:#94a3b8;'>Dummy makes head insertion no different from any other position</div>",
+            "overlay": "Dummy pattern: <code>ListNode dummy = new ListNode(0);<br>dummy.next = head;<br>ListNode prev = dummy;</code>"
+          },
+          {
+            "label": "CREATE NEW NODE",
+            "msg": "Create the new node: <strong>newNode = new ListNode(3)</strong>. This node is currently disconnected \u2014 we'll splice it in next.",
+            "html": "<div class='v-label'>CURRENT STATE</div><div class='v-row' style='align-items:flex-end;'><div style='display:flex;flex-direction:column;align-items:center;gap:4px;'><span style='font-size:10px;color:#79c0ff;font-weight:700;'>DUMMY</span><div class='v-cell' style='background:#1e293b;border:1px dashed #475569;'><strong>0</strong></div></div><span class='v-arrow'>\u2192</span><div class='v-cell'><strong>1</strong></div><span class='v-arrow'>\u2192</span><div class='v-cell'><strong>2</strong></div><span class='v-arrow'>\u2192</span><div class='v-cell v-null'>\u2205</div></div><div class='v-row' style='margin-top:12px;'><div class='v-cell v-new'><strong>3</strong></div><span style='margin-left:8px;color:#64748b;'>(new node, disconnected)</span></div>"
           },
           {
             "label": "WALK TO PREDECESSOR",
-            "msg": "Use dummy node. Walk to position 0 (pred of position 1). Create newNode(3).",
-            "html": "<div class='v-row'><div class='v-cell v-active'>1</div><span class='v-arrow'>\u2192</span><div class='v-cell'>2</div><span class='v-arrow'>\u2192</span><div class='v-cell v-null'>NULL</div></div><div class='v-row' style='margin-top:8px;'><div class='v-cell v-new'>3</div><span style='margin-left:8px; color:#64748b;'>(new node)</span></div>",
-            "overlay": "Splice: <code>newNode.next = prev.next; prev.next = newNode;</code>"
+            "msg": "To insert at position <strong>C = 0</strong>, walk to position <strong>C - 1 = -1</strong> (which is the dummy node itself). Set <strong>prev = dummy</strong>. We walk <strong>0 steps</strong> from dummy (since we're already at the predecessor).",
+            "html": "<div class='v-label'>IDENTIFY PREDECESSOR</div><div class='v-row' style='align-items:flex-end;'><div style='display:flex;flex-direction:column;align-items:center;gap:4px;'><span style='font-size:10px;color:#bc8cff;font-weight:700;letter-spacing:.1em;'>PREV (at dummy)</span><div class='v-cell v-active' style='background:#1e293b;border:1px dashed #475569;'><strong>0</strong></div></div><span class='v-arrow'>\u2192</span><div class='v-cell'><strong>1</strong></div><span class='v-arrow'>\u2192</span><div class='v-cell'><strong>2</strong></div><span class='v-arrow'>\u2192</span><div class='v-cell v-null'>\u2205</div></div><div style='margin-top:8px;font-size:11px;color:#94a3b8;'>Position 0 \u2192 predecessor is dummy (position -1)</div>",
+            "overlay": "Loop: <code>for (int i = 0; i < C; i++) prev = prev.next;</code><br>For C=0, loop runs 0 times \u2192 prev stays at dummy."
           },
           {
-            "label": "DONE",
-            "msg": "\u2705 <strong>Result: 1\u21923\u21922\u2192NULL</strong>. Node 3 inserted at position 1.",
-            "html": "<div class='v-row'><div class='v-cell v-result'>1</div><span class='v-arrow v-new'>\u2192</span><div class='v-cell v-result'>3</div><span class='v-arrow'>\u2192</span><div class='v-cell v-result'>2</div><span class='v-arrow'>\u2192</span><div class='v-cell v-null'>NULL</div></div>"
+            "label": "SPLICE STEP 1 \u2014 wire new node",
+            "msg": "First, point the new node to what comes after the insertion point: <strong>newNode.next = prev.next</strong>. So <strong>newNode(3).next = node 1</strong>. Now node <strong>3</strong> points to the rest of the list.",
+            "html": "<div class='v-label'>WIRE: newNode.next = prev.next</div><div class='v-row' style='align-items:flex-end;'><div style='display:flex;flex-direction:column;align-items:center;gap:4px;'><span style='font-size:10px;color:#bc8cff;font-weight:700;'>PREV</span><div class='v-cell' style='background:#1e293b;border:1px dashed #475569;'><strong>0</strong></div></div><span class='v-arrow' style='opacity:0.3;'>\u2192</span><div class='v-cell'><strong>1</strong></div><span class='v-arrow'>\u2192</span><div class='v-cell'><strong>2</strong></div><span class='v-arrow'>\u2192</span><div class='v-cell v-null'>\u2205</div></div><div class='v-row' style='margin-top:12px;'><div class='v-cell v-new'><strong>3</strong></div><span class='v-arrow v-new'>\u2192</span><div class='v-cell' style='opacity:0.5;'><strong>1</strong></div></div><div style='margin-top:8px;font-size:11px;color:#94a3b8;'>newNode now points to node 1 (the old head)</div>",
+            "overlay": "First line of splice: <code>newNode.next = prev.next;</code> \u2014 saves the rest of the list."
+          },
+          {
+            "label": "SPLICE STEP 2 \u2014 update predecessor",
+            "msg": "Now update the predecessor to point to the new node: <strong>prev.next = newNode</strong>. So <strong>dummy.next = newNode(3)</strong>. This inserts node <strong>3</strong> into the list. The old link from dummy to 1 is broken (shown with cut arrow).",
+            "html": "<div class='v-label'>WIRE: prev.next = newNode</div><div class='v-row' style='align-items:flex-end;'><div style='display:flex;flex-direction:column;align-items:center;gap:4px;'><span style='font-size:10px;color:#bc8cff;font-weight:700;'>PREV</span><div class='v-cell' style='background:#1e293b;border:1px dashed #475569;'><strong>0</strong></div></div><span class='v-arrow v-new'>\u2192</span><div class='v-cell v-new'><strong>3</strong></div><span class='v-arrow'>\u2192</span><div class='v-cell'><strong>1</strong></div><span class='v-arrow'>\u2192</span><div class='v-cell'><strong>2</strong></div><span class='v-arrow'>\u2192</span><div class='v-cell v-null'>\u2205</div></div><div class='v-row' style='margin-top:12px;'><span class='v-arrow v-cut' style='opacity:0.3;'>\u2192</span><span style='margin-left:8px;color:#64748b;font-size:11px;'>(old dummy\u21921 link, now broken)</span></div><div style='margin-top:8px;font-size:11px;color:#94a3b8;'>Node 3 spliced in between dummy and node 1</div>",
+            "overlay": "Second line of splice: <code>prev.next = newNode;</code> \u2014 completes the insertion."
+          },
+          {
+            "label": "RETURN NEW HEAD",
+            "msg": "The list is now <strong>dummy \u2192 3 \u2192 1 \u2192 2 \u2192 \u2205</strong>. Return <strong>dummy.next</strong> as the new head of the list. Since we inserted at position 0, the new head is <strong>node 3</strong>.",
+            "html": "<div class='v-label'>UPDATED LIST (via dummy)</div><div class='v-row' style='align-items:flex-end;'><div class='v-cell' style='background:#1e293b;border:1px dashed #475569;'><strong>0</strong></div><span class='v-arrow'>\u2192</span><div style='display:flex;flex-direction:column;align-items:center;gap:4px;'><span style='font-size:10px;color:#22c55e;font-weight:700;letter-spacing:.1em;'>NEW HEAD</span><div class='v-cell v-result'><strong>3</strong></div></div><span class='v-arrow'>\u2192</span><div class='v-cell v-result'><strong>1</strong></div><span class='v-arrow'>\u2192</span><div class='v-cell v-result'><strong>2</strong></div><span class='v-arrow'>\u2192</span><div class='v-cell v-null'>\u2205</div></div><div style='margin-top:8px;font-size:11px;color:#94a3b8;'>Return dummy.next = node 3</div>"
+          },
+          {
+            "label": "FINAL STATE \u2014 insertion complete",
+            "msg": "\u2705 Final result: <strong>3 \u2192 1 \u2192 2 \u2192 \u2205</strong>. Node with value <strong>3</strong> inserted at position <strong>0</strong>. The dummy node trick made this a uniform operation \u2014 no special 'insert at head' branch needed.",
+            "html": "<div class='v-label'>FINAL LIST</div><div class='v-row'><div class='v-cell v-result'><strong>3</strong></div><span class='v-arrow'>\u2192</span><div class='v-cell v-result'><strong>1</strong></div><span class='v-arrow'>\u2192</span><div class='v-cell v-result'><strong>2</strong></div><span class='v-arrow'>\u2192</span><div class='v-cell v-null'>\u2205</div></div><div style='margin-top:8px;font-size:11px;color:#22c55e;'>\u2713 Insertion at position 0 complete</div>",
+            "overlay": "Edge case handled: position C \u2265 length \u2192 insert at tail.<br>Edge case handled: position 0 \u2192 insert at head (no special code needed with dummy)."
+          },
+          {
+            "label": "DONE \u2014 dummy node power",
+            "msg": "The <strong>dummy node technique</strong> is a linked list superpower. It eliminates the 'insert/delete at head' special case by giving you a stable reference to '<strong>one before the head</strong>'. Use it whenever a problem asks you to modify the head.",
+            "html": "<div class='v-row' style='gap:16px;'><span class='v-stat' style='background:#1e3a8a;'>Time: <strong>O(N)</strong></span><span class='v-stat' style='background:#166534;'>Space: <strong>O(1)</strong></span></div><div style='margin-top:12px;padding:8px;background:#1e293b;border-left:3px solid #3b82f6;'><div style='font-size:11px;color:#3b82f6;font-weight:700;'>DUMMY NODE PATTERN</div><div style='font-size:11px;color:#e2e8f0;margin-top:4px;'>Always use a dummy node for insert/delete operations. It makes the head position no different from any other position, avoiding messy if-statements.</div></div>"
           }
         ]
       }
@@ -332,34 +424,58 @@
     "viz": {
       "kind": "scripted-array",
       "data": {
-        "A": [
-          1,
-          2,
-          3
-        ],
-        "footer": "Delete node at position \u2014 1\u21922\u21923, delete position 1.",
-        "legend": [
-          "c-input",
-          "c-active",
-          "c-result",
-          "c-removed"
-        ],
+        "A": [1, 2, 3],
+        "footer": "Delete node at position \u2014 1\u21922\u21923, delete position B=1 (0-indexed). Uses dummy node technique.",
+        "legend": ["c-input", "c-active", "c-result", "c-removed"],
         "script": [
           {
-            "label": "SETUP",
-            "msg": "List: <strong>1\u21922\u21923\u2192NULL</strong>. Delete node at <strong>position=1</strong>. Walk to predecessor, skip doomed node.",
-            "html": "<div class='v-row'><div class='v-cell'>1</div><span class='v-arrow'>\u2192</span><div class='v-cell'>2</div><span class='v-arrow'>\u2192</span><div class='v-cell'>3</div><span class='v-arrow'>\u2192</span><div class='v-cell v-null'>NULL</div></div>"
+            "label": "SETUP \u2014 the problem",
+            "msg": "Original list: <strong>1 \u2192 2 \u2192 3 \u2192 \u2205</strong>. Task: delete the node at position <strong>B = 1</strong> (0-indexed, meaning delete <strong>node 2</strong>). Final result should be <strong>1 \u2192 3 \u2192 \u2205</strong>.",
+            "html": "<div class='v-label'>ORIGINAL LIST</div><div class='v-row'><div class='v-cell'><strong>1</strong></div><span class='v-arrow'>\u2192</span><div class='v-cell'><strong>2</strong></div><span class='v-arrow'>\u2192</span><div class='v-cell'><strong>3</strong></div><span class='v-arrow'>\u2192</span><div class='v-cell v-null'>\u2205</div></div><div style='margin-top:8px;font-size:11px;color:#94a3b8;'>Delete position=<strong>1</strong> (node 2, 0-indexed)</div>"
           },
           {
-            "label": "SKIP NODE 2",
-            "msg": "Walk to node 1 (predecessor). Point node 1 directly to node 3: <code>prev.next = prev.next.next</code>.",
-            "html": "<div class='v-row'><div class='v-cell v-active'>1</div><span class='v-arrow v-new'>\u2192</span><div class='v-cell v-removed'>2</div><span class='v-arrow v-cut'>\u2192</span><div class='v-cell'>3</div><span class='v-arrow'>\u2192</span><div class='v-cell v-null'>NULL</div></div>",
-            "overlay": "Node 2 is orphaned and garbage-collected."
+            "label": "CREATE DUMMY NODE",
+            "msg": "Use a <strong>dummy node</strong> pointing to head. This eliminates the special case for deleting the head \u2014 we can treat all positions uniformly. Set <strong>dummy.next = head</strong>, so dummy points to <strong>node 1</strong>.",
+            "html": "<div class='v-label'>DUMMY NODE TECHNIQUE</div><div class='v-row' style='align-items:flex-end;'><div style='display:flex;flex-direction:column;align-items:center;gap:4px;'><span style='font-size:10px;color:#79c0ff;font-weight:700;letter-spacing:.1em;'>DUMMY</span><div class='v-cell' style='background:#1e293b;border:1px dashed #475569;'><strong>0</strong></div></div><span class='v-arrow'>\u2192</span><div class='v-cell'><strong>1</strong></div><span class='v-arrow'>\u2192</span><div class='v-cell'><strong>2</strong></div><span class='v-arrow'>\u2192</span><div class='v-cell'><strong>3</strong></div><span class='v-arrow'>\u2192</span><div class='v-cell v-null'>\u2205</div></div><div style='margin-top:8px;font-size:11px;color:#94a3b8;'>Dummy makes head deletion no different from any other position</div>",
+            "overlay": "Dummy pattern: <code>ListNode dummy = new ListNode(0);<br>dummy.next = head;<br>ListNode prev = dummy;</code>"
           },
           {
-            "label": "DONE",
-            "msg": "\u2705 <strong>Result: 1\u21923\u2192NULL</strong>. Node 2 deleted.",
-            "html": "<div class='v-row'><div class='v-cell v-result'>1</div><span class='v-arrow'>\u2192</span><div class='v-cell v-result'>3</div><span class='v-arrow'>\u2192</span><div class='v-cell v-null'>NULL</div></div>"
+            "label": "WALK TO PREDECESSOR",
+            "msg": "To delete position <strong>B = 1</strong>, walk to position <strong>B - 1 = 0</strong> (the predecessor). Start at dummy, walk <strong>1 step</strong> to reach <strong>node 1</strong>. Set <strong>prev = node 1</strong>.",
+            "html": "<div class='v-label'>WALK TO PREDECESSOR</div><div class='v-row' style='align-items:flex-end;'><div class='v-cell' style='background:#1e293b;border:1px dashed #475569;'><strong>0</strong></div><span class='v-arrow'>\u2192</span><div style='display:flex;flex-direction:column;align-items:center;gap:4px;'><span style='font-size:10px;color:#bc8cff;font-weight:700;letter-spacing:.1em;'>PREV (pos 0)</span><div class='v-cell v-active'><strong>1</strong></div></div><span class='v-arrow'>\u2192</span><div class='v-cell'><strong>2</strong></div><span class='v-arrow'>\u2192</span><div class='v-cell'><strong>3</strong></div><span class='v-arrow'>\u2192</span><div class='v-cell v-null'>\u2205</div></div><div style='margin-top:8px;font-size:11px;color:#94a3b8;'>Position 1 \u2192 predecessor is node 1 (position 0)</div>",
+            "overlay": "Loop: <code>for (int i = 0; i < B; i++) {<br>&nbsp;&nbsp;if (prev.next == null) return head;<br>&nbsp;&nbsp;prev = prev.next;<br>}</code>"
+          },
+          {
+            "label": "IDENTIFY TARGET NODE",
+            "msg": "The node to delete is <strong>prev.next</strong> (which is <strong>node 2</strong>). We'll unlink it by pointing prev directly to <strong>prev.next.next</strong> (which is <strong>node 3</strong>). This skips node 2 entirely.",
+            "html": "<div class='v-label'>TARGET NODE</div><div class='v-row' style='align-items:flex-end;'><div class='v-cell' style='background:#1e293b;border:1px dashed #475569;'><strong>0</strong></div><span class='v-arrow'>\u2192</span><div style='display:flex;flex-direction:column;align-items:center;gap:4px;'><span style='font-size:10px;color:#bc8cff;font-weight:700;'>PREV</span><div class='v-cell v-active'><strong>1</strong></div></div><span class='v-arrow'>\u2192</span><div style='display:flex;flex-direction:column;align-items:center;gap:4px;'><span style='font-size:10px;color:#f87171;font-weight:700;letter-spacing:.1em;'>TARGET</span><div class='v-cell' style='border:2px solid #dc2626;'><strong>2</strong></div></div><span class='v-arrow'>\u2192</span><div class='v-cell'><strong>3</strong></div><span class='v-arrow'>\u2192</span><div class='v-cell v-null'>\u2205</div></div><div style='margin-top:8px;font-size:11px;color:#94a3b8;'>Target = prev.next = node 2</div>"
+          },
+          {
+            "label": "UNLINK TARGET NODE",
+            "msg": "Perform the deletion: <strong>prev.next = prev.next.next</strong>. So <strong>node 1.next = node 3</strong>. The old link from <strong>1\u21922</strong> is broken (shown with cut arrow). Node <strong>2</strong> is now orphaned.",
+            "html": "<div class='v-label'>UNLINK: prev.next = prev.next.next</div><div class='v-row' style='align-items:flex-end;'><div class='v-cell' style='background:#1e293b;border:1px dashed #475569;'><strong>0</strong></div><span class='v-arrow'>\u2192</span><div style='display:flex;flex-direction:column;align-items:center;gap:4px;'><span style='font-size:10px;color:#bc8cff;font-weight:700;'>PREV</span><div class='v-cell v-active'><strong>1</strong></div></div><span class='v-arrow v-new'>\u2192</span><div class='v-cell v-removed'><strong>2</strong></div><span class='v-arrow v-cut'>\u2192</span><div class='v-cell v-result'><strong>3</strong></div><span class='v-arrow'>\u2192</span><div class='v-cell v-null'>\u2205</div></div><div style='margin-top:8px;font-size:11px;color:#94a3b8;'>Node 1 now points directly to node 3, skipping node 2</div>",
+            "overlay": "Deletion line: <code>if (prev.next != null)<br>&nbsp;&nbsp;prev.next = prev.next.next;</code> \u2014 orphans the target."
+          },
+          {
+            "label": "NODE ORPHANED \u2014 garbage collection",
+            "msg": "Node <strong>2</strong> is now unreachable from the list. It has no incoming pointers. In languages with garbage collection (Java), it will be automatically freed. In C/C++, you'd need <code>free(node2)</code>.",
+            "html": "<div class='v-label'>ORPHANED NODE</div><div class='v-row' style='align-items:flex-end;'><div class='v-cell' style='background:#1e293b;border:1px dashed #475569;'><strong>0</strong></div><span class='v-arrow'>\u2192</span><div class='v-cell'><strong>1</strong></div><span class='v-arrow'>\u2192</span><div class='v-cell v-result'><strong>3</strong></div><span class='v-arrow'>\u2192</span><div class='v-cell v-null'>\u2205</div></div><div class='v-row' style='margin-top:16px;'><div class='v-cell v-removed'><strong>2</strong></div><span style='margin-left:8px;color:#64748b;font-size:11px;'>(orphaned, will be garbage-collected)</span></div><div style='margin-top:8px;font-size:11px;color:#94a3b8;'>No references to node 2 remain</div>",
+            "overlay": "In Java: garbage collector frees node 2.<br>In C/C++: you must <code>free()</code> manually to avoid memory leak."
+          },
+          {
+            "label": "RETURN NEW HEAD",
+            "msg": "The list is now <strong>dummy \u2192 1 \u2192 3 \u2192 \u2205</strong>. Return <strong>dummy.next</strong> as the head of the list. The head is still <strong>node 1</strong> (unchanged, since we deleted position 1, not position 0).",
+            "html": "<div class='v-label'>UPDATED LIST (via dummy)</div><div class='v-row' style='align-items:flex-end;'><div class='v-cell' style='background:#1e293b;border:1px dashed #475569;'><strong>0</strong></div><span class='v-arrow'>\u2192</span><div style='display:flex;flex-direction:column;align-items:center;gap:4px;'><span style='font-size:10px;color:#22c55e;font-weight:700;letter-spacing:.1em;'>HEAD</span><div class='v-cell v-result'><strong>1</strong></div></div><span class='v-arrow'>\u2192</span><div class='v-cell v-result'><strong>3</strong></div><span class='v-arrow'>\u2192</span><div class='v-cell v-null'>\u2205</div></div><div style='margin-top:8px;font-size:11px;color:#94a3b8;'>Return dummy.next = node 1</div>"
+          },
+          {
+            "label": "FINAL STATE \u2014 deletion complete",
+            "msg": "\u2705 Final result: <strong>1 \u2192 3 \u2192 \u2205</strong>. Node at position <strong>1</strong> (node <strong>2</strong>) successfully deleted. The dummy node technique made this a uniform operation \u2014 no special 'delete head' branch needed.",
+            "html": "<div class='v-label'>FINAL LIST</div><div class='v-row'><div class='v-cell v-result'><strong>1</strong></div><span class='v-arrow'>\u2192</span><div class='v-cell v-result'><strong>3</strong></div><span class='v-arrow'>\u2192</span><div class='v-cell v-null'>\u2205</div></div><div style='margin-top:8px;font-size:11px;color:#22c55e;'>\u2713 Deletion at position 1 complete</div>"
+          },
+          {
+            "label": "DONE \u2014 edge cases handled",
+            "msg": "The <strong>dummy node technique</strong> handles all edge cases uniformly: delete head (position 0), delete middle, delete tail. Edge case: if position B is out of range, the loop terminates early and we return the list unchanged.",
+            "html": "<div class='v-row' style='gap:16px;'><span class='v-stat' style='background:#1e3a8a;'>Time: <strong>O(N)</strong></span><span class='v-stat' style='background:#166534;'>Space: <strong>O(1)</strong></span></div><div style='margin-top:12px;padding:8px;background:#1e293b;border-left:3px solid #3b82f6;'><div style='font-size:11px;color:#3b82f6;font-weight:700;'>DUMMY NODE POWER</div><div style='font-size:11px;color:#e2e8f0;margin-top:4px;'>Dummy node = no special case for head deletion. Walk to predecessor, skip the target. Done.</div></div>"
           }
         ]
       }
@@ -401,7 +517,7 @@
           3,
           3
         ],
-        "footer": "Remove duplicates from sorted list \u2014 1\u21921\u21922\u21923\u21923\u2192NULL.",
+        "footer": "Remove duplicates from sorted list \u2014 1\u21921\u21922\u21923\u21923\u2192\u2205 using a single-pointer walk that splices out consecutive duplicates.",
         "legend": [
           "c-input",
           "c-active",
@@ -410,20 +526,54 @@
         ],
         "script": [
           {
-            "label": "SETUP",
-            "msg": "Sorted list: <strong>1\u21921\u21922\u21923\u21923\u2192NULL</strong>. Remove duplicates. Walk once: if curr.val == curr.next.val, skip next.",
-            "html": "<div class='v-row'><div class='v-cell'>1</div><span class='v-arrow'>\u2192</span><div class='v-cell'>1</div><span class='v-arrow'>\u2192</span><div class='v-cell'>2</div><span class='v-arrow'>\u2192</span><div class='v-cell'>3</div><span class='v-arrow'>\u2192</span><div class='v-cell'>3</div><span class='v-arrow'>\u2192</span><div class='v-cell v-null'>NULL</div></div>"
+            "label": "SETUP \u2014 sorted list with duplicates",
+            "msg": "We have a sorted linked list <strong>1\u21921\u21922\u21923\u21923\u2192\u2205</strong>. The goal: keep only one copy of each value, removing all consecutive duplicates in place. We walk with a single pointer <strong>curr</strong> and splice out duplicate nodes on the fly.",
+            "html": "<div class='v-label'>ORIGINAL SORTED LIST</div><div class='v-row'><div class='v-cell'>1</div><span class='v-arrow'>\u2192</span><div class='v-cell'>1</div><span class='v-arrow'>\u2192</span><div class='v-cell'>2</div><span class='v-arrow'>\u2192</span><div class='v-cell'>3</div><span class='v-arrow'>\u2192</span><div class='v-cell'>3</div><span class='v-arrow'>\u2192</span><div class='v-cell v-null'>\u2205</div></div>"
           },
           {
-            "label": "SKIP DUPLICATES",
-            "msg": "At first 1: 1==1 \u2192 skip. At 2: 2\u22603 \u2192 advance. At first 3: 3==3 \u2192 skip.",
-            "html": "<div class='v-row'><div class='v-cell v-result'>1</div><span class='v-arrow v-new'>\u2192</span><div class='v-cell v-removed'>1</div><span class='v-arrow v-cut'>\u2192</span><div class='v-cell v-result'>2</div><span class='v-arrow'>\u2192</span><div class='v-cell v-result'>3</div><span class='v-arrow v-new'>\u2192</span><div class='v-cell v-removed'>3</div><span class='v-arrow v-cut'>\u2192</span><div class='v-cell v-null'>NULL</div></div>",
-            "overlay": "Key: don't advance curr when deleting \u2014 there might be more duplicates."
+            "label": "INITIALISE POINTER",
+            "msg": "Set <strong>curr = head = node 1</strong>. Loop condition: <code>curr != null && curr.next != null</code>. At each step, we check: does <strong>curr.val</strong> equal <strong>curr.next.val</strong>? If yes, splice out <strong>curr.next</strong>; if no, advance <strong>curr</strong>.",
+            "html": "<div class='v-row' style='align-items:flex-end;'><div style='display:flex;flex-direction:column;align-items:center;gap:4px;'><span style='font-size:10px;color:#bc8cff;font-weight:700;letter-spacing:.1em;'>CURR</span><div class='v-cell v-current'>1</div></div><span class='v-arrow'>\u2192</span><div class='v-cell'>1</div><span class='v-arrow'>\u2192</span><div class='v-cell'>2</div><span class='v-arrow'>\u2192</span><div class='v-cell'>3</div><span class='v-arrow'>\u2192</span><div class='v-cell'>3</div><span class='v-arrow'>\u2192</span><div class='v-cell v-null'>\u2205</div></div>",
+            "overlay": "<code>ListNode curr = head;</code><br><code>while (curr != null && curr.next != null)</code>"
           },
           {
-            "label": "DONE",
-            "msg": "\u2705 <strong>Result: 1\u21922\u21923\u2192NULL</strong>. Each value appears once.",
-            "html": "<div class='v-row'><div class='v-cell v-result'>1</div><span class='v-arrow'>\u2192</span><div class='v-cell v-result'>2</div><span class='v-arrow'>\u2192</span><div class='v-cell v-result'>3</div><span class='v-arrow'>\u2192</span><div class='v-cell v-null'>NULL</div></div>"
+            "label": "ITERATION 1 \u2014 curr at node 1, duplicate found",
+            "msg": "<strong>curr.val = 1</strong>, <strong>curr.next.val = 1</strong> \u2192 they match! Splice out the second <strong>1</strong>: <code>curr.next = curr.next.next</code>, jumping directly to <strong>node 2</strong>. The duplicate node is dropped. <strong>Do NOT advance curr</strong> \u2014 there could be another duplicate right after.",
+            "html": "<div class='v-row' style='align-items:flex-end;'><div style='display:flex;flex-direction:column;align-items:center;gap:4px;'><span style='font-size:10px;color:#bc8cff;font-weight:700;letter-spacing:.1em;'>CURR</span><div class='v-cell v-current'>1</div></div><span class='v-arrow v-new'>\u2192</span><div class='v-cell v-removed'>1</div><span class='v-arrow v-cut'>\u2192</span><div class='v-cell'>2</div><span class='v-arrow'>\u2192</span><div class='v-cell'>3</div><span class='v-arrow'>\u2192</span><div class='v-cell'>3</div><span class='v-arrow'>\u2192</span><div class='v-cell v-null'>\u2205</div></div>",
+            "overlay": "<code>if (curr.val == curr.next.val)</code><br>&nbsp;&nbsp;<code>curr.next = curr.next.next;</code><br>&nbsp;&nbsp;// splice out duplicate, stay put"
+          },
+          {
+            "label": "ITERATION 2 \u2014 curr still at node 1, no more duplicates",
+            "msg": "<strong>curr.val = 1</strong>, <strong>curr.next.val = 2</strong> \u2192 different. No duplicate to remove. Advance: <strong>curr = curr.next = node 2</strong>.",
+            "html": "<div class='v-row' style='align-items:flex-end;'><div class='v-cell v-result'>1</div><span class='v-arrow'>\u2192</span><div style='display:flex;flex-direction:column;align-items:center;gap:4px;'><span style='font-size:10px;color:#bc8cff;font-weight:700;letter-spacing:.1em;'>CURR</span><div class='v-cell v-current'>2</div></div><span class='v-arrow'>\u2192</span><div class='v-cell'>3</div><span class='v-arrow'>\u2192</span><div class='v-cell'>3</div><span class='v-arrow'>\u2192</span><div class='v-cell v-null'>\u2205</div></div>",
+            "overlay": "<code>else</code><br>&nbsp;&nbsp;<code>curr = curr.next;</code> // advance to next node"
+          },
+          {
+            "label": "ITERATION 3 \u2014 curr at node 2",
+            "msg": "<strong>curr.val = 2</strong>, <strong>curr.next.val = 3</strong> \u2192 different. Advance: <strong>curr = node 3</strong>.",
+            "html": "<div class='v-row' style='align-items:flex-end;'><div class='v-cell v-result'>1</div><span class='v-arrow'>\u2192</span><div class='v-cell v-result'>2</div><span class='v-arrow'>\u2192</span><div style='display:flex;flex-direction:column;align-items:center;gap:4px;'><span style='font-size:10px;color:#bc8cff;font-weight:700;letter-spacing:.1em;'>CURR</span><div class='v-cell v-current'>3</div></div><span class='v-arrow'>\u2192</span><div class='v-cell'>3</div><span class='v-arrow'>\u2192</span><div class='v-cell v-null'>\u2205</div></div>"
+          },
+          {
+            "label": "ITERATION 4 \u2014 curr at first 3, duplicate found",
+            "msg": "<strong>curr.val = 3</strong>, <strong>curr.next.val = 3</strong> \u2192 match! Splice out the second <strong>3</strong>: <code>curr.next = curr.next.next</code>, pointing directly to <strong>\u2205</strong>. The duplicate <strong>3</strong> is dropped. <strong>Do NOT advance curr</strong>.",
+            "html": "<div class='v-row' style='align-items:flex-end;'><div class='v-cell v-result'>1</div><span class='v-arrow'>\u2192</span><div class='v-cell v-result'>2</div><span class='v-arrow'>\u2192</span><div style='display:flex;flex-direction:column;align-items:center;gap:4px;'><span style='font-size:10px;color:#bc8cff;font-weight:700;letter-spacing:.1em;'>CURR</span><div class='v-cell v-current'>3</div></div><span class='v-arrow v-new'>\u2192</span><div class='v-cell v-removed'>3</div><span class='v-arrow v-cut'>\u2192</span><div class='v-cell v-null'>\u2205</div></div>",
+            "overlay": "Same splice logic: <code>curr.next = curr.next.next;</code> now points <strong>3 \u2192 \u2205</strong>"
+          },
+          {
+            "label": "ITERATION 5 \u2014 curr at node 3, check next",
+            "msg": "<strong>curr.val = 3</strong>, <strong>curr.next = \u2205</strong> \u2192 the loop condition <code>curr.next != null</code> is now false. Loop exits.",
+            "html": "<div class='v-row' style='align-items:flex-end;'><div class='v-cell v-result'>1</div><span class='v-arrow'>\u2192</span><div class='v-cell v-result'>2</div><span class='v-arrow'>\u2192</span><div style='display:flex;flex-direction:column;align-items:center;gap:4px;'><span style='font-size:10px;color:#bc8cff;font-weight:700;letter-spacing:.1em;'>CURR</span><div class='v-cell v-current'>3</div></div><span class='v-arrow'>\u2192</span><div class='v-cell v-null'>\u2205</div></div>"
+          },
+          {
+            "label": "LOOP EXITS \u2014 deduplication complete",
+            "msg": "Loop exits because <strong>curr.next = \u2205</strong>. All consecutive duplicates have been spliced out. The list now contains only unique values: <strong>1 \u2192 2 \u2192 3 \u2192 \u2205</strong>.",
+            "html": "<div class='v-label'>DEDUPLICATED LIST</div><div class='v-row'><div class='v-cell v-result'>1</div><span class='v-arrow'>\u2192</span><div class='v-cell v-result'>2</div><span class='v-arrow'>\u2192</span><div class='v-cell v-result'>3</div><span class='v-arrow'>\u2192</span><div class='v-cell v-null'>\u2205</div></div>",
+            "overlay": "<code>return head;</code> // original head pointer unchanged"
+          },
+          {
+            "label": "DONE \u2014 complexity analysis",
+            "msg": "\u2705 Deduplication complete: <strong>1 \u2192 2 \u2192 3 \u2192 \u2205</strong>. Each value appears exactly once. We walked the list once, splicing nodes in <strong>O(N)</strong> time using <strong>O(1)</strong> extra space. The key insight: because the list is <strong>sorted</strong>, all duplicates are consecutive \u2014 a single pass suffices.",
+            "html": "<div class='v-label'>FINAL RESULT</div><div class='v-row'><div class='v-cell v-result'>1</div><span class='v-arrow'>\u2192</span><div class='v-cell v-result'>2</div><span class='v-arrow'>\u2192</span><div class='v-cell v-result'>3</div><span class='v-arrow'>\u2192</span><div class='v-cell v-null'>\u2205</div></div><div class='v-row' style='margin-top:8px;'><span class='v-stat'>Time: <strong>O(N)</strong></span><span class='v-stat' style='margin-left:8px;'>Space: <strong>O(1)</strong></span></div>"
           }
         ]
       }
@@ -465,7 +615,7 @@
           4,
           5
         ],
-        "footer": "Remove Nth node from end \u2014 1\u21922\u21923\u21924\u21925, remove 2nd from end.",
+        "footer": "Remove Nth node from end \u2014 1\u21922\u21923\u21924\u21925, remove 2nd from end (node 4) using the two-pointer rubber-band trick. O(N) time, O(1) space, one pass.",
         "legend": [
           "c-input",
           "c-active",
@@ -474,25 +624,56 @@
         ],
         "script": [
           {
-            "label": "SETUP",
-            "msg": "List: <strong>1\u21922\u21923\u21924\u21925\u2192NULL</strong>. Remove <strong>2nd from end</strong> (node 4). Two-pointer with gap=2.",
-            "html": "<div class='v-row'><div class='v-cell'>1</div><span class='v-arrow'>\u2192</span><div class='v-cell'>2</div><span class='v-arrow'>\u2192</span><div class='v-cell'>3</div><span class='v-arrow'>\u2192</span><div class='v-cell'>4</div><span class='v-arrow'>\u2192</span><div class='v-cell'>5</div><span class='v-arrow'>\u2192</span><div class='v-cell v-null'>NULL</div></div>"
+            "label": "SETUP \u2014 remove Nth from end in one pass",
+            "msg": "We have a linked list <strong>1\u21922\u21923\u21924\u21925\u2192\u2205</strong> and need to remove the <strong>B=2</strong>nd node from the end (that is, <strong>node 4</strong>) in a single pass without counting the length first. The trick: use two pointers with a <strong>gap of B nodes</strong> between them. When the fast pointer reaches the end, the slow pointer will land exactly on the <strong>predecessor of the node we want to delete</strong>.",
+            "html": "<div class='v-label'>ORIGINAL LIST</div><div class='v-row'><div class='v-cell'>1</div><span class='v-arrow'>\u2192</span><div class='v-cell'>2</div><span class='v-arrow'>\u2192</span><div class='v-cell'>3</div><span class='v-arrow'>\u2192</span><div class='v-cell'>4</div><span class='v-arrow'>\u2192</span><div class='v-cell'>5</div><span class='v-arrow'>\u2192</span><div class='v-cell v-null'>\u2205</div></div>",
+            "overlay": "Goal: remove <strong>2nd from end</strong> = node 4. Use <strong>dummy node</strong> to handle edge case when removing head."
           },
           {
-            "label": "TWO-POINTER SETUP",
-            "msg": "Fast pointer advances N=2 steps. Then slide both until fast reaches end. Slow lands on predecessor of target.",
-            "html": "<div class='v-row'><div class='v-cell v-low'>slow</div><span style='margin:0 8px;'> </span><div class='v-cell v-high'>fast (2 ahead)</div></div>",
-            "overlay": "Rubber-band trick: gap of N between pointers."
+            "label": "INITIALISE TWO POINTERS",
+            "msg": "Create a <strong>dummy</strong> node pointing to <strong>head</strong> (helps handle 'remove head' case). Set <strong>FAST = dummy</strong> and <strong>SLOW = dummy</strong>. Both start at the dummy.",
+            "html": "<div class='v-row' style='align-items:flex-end;'><div style='display:flex;flex-direction:column;align-items:center;gap:4px;'><span style='font-size:10px;color:#79c0ff;font-weight:700;letter-spacing:.1em;'>FAST</span><span style='font-size:10px;color:#bc8cff;font-weight:700;letter-spacing:.1em;'>SLOW</span><div class='v-cell v-null'>dummy</div></div><span class='v-arrow'>\u2192</span><div class='v-cell'>1</div><span class='v-arrow'>\u2192</span><div class='v-cell'>2</div><span class='v-arrow'>\u2192</span><div class='v-cell'>3</div><span class='v-arrow'>\u2192</span><div class='v-cell'>4</div><span class='v-arrow'>\u2192</span><div class='v-cell'>5</div><span class='v-arrow'>\u2192</span><div class='v-cell v-null'>\u2205</div></div>",
+            "overlay": "<code>ListNode dummy = new ListNode(0);</code><br><code>dummy.next = head;</code><br><code>ListNode fast = dummy, slow = dummy;</code>"
           },
           {
-            "label": "DELETE NODE 4",
-            "msg": "When fast=NULL, slow is at node 3. Skip node 4: <code>slow.next = slow.next.next</code>.",
-            "html": "<div class='v-row'><div class='v-cell v-result'>1</div><span class='v-arrow'>\u2192</span><div class='v-cell v-result'>2</div><span class='v-arrow'>\u2192</span><div class='v-cell v-active'>3</div><span class='v-arrow v-new'>\u2192</span><div class='v-cell v-removed'>4</div><span class='v-arrow v-cut'>\u2192</span><div class='v-cell v-result'>5</div><span class='v-arrow'>\u2192</span><div class='v-cell v-null'>NULL</div></div>"
+            "label": "ADVANCE FAST POINTER B STEPS",
+            "msg": "Advance <strong>FAST</strong> exactly <strong>B = 2</strong> steps ahead, creating a gap of <strong>2 nodes</strong> between FAST and SLOW. FAST moves from dummy \u2192 1 \u2192 2. Now <strong>FAST is at node 2</strong>, <strong>SLOW is at dummy</strong>.",
+            "html": "<div class='v-row' style='align-items:flex-end;'><div style='display:flex;flex-direction:column;align-items:center;gap:4px;'><span style='font-size:10px;color:#bc8cff;font-weight:700;letter-spacing:.1em;'>SLOW</span><div class='v-cell v-null'>dummy</div></div><span class='v-arrow'>\u2192</span><div class='v-cell'>1</div><span class='v-arrow'>\u2192</span><div style='display:flex;flex-direction:column;align-items:center;gap:4px;'><span style='font-size:10px;color:#79c0ff;font-weight:700;letter-spacing:.1em;'>FAST</span><div class='v-cell v-high'>2</div></div><span class='v-arrow'>\u2192</span><div class='v-cell'>3</div><span class='v-arrow'>\u2192</span><div class='v-cell'>4</div><span class='v-arrow'>\u2192</span><div class='v-cell'>5</div><span class='v-arrow'>\u2192</span><div class='v-cell v-null'>\u2205</div></div>",
+            "overlay": "<code>for (int i = 0; i < B; i++)</code><br>&nbsp;&nbsp;<code>fast = fast.next;</code><br>Gap = <strong>2 nodes</strong>"
           },
           {
-            "label": "DONE",
-            "msg": "\u2705 <strong>Result: 1\u21922\u21923\u21925\u2192NULL</strong>. Node 4 removed.",
-            "html": "<div class='v-row'><div class='v-cell v-result'>1</div><span class='v-arrow'>\u2192</span><div class='v-cell v-result'>2</div><span class='v-arrow'>\u2192</span><div class='v-cell v-result'>3</div><span class='v-arrow'>\u2192</span><div class='v-cell v-result'>5</div><span class='v-arrow'>\u2192</span><div class='v-cell v-null'>NULL</div></div>"
+            "label": "SLIDE BOTH POINTERS TOGETHER \u2014 iteration 1",
+            "msg": "Now slide <strong>both pointers forward together</strong>, maintaining the gap, until <strong>fast.next = \u2205</strong>. Advance both: <strong>SLOW</strong> dummy \u2192 1, <strong>FAST</strong> 2 \u2192 3.",
+            "html": "<div class='v-row' style='align-items:flex-end;'><div style='display:flex;flex-direction:column;align-items:center;gap:4px;'><span style='font-size:10px;color:#bc8cff;font-weight:700;letter-spacing:.1em;'>SLOW</span><div class='v-cell v-low'>1</div></div><span class='v-arrow'>\u2192</span><div class='v-cell'>2</div><span class='v-arrow'>\u2192</span><div style='display:flex;flex-direction:column;align-items:center;gap:4px;'><span style='font-size:10px;color:#79c0ff;font-weight:700;letter-spacing:.1em;'>FAST</span><div class='v-cell v-high'>3</div></div><span class='v-arrow'>\u2192</span><div class='v-cell'>4</div><span class='v-arrow'>\u2192</span><div class='v-cell'>5</div><span class='v-arrow'>\u2192</span><div class='v-cell v-null'>\u2205</div></div>",
+            "overlay": "<code>while (fast.next != null) {</code><br>&nbsp;&nbsp;<code>fast = fast.next;</code><br>&nbsp;&nbsp;<code>slow = slow.next;</code><br><code>}</code>"
+          },
+          {
+            "label": "SLIDE BOTH POINTERS \u2014 iteration 2",
+            "msg": "Continue sliding. Advance both: <strong>SLOW</strong> 1 \u2192 2, <strong>FAST</strong> 3 \u2192 4.",
+            "html": "<div class='v-row' style='align-items:flex-end;'><div class='v-cell'>1</div><span class='v-arrow'>\u2192</span><div style='display:flex;flex-direction:column;align-items:center;gap:4px;'><span style='font-size:10px;color:#bc8cff;font-weight:700;letter-spacing:.1em;'>SLOW</span><div class='v-cell v-low'>2</div></div><span class='v-arrow'>\u2192</span><div class='v-cell'>3</div><span class='v-arrow'>\u2192</span><div style='display:flex;flex-direction:column;align-items:center;gap:4px;'><span style='font-size:10px;color:#79c0ff;font-weight:700;letter-spacing:.1em;'>FAST</span><div class='v-cell v-high'>4</div></div><span class='v-arrow'>\u2192</span><div class='v-cell'>5</div><span class='v-arrow'>\u2192</span><div class='v-cell v-null'>\u2205</div></div>"
+          },
+          {
+            "label": "SLIDE BOTH POINTERS \u2014 iteration 3 (final)",
+            "msg": "Advance both: <strong>SLOW</strong> 2 \u2192 3, <strong>FAST</strong> 4 \u2192 5. Now <strong>fast.next = \u2205</strong> \u2192 loop stops. <strong>SLOW is at node 3</strong>, which is the <strong>predecessor</strong> of the node we want to delete (<strong>node 4</strong>).",
+            "html": "<div class='v-row' style='align-items:flex-end;'><div class='v-cell'>1</div><span class='v-arrow'>\u2192</span><div class='v-cell'>2</div><span class='v-arrow'>\u2192</span><div style='display:flex;flex-direction:column;align-items:center;gap:4px;'><span style='font-size:10px;color:#bc8cff;font-weight:700;letter-spacing:.1em;'>SLOW</span><div class='v-cell v-low'>3</div></div><span class='v-arrow'>\u2192</span><div class='v-cell'>4</div><span class='v-arrow'>\u2192</span><div style='display:flex;flex-direction:column;align-items:center;gap:4px;'><span style='font-size:10px;color:#79c0ff;font-weight:700;letter-spacing:.1em;'>FAST</span><div class='v-cell v-high'>5</div></div><span class='v-arrow'>\u2192</span><div class='v-cell v-null'>\u2205</div></div>",
+            "overlay": "When loop exits: <strong>SLOW</strong> is B nodes behind <strong>FAST</strong>, so SLOW is exactly at the node <strong>before</strong> the target."
+          },
+          {
+            "label": "SPLICE OUT THE TARGET NODE",
+            "msg": "<strong>SLOW is at node 3</strong>. The node we want to delete is <strong>SLOW.next = node 4</strong>. Splice it out: <code>slow.next = slow.next.next</code>, making <strong>3 \u2192 5</strong>. Node 4 is now orphaned and will be garbage-collected.",
+            "html": "<div class='v-row' style='align-items:flex-end;'><div class='v-cell v-result'>1</div><span class='v-arrow'>\u2192</span><div class='v-cell v-result'>2</div><span class='v-arrow'>\u2192</span><div style='display:flex;flex-direction:column;align-items:center;gap:4px;'><span style='font-size:10px;color:#bc8cff;font-weight:700;letter-spacing:.1em;'>SLOW</span><div class='v-cell v-active'>3</div></div><span class='v-arrow v-new'>\u2192</span><div class='v-cell v-removed'>4</div><span class='v-arrow v-cut'>\u2192</span><div class='v-cell v-result'>5</div><span class='v-arrow'>\u2192</span><div class='v-cell v-null'>\u2205</div></div>",
+            "overlay": "<code>slow.next = slow.next.next;</code><br>Node 4 is cut out of the list."
+          },
+          {
+            "label": "RETURN NEW HEAD",
+            "msg": "Return <strong>dummy.next</strong> as the new head. In this case, the head didn't change (still <strong>node 1</strong>), but using dummy handles the edge case where we remove the head node itself.",
+            "html": "<div class='v-label'>RESULT LIST</div><div class='v-row'><div class='v-cell v-result'>1</div><span class='v-arrow'>\u2192</span><div class='v-cell v-result'>2</div><span class='v-arrow'>\u2192</span><div class='v-cell v-result'>3</div><span class='v-arrow'>\u2192</span><div class='v-cell v-result'>5</div><span class='v-arrow'>\u2192</span><div class='v-cell v-null'>\u2205</div></div>",
+            "overlay": "<code>return dummy.next;</code>"
+          },
+          {
+            "label": "DONE \u2014 why this works",
+            "msg": "\u2705 Node removed: <strong>1 \u2192 2 \u2192 3 \u2192 5 \u2192 \u2205</strong>. The <strong>2nd node from the end (node 4)</strong> is gone. <strong>Why the rubber-band trick works:</strong> when FAST is B nodes ahead of SLOW and FAST reaches the end (FAST.next = \u2205), SLOW is exactly B nodes back from the end \u2014 that is, SLOW is at the predecessor of the Bth node from the end. We only made <strong>one pass</strong> through the list. <strong>O(N)</strong> time, <strong>O(1)</strong> space.",
+            "html": "<div class='v-label'>FINAL RESULT</div><div class='v-row'><div class='v-cell v-result'>1</div><span class='v-arrow'>\u2192</span><div class='v-cell v-result'>2</div><span class='v-arrow'>\u2192</span><div class='v-cell v-result'>3</div><span class='v-arrow'>\u2192</span><div class='v-cell v-result'>5</div><span class='v-arrow'>\u2192</span><div class='v-cell v-null'>\u2205</div></div><div class='v-row' style='margin-top:8px;'><span class='v-stat'>Time: <strong>O(N)</strong></span><span class='v-stat' style='margin-left:8px;'>Space: <strong>O(1)</strong></span><span class='v-stat' style='margin-left:8px;'>One pass</span></div>"
           }
         ]
       }
@@ -534,7 +715,7 @@
           4,
           5
         ],
-        "footer": "Reverse sublist \u2014 1\u21922\u21923\u21924\u21925, reverse positions 2-4.",
+        "footer": "Reverse sublist \u2014 1\u21922\u21923\u21924\u21925, reverse positions 2-4 (1-indexed) using front-insertion. O(N) time, O(1) space, one pass.",
         "legend": [
           "c-input",
           "c-active",
@@ -542,25 +723,51 @@
         ],
         "script": [
           {
-            "label": "SETUP",
-            "msg": "List: <strong>1\u21922\u21923\u21924\u21925\u2192NULL</strong>. Reverse positions <strong>2 to 4</strong> (1-indexed). Result: 1\u21924\u21923\u21922\u21925.",
-            "html": "<div class='v-row'><div class='v-cell'>1</div><span class='v-arrow'>\u2192</span><div class='v-cell'>2</div><span class='v-arrow'>\u2192</span><div class='v-cell'>3</div><span class='v-arrow'>\u2192</span><div class='v-cell'>4</div><span class='v-arrow'>\u2192</span><div class='v-cell'>5</div><span class='v-arrow'>\u2192</span><div class='v-cell v-null'>NULL</div></div>"
+            "label": "SETUP \u2014 reverse sublist [B, C]",
+            "msg": "We have a linked list <strong>1\u21922\u21923\u21924\u21925\u2192\u2205</strong> and need to reverse positions <strong>B=2 through C=4</strong> (1-indexed), so the segment <strong>2\u21923\u21924</strong> will be reversed to <strong>4\u21923\u21922</strong>. The nodes before and after this segment (<strong>1</strong> and <strong>5</strong>) stay in place. We will reverse the segment in-place using the <strong>front-insertion</strong> technique: repeatedly lift the next node to the front of the segment.",
+            "html": "<div class='v-label'>ORIGINAL LIST</div><div class='v-row'><div class='v-cell'>1</div><span class='v-arrow'>\u2192</span><div class='v-cell'>2</div><span class='v-arrow'>\u2192</span><div class='v-cell'>3</div><span class='v-arrow'>\u2192</span><div class='v-cell'>4</div><span class='v-arrow'>\u2192</span><div class='v-cell'>5</div><span class='v-arrow'>\u2192</span><div class='v-cell v-null'>\u2205</div></div>",
+            "overlay": "Goal: reverse <strong>positions 2-4</strong> \u2192 result <strong>1\u21924\u21923\u21922\u21925\u2192\u2205</strong>"
           },
           {
-            "label": "IDENTIFY SEGMENT",
-            "msg": "Walk to node 1 (before segment start). Segment: nodes 2,3,4. Reverse this segment in-place using front-insertion.",
-            "html": "<div class='v-row'><div class='v-cell'>1</div><span class='v-arrow'>\u2192</span><div class='v-cell v-active'>2</div><span class='v-arrow'>\u2192</span><div class='v-cell v-active'>3</div><span class='v-arrow'>\u2192</span><div class='v-cell v-active'>4</div><span class='v-arrow'>\u2192</span><div class='v-cell'>5</div><span class='v-arrow'>\u2192</span><div class='v-cell v-null'>NULL</div></div>",
-            "overlay": "Front-insertion: repeatedly lift nodes to the front of segment."
+            "label": "WALK TO PRE-SEGMENT NODE",
+            "msg": "Use a dummy node for simplicity. Walk <strong>B-1 = 1</strong> step from dummy to reach <strong>node 1</strong> (the node immediately before the segment). Set <strong>pre = node 1</strong>, <strong>start = node 2</strong> (first node of segment), <strong>then = node 3</strong> (the node we will lift first).",
+            "html": "<div class='v-row' style='align-items:flex-end;'><div style='display:flex;flex-direction:column;align-items:center;gap:4px;'><span style='font-size:10px;color:#8b5cf6;font-weight:700;letter-spacing:.1em;'>PRE</span><div class='v-cell'>1</div></div><span class='v-arrow'>\u2192</span><div style='display:flex;flex-direction:column;align-items:center;gap:4px;'><span style='font-size:10px;color:#22c55e;font-weight:700;letter-spacing:.1em;'>START</span><div class='v-cell v-active'>2</div></div><span class='v-arrow'>\u2192</span><div style='display:flex;flex-direction:column;align-items:center;gap:4px;'><span style='font-size:10px;color:#f59e0b;font-weight:700;letter-spacing:.1em;'>THEN</span><div class='v-cell v-active'>3</div></div><span class='v-arrow'>\u2192</span><div class='v-cell v-active'>4</div><span class='v-arrow'>\u2192</span><div class='v-cell'>5</div><span class='v-arrow'>\u2192</span><div class='v-cell v-null'>\u2205</div></div>",
+            "overlay": "<code>ListNode pre = dummy;</code><br><code>for (int i = 1; i < B; i++) pre = pre.next;</code><br><code>ListNode start = pre.next, then = start.next;</code>"
           },
           {
-            "label": "REVERSED SEGMENT",
-            "msg": "After C-B lifts, segment is reversed. Reattach to rest of list.",
-            "html": "<div class='v-row'><div class='v-cell v-result'>1</div><span class='v-arrow'>\u2192</span><div class='v-cell v-result'>4</div><span class='v-arrow v-rev'>\u2190</span><div class='v-cell v-result'>3</div><span class='v-arrow v-rev'>\u2190</span><div class='v-cell v-result'>2</div><span class='v-arrow'>\u2192</span><div class='v-cell v-result'>5</div><span class='v-arrow'>\u2192</span><div class='v-cell v-null'>NULL</div></div>"
+            "label": "READY TO START \u2014 segment identified",
+            "msg": "The segment to reverse is <strong>2 \u2192 3 \u2192 4</strong> (positions B=2 through C=4). We need exactly <strong>C - B = 2</strong> front-insertion lifts. <strong>START</strong> stays fixed at node 2 throughout the loop; we repeatedly lift <strong>THEN</strong> to the front and update THEN to the next node.",
+            "html": "<div class='v-label'>SEGMENT TO REVERSE: 2 \u2192 3 \u2192 4</div><div class='v-row' style='align-items:flex-end;'><div style='display:flex;flex-direction:column;align-items:center;gap:4px;'><span style='font-size:10px;color:#8b5cf6;font-weight:700;letter-spacing:.1em;'>PRE</span><div class='v-cell'>1</div></div><span class='v-arrow'>\u2192</span><div style='display:flex;flex-direction:column;align-items:center;gap:4px;'><span style='font-size:10px;color:#22c55e;font-weight:700;letter-spacing:.1em;'>START</span><div class='v-cell v-active'>2</div></div><span class='v-arrow'>\u2192</span><div style='display:flex;flex-direction:column;align-items:center;gap:4px;'><span style='font-size:10px;color:#f59e0b;font-weight:700;letter-spacing:.1em;'>THEN</span><div class='v-cell v-active'>3</div></div><span class='v-arrow'>\u2192</span><div class='v-cell v-active'>4</div><span class='v-arrow'>\u2192</span><div class='v-cell'>5</div><span class='v-arrow'>\u2192</span><div class='v-cell v-null'>\u2205</div></div>",
+            "overlay": "<code>for (int k = 0; k < C - B; k++)</code> \u2014 need <strong>2</strong> lifts to reverse 3 nodes<br>Loop invariant: <strong>START</strong> is the original head (will become tail)"
           },
           {
-            "label": "DONE",
-            "msg": "\u2705 <strong>Result: 1\u21924\u21923\u21922\u21925\u2192NULL</strong>. Partial reversal in one pass.",
-            "html": "<div class='v-row'><div class='v-cell v-result'>1</div><span class='v-arrow'>\u2192</span><div class='v-cell v-result'>4</div><span class='v-arrow'>\u2192</span><div class='v-cell v-result'>3</div><span class='v-arrow'>\u2192</span><div class='v-cell v-result'>2</div><span class='v-arrow'>\u2192</span><div class='v-cell v-result'>5</div><span class='v-arrow'>\u2192</span><div class='v-cell v-null'>NULL</div></div>"
+            "label": "FRONT-INSERTION ITERATION 1 \u2014 lift node 3",
+            "msg": "<strong>Lift node 3 to the front</strong> of the segment. Steps: <strong>start.next = then.next</strong> (2 now points to 4), <strong>then.next = pre.next</strong> (3 now points to 2), <strong>pre.next = then</strong> (1 now points to 3). Node 3 is now at the front of the segment. <strong>then = start.next = node 4</strong> (next node to lift).",
+            "html": "<div class='v-row' style='align-items:flex-end;'><div style='display:flex;flex-direction:column;align-items:center;gap:4px;'><span style='font-size:10px;color:#8b5cf6;font-weight:700;letter-spacing:.1em;'>PRE</span><div class='v-cell'>1</div></div><span class='v-arrow'>\u2192</span><div style='display:flex;flex-direction:column;align-items:center;gap:4px;'><span style='font-size:10px;color:#f59e0b;font-weight:700;letter-spacing:.1em;'>LIFTED</span><div class='v-cell v-result'>3</div></div><span class='v-arrow v-new'>\u2192</span><div style='display:flex;flex-direction:column;align-items:center;gap:4px;'><span style='font-size:10px;color:#22c55e;font-weight:700;letter-spacing:.1em;'>START</span><div class='v-cell v-active'>2</div></div><span class='v-arrow v-new'>\u2192</span><div style='display:flex;flex-direction:column;align-items:center;gap:4px;'><span style='font-size:10px;color:#f59e0b;font-weight:700;letter-spacing:.1em;'>THEN</span><div class='v-cell v-active'>4</div></div><span class='v-arrow'>\u2192</span><div class='v-cell'>5</div><span class='v-arrow'>\u2192</span><div class='v-cell v-null'>\u2205</div></div>",
+            "overlay": "<code>start.next = then.next;</code><br><code>then.next = pre.next;</code><br><code>pre.next = then;</code><br><code>then = start.next;</code> // = 4"
+          },
+          {
+            "label": "FRONT-INSERTION ITERATION 2 \u2014 lift node 4",
+            "msg": "<strong>Lift node 4 to the front</strong>. Same steps: <strong>start.next = then.next</strong> (2 \u2192 5), <strong>then.next = pre.next</strong> (4 \u2192 3), <strong>pre.next = then</strong> (1 \u2192 4). Node 4 is now at the front. <strong>then = start.next = node 5</strong> (but we are done \u2014 we only reverse positions 2-4, which is C-B = 2 lifts).",
+            "html": "<div class='v-row' style='align-items:flex-end;'><div style='display:flex;flex-direction:column;align-items:center;gap:4px;'><span style='font-size:10px;color:#8b5cf6;font-weight:700;letter-spacing:.1em;'>PRE</span><div class='v-cell'>1</div></div><span class='v-arrow'>\u2192</span><div style='display:flex;flex-direction:column;align-items:center;gap:4px;'><span style='font-size:10px;color:#f59e0b;font-weight:700;letter-spacing:.1em;'>LIFTED</span><div class='v-cell v-result'>4</div></div><span class='v-arrow v-new'>\u2192</span><div class='v-cell v-result'>3</div><span class='v-arrow'>\u2192</span><div style='display:flex;flex-direction:column;align-items:center;gap:4px;'><span style='font-size:10px;color:#22c55e;font-weight:700;letter-spacing:.1em;'>START</span><div class='v-cell v-result'>2</div></div><span class='v-arrow v-new'>\u2192</span><div class='v-cell'>5</div><span class='v-arrow'>\u2192</span><div class='v-cell v-null'>\u2205</div></div>",
+            "overlay": "Loop: <code>for (int k = 0; k < C - B; k++)</code> \u2014 we lift <strong>C - B = 2</strong> nodes total."
+          },
+          {
+            "label": "SEGMENT REVERSED",
+            "msg": "After <strong>C - B = 2</strong> lifts, the segment is reversed. The list is now <strong>1 \u2192 4 \u2192 3 \u2192 2 \u2192 5 \u2192 \u2205</strong>. Node <strong>2</strong> (originally the first node of the segment) is now the <strong>last node of the reversed segment</strong> and correctly points to <strong>5</strong> (the node after the original segment).",
+            "html": "<div class='v-label'>REVERSED SEGMENT</div><div class='v-row'><div class='v-cell v-result'>1</div><span class='v-arrow'>\u2192</span><div class='v-cell v-result'>4</div><span class='v-arrow'>\u2192</span><div class='v-cell v-result'>3</div><span class='v-arrow'>\u2192</span><div class='v-cell v-result'>2</div><span class='v-arrow'>\u2192</span><div class='v-cell v-result'>5</div><span class='v-arrow'>\u2192</span><div class='v-cell v-null'>\u2205</div></div>",
+            "overlay": "The segment <strong>2\u21923\u21924</strong> is now <strong>4\u21923\u21922</strong>, stitched back into the list."
+          },
+          {
+            "label": "RETURN NEW HEAD",
+            "msg": "Return <strong>dummy.next</strong> as the new head. In this case, the head is still <strong>node 1</strong>, unchanged. Using dummy simplifies edge cases (e.g., if B=1, we reverse starting from the head).",
+            "html": "<div class='v-label'>FINAL LIST</div><div class='v-row'><div class='v-cell v-result'>1</div><span class='v-arrow'>\u2192</span><div class='v-cell v-result'>4</div><span class='v-arrow'>\u2192</span><div class='v-cell v-result'>3</div><span class='v-arrow'>\u2192</span><div class='v-cell v-result'>2</div><span class='v-arrow'>\u2192</span><div class='v-cell v-result'>5</div><span class='v-arrow'>\u2192</span><div class='v-cell v-null'>\u2205</div></div>",
+            "overlay": "<code>return dummy.next;</code>"
+          },
+          {
+            "label": "DONE \u2014 why front-insertion works",
+            "msg": "\u2705 Result: <strong>1 \u2192 4 \u2192 3 \u2192 2 \u2192 5 \u2192 \u2205</strong>. The segment at positions 2-4 is reversed. <strong>Why front-insertion works:</strong> on each iteration, we take the next node in the original order (<strong>then</strong>) and move it to the front of the segment (right after <strong>pre</strong>). After <strong>C - B</strong> lifts, the segment is fully reversed and all pointers are correctly updated. We only walked through the segment once \u2014 <strong>O(N)</strong> time, <strong>O(1)</strong> space.",
+            "html": "<div class='v-label'>FINAL RESULT</div><div class='v-row'><div class='v-cell v-result'>1</div><span class='v-arrow'>\u2192</span><div class='v-cell v-result'>4</div><span class='v-arrow'>\u2192</span><div class='v-cell v-result'>3</div><span class='v-arrow'>\u2192</span><div class='v-cell v-result'>2</div><span class='v-arrow'>\u2192</span><div class='v-cell v-result'>5</div><span class='v-arrow'>\u2192</span><div class='v-cell v-null'>\u2205</div></div><div class='v-row' style='margin-top:8px;'><span class='v-stat'>Time: <strong>O(N)</strong></span><span class='v-stat' style='margin-left:8px;'>Space: <strong>O(1)</strong></span><span class='v-stat' style='margin-left:8px;'>One pass</span></div>"
           }
         ]
       }
@@ -613,7 +820,7 @@
           5,
           6
         ],
-        "footer": "Reverse in K groups \u2014 [1,2,3,4,5,6], K=3.",
+        "footer": "Reverse in K groups \u2014 [1,2,3,4,5,6], K=3. Reverse each group independently using the three-pointer technique, then stitch groups together. O(N) time, O(1) space.",
         "legend": [
           "c-input",
           "c-active",
@@ -621,25 +828,55 @@
         ],
         "script": [
           {
-            "label": "SETUP",
-            "msg": "List: <strong>1\u21922\u21923\u21924\u21925\u21926\u2192NULL</strong>. Reverse every <strong>K=3</strong> nodes. Result: 3\u21922\u21921\u21926\u21925\u21924.",
-            "html": "<div class='v-row'><div class='v-cell'>1</div><span class='v-arrow'>\u2192</span><div class='v-cell'>2</div><span class='v-arrow'>\u2192</span><div class='v-cell'>3</div><span class='v-arrow'>\u2192</span><div class='v-cell'>4</div><span class='v-arrow'>\u2192</span><div class='v-cell'>5</div><span class='v-arrow'>\u2192</span><div class='v-cell'>6</div><span class='v-arrow'>\u2192</span><div class='v-cell v-null'>NULL</div></div>"
+            "label": "SETUP \u2014 reverse every K nodes",
+            "msg": "We have a linked list <strong>1\u21922\u21923\u21924\u21925\u21926\u2192\u2205</strong> and need to reverse every <strong>K=3</strong> consecutive nodes. The list length is guaranteed to be a multiple of K. The result will be <strong>3\u21922\u21921\u21926\u21925\u21924\u2192\u2205</strong>. Strategy: identify group boundaries, reverse each K-group in place using the standard three-pointer reversal (prev, curr, next), then stitch the reversed groups back together.",
+            "html": "<div class='v-label'>ORIGINAL LIST</div><div class='v-row'><div class='v-cell'>1</div><span class='v-arrow'>\u2192</span><div class='v-cell'>2</div><span class='v-arrow'>\u2192</span><div class='v-cell'>3</div><span class='v-arrow'>\u2192</span><div class='v-cell'>4</div><span class='v-arrow'>\u2192</span><div class='v-cell'>5</div><span class='v-arrow'>\u2192</span><div class='v-cell'>6</div><span class='v-arrow'>\u2192</span><div class='v-cell v-null'>\u2205</div></div>",
+            "overlay": "Goal: reverse every <strong>K=3</strong> nodes \u2192 <strong>3\u21922\u21921\u21926\u21925\u21924\u2192\u2205</strong>"
           },
           {
-            "label": "REVERSE GROUP 1",
-            "msg": "Reverse first K=3 nodes: 1\u21922\u21923 becomes 3\u21922\u21921. Connect to rest recursively.",
-            "html": "<div class='v-row'><div class='v-cell v-result'>3</div><span class='v-arrow v-rev'>\u2190</span><div class='v-cell v-result'>2</div><span class='v-arrow v-rev'>\u2190</span><div class='v-cell v-result'>1</div><span style='margin:0 8px;'>\u22ef</span><div class='v-cell'>4</div><span class='v-arrow'>\u2192</span><div class='v-cell'>5</div><span class='v-arrow'>\u2192</span><div class='v-cell'>6</div></div>",
-            "overlay": "Recursive: reverse first K, then call reverseK on remainder."
+            "label": "IDENTIFY GROUP 1 \u2014 nodes 1, 2, 3",
+            "msg": "The first group is nodes <strong>1, 2, 3</strong> (K=3 nodes). We will reverse this group using the three-pointer technique (prev, curr, next), exactly like reversing an entire list but stopping after K flips. Mark the group boundaries: <strong>group start = node 1</strong>, <strong>group end = node 3</strong>, <strong>next group start = node 4</strong>.",
+            "html": "<div class='v-label'>GROUP 1: nodes 1, 2, 3</div><div class='v-row' style='align-items:flex-end;'><div style='display:flex;flex-direction:column;align-items:center;gap:4px;'><span style='font-size:9px;color:#22c55e;font-weight:700;'>GROUP START</span><div class='v-cell v-active'>1</div></div><span class='v-arrow'>\u2192</span><div class='v-cell v-active'>2</div><span class='v-arrow'>\u2192</span><div style='display:flex;flex-direction:column;align-items:center;gap:4px;'><span style='font-size:9px;color:#f59e0b;font-weight:700;'>GROUP END</span><div class='v-cell v-active'>3</div></div><span class='v-arrow' style='border:2px dashed #3b82f6;'>\u2192</span><div class='v-cell'>4</div><span class='v-arrow'>\u2192</span><div class='v-cell'>5</div><span class='v-arrow'>\u2192</span><div class='v-cell'>6</div><span class='v-arrow'>\u2192</span><div class='v-cell v-null'>\u2205</div></div>",
+            "overlay": "<code>count K nodes from current position</code><br>If count < K, no reversal (but here we have exactly K=3)"
           },
           {
-            "label": "REVERSE GROUP 2",
-            "msg": "Reverse next K=3: 4\u21925\u21926 becomes 6\u21925\u21924. Attach to previous group.",
-            "html": "<div class='v-row'><div class='v-cell v-result'>3</div><span class='v-arrow'>\u2192</span><div class='v-cell v-result'>2</div><span class='v-arrow'>\u2192</span><div class='v-cell v-result'>1</div><span class='v-arrow'>\u2192</span><div class='v-cell v-result'>6</div><span class='v-arrow v-rev'>\u2190</span><div class='v-cell v-result'>5</div><span class='v-arrow v-rev'>\u2190</span><div class='v-cell v-result'>4</div></div>"
+            "label": "REVERSE GROUP 1 \u2014 three-pointer flip",
+            "msg": "Reverse the group <strong>1\u21922\u21923</strong> using the standard technique: <code>prev=null, curr=1</code>, then flip each arrow. After K=3 flips, the group becomes <strong>3\u21922\u21921</strong>. Node <strong>1</strong> (originally the head of this group) is now the <strong>tail</strong> of the reversed group and will point to <strong>node 4</strong> (the start of the next group).",
+            "html": "<div class='v-label'>GROUP 1 REVERSED: 3 \u2192 2 \u2192 1</div><div class='v-row' style='align-items:flex-end;'><div style='display:flex;flex-direction:column;align-items:center;gap:4px;'><span style='font-size:9px;color:#f59e0b;font-weight:700;'>NEW HEAD</span><div class='v-cell v-result'>3</div></div><span class='v-arrow v-rev'>\u2190</span><div class='v-cell v-result'>2</div><span class='v-arrow v-rev'>\u2190</span><div style='display:flex;flex-direction:column;align-items:center;gap:4px;'><span style='font-size:9px;color:#22c55e;font-weight:700;'>NEW TAIL</span><div class='v-cell v-result'>1</div></div><span class='v-arrow' style='border:2px dashed #3b82f6;'>\u2192</span><div class='v-cell'>4</div><span class='v-arrow'>\u2192</span><div class='v-cell'>5</div><span class='v-arrow'>\u2192</span><div class='v-cell'>6</div><span class='v-arrow'>\u2192</span><div class='v-cell v-null'>\u2205</div></div>",
+            "overlay": "<code>prev = null, curr = head;</code><br><code>for (int i = 0; i < K; i++) {</code><br>&nbsp;&nbsp;<code>next = curr.next; curr.next = prev;</code><br>&nbsp;&nbsp;<code>prev = curr; curr = next;</code><br><code>}</code><br>After loop: <strong>prev = new head of group</strong>"
           },
           {
-            "label": "DONE",
-            "msg": "\u2705 <strong>Result: 3\u21922\u21921\u21926\u21925\u21924\u2192NULL</strong>. Every K-group reversed.",
-            "html": "<div class='v-row'><div class='v-cell v-result'>3</div><span class='v-arrow'>\u2192</span><div class='v-cell v-result'>2</div><span class='v-arrow'>\u2192</span><div class='v-cell v-result'>1</div><span class='v-arrow'>\u2192</span><div class='v-cell v-result'>6</div><span class='v-arrow'>\u2192</span><div class='v-cell v-result'>5</div><span class='v-arrow'>\u2192</span><div class='v-cell v-result'>4</div><span class='v-arrow'>\u2192</span><div class='v-cell v-null'>NULL</div></div>"
+            "label": "STITCH GROUP 1 TO THE REST",
+            "msg": "The reversed group 1 now has <strong>node 3</strong> as the new head and <strong>node 1</strong> as the new tail. We connect <strong>node 1</strong> (tail) to <strong>node 4</strong> (start of next group). The overall list head is now <strong>node 3</strong>.",
+            "html": "<div class='v-row'><div class='v-cell v-result'>3</div><span class='v-arrow'>\u2192</span><div class='v-cell v-result'>2</div><span class='v-arrow'>\u2192</span><div class='v-cell v-result'>1</div><span class='v-arrow v-new'>\u2192</span><div class='v-cell'>4</div><span class='v-arrow'>\u2192</span><div class='v-cell'>5</div><span class='v-arrow'>\u2192</span><div class='v-cell'>6</div><span class='v-arrow'>\u2192</span><div class='v-cell v-null'>\u2205</div></div>",
+            "overlay": "<code>oldHead.next = nextGroupStart;</code> // node 1 \u2192 node 4"
+          },
+          {
+            "label": "IDENTIFY GROUP 2 \u2014 nodes 4, 5, 6",
+            "msg": "Now process the second group: nodes <strong>4, 5, 6</strong>. Same boundaries: <strong>group start = node 4</strong>, <strong>group end = node 6</strong>, <strong>next group start = \u2205</strong> (this is the last group).",
+            "html": "<div class='v-label'>GROUP 2: nodes 4, 5, 6</div><div class='v-row'><div class='v-cell v-result'>3</div><span class='v-arrow'>\u2192</span><div class='v-cell v-result'>2</div><span class='v-arrow'>\u2192</span><div class='v-cell v-result'>1</div><span class='v-arrow'>\u2192</span><div style='display:flex;flex-direction:column;align-items:center;gap:4px;'><span style='font-size:9px;color:#22c55e;font-weight:700;'>GROUP START</span><div class='v-cell v-active'>4</div></div><span class='v-arrow'>\u2192</span><div class='v-cell v-active'>5</div><span class='v-arrow'>\u2192</span><div style='display:flex;flex-direction:column;align-items:center;gap:4px;'><span style='font-size:9px;color:#f59e0b;font-weight:700;'>GROUP END</span><div class='v-cell v-active'>6</div></div><span class='v-arrow'>\u2192</span><div class='v-cell v-null'>\u2205</div></div>"
+          },
+          {
+            "label": "REVERSE GROUP 2 \u2014 three-pointer flip",
+            "msg": "Reverse the group <strong>4\u21925\u21926</strong> using the same three-pointer technique. After K=3 flips, the group becomes <strong>6\u21925\u21924</strong>. Node <strong>4</strong> (originally the head of this group) is now the <strong>tail</strong> and will point to <strong>\u2205</strong> (end of list).",
+            "html": "<div class='v-label'>GROUP 2 REVERSED: 6 \u2192 5 \u2192 4</div><div class='v-row'><div class='v-cell v-result'>3</div><span class='v-arrow'>\u2192</span><div class='v-cell v-result'>2</div><span class='v-arrow'>\u2192</span><div class='v-cell v-result'>1</div><span class='v-arrow' style='border:2px dashed #3b82f6;'>\u2192</span><div style='display:flex;flex-direction:column;align-items:center;gap:4px;'><span style='font-size:9px;color:#f59e0b;font-weight:700;'>NEW HEAD</span><div class='v-cell v-result'>6</div></div><span class='v-arrow v-rev'>\u2190</span><div class='v-cell v-result'>5</div><span class='v-arrow v-rev'>\u2190</span><div style='display:flex;flex-direction:column;align-items:center;gap:4px;'><span style='font-size:9px;color:#22c55e;font-weight:700;'>NEW TAIL</span><div class='v-cell v-result'>4</div></div><span class='v-arrow'>\u2192</span><div class='v-cell v-null'>\u2205</div></div>",
+            "overlay": "Same reversal loop: <code>for (int i = 0; i < K; i++)</code> flip arrows"
+          },
+          {
+            "label": "STITCH GROUP 2 TO GROUP 1",
+            "msg": "Connect the tail of group 1 (<strong>node 1</strong>) to the new head of group 2 (<strong>node 6</strong>). The reversed group 2 tail (<strong>node 4</strong>) correctly points to <strong>\u2205</strong>.",
+            "html": "<div class='v-row'><div class='v-cell v-result'>3</div><span class='v-arrow'>\u2192</span><div class='v-cell v-result'>2</div><span class='v-arrow'>\u2192</span><div class='v-cell v-result'>1</div><span class='v-arrow v-new'>\u2192</span><div class='v-cell v-result'>6</div><span class='v-arrow'>\u2192</span><div class='v-cell v-result'>5</div><span class='v-arrow'>\u2192</span><div class='v-cell v-result'>4</div><span class='v-arrow'>\u2192</span><div class='v-cell v-null'>\u2205</div></div>",
+            "overlay": "<code>prevGroupTail.next = newGroupHead;</code> // node 1 \u2192 node 6"
+          },
+          {
+            "label": "ALL GROUPS REVERSED",
+            "msg": "All K-groups are now reversed and stitched together. The final list is <strong>3 \u2192 2 \u2192 1 \u2192 6 \u2192 5 \u2192 4 \u2192 \u2205</strong>. The original group <strong>1,2,3</strong> is now <strong>3,2,1</strong>; the original group <strong>4,5,6</strong> is now <strong>6,5,4</strong>.",
+            "html": "<div class='v-label'>FINAL RESULT</div><div class='v-row'><div class='v-cell v-result'>3</div><span class='v-arrow'>\u2192</span><div class='v-cell v-result'>2</div><span class='v-arrow'>\u2192</span><div class='v-cell v-result'>1</div><span class='v-arrow'>\u2192</span><div class='v-cell v-result'>6</div><span class='v-arrow'>\u2192</span><div class='v-cell v-result'>5</div><span class='v-arrow'>\u2192</span><div class='v-cell v-result'>4</div><span class='v-arrow'>\u2192</span><div class='v-cell v-null'>\u2205</div></div>"
+          },
+          {
+            "label": "DONE \u2014 complexity analysis",
+            "msg": "\u2705 Reversal complete: <strong>3 \u2192 2 \u2192 1 \u2192 6 \u2192 5 \u2192 4 \u2192 \u2205</strong>. Every K-group is reversed. We walked the entire list once, reversing each node exactly once using the three-pointer technique. <strong>O(N)</strong> time (each node visited once), <strong>O(1)</strong> extra space (only a few pointers). The key insight: treat each K-group as an independent sublist, reverse it in place, then stitch the reversed groups back together using the original head (now tail) of each group.",
+            "html": "<div class='v-label'>FINAL RESULT</div><div class='v-row'><div class='v-cell v-result'>3</div><span class='v-arrow'>\u2192</span><div class='v-cell v-result'>2</div><span class='v-arrow'>\u2192</span><div class='v-cell v-result'>1</div><span class='v-arrow'>\u2192</span><div class='v-cell v-result'>6</div><span class='v-arrow'>\u2192</span><div class='v-cell v-result'>5</div><span class='v-arrow'>\u2192</span><div class='v-cell v-result'>4</div><span class='v-arrow'>\u2192</span><div class='v-cell v-null'>\u2205</div></div><div class='v-row' style='margin-top:8px;'><span class='v-stat'>Time: <strong>O(N)</strong></span><span class='v-stat' style='margin-left:8px;'>Space: <strong>O(1)</strong></span><span class='v-stat' style='margin-left:8px;'>K-group reversal</span></div>"
           }
         ]
       }

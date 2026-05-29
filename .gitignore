@@ -10,3 +10,6 @@ out/
 
 # Claude/Copilot scratch
 .claude/
+
+# DSA revise: input problem screenshots (local only)
+Scaler/DSA/Advanced/Revise/data/images/

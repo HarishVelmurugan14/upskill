@@ -130,28 +130,66 @@ Aim ~80% sourced, 20% written. **Never invent code without searching first.**
 
 ## 6. Visualizer (`viz.kind`)
 
-Existing kinds (in `viz/viz-kinds.js`):
+**Gold-standard kind (use this for ALL new problems):** `scripted-array`.
 
-| Kind | Use for | Required `data` |
-|---|---|---|
-| `bs-bound` | first/last occurrence | `A`, `B`, `mode: 'both'` |
-| `bs-lower-bound` | lower_bound / insert position | `A`, `B` |
-| `bs-peak` | peak in unimodal array | `A` |
-| `bs-single-element` | sorted-with-loner | `A` |
-| `bs-matrix` | 2D sorted matrix search | `A` (2D), `B` |
-| `bs-on-answer` | minimize/maximize answer | `low, high, target, label, predicate` |
-| `bs-rotated` | rotated sorted array | `A`, `B` |
-| `bs-partition` | median of two sorted | `A, B` |
-| `sliding-window` | window of size K | `A, K, B?` |
-| `ll-traverse` | walk a list | `values, label?` |
-| `ll-reverse` | full or K-group reversal | `values, from?, to?, groupSize?` |
-| `ll-insert` | insert at position | `values, insertValue, insertAt` |
-| `ll-delete` | delete at position | `values, deleteAt` |
-| `ll-two-pointer` | N-from-end / slow-fast | `values, gap` |
+Each step in the script supports:
+- `label` — short ALL-CAPS banner (`"SETUP"`, `"ITERATION 2 — PICK MID"`, `"DONE"`).
+- `msg` — HTML narration shown in the dark band. Wrap key values in `<strong>`. Tie it to the actual sample input.
+- `marks` — `{ "0": "c-mid", "3": "c-eliminated" }` per-index cell class (array mode only).
+- `ptrs` — `{ "low": 0, "mid": 2, "high": 3, "ans": 2 }` adds L/M/H/★ markers (array mode only).
+- `overlay` — yellow callout HTML after the visual. Use for rules / formulas with `<code>` tags.
+- `html` — escape hatch: raw HTML using the `v-*` CSS vocabulary (cells, arrows, rows, labels, number-lines, stats). Use for matrices, linked lists, trees, custom layouts.
 
-**If a topic needs a brand-new viz kind** (e.g. `tree-traverse`, `graph-bfs`, `dp-table`), add it to `viz/viz-kinds.js` using the engine helpers (`E.cell`, `E.arrayRow`, `E.pointerRow`, `E.numberLine`, `E.llRow`, etc.) — same pattern as existing kinds: `{ makeSteps(data), render(canvas, step, data), footer?(data) }`. Then register it in the `VIZ_KINDS` map at the bottom of the file.
+**Quality bar (mandatory, no exceptions):**
+- **8 to 12 steps minimum** per problem. Setup + every meaningful iteration + Done.
+- **3+ overlays** per problem.
+- **Every step has a `label`**.
+- **Every value in `msg` is tied to the actual sample input** and wrapped in `<strong>`.
+- **Every step visually changes** vs the previous (a pointer moves, a cell flips colour, an arrow flips).
+- **Reference these three as the bar:** `bs-peak-element`, `bs-aggressive-cows`, `ll-reverse` in `binary-search.json` and `linked-list.json`.
 
-If no viz fits and writing one is out of scope, set `viz: { "kind": "ll-traverse", "data": { "values": [...], "label": "fallback" } }` rather than leaving it broken.
+**`v-*` CSS vocabulary** (already defined in `dsa-revisor.html`, do NOT add CSS):
+
+| Class | Purpose |
+|---|---|
+| `v-row` | flex row container, gap 4px, wraps |
+| `v-cell` | dark cell, base |
+| `v-cell v-active` | orange (being inspected) |
+| `v-cell v-low` | blue (left boundary) |
+| `v-cell v-high` | purple (right boundary) |
+| `v-cell v-mid` | red (probe) |
+| `v-cell v-result` | green (answer) |
+| `v-cell v-eliminated` | greyed strikethrough |
+| `v-cell v-peak` | orange glow |
+| `v-cell v-current` | purple glow (LL curr) |
+| `v-cell v-new` | green glow (newly added) |
+| `v-cell v-removed` | red strikethrough |
+| `v-cell v-null` | dashed outline (NULL/∅) |
+| `v-arrow` | neutral grey → |
+| `v-arrow v-rev` | orange ← (reversed) |
+| `v-arrow v-new` | green → (new link) |
+| `v-arrow v-cut` | red strikethrough |
+| `v-label` | small uppercase blue caption |
+| `v-matrix` | matrix container (column flex) |
+| `v-numline` + `v-numline-track` + `v-numline-active` + `v-numline-marker v-low/v-high/v-mid/v-ans` | number-line viz |
+| `v-stat` | pill-style live readout (`<span class='v-stat'>painters=<strong>3</strong></span>`) |
+
+**Legend mapping** (`data.legend` accepts only `c-*` names; map `v-*` semantics back to nearest):
+- `c-low` `c-high` `c-mid` `c-active` `c-eliminated` `c-result` `c-peak` `c-input`
+
+**Legacy kinds** (still registered, do not use for new work): `bs-bound`, `bs-lower-bound`, `bs-peak`, `bs-single-element`, `bs-matrix`, `bs-on-answer`, `bs-rotated`, `bs-partition`, `sliding-window`, `ll-traverse`, `ll-reverse`, `ll-insert`, `ll-delete`, `ll-two-pointer`. Convert these to `scripted-array` whenever revisiting a problem.
+
+---
+
+## 6a. Problem images
+
+User screenshots live at: `Scaler/DSA/Advanced/Revise/data/images/<topic-slug>/<topic-slug>-NN.png` (zero-padded, ordered by capture time = problem order).
+
+In each problem's JSON, include a top-level field:
+```json
+"image": "images/<topic-slug>/<topic-slug>-NN.png"
+```
+The page renders it as a faint reference thumbnail under the problem description.
 
 ---
 

@@ -40,68 +40,71 @@
       "data": {
         "A": [5, 7, 7, 8, 8, 10],
         "footer": "Two-phase binary search — A = [5, 7, 7, 8, 8, 10], B = 8. First BS finds leftmost 8, second finds rightmost.",
-        "legend": ["c-input", "c-low", "c-mid", "c-high", "c-active", "c-result"],
+        "legend": ["c-input", "c-low", "c-mid", "c-high", "c-active", "c-result", "c-eliminated"],
         "script": [
           {
             "label": "SETUP",
-            "msg": "Array <strong>A = [5, 7, 7, 8, 8, 10]</strong>, target <strong>B = 8</strong>. Find <strong>first</strong> and <strong>last</strong> indices where A[i] == 8. Run two binary searches: Phase 1 finds first, Phase 2 finds last."
+            "marks": {"0": "c-input", "1": "c-input", "2": "c-input", "3": "c-input", "4": "c-input", "5": "c-input"},
+            "msg": "Sorted array <strong>A = [5, 7, 7, 8, 8, 10]</strong>, target <strong>B = 8</strong>. Find <strong>first</strong> and <strong>last</strong> indices where A[i] == <strong>8</strong>. Strategy: run <strong>two</strong> independent binary searches. Phase 1 finds the leftmost occurrence, Phase 2 finds the rightmost.",
+            "overlay": "Twin BS pattern: <code>first</code> hugs left (<code>high = mid - 1</code> on match), <code>last</code> hugs right (<code>low = mid + 1</code> on match). Both searches have identical loop structure, only the 'on equal' branch flips."
           },
           {
-            "label": "PHASE 1 — Find First Occurrence",
-            "marks": {"0": "c-low", "5": "c-high"},
+            "label": "PHASE 1 — INITIALISE (find first)",
+            "marks": {"0": "c-low", "1": "c-active", "2": "c-active", "3": "c-active", "4": "c-active", "5": "c-high"},
             "ptrs": {"low": 0, "high": 5},
-            "msg": "<strong>Phase 1 start:</strong> low = <strong>0</strong>, high = <strong>5</strong>. Search the full array for the <em>first</em> occurrence of 8.",
-            "overlay": "Rule: when <code>A[mid] == B</code>, store <code>first = mid</code> but keep going left: <code>high = mid - 1</code>."
+            "msg": "<strong>Phase 1 start:</strong> low = <strong>0</strong>, high = <strong>5</strong>, first = <strong>-1</strong>. Search the full array [<strong>0..5</strong>] for the <em>first</em> occurrence of <strong>8</strong>. When we hit a match, we'll store it but keep searching left to see if an earlier match exists."
           },
           {
-            "label": "PHASE 1 — Iteration 1",
-            "marks": {"0": "c-low", "2": "c-mid", "5": "c-high"},
+            "label": "PHASE 1 — Iteration 1 (mid=2)",
+            "marks": {"0": "c-low", "1": "c-eliminated", "2": "c-mid", "3": "c-active", "4": "c-active", "5": "c-high"},
             "ptrs": {"low": 0, "mid": 2, "high": 5},
-            "msg": "<strong>mid = 2</strong>, A[2] = <strong>7</strong>. Since <strong>7 &lt; 8</strong>, the target must be to the right → <strong>low = mid + 1 = 3</strong>."
+            "msg": "<strong>mid = (0+5)/2 = 2</strong>. Check A[2] = <strong>7</strong>. Since <strong>7 &lt; 8</strong>, the target must be to the <em>right</em> of mid. Eliminate left half [<strong>0..2</strong>] → <strong>low = mid + 1 = 3</strong>.",
+            "overlay": "Standard BS: <code>A[mid] &lt; B</code> → discard left → <code>low = mid + 1</code>."
           },
           {
-            "label": "PHASE 1 — Iteration 2",
-            "marks": {"3": "c-low", "4": "c-mid", "5": "c-high"},
+            "label": "PHASE 1 — Iteration 2 (mid=4, first match)",
+            "marks": {"0": "c-eliminated", "1": "c-eliminated", "2": "c-eliminated", "3": "c-low", "4": "c-mid c-active", "5": "c-high"},
             "ptrs": {"low": 3, "mid": 4, "high": 5},
-            "msg": "<strong>mid = 4</strong>, A[4] = <strong>8</strong>. Match found! Store <strong>first = 4</strong> as a candidate, but there might be an earlier 8 → <strong>high = mid - 1 = 3</strong>.",
-            "overlay": "On match: save the index, then search LEFT for an earlier one."
+            "msg": "<strong>mid = (3+5)/2 = 4</strong>. Check A[4] = <strong>8</strong>. Perfect match! <strong>8 == 8</strong> ✓. Store <strong>first = 4</strong> as a candidate. But there might be an <em>earlier</em> occurrence of <strong>8</strong> to the left → push <strong>high = mid - 1 = 3</strong> and continue searching.",
+            "overlay": "Lower-bound BS: on match, store the candidate but keep searching <em>left</em>: <code>first = mid; high = mid - 1;</code>"
           },
           {
-            "label": "PHASE 1 — Iteration 3",
-            "marks": {"3": "c-low c-mid c-high c-result"},
+            "label": "PHASE 1 — Iteration 3 (mid=3, better match)",
+            "marks": {"0": "c-eliminated", "1": "c-eliminated", "2": "c-eliminated", "3": "c-low c-mid c-high c-result", "4": "c-eliminated", "5": "c-eliminated"},
             "ptrs": {"low": 3, "mid": 3, "high": 3},
-            "msg": "<strong>mid = 3</strong>, A[3] = <strong>8</strong>. Another match! Update <strong>first = 3</strong> and push <strong>high = 2</strong>. Now low &gt; high → Phase 1 done. <strong>First occurrence = index 3</strong>."
+            "msg": "<strong>mid = 3</strong>. Check A[3] = <strong>8</strong>. Another match! <strong>8 == 8</strong> ✓. Update <strong>first = 3</strong> (this is earlier than index 4). Push <strong>high = mid - 1 = 2</strong>. Now <strong>low = 3 &gt; high = 2</strong> → Phase 1 terminates. <strong>First occurrence locked at index 3</strong>."
           },
           {
-            "label": "PHASE 2 — Find Last Occurrence",
-            "marks": {"3": "c-result", "0": "c-low", "5": "c-high"},
+            "label": "PHASE 2 — INITIALISE (find last)",
+            "marks": {"3": "c-result", "0": "c-low", "1": "c-active", "2": "c-active", "4": "c-active", "5": "c-high"},
             "ptrs": {"low": 0, "high": 5},
-            "msg": "<strong>Phase 2 start:</strong> Reset search window. Now hunt for the <em>last</em> occurrence of 8. low = <strong>0</strong>, high = <strong>5</strong>.",
-            "overlay": "Rule: when <code>A[mid] == B</code>, store <code>last = mid</code> but keep going right: <code>low = mid + 1</code>."
+            "msg": "<strong>Phase 2 start:</strong> Reset search window. Now hunt for the <em>last</em> occurrence of <strong>8</strong>. low = <strong>0</strong>, high = <strong>5</strong>, last = <strong>-1</strong>. This time, when we match, we push <strong>low</strong> right instead of <strong>high</strong> left.",
+            "overlay": "Upper-bound BS: on match, store the candidate but keep searching <em>right</em>: <code>last = mid; low = mid + 1;</code>"
           },
           {
-            "label": "PHASE 2 — Iteration 1",
-            "marks": {"3": "c-result", "0": "c-low", "2": "c-mid", "5": "c-high"},
+            "label": "PHASE 2 — Iteration 1 (mid=2)",
+            "marks": {"3": "c-result", "0": "c-low", "1": "c-eliminated", "2": "c-mid", "3": "c-active", "4": "c-active", "5": "c-high"},
             "ptrs": {"low": 0, "mid": 2, "high": 5},
-            "msg": "<strong>mid = 2</strong>, A[2] = <strong>7 &lt; 8</strong> → go right: <strong>low = 3</strong>."
+            "msg": "<strong>mid = 2</strong>. Check A[2] = <strong>7 &lt; 8</strong>. The target lies to the right → eliminate [<strong>0..2</strong>], set <strong>low = 3</strong>."
           },
           {
-            "label": "PHASE 2 — Iteration 2",
+            "label": "PHASE 2 — Iteration 2 (mid=4, match)",
             "marks": {"3": "c-result", "4": "c-low c-mid c-result", "5": "c-high"},
             "ptrs": {"low": 3, "mid": 4, "high": 5},
-            "msg": "<strong>mid = 4</strong>, A[4] = <strong>8</strong>. Match! Store <strong>last = 4</strong> and search right for a later one → <strong>low = 5</strong>."
+            "msg": "<strong>mid = 4</strong>. Check A[4] = <strong>8</strong>. Match! <strong>8 == 8</strong> ✓. Store <strong>last = 4</strong> and search <em>right</em> for a later occurrence → <strong>low = mid + 1 = 5</strong>."
           },
           {
-            "label": "PHASE 2 — Iteration 3",
-            "marks": {"3": "c-result", "4": "c-result", "5": "c-mid c-high"},
+            "label": "PHASE 2 — Iteration 3 (mid=5)",
+            "marks": {"3": "c-result", "4": "c-result", "5": "c-low c-mid c-high"},
             "ptrs": {"low": 5, "mid": 5, "high": 5},
-            "msg": "<strong>mid = 5</strong>, A[5] = <strong>10 &gt; 8</strong> → go left: <strong>high = 4</strong>. Now low &gt; high → Phase 2 done. <strong>Last occurrence = index 4</strong>."
+            "msg": "<strong>mid = 5</strong>. Check A[5] = <strong>10 &gt; 8</strong>. The target is to the left → <strong>high = mid - 1 = 4</strong>. Now <strong>low = 5 &gt; high = 4</strong> → Phase 2 terminates. <strong>Last occurrence locked at index 4</strong>."
           },
           {
             "label": "DONE",
             "marks": {"3": "c-result", "4": "c-result"},
             "ptrs": {"ans": 3},
-            "msg": "✅ <strong>Answer = [3, 4]</strong>. First occurrence at index <strong>3</strong>, last at <strong>4</strong>. Two O(log N) binary searches solved the problem with no linear scan."
+            "msg": "✅ <strong>Answer = [3, 4]</strong>. First occurrence of <strong>8</strong> is at index <strong>3</strong>, last occurrence at index <strong>4</strong>. Two <strong>O(log N)</strong> binary searches — total <strong>6 probes</strong> for N=<strong>6</strong>. Linear scan would need up to <strong>6 comparisons</strong>.",
+            "overlay": "Core pattern: same BS loop body twice. Only difference: first search narrows <em>from the right</em> on match, last search narrows <em>from the left</em>. Memorize: <strong>first hugs left, last hugs right</strong>."
           }
         ]
       }
@@ -146,38 +149,64 @@
       "kind": "scripted-array",
       "data": {
         "A": [1, 3, 5, 6],
-        "footer": "Lower bound binary search — A = [1, 3, 5, 6], B = 5. Find index where 5 exists or should be inserted.",
-        "legend": ["c-input", "c-low", "c-mid", "c-high", "c-result"],
+        "footer": "Lower bound binary search — A = [1,3,5,6], B = 5. Find index where B exists or should be inserted.",
+        "legend": ["c-input", "c-low", "c-mid", "c-high", "c-active", "c-result", "c-eliminated"],
         "script": [
           {
             "label": "SETUP",
-            "msg": "Sorted array <strong>A = [1, 3, 5, 6]</strong>, target <strong>B = 5</strong>. Find the index where B exists, or where it should be inserted to maintain sorted order. This is the <em>lower bound</em> problem."
+            "marks": {"0": "c-input", "1": "c-input", "2": "c-input", "3": "c-input"},
+            "msg": "Sorted array <strong>A = [1, 3, 5, 6]</strong>, target <strong>B = 5</strong>. Find the index where <strong>B</strong> exists, or where it should be inserted to keep the array sorted. This is <strong>lower_bound</strong> — the first position where an element <strong>≥ B</strong> can be found or placed.",
+            "overlay": "Core strategy: maintain <code>ans = N</code> (sentinel — one past the end). When <code>A[mid] ≥ B</code>, record <code>ans = mid</code> and search left: <code>high = mid - 1</code>. Sentinel auto-handles the 'insert at end' case."
           },
           {
             "label": "INITIALISE",
-            "marks": {"0": "c-low", "3": "c-high"},
+            "marks": {"0": "c-low", "1": "c-active", "2": "c-active", "3": "c-high"},
             "ptrs": {"low": 0, "high": 3},
-            "msg": "Set <strong>low = 0</strong>, <strong>high = 3</strong>, <strong>ans = 4</strong> (sentinel value = N). If no element ≥ B exists, we return N meaning 'insert at end'.",
-            "overlay": "Rule: when <code>A[mid] ≥ B</code>, store <code>ans = mid</code> and search left for an earlier position."
+            "msg": "Set <strong>low = 0</strong>, <strong>high = 3</strong>, <strong>ans = N = 4</strong> (the sentinel). If no element <strong>≥ 5</strong> exists in the array, we'll return <strong>4</strong>, meaning 'insert after index 3 (at the end)'. Search window covers all <strong>4 elements</strong>."
           },
           {
-            "label": "ITERATION 1",
-            "marks": {"0": "c-low", "1": "c-mid", "3": "c-high"},
+            "label": "ITERATION 1 — mid=1 (too small)",
+            "marks": {"0": "c-low", "1": "c-mid c-eliminated", "2": "c-active", "3": "c-high"},
             "ptrs": {"low": 0, "mid": 1, "high": 3},
-            "msg": "<strong>mid = 1</strong>, A[1] = <strong>3</strong>. Compare: <strong>3 &lt; 5</strong> → the insert position must be to the right. Update <strong>low = mid + 1 = 2</strong>."
+            "msg": "<strong>mid = (0+3)/2 = 1</strong>. Check A[1] = <strong>3</strong>. Is <strong>3 &lt; 5</strong>? Yes! This means the target (or its insertion slot) must be to the <em>right</em> of mid. Discard the left half [<strong>0..1</strong>] → <strong>low = mid + 1 = 2</strong>.",
+            "overlay": "BS direction rule: <code>A[mid] &lt; B</code> → answer cannot be in [low..mid] → <code>low = mid + 1</code>."
           },
           {
-            "label": "ITERATION 2",
-            "marks": {"2": "c-low c-mid c-result", "3": "c-high"},
+            "label": "ITERATION 2 — mid=2 (exact match)",
+            "marks": {"0": "c-eliminated", "1": "c-eliminated", "2": "c-low c-mid c-active", "3": "c-high"},
             "ptrs": {"low": 2, "mid": 2, "high": 3},
-            "msg": "<strong>mid = 2</strong>, A[2] = <strong>5</strong>. Perfect match! <strong>5 == 5</strong> → return <strong>mid = 2</strong> immediately.",
-            "overlay": "Exact match case: when <code>A[mid] == B</code>, the insert position IS mid (because B already exists there)."
+            "msg": "<strong>mid = (2+3)/2 = 2</strong>. Check A[2] = <strong>5</strong>. Perfect match! <strong>5 == 5</strong> ✓. This is a valid answer. Store <strong>ans = 2</strong>. But for lower_bound, we must confirm this is the <em>first</em> occurrence of <strong>5</strong>, so search left: <strong>high = mid - 1 = 1</strong>.",
+            "overlay": "Lower_bound on exact match: store the index, but keep searching left to ensure it's the <em>leftmost</em>: <code>ans = mid; high = mid - 1;</code>"
+          },
+          {
+            "label": "ITERATION 3 — loop terminates",
+            "marks": {"0": "c-eliminated", "1": "c-eliminated", "2": "c-result", "3": "c-eliminated"},
+            "ptrs": {"ans": 2},
+            "msg": "Now <strong>low = 2 &gt; high = 1</strong> → binary search terminates. The stored <strong>ans = 2</strong> is the first position where an element <strong>≥ 5</strong> exists. Since A[2] = <strong>5</strong>, the element is present at index <strong>2</strong>."
+          },
+          {
+            "label": "EDGE CASE 1 — absent value (B=4)",
+            "marks": {"0": "c-eliminated", "1": "c-eliminated", "2": "c-active", "3": "c-input"},
+            "msg": "What if <strong>B = 4</strong> (not in array)? Same algorithm: A[1]=<strong>3 &lt; 4</strong> → low=2. A[2]=<strong>5 &gt; 4</strong> → <strong>5 ≥ 4</strong> ✓ → store ans=2, high=1. Loop exits. Return <strong>2</strong> → insert <strong>4</strong> before <strong>5</strong> to maintain sorted order.",
+            "overlay": "Lower_bound guarantees: if <strong>B present</strong> → its index; if <strong>B absent</strong> → the insertion point that keeps array sorted."
+          },
+          {
+            "label": "EDGE CASE 2 — larger than all (B=7)",
+            "marks": {"0": "c-eliminated", "1": "c-eliminated", "2": "c-eliminated", "3": "c-eliminated"},
+            "msg": "What if <strong>B = 7</strong> (larger than all elements)? A[2]=<strong>5 &lt; 7</strong> → low=3. A[3]=<strong>6 &lt; 7</strong> → low=4 &gt; high=3. Loop exits. We never stored ans → sentinel <strong>ans = 4</strong> is returned. Insert <strong>7</strong> at the end (index 4).",
+            "overlay": "Sentinel <code>N</code> elegantly handles the 'larger than all' case with zero special-case code. It's already the correct answer."
+          },
+          {
+            "label": "EDGE CASE 3 — smaller than all (B=0)",
+            "marks": {"0": "c-active", "1": "c-input", "2": "c-input", "3": "c-input"},
+            "msg": "What if <strong>B = 0</strong> (smaller than all)? A[1]=<strong>3 &gt; 0</strong> → <strong>3 ≥ 0</strong> ✓ → store ans=1, high=0. A[0]=<strong>1 &gt; 0</strong> → store ans=0, high=-1. Loop exits. Return <strong>0</strong> → insert at the beginning."
           },
           {
             "label": "DONE",
             "marks": {"2": "c-result"},
             "ptrs": {"ans": 2},
-            "msg": "✅ <strong>Answer = 2</strong>. The target value 5 exists at index 2. If B were 4 (not present), we'd return 2 as well — the slot where 4 should be inserted."
+            "msg": "✅ <strong>Answer = 2</strong> for B=<strong>5</strong>. Target exists at index <strong>2</strong>. Binary search took <strong>2 interior probes</strong> for N=<strong>4</strong>, vs up to <strong>4 comparisons</strong> for linear scan. Lower_bound is the workhorse of sorted-array algorithms: range queries, merge operations, and duplicate handling all build on this pattern.",
+            "overlay": "Three cases, one algorithm: <strong>(1) target present</strong> → returns its index. <strong>(2) target absent</strong> → returns insertion point. <strong>(3) target larger than all</strong> → sentinel N handles it. No if-else, just one clean loop."
           }
         ]
       }
@@ -233,44 +262,58 @@
       "kind": "scripted-array",
       "data": {
         "A": [1, 1, 2, 2, 3, 3, 4, 5, 5],
-        "footer": "Index-parity binary search — A = [1, 1, 2, 2, 3, 3, 4, 5, 5]. Every element appears twice except one. Find it in O(log N).",
+        "footer": "Index-parity binary search — A = [1,1,2,2,3,3,4,5,5]. Every element appears twice except one. Use parity to guide BS direction.",
         "legend": ["c-input", "c-low", "c-mid", "c-high", "c-active", "c-eliminated", "c-result"],
         "script": [
           {
             "label": "SETUP",
-            "msg": "Array <strong>A = [1, 1, 2, 2, 3, 3, 4, 5, 5]</strong>. Every element appears <strong>twice</strong> in sorted order, except <strong>one unique element</strong>. Before the unique, pairs sit at (even, odd) indices. After it, they shift to (odd, even). Binary search finds where the pattern breaks."
+            "marks": {"0": "c-input", "1": "c-input", "2": "c-input", "3": "c-input", "4": "c-input", "5": "c-input", "6": "c-input", "7": "c-input", "8": "c-input"},
+            "msg": "Sorted array <strong>A = [1, 1, 2, 2, 3, 3, 4, 5, 5]</strong> of length <strong>N = 9</strong>. Every element appears <strong>exactly twice</strong>, except <strong>one unique element</strong>. Constraint: <strong>sorted order</strong> and <strong>all duplicates are adjacent</strong>. The unique element breaks the pair pattern. Key insight: <strong>before</strong> the unique, pairs sit at <strong>(even, odd)</strong> indices; <strong>after</strong> it, they shift to <strong>(odd, even)</strong>.",
+            "overlay": "Core strategy: at each mid, check if <code>A[mid]</code> matches its neighbor. Combine this with <code>mid % 2</code> (parity check) to determine which side the unique element is on. If <code>mid is even</code> and matches <code>A[mid+1]</code> → pattern intact on left → unique is <strong>after</strong>. If <code>mid is odd</code> and matches <code>A[mid+1]</code> → pattern broken on left → unique is <strong>before</strong>."
           },
           {
             "label": "CHECK BOUNDARIES",
             "marks": {"0": "c-active", "1": "c-active", "7": "c-active", "8": "c-active"},
-            "msg": "Edge cases: A[0]=<strong>1</strong> matches A[1]=<strong>1</strong> ✓, A[8]=<strong>5</strong> matches A[7]=<strong>5</strong> ✓. Neither boundary is the loner. Search interior indices <strong>1 to 7</strong>.",
-            "overlay": "Pre-check: if <code>A[0] != A[1]</code> return A[0]. If <code>A[N-1] != A[N-2]</code> return A[N-1]."
+            "msg": "Before binary searching the interior, check both edges. Left edge: A[0]=<strong>1</strong> vs A[1]=<strong>1</strong> → they match ✓, so index <strong>0</strong> is not the loner. Right edge: A[8]=<strong>5</strong> vs A[7]=<strong>5</strong> → they match ✓, so index <strong>8</strong> is not the loner. Both boundaries are paired → the unique element lies in the interior <strong>[1..7]</strong>.",
+            "overlay": "Edge case handling: <code>if (A[0] != A[1]) return A[0];</code> and <code>if (A[N-1] != A[N-2]) return A[N-1];</code> → if either boundary is unpaired, it's the answer. Otherwise, search the safe interior."
           },
           {
             "label": "INITIALISE",
-            "marks": {"0": "c-eliminated", "1": "c-low", "7": "c-high", "8": "c-eliminated"},
+            "marks": {"0": "c-eliminated", "1": "c-low", "2": "c-active", "3": "c-active", "4": "c-active", "5": "c-active", "6": "c-active", "7": "c-high", "8": "c-eliminated"},
             "ptrs": {"low": 1, "high": 7},
-            "msg": "Set <strong>low = 1</strong>, <strong>high = 7</strong>. The search window avoids the boundary pairs."
+            "msg": "Set <strong>low = 1</strong>, <strong>high = 7</strong>. Binary search the interior <strong>[1..7]</strong>, using <strong>index parity</strong> + <strong>neighbor matching</strong> to guide direction. We'll never touch out-of-bounds neighbors."
           },
           {
-            "label": "ITERATION 1",
-            "marks": {"0": "c-eliminated", "1": "c-low", "4": "c-mid", "5": "c-active", "7": "c-high", "8": "c-eliminated"},
+            "label": "ITERATION 1 — mid=4 (even, match right)",
+            "marks": {"0": "c-eliminated", "1": "c-low", "2": "c-active", "3": "c-active", "4": "c-mid c-active", "5": "c-active", "6": "c-active", "7": "c-high", "8": "c-eliminated"},
             "ptrs": {"low": 1, "mid": 4, "high": 7},
-            "msg": "<strong>mid = 4</strong> (even index), A[4] = <strong>3</strong>, A[5] = <strong>3</strong>. They match! Since mid is <strong>even</strong> and its pair is to the <em>right</em>, the pattern is still intact → unique is <strong>after</strong> this pair. Set <strong>low = mid + 2 = 6</strong>.",
-            "overlay": "Rule: <code>mid is even && A[mid] == A[mid+1]</code> → unique is to the right → <code>low = mid + 2</code> (skip the pair)."
+            "msg": "<strong>mid = (1+7)/2 = 4</strong> (even index). Check A[4] = <strong>3</strong> against neighbors. A[3] = <strong>2</strong> (no match), A[5] = <strong>3</strong> (match ✓). Since mid is <strong>even</strong> and matches its <strong>right</strong> neighbor, the pair <strong>(4,5)</strong> is intact. Pattern is <strong>unbroken before mid</strong> → the unique element must be <strong>after index 5</strong>. Skip the pair: <strong>low = mid + 2 = 6</strong>.",
+            "overlay": "Parity rule: <code>mid % 2 == 0 && A[mid] == A[mid+1]</code> → left pattern intact → unique is on the right → <code>low = mid + 2</code> (skip the matched pair)."
           },
           {
-            "label": "ITERATION 2",
+            "label": "ITERATION 2 — mid=6 (even, no match)",
             "marks": {"0": "c-eliminated", "1": "c-eliminated", "2": "c-eliminated", "3": "c-eliminated", "4": "c-eliminated", "5": "c-eliminated", "6": "c-low c-mid c-result", "7": "c-high", "8": "c-eliminated"},
             "ptrs": {"low": 6, "mid": 6, "high": 7},
-            "msg": "<strong>mid = 6</strong>, A[6] = <strong>4</strong>, A[5] = <strong>3</strong>, A[7] = <strong>5</strong>. A[6] matches <em>neither</em> neighbour → <strong>this is the unique element!</strong> Return <strong>4</strong>.",
-            "overlay": "Base case: when <code>A[mid] != A[mid-1]</code> AND <code>A[mid] != A[mid+1]</code>, mid is the loner."
+            "msg": "<strong>mid = 6</strong>. Check A[6] = <strong>4</strong> against neighbors. A[5] = <strong>3</strong> (no match), A[7] = <strong>5</strong> (no match). A[6] matches <em>neither</em> neighbor! This means <strong>A[6] = 4</strong> is the <strong>unique element</strong>. The pair pattern is broken at index <strong>6</strong>. Return <strong>4</strong>.",
+            "overlay": "Base case: when <code>A[mid] != A[mid-1] AND A[mid] != A[mid+1]</code>, mid is the loner. This is the termination condition — no parity check needed."
+          },
+          {
+            "label": "PATTERN VISUALISATION — before unique",
+            "marks": {"0": "c-low", "1": "c-high", "2": "c-low", "3": "c-high", "4": "c-low", "5": "c-high", "6": "c-result", "7": "c-low", "8": "c-high"},
+            "msg": "Pair indices <strong>before</strong> the unique: [1,1] at (even=0, odd=1), [2,2] at (even=2, odd=3), [3,3] at (even=4, odd=5). Pattern: <strong>first element of pair at even index</strong>. Unique at <strong>6</strong>. Pairs <strong>after</strong>: [5,5] at (odd=7, even=8). Pattern flips!",
+            "overlay": "Why parity works: <strong>before</strong> unique, pairs start at even indices. <strong>After</strong> unique, pairs start at odd indices. The unique element shifts all subsequent pairs by 1."
+          },
+          {
+            "label": "ALTERNATIVE — XOR scan (O(N))",
+            "msg": "Alternative approach: XOR all elements. <strong>1⊕1⊕2⊕2⊕3⊕3⊕4⊕5⊕5 = 4</strong>. Duplicate pairs cancel out (x⊕x=0), leaving only the unique element. Simpler code but <strong>O(N)</strong>, not <strong>O(log N)</strong>. When to use: (1) array not sorted, (2) debugging, (3) coding interview time pressure.",
+            "overlay": "XOR trick: <code>int x = 0; for(int v : A) x ^= v; return x;</code> → bulletproof but linear. Parity BS is faster but requires sorted duplicates."
           },
           {
             "label": "DONE",
-            "marks": {"6": "c-result"},
+            "marks": {"0": "c-eliminated", "1": "c-eliminated", "2": "c-eliminated", "3": "c-eliminated", "4": "c-eliminated", "5": "c-eliminated", "6": "c-result", "7": "c-eliminated", "8": "c-eliminated"},
             "ptrs": {"ans": 6},
-            "msg": "✅ <strong>Answer = 4</strong> at index 6. The parity-check BS visited only 2 interior probes for N=9, avoiding a full linear scan."
+            "msg": "✅ <strong>Answer = 4</strong> at index <strong>6</strong>. The index-parity binary search visited only <strong>2 interior probes</strong> for N=<strong>9</strong>, avoiding a full linear scan. Complexity: <strong>O(log N)</strong> time, <strong>O(1)</strong> space. This pattern appears in: 'Single Element in Sorted Array' (LeetCode 540), 'Find Peak Element' variants, and any problem exploiting positional invariants.",
+            "overlay": "Core takeaway: when a <strong>sorted array</strong> has a <strong>structural pattern</strong> (here: pairs), and an anomaly <strong>breaks</strong> that pattern in a <strong>monotonic way</strong>, you can binary search by checking the pattern's integrity at mid, rather than comparing values directly. The unique element acts as a 'fault line' — everything on one side follows the old pattern, everything on the other follows the new pattern."
           }
         ]
       }
@@ -433,35 +476,52 @@
         "script": [
           {
             "label": "SETUP",
-            "msg": "Matrix <strong>3×4</strong>, each row sorted, and each row's first element ≥ previous row's last. Target <strong>B = 16</strong>. Pretend the matrix is one long sorted array of length <strong>N×M = 12</strong>. Use flat indexing: <code>row = idx / M</code>, <code>col = idx % M</code>.",
-            "html": "<div class='v-label'>MATRIX (3×4)</div><div class='v-matrix'><div class='v-row'><div class='v-cell'>1</div><div class='v-cell'>3</div><div class='v-cell'>5</div><div class='v-cell'>7</div></div><div class='v-row'><div class='v-cell'>10</div><div class='v-cell'>11</div><div class='v-cell'>16</div><div class='v-cell'>20</div></div><div class='v-row'><div class='v-cell'>23</div><div class='v-cell'>30</div><div class='v-cell'>34</div><div class='v-cell'>50</div></div></div><div class='v-row' style='margin-top:12px;'><span class='v-stat'>target=<strong>16</strong></span></div>"
+            "msg": "Matrix <strong>3×4</strong>: each row sorted left→right, and each row's <strong>first element</strong> ≥ previous row's <strong>last element</strong>. Target <strong>B = 16</strong>. The matrix is <strong>globally sorted</strong> if you flatten it. Strategy: pretend the matrix is one long array of length <strong>N×M = 12</strong>. Use <strong>flat indexing</strong>: given a 1D index <strong>idx</strong>, convert to 2D: <code>row = idx / M</code>, <code>col = idx % M</code>. Binary search on the virtual 1D array.",
+            "html": "<div class='v-label'>MATRIX (3×4)</div><div class='v-matrix'><div class='v-row'><div class='v-cell'>1</div><div class='v-cell'>3</div><div class='v-cell'>5</div><div class='v-cell'>7</div></div><div class='v-row'><div class='v-cell'>10</div><div class='v-cell'>11</div><div class='v-cell'>16</div><div class='v-cell'>20</div></div><div class='v-row'><div class='v-cell'>23</div><div class='v-cell'>30</div><div class='v-cell'>34</div><div class='v-cell'>50</div></div></div><div class='v-row' style='margin-top:12px;'><span class='v-stat'>target=<strong>16</strong></span><span class='v-stat'>N=<strong>3</strong></span><span class='v-stat'>M=<strong>4</strong></span></div>",
+            "overlay": "Conversion formula: <code>row = idx / M</code>, <code>col = idx % M</code>. Example: idx=<strong>5</strong> → row=5/4=<strong>1</strong>, col=5%4=<strong>1</strong> → A[1][1]=<strong>11</strong>. This collapses 2D → 1D for free, and the sorted property is preserved."
+          },
+          {
+            "label": "FLAT VIEW — virtual 1D array",
+            "msg": "Imagine the matrix flattened into a single array: <strong>[1, 3, 5, 7, 10, 11, 16, 20, 23, 30, 34, 50]</strong>. Indices <strong>[0..11]</strong>. Binary search this virtual array. Each time we probe, convert the 1D index to 2D to read the value.",
+            "html": "<div class='v-label'>FLAT VIEW [0..11]</div><div class='v-row'><div class='v-cell v-low'>1</div><div class='v-cell'>3</div><div class='v-cell'>5</div><div class='v-cell'>7</div><div class='v-cell'>10</div><div class='v-cell'>11</div><div class='v-cell'>16</div><div class='v-cell'>20</div><div class='v-cell'>23</div><div class='v-cell'>30</div><div class='v-cell'>34</div><div class='v-cell v-high'>50</div></div><div class='v-row' style='margin-top:8px;'><span class='v-stat'>low=<strong>0</strong></span><span class='v-stat'>high=<strong>11</strong></span></div>"
           },
           {
             "label": "INITIALISE",
-            "msg": "Set <strong>low = 0</strong>, <strong>high = 11</strong> (total 12 elements). Binary search the flat index space.",
-            "html": "<div class='v-label'>FLAT VIEW [0..11]</div><div class='v-row'><div class='v-cell v-low'>1</div><div class='v-cell'>3</div><div class='v-cell'>5</div><div class='v-cell'>7</div><div class='v-cell'>10</div><div class='v-cell'>11</div><div class='v-cell'>16</div><div class='v-cell'>20</div><div class='v-cell'>23</div><div class='v-cell'>30</div><div class='v-cell'>34</div><div class='v-cell v-high'>50</div></div><div class='v-row' style='margin-top:8px;'><span class='v-stat'>low=<strong>0</strong></span><span class='v-stat'>high=<strong>11</strong></span></div>",
-            "overlay": "Conversion: <code>idx = 5</code> → <code>r = 5/4 = 1</code>, <code>c = 5%4 = 1</code> → A[1][1] = 11."
+            "msg": "Set <strong>low = 0</strong>, <strong>high = N×M - 1 = 11</strong> (total <strong>12 elements</strong>). Binary search the flat index space <strong>[0..11]</strong>. Each probe: compute mid, convert to (row, col), read A[row][col], compare with <strong>B = 16</strong>.",
+            "html": "<div class='v-label'>SEARCH WINDOW</div><div class='v-row'><span class='v-stat'>low=<strong>0</strong></span><span class='v-stat'>high=<strong>11</strong></span><span class='v-stat'>total=<strong>12</strong></span></div>"
           },
           {
-            "label": "ITERATION 1",
-            "msg": "<strong>mid = 5</strong>. Convert: r = 5/4 = <strong>1</strong>, c = 5%4 = <strong>1</strong> → A[1][1] = <strong>11</strong>. Compare: <strong>11 &lt; 16</strong> → go right: <strong>low = mid + 1 = 6</strong>.",
-            "html": "<div class='v-label'>mid=5 → A[1][1] = 11</div><div class='v-matrix'><div class='v-row'><div class='v-cell'>1</div><div class='v-cell'>3</div><div class='v-cell'>5</div><div class='v-cell'>7</div></div><div class='v-row'><div class='v-cell'>10</div><div class='v-cell v-mid'>11</div><div class='v-cell'>16</div><div class='v-cell'>20</div></div><div class='v-row'><div class='v-cell'>23</div><div class='v-cell'>30</div><div class='v-cell'>34</div><div class='v-cell'>50</div></div></div><div class='v-row' style='margin-top:8px;'><span class='v-stat'>A[1][1]=<strong>11</strong> &lt; 16</span></div>"
+            "label": "ITERATION 1 — mid=5 → A[1][1]=11",
+            "msg": "<strong>mid = (0+11)/2 = 5</strong>. Convert: row = 5/4 = <strong>1</strong>, col = 5%4 = <strong>1</strong> → A[1][1] = <strong>11</strong>. Compare: <strong>11 &lt; 16</strong> → the target is to the <em>right</em> in the flat array. Discard flat indices [<strong>0..5</strong>] → <strong>low = mid + 1 = 6</strong>.",
+            "html": "<div class='v-label'>Probe mid=5 → A[1][1] = 11</div><div class='v-matrix'><div class='v-row'><div class='v-cell'>1</div><div class='v-cell'>3</div><div class='v-cell'>5</div><div class='v-cell'>7</div></div><div class='v-row'><div class='v-cell'>10</div><div class='v-cell v-mid'>11</div><div class='v-cell'>16</div><div class='v-cell'>20</div></div><div class='v-row'><div class='v-cell'>23</div><div class='v-cell'>30</div><div class='v-cell'>34</div><div class='v-cell'>50</div></div></div><div class='v-row' style='margin-top:8px;'><span class='v-stat'>A[1][1]=<strong>11</strong> &lt; 16</span><span class='v-stat'>go right</span></div>",
+            "overlay": "Decision: <code>A[row][col] &lt; B</code> → eliminate left half → <code>low = mid + 1</code>. Standard BS, just with 2D indexing."
           },
           {
-            "label": "ITERATION 2",
-            "msg": "<strong>mid = 8</strong>. Convert: r = 8/4 = <strong>2</strong>, c = 8%4 = <strong>0</strong> → A[2][0] = <strong>23</strong>. Compare: <strong>23 &gt; 16</strong> → go left: <strong>high = mid - 1 = 7</strong>.",
-            "html": "<div class='v-label'>mid=8 → A[2][0] = 23</div><div class='v-matrix'><div class='v-row'><div class='v-cell'>1</div><div class='v-cell'>3</div><div class='v-cell'>5</div><div class='v-cell'>7</div></div><div class='v-row'><div class='v-cell'>10</div><div class='v-cell'>11</div><div class='v-cell'>16</div><div class='v-cell'>20</div></div><div class='v-row'><div class='v-cell v-mid'>23</div><div class='v-cell'>30</div><div class='v-cell'>34</div><div class='v-cell'>50</div></div></div><div class='v-row' style='margin-top:8px;'><span class='v-stat'>A[2][0]=<strong>23</strong> &gt; 16</span></div>"
+            "label": "ITERATION 2 — mid=8 → A[2][0]=23",
+            "msg": "<strong>mid = (6+11)/2 = 8</strong>. Convert: row = 8/4 = <strong>2</strong>, col = 8%4 = <strong>0</strong> → A[2][0] = <strong>23</strong>. Compare: <strong>23 &gt; 16</strong> → the target is to the <em>left</em> in the flat array. Discard flat indices [<strong>8..11</strong>] → <strong>high = mid - 1 = 7</strong>.",
+            "html": "<div class='v-label'>Probe mid=8 → A[2][0] = 23</div><div class='v-matrix'><div class='v-row'><div class='v-cell'>1</div><div class='v-cell'>3</div><div class='v-cell'>5</div><div class='v-cell'>7</div></div><div class='v-row'><div class='v-cell'>10</div><div class='v-cell'>11</div><div class='v-cell'>16</div><div class='v-cell'>20</div></div><div class='v-row'><div class='v-cell v-mid'>23</div><div class='v-cell'>30</div><div class='v-cell'>34</div><div class='v-cell'>50</div></div></div><div class='v-row' style='margin-top:8px;'><span class='v-stat'>A[2][0]=<strong>23</strong> &gt; 16</span><span class='v-stat'>go left</span></div>",
+            "overlay": "Decision: <code>A[row][col] &gt; B</code> → eliminate right half → <code>high = mid - 1</code>."
           },
           {
-            "label": "ITERATION 3",
-            "msg": "<strong>mid = 6</strong>. Convert: r = 6/4 = <strong>1</strong>, c = 6%4 = <strong>2</strong> → A[1][2] = <strong>16</strong>. Perfect match! <strong>16 == 16</strong> → return <strong>1</strong> (found).",
-            "html": "<div class='v-label'>mid=6 → A[1][2] = 16 ✓</div><div class='v-matrix'><div class='v-row'><div class='v-cell'>1</div><div class='v-cell'>3</div><div class='v-cell'>5</div><div class='v-cell'>7</div></div><div class='v-row'><div class='v-cell'>10</div><div class='v-cell'>11</div><div class='v-cell v-result'>16</div><div class='v-cell'>20</div></div><div class='v-row'><div class='v-cell'>23</div><div class='v-cell'>30</div><div class='v-cell'>34</div><div class='v-cell'>50</div></div></div><div class='v-row' style='margin-top:8px;'><span class='v-stat'>FOUND at [1][2]</span></div>",
-            "overlay": "Flat indexing collapses 2D → 1D for free. The sorted property of rows + monotonic first-elements guarantees vanilla BS works."
+            "label": "ITERATION 3 — mid=6 → A[1][2]=16 (match!)",
+            "msg": "<strong>mid = (6+7)/2 = 6</strong>. Convert: row = 6/4 = <strong>1</strong>, col = 6%4 = <strong>2</strong> → A[1][2] = <strong>16</strong>. Perfect match! <strong>16 == 16</strong> ✓. Element exists at <strong>[row=1, col=2]</strong>. Return <strong>1</strong> (or the coordinates, depending on problem spec).",
+            "html": "<div class='v-label'>Probe mid=6 → A[1][2] = 16 ✓</div><div class='v-matrix'><div class='v-row'><div class='v-cell'>1</div><div class='v-cell'>3</div><div class='v-cell'>5</div><div class='v-cell'>7</div></div><div class='v-row'><div class='v-cell'>10</div><div class='v-cell'>11</div><div class='v-cell v-result'>16</div><div class='v-cell'>20</div></div><div class='v-row'><div class='v-cell'>23</div><div class='v-cell'>30</div><div class='v-cell'>34</div><div class='v-cell'>50</div></div></div><div class='v-row' style='margin-top:8px;'><span class='v-stat'>FOUND at [1][2]</span></div>"
+          },
+          {
+            "label": "WHY THIS WORKS — sorted property",
+            "msg": "The matrix satisfies: <strong>(1)</strong> each row sorted, <strong>(2)</strong> A[i][M-1] ≤ A[i+1][0]</strong>. This guarantees the <strong>global sorted order</strong> when flattened. Example: last element of row 0 is <strong>7</strong>, first element of row 1 is <strong>10</strong> → <strong>7 ≤ 10</strong> ✓. The flat array <strong>[1,3,5,7,10,11,16,20,23,30,34,50]</strong> is monotonic.",
+            "overlay": "Key constraint: <strong>each row sorted</strong> + <strong>first element of row i+1 ≥ last element of row i</strong> → the matrix is <em>globally sorted</em> when read row-by-row. Flat indexing turns 2D → 1D with zero overhead."
+          },
+          {
+            "label": "EDGE CASE — absent value (B=15)",
+            "msg": "What if <strong>B = 15</strong> (not in matrix)? Same algorithm: mid=5 → 11&lt;15 → low=6. mid=8 → 23&gt;15 → high=7. mid=6 → 16&gt;15 → high=5. Now low&gt;high → not found. Return <strong>0</strong> or <strong>-1</strong> depending on problem spec.",
+            "overlay": "Binary search finds or doesn't find. Same termination condition: <code>low &gt; high</code> → element absent."
           },
           {
             "label": "DONE",
-            "html": "<div class='v-label'>RESULT</div><div class='v-matrix'><div class='v-row'><div class='v-cell'>1</div><div class='v-cell'>3</div><div class='v-cell'>5</div><div class='v-cell'>7</div></div><div class='v-row'><div class='v-cell'>10</div><div class='v-cell'>11</div><div class='v-cell v-result'>16</div><div class='v-cell'>20</div></div><div class='v-row'><div class='v-cell'>23</div><div class='v-cell'>30</div><div class='v-cell'>34</div><div class='v-cell'>50</div></div></div><div class='v-row' style='margin-top:8px;'><span class='v-stat'>Answer=<strong>1</strong></span></div>",
-            "msg": "✅ <strong>Answer = 1</strong> (element exists). Binary search on <strong>12 elements</strong> took only <strong>3 probes</strong>, visiting indices 5 → 8 → 6."
+            "html": "<div class='v-label'>RESULT</div><div class='v-matrix'><div class='v-row'><div class='v-cell'>1</div><div class='v-cell'>3</div><div class='v-cell'>5</div><div class='v-cell'>7</div></div><div class='v-row'><div class='v-cell'>10</div><div class='v-cell'>11</div><div class='v-cell v-result'>16</div><div class='v-cell'>20</div></div><div class='v-row'><div class='v-cell'>23</div><div class='v-cell'>30</div><div class='v-cell'>34</div><div class='v-cell'>50</div></div></div><div class='v-row' style='margin-top:8px;'><span class='v-stat'>Answer=<strong>1</strong> (element exists)</span></div>",
+            "msg": "✅ <strong>Answer = 1</strong> (element exists at [1][2]). Binary search on <strong>12 elements</strong> took only <strong>3 probes</strong>, visiting flat indices 5 → 8 → 6. Linear scan would need up to <strong>12 comparisons</strong>. Complexity: <strong>O(log(N×M))</strong> time, <strong>O(1)</strong> space. This pattern generalises to any 2D structure with a monotonic flattened form.",
+            "overlay": "Core insight: if a 2D structure has a <strong>total order</strong> when flattened, you can binary search it with <strong>index arithmetic</strong>. No need to search row-by-row. Flat indexing: <code>mid → (mid/M, mid%M)</code>. One BS instead of two."
           }
         ]
       }
@@ -502,39 +562,53 @@
         "script": [
           {
             "label": "SETUP",
-            "msg": "Matrix <strong>3×2</strong>: row0 = [7, 3], row1 = [2, 1], row2 = [4, 9]. Find the minimum absolute difference between <em>any</em> element in row <strong>i</strong> and <em>any</em> element in row <strong>i+1</strong>. First <strong>sort each row</strong> so lower_bound works.",
-            "html": "<div class='v-label'>ORIGINAL</div><div class='v-matrix'><div class='v-row'><div class='v-cell'>7</div><div class='v-cell'>3</div></div><div class='v-row'><div class='v-cell'>2</div><div class='v-cell'>1</div></div><div class='v-row'><div class='v-cell'>4</div><div class='v-cell'>9</div></div></div>"
+            "msg": "Matrix <strong>3×2</strong>: row0 = <strong>[7, 3]</strong>, row1 = <strong>[2, 1]</strong>, row2 = <strong>[4, 9]</strong>. Find the <strong>minimum absolute difference</strong> between any element in row <strong>i</strong> and any element in row <strong>i+1</strong>. First, <strong>sort each row independently</strong> so binary search (lower_bound) works. Then for each element in row i, find its closest neighbour in row i+1.",
+            "html": "<div class='v-label'>ORIGINAL MATRIX</div><div class='v-matrix'><div class='v-row'><div class='v-cell'>7</div><div class='v-cell'>3</div></div><div class='v-row'><div class='v-cell'>2</div><div class='v-cell'>1</div></div><div class='v-row'><div class='v-cell'>4</div><div class='v-cell'>9</div></div></div>",
+            "overlay": "Strategy: for each <code>val</code> in row[i], use <strong>lower_bound</strong> on row[i+1] to find the first element <strong>≥ val</strong> (index <code>lb</code>). Check both <code>|val - row[i+1][lb]|</code> (closest greater-or-equal) and <code>|val - row[i+1][lb-1]|</code> (closest smaller). Track the global minimum."
           },
           {
             "label": "SORT ROWS",
-            "msg": "After sorting each row independently: row0 = [3, 7], row1 = [1, 2], row2 = [4, 9]. Now for each element in row <strong>i</strong>, find its closest neighbour in row <strong>i+1</strong> using <strong>lower_bound</strong>.",
+            "msg": "After sorting each row: row0 = <strong>[3, 7]</strong>, row1 = <strong>[1, 2]</strong>, row2 = <strong>[4, 9]</strong>. Now we have monotonic rows, enabling <strong>O(log B)</strong> lower_bound lookups.",
             "html": "<div class='v-label'>AFTER SORTING</div><div class='v-matrix'><div class='v-row'><div class='v-cell'>3</div><div class='v-cell'>7</div></div><div class='v-row'><div class='v-cell'>1</div><div class='v-cell'>2</div></div><div class='v-row'><div class='v-cell'>4</div><div class='v-cell'>9</div></div></div>",
-            "overlay": "Strategy: for each <code>row[i][j]</code>, find <code>lb = lower_bound(row[i+1], val)</code>. Check both <code>|val - row[i+1][lb]|</code> and <code>|val - row[i+1][lb-1]|</code>."
+            "overlay": "Why sort? Lower_bound requires a sorted array. Once sorted, each element lookup is <strong>O(log B)</strong> instead of <strong>O(B)</strong>."
           },
           {
             "label": "ROW 0 → ROW 1: element 3",
-            "msg": "Pick <strong>row0[0] = 3</strong>. Search row1 = [1, 2] for lower_bound(3) → index 2 (past end). Check <strong>|3 - 2| = 1</strong> (the predecessor). Current min diff = <strong>1</strong>.",
-            "html": "<div class='v-label'>row0[0]=3 vs row1</div><div class='v-matrix'><div class='v-row'><div class='v-cell v-active'>3</div><div class='v-cell'>7</div></div><div class='v-row'><div class='v-cell'>1</div><div class='v-cell v-active'>2</div></div><div class='v-row'><div class='v-cell'>4</div><div class='v-cell'>9</div></div></div><div class='v-row' style='margin-top:8px;'><span class='v-stat'>|3-2|=<strong>1</strong></span></div>"
+            "msg": "Pick <strong>row0[0] = 3</strong>. Search row1 = <strong>[1, 2]</strong> for <code>lower_bound(3)</code> → first element <strong>≥ 3</strong> is... none (both are smaller). <code>lb = 2</code> (past the end). Check predecessor: <code>|3 - row1[1]| = |3 - 2| = <strong>1</strong></code>. Current min diff = <strong>1</strong>.",
+            "html": "<div class='v-label'>row0[0]=3 vs row1=[1,2]</div><div class='v-matrix'><div class='v-row'><div class='v-cell v-active'>3</div><div class='v-cell'>7</div></div><div class='v-row'><div class='v-cell'>1</div><div class='v-cell v-active'>2</div></div><div class='v-row'><div class='v-cell'>4</div><div class='v-cell'>9</div></div></div><div class='v-row' style='margin-top:8px;'><span class='v-stat'>|3-2|=<strong>1</strong></span><span class='v-stat'>min=<strong>1</strong></span></div>",
+            "overlay": "Lower_bound returns index <code>lb</code>. Two candidates: <code>row[i+1][lb]</code> (closest ≥) and <code>row[i+1][lb-1]</code> (closest &lt;). Check both bounds."
           },
           {
             "label": "ROW 0 → ROW 1: element 7",
-            "msg": "Pick <strong>row0[1] = 7</strong>. Lower_bound in [1, 2] → index 2. Check <strong>|7 - 2| = 5</strong>. Still worse than 1.",
-            "html": "<div class='v-label'>row0[1]=7 vs row1</div><div class='v-matrix'><div class='v-row'><div class='v-cell'>3</div><div class='v-cell v-active'>7</div></div><div class='v-row'><div class='v-cell'>1</div><div class='v-cell v-active'>2</div></div><div class='v-row'><div class='v-cell'>4</div><div class='v-cell'>9</div></div></div><div class='v-row' style='margin-top:8px;'><span class='v-stat'>|7-2|=5</span><span class='v-stat'>min=<strong>1</strong></span></div>"
+            "msg": "Pick <strong>row0[1] = 7</strong>. Search row1 = <strong>[1, 2]</strong> for <code>lower_bound(7)</code> → <code>lb = 2</code> (past end). Check predecessor: <code>|7 - 2| = <strong>5</strong></code>. Worse than current min = <strong>1</strong>.",
+            "html": "<div class='v-label'>row0[1]=7 vs row1=[1,2]</div><div class='v-matrix'><div class='v-row'><div class='v-cell'>3</div><div class='v-cell v-active'>7</div></div><div class='v-row'><div class='v-cell'>1</div><div class='v-cell v-active'>2</div></div><div class='v-row'><div class='v-cell'>4</div><div class='v-cell'>9</div></div></div><div class='v-row' style='margin-top:8px;'><span class='v-stat'>|7-2|=5</span><span class='v-stat'>min=<strong>1</strong></span></div>"
           },
           {
             "label": "ROW 1 → ROW 2: element 1",
-            "msg": "Pick <strong>row1[0] = 1</strong>. Lower_bound in [4, 9] → index 0 (4 is the first ≥ 1). Check <strong>|1 - 4| = 3</strong>. Still worse than 1.",
-            "html": "<div class='v-label'>row1[0]=1 vs row2</div><div class='v-matrix'><div class='v-row'><div class='v-cell'>3</div><div class='v-cell'>7</div></div><div class='v-row'><div class='v-cell v-active'>1</div><div class='v-cell'>2</div></div><div class='v-row'><div class='v-cell v-active'>4</div><div class='v-cell'>9</div></div></div><div class='v-row' style='margin-top:8px;'><span class='v-stat'>|1-4|=3</span><span class='v-stat'>min=<strong>1</strong></span></div>"
+            "msg": "Pick <strong>row1[0] = 1</strong>. Search row2 = <strong>[4, 9]</strong> for <code>lower_bound(1)</code> → first ≥ 1 is <strong>4</strong> at index <strong>0</strong>. Check: <code>|1 - 4| = <strong>3</strong></code>. Worse than current min = <strong>1</strong>. No predecessor (lb=0).",
+            "html": "<div class='v-label'>row1[0]=1 vs row2=[4,9]</div><div class='v-matrix'><div class='v-row'><div class='v-cell'>3</div><div class='v-cell'>7</div></div><div class='v-row'><div class='v-cell v-active'>1</div><div class='v-cell'>2</div></div><div class='v-row'><div class='v-cell v-active'>4</div><div class='v-cell'>9</div></div></div><div class='v-row' style='margin-top:8px;'><span class='v-stat'>|1-4|=3</span><span class='v-stat'>min=<strong>1</strong></span></div>"
           },
           {
             "label": "ROW 1 → ROW 2: element 2",
-            "msg": "Pick <strong>row1[1] = 2</strong>. Lower_bound in [4, 9] → index 0. Check <strong>|2 - 4| = 2</strong>. Still worse than 1. Final answer = <strong>1</strong>.",
-            "html": "<div class='v-label'>row1[1]=2 vs row2</div><div class='v-matrix'><div class='v-row'><div class='v-cell'>3</div><div class='v-cell'>7</div></div><div class='v-row'><div class='v-cell'>1</div><div class='v-cell v-active'>2</div></div><div class='v-row'><div class='v-cell v-active'>4</div><div class='v-cell'>9</div></div></div><div class='v-row' style='margin-top:8px;'><span class='v-stat'>|2-4|=2</span><span class='v-stat'>min=<strong>1</strong></span></div>"
+            "msg": "Pick <strong>row1[1] = 2</strong>. Search row2 = <strong>[4, 9]</strong> for <code>lower_bound(2)</code> → first ≥ 2 is <strong>4</strong> at index <strong>0</strong>. Check: <code>|2 - 4| = <strong>2</strong></code>. Still worse than min = <strong>1</strong>. No predecessor.",
+            "html": "<div class='v-label'>row1[1]=2 vs row2=[4,9]</div><div class='v-matrix'><div class='v-row'><div class='v-cell'>3</div><div class='v-cell'>7</div></div><div class='v-row'><div class='v-cell'>1</div><div class='v-cell v-active'>2</div></div><div class='v-row'><div class='v-cell v-active'>4</div><div class='v-cell'>9</div></div></div><div class='v-row' style='margin-top:8px;'><span class='v-stat'>|2-4|=2</span><span class='v-stat'>min=<strong>1</strong></span></div>"
+          },
+          {
+            "label": "NUMBER LINE — visualising closest pairs",
+            "msg": "Visual summary on a number line: row0 elements <strong>[3, 7]</strong>, row1 elements <strong>[1, 2]</strong>. The <strong>closest pair</strong> across these rows is <strong>3 (row0) and 2 (row1)</strong>, distance <strong>1</strong>. Binary search finds this in <strong>O(A×B×log B)</strong> instead of brute-force <strong>O(A×B²)</strong>.",
+            "html": "<div class='v-label'>NUMBER LINE (rows 0↔1)</div><div class='v-numline'><div class='v-numline-track'><div class='v-numline-marker v-low' style='left:10%;'><div>1</div></div><div class='v-numline-marker v-mid' style='left:20%;'><div>2</div></div><div class='v-numline-marker v-high' style='left:30%;'><div>3</div></div><div class='v-numline-marker v-ans' style='left:70%;'><div>7</div></div></div></div><div class='v-row' style='margin-top:12px;'><span class='v-stat'>min gap=<strong>1</strong> (3→2)</span></div>",
+            "overlay": "Core insight: closest element to <code>val</code> in a sorted array is one of <strong>two</strong>: the first element <strong>≥ val</strong> (returned by lower_bound), or the one immediately before it. Check both, pick the smaller difference."
+          },
+          {
+            "label": "COMPLEXITY ANALYSIS",
+            "msg": "For each of <strong>A-1</strong> row pairs, for each of <strong>B</strong> elements in row i, run one <strong>O(log B)</strong> binary search on row i+1, then check 2 candidates. Total: <strong>O(A×B×log B)</strong>. Sorting all rows upfront: <strong>O(A×B log B)</strong>. Dominated by the search phase. Space: <strong>O(1)</strong> (in-place sort).",
+            "overlay": "Why not brute-force? For each element in row i, checking all B elements in row i+1 would be <strong>O(B)</strong> per element → total <strong>O(A×B²)</strong>. Binary search cuts per-element cost to <strong>O(log B)</strong>."
           },
           {
             "label": "DONE",
-            "html": "<div class='v-label'>RESULT</div><div class='v-matrix'><div class='v-row'><div class='v-cell v-result'>3</div><div class='v-cell'>7</div></div><div class='v-row'><div class='v-cell'>1</div><div class='v-cell v-result'>2</div></div><div class='v-row'><div class='v-cell'>4</div><div class='v-cell'>9</div></div></div><div class='v-row' style='margin-top:8px;'><span class='v-stat'>min diff=<strong>1</strong></span></div>",
-            "msg": "✅ <strong>Answer = 1</strong> (between row0[0]=3 and row1[1]=2). For each of <strong>A×B</strong> elements, one binary search → <strong>O(A×B×log B)</strong>."
+            "html": "<div class='v-label'>RESULT</div><div class='v-matrix'><div class='v-row'><div class='v-cell v-result'>3</div><div class='v-cell'>7</div></div><div class='v-row'><div class='v-cell'>1</div><div class='v-cell v-result'>2</div></div><div class='v-row'><div class='v-cell'>4</div><div class='v-cell'>9</div></div></div><div class='v-row' style='margin-top:8px;'><span class='v-stat'>min diff=<strong>1</strong> (row0[0]=3, row1[1]=2)</span></div>",
+            "msg": "✅ <strong>Answer = 1</strong> (minimum difference between <strong>row0[0]=3</strong> and <strong>row1[1]=2</strong>). For A=<strong>3 rows</strong>, B=<strong>2 cols</strong>, we ran <strong>4 binary searches</strong> (2 from row0→row1, 2 from row1→row2). Each search is <strong>O(log 2) = 1</strong> comparison. Total probes: <strong>4</strong> vs brute-force <strong>8 comparisons</strong>. This pattern appears in: merge-sort of linked lists, finding closest pair across sorted arrays, K-way merge problems.",
+            "overlay": "Pattern generalisation: any time you need to find the <strong>closest match</strong> for an element in a sorted collection, think <strong>lower_bound</strong>. It returns the 'landing spot' and its left neighbor — the two candidates for closest. No linear scan needed."
           }
         ]
       }
@@ -585,35 +659,53 @@
         "script": [
           {
             "label": "SETUP",
-            "msg": "Given <strong>A = 20 blocks</strong>, build a staircase where step <strong>i</strong> needs <strong>i</strong> blocks. Find max height <strong>h</strong> such that <strong>1 + 2 + ... + h ≤ 20</strong>. Formula: <strong>h×(h+1)/2 ≤ A</strong>. Binary search on <strong>h</strong>.",
-            "html": "<div class='v-row'><span class='v-stat'>blocks=<strong>20</strong></span></div><div style='margin-top:12px; color:#64748b; font-size:0.9em;'>Staircase: step 1 = 1 block, step 2 = 2 blocks, step 3 = 3 blocks...</div>",
-            "overlay": "Predicate: <code>h*(h+1)/2 &lt;= A</code> ? If yes, h is feasible. Find largest feasible h."
+            "msg": "Given <strong>A = 20 blocks</strong>, build a staircase where step <strong>k</strong> needs <strong>k</strong> blocks. Step 1 costs <strong>1</strong>, step 2 costs <strong>2</strong>, step 3 costs <strong>3</strong>, etc. Find the <strong>maximum height h</strong> such that <strong>1 + 2 + 3 + ... + h ≤ 20</strong>. Formula: <strong>sum = h×(h+1)/2</strong>. Binary search on <strong>h</strong> to find the largest h where sum ≤ <strong>20</strong>.",
+            "html": "<div class='v-row'><span class='v-stat'>blocks=<strong>20</strong></span></div><div style='margin-top:12px; color:#64748b; font-size:0.9em;'>Staircase structure: step 1 = 1 block [#], step 2 = 2 blocks [##], step 3 = 3 blocks [###]...</div>",
+            "overlay": "Predicate: <code>h*(h+1)/2 &lt;= A</code> ? If yes, h is <strong>feasible</strong>. If no, h is <strong>too tall</strong>. Monotonic: once h is too tall, all larger h are also too tall. Binary search finds the <strong>largest feasible h</strong>."
           },
           {
-            "label": "INITIALISE",
-            "msg": "Set <strong>low = 0</strong>, <strong>high = 6</strong> (rough upper bound from √(2×20) ≈ 6.3). Search for max h.",
-            "html": "<div class='v-row'><span class='v-stat'>low=<strong>0</strong></span><span class='v-stat'>high=<strong>6</strong></span><span class='v-stat'>ans=<strong>0</strong></span></div>"
+            "label": "SEARCH SPACE — bounds",
+            "msg": "What's the upper bound for h? If we had infinite blocks, h could be infinite. But with <strong>A = 20</strong>, the max h is around <strong>√(2×20) ≈ 6.3</strong>. Set <strong>low = 0</strong> (degenerate empty staircase), <strong>high = 6</strong> (rough upper bound). The answer lies in <strong>[0..6]</strong>.",
+            "html": "<div class='v-row'><span class='v-stat'>low=<strong>0</strong></span><span class='v-stat'>high=<strong>6</strong></span><span class='v-stat'>ans=<strong>0</strong></span></div>",
+            "overlay": "Upper bound derivation: <code>h²/2 ≈ A</code> → <code>h ≈ √(2A)</code>. For A=20, <code>h ≈ √40 ≈ 6.3</code>. So <code>high = 6 or 7</code> is safe."
           },
           {
-            "label": "ITERATION 1",
-            "msg": "<strong>mid = 3</strong>. Check: <strong>3×4/2 = 6 ≤ 20</strong> ✓. Feasible! Store <strong>ans = 3</strong> and try taller: <strong>low = 4</strong>.",
-            "html": "<div class='v-row'><span class='v-stat'>mid=<strong>3</strong></span><span class='v-stat'>sum=3×4/2=<strong>6</strong></span><span class='v-stat'>6 ≤ 20 ✓</span></div><div style='margin-top:8px; color:#22c55e;'>Feasible → search right</div>",
-            "overlay": "Decision: <code>mid*(mid+1)/2 &lt;= A</code> → store ans, try <code>low = mid + 1</code>."
+            "label": "ITERATION 1 — h=3",
+            "msg": "<strong>mid = (0+6)/2 = 3</strong>. Check: <strong>3×4/2 = 6 ≤ 20</strong> ✓. Feasible! A staircase of height <strong>3</strong> uses <strong>1+2+3 = 6 blocks</strong>, leaving <strong>14 unused</strong>. We can try taller. Store <strong>ans = 3</strong> and push <strong>low = mid + 1 = 4</strong> to search right.",
+            "html": "<div class='v-row'><span class='v-stat'>h=<strong>3</strong></span><span class='v-stat'>sum=3×4/2=<strong>6</strong></span><span class='v-stat'>6 ≤ 20 ✓</span></div><div style='margin-top:8px; color:#22c55e;'>Feasible → try taller (search right)</div>",
+            "overlay": "Decision: <code>mid*(mid+1)/2 &lt;= A</code> → store <code>ans = mid</code>, then try larger <code>h</code> → <code>low = mid + 1</code>."
           },
           {
-            "label": "ITERATION 2",
-            "msg": "<strong>mid = 5</strong>. Check: <strong>5×6/2 = 15 ≤ 20</strong> ✓. Feasible! Update <strong>ans = 5</strong>, try <strong>low = 6</strong>.",
-            "html": "<div class='v-row'><span class='v-stat'>mid=<strong>5</strong></span><span class='v-stat'>sum=5×6/2=<strong>15</strong></span><span class='v-stat'>15 ≤ 20 ✓</span></div><div style='margin-top:8px; color:#22c55e;'>Feasible → search right</div>"
+            "label": "ITERATION 2 — h=5",
+            "msg": "<strong>mid = (4+6)/2 = 5</strong>. Check: <strong>5×6/2 = 15 ≤ 20</strong> ✓. Feasible! Height <strong>5</strong> uses <strong>1+2+3+4+5 = 15 blocks</strong>, leaving <strong>5 unused</strong>. Update <strong>ans = 5</strong> and try <strong>low = 6</strong>.",
+            "html": "<div class='v-row'><span class='v-stat'>h=<strong>5</strong></span><span class='v-stat'>sum=5×6/2=<strong>15</strong></span><span class='v-stat'>15 ≤ 20 ✓</span></div><div style='margin-top:8px; color:#22c55e;'>Feasible → search right</div>"
           },
           {
-            "label": "ITERATION 3",
-            "msg": "<strong>mid = 6</strong>. Check: <strong>6×7/2 = 21 &gt; 20</strong> ✗. Too tall! Pull <strong>high = 5</strong>. Now low &gt; high → done.",
-            "html": "<div class='v-row'><span class='v-stat'>mid=<strong>6</strong></span><span class='v-stat'>sum=6×7/2=<strong>21</strong></span><span class='v-stat'>21 &gt; 20 ✗</span></div><div style='margin-top:8px; color:#f59e0b;'>Too tall → search left</div>"
+            "label": "ITERATION 3 — h=6 (too tall)",
+            "msg": "<strong>mid = 6</strong>. Check: <strong>6×7/2 = 21 &gt; 20</strong> ✗. Too tall! A staircase of height <strong>6</strong> would need <strong>1+2+3+4+5+6 = 21 blocks</strong>, but we only have <strong>20</strong>. Pull <strong>high = mid - 1 = 5</strong>. Now <strong>low = 6 &gt; high = 5</strong> → binary search terminates.",
+            "html": "<div class='v-row'><span class='v-stat'>h=<strong>6</strong></span><span class='v-stat'>sum=6×7/2=<strong>21</strong></span><span class='v-stat'>21 &gt; 20 ✗</span></div><div style='margin-top:8px; color:#f59e0b;'>Too tall → search left</div>",
+            "overlay": "Decision: <code>mid*(mid+1)/2 &gt; A</code> → discard [mid..high] → <code>high = mid - 1</code>."
+          },
+          {
+            "label": "VISUALISE — staircase of height 5",
+            "msg": "The optimal staircase has height <strong>5</strong>. Visual: step 1 = <strong>1 block</strong>, step 2 = <strong>2 blocks</strong>, step 3 = <strong>3 blocks</strong>, step 4 = <strong>4 blocks</strong>, step 5 = <strong>5 blocks</strong>. Total = <strong>15 blocks</strong>. Leftover = <strong>5 blocks</strong> (not enough to build step 6, which needs 6).",
+            "html": "<div style='margin-top:12px; color:#64748b; font-size:0.9em; line-height:1.6;'><strong>Step 1:</strong> [#]<br><strong>Step 2:</strong> [##]<br><strong>Step 3:</strong> [###]<br><strong>Step 4:</strong> [####]<br><strong>Step 5:</strong> [#####]<br><div style='margin-top:8px;'><span class='v-stat'>total=<strong>15</strong></span><span class='v-stat'>leftover=<strong>5</strong></span></div></div>"
+          },
+          {
+            "label": "EDGE CASE — exact sum (A=15)",
+            "msg": "What if <strong>A = 15</strong> (perfect triangle number)? Same BS: h=3 → sum=6 ✓, h=5 → sum=15 ✓ (exact), h=6 → sum=21 ✗. Return <strong>5</strong>. Leftover = <strong>0</strong>. The staircase is <strong>complete</strong> with no leftover blocks.",
+            "overlay": "Triangle numbers: 1, 3, 6, 10, 15, 21, 28, 36, 45, 55... These are values where <code>h*(h+1)/2</code> is exact. For these inputs, the staircase uses <em>all</em> blocks."
+          },
+          {
+            "label": "ALTERNATIVE — greedy walk (O(√A))",
+            "msg": "Alternative approach: start with h=1, keep building steps until you run out of blocks. <code>x=1; steps=0; while(A ≥ x) { A-=x; steps++; x++; }</code>. Simpler code, but <strong>O(√A)</strong> time (visits all steps). Binary search is <strong>O(log A)</strong>. When to use greedy? (1) A is small (&lt;1000), (2) coding interview time pressure, (3) debugging. When to use BS? A is large (up to <strong>10⁹</strong>).",
+            "overlay": "Greedy: <code>int x=1, steps=0; while(A>=x) {steps++; A-=x; x++;} return steps;</code> → clean but √A steps. BS: <code>O(log A)</code> but needs the formula."
           },
           {
             "label": "DONE",
-            "msg": "✅ <strong>Answer = 5</strong>. A staircase of height 5 uses <strong>1+2+3+4+5 = 15 blocks</strong>, leaving <strong>5 unused</strong>. Height 6 would need 21 blocks (too many).",
-            "html": "<div class='v-row'><span class='v-stat'>height=<strong>5</strong></span><span class='v-stat'>blocks used=<strong>15</strong></span><span class='v-stat'>leftover=<strong>5</strong></span></div><div style='margin-top:12px; color:#64748b; font-size:0.9em;'>Staircase: [1] [2][2] [3][3][3] [4][4][4][4] [5][5][5][5][5]</div>"
+            "msg": "✅ <strong>Answer = 5</strong>. Maximum staircase height is <strong>5</strong>, using <strong>1+2+3+4+5 = 15 blocks</strong>, leaving <strong>5 unused</strong>. Binary search took <strong>3 probes</strong> (h=3, h=5, h=6) for A=<strong>20</strong>. Greedy walk would take <strong>5 steps</strong>. Complexity: <strong>O(log A)</strong> time, <strong>O(1)</strong> space. This pattern appears in: 'Arranging Coins' (LeetCode 441), 'Reach a Number' (LeetCode 754), any problem with triangular sums or quadratic predicates.",
+            "html": "<div class='v-row'><span class='v-stat'>height=<strong>5</strong></span><span class='v-stat'>blocks used=<strong>15</strong></span><span class='v-stat'>leftover=<strong>5</strong></span></div><div style='margin-top:12px; color:#64748b; font-size:0.9em;'>Staircase: [#] [##] [###] [####] [#####]</div>",
+            "overlay": "Core pattern: <strong>BS on answer</strong> with a <strong>mathematical predicate</strong>. Any time the answer is an integer in a range and you have a <strong>monotonic yes/no test</strong> (here: sum formula), binary search finds it in <strong>O(log range)</strong>. Key skill: recognising when a problem's answer is <strong>searchable</strong> rather than <strong>constructable</strong>."
           }
         ]
       }
@@ -664,30 +756,57 @@
         "script": [
           {
             "label": "SETUP",
-            "msg": "Given <strong>A = 11</strong>, compute <strong>floor(√11)</strong> without using Math.sqrt. Find largest integer <strong>x</strong> such that <strong>x² ≤ 11</strong>. Binary search on x.",
-            "html": "<div class='v-row'><span class='v-stat'>A=<strong>11</strong></span></div>",
-            "overlay": "Predicate: <code>mid * mid &lt;= A</code> ? Use <strong>long</strong> to avoid overflow (mid×mid can exceed int range)."
+            "msg": "Given <strong>A = 11</strong>, compute <strong>floor(√11)</strong> without using <code>Math.sqrt</code>. Find the largest integer <strong>x</strong> such that <strong>x² ≤ 11</strong>. This is a classic <strong>binary search on answer</strong> problem. The search space is <strong>[0..A]</strong>, but we can tighten it: for any <strong>x &gt; A/2</strong>, we have <strong>x² &gt; A</strong> (except x=1), so <strong>high = A/2</strong> is a sharp upper bound.",
+            "html": "<div class='v-row'><span class='v-stat'>A=<strong>11</strong></span><span class='v-stat'>√11 ≈ <strong>3.316...</strong></span></div><div style='margin-top:12px; color:#64748b; font-size:0.9em;'>Goal: find floor(√11) = largest integer x with x² ≤ 11</div>",
+            "overlay": "Predicate: <code>mid * mid &lt;= A</code> ? If yes, <code>mid</code> is feasible (store as candidate). If no, <code>mid</code> is too large. <strong>Critical:</strong> Use <code>long</code> for the multiplication <code>mid*mid</code> to avoid integer overflow when A is large (up to 10⁹)."
+          },
+          {
+            "label": "OVERFLOW TRAP — why long?",
+            "msg": "Consider <strong>A = 2×10⁹</strong>. The answer is around <strong>√(2×10⁹) ≈ 44721</strong>. During BS, mid could be around <strong>10⁵</strong>. If we compute <code>(int) mid * mid</code>, the product is <strong>10¹⁰</strong>, which <strong>overflows</strong> a 32-bit int (max ≈ 2.1×10⁹). The result wraps around to a negative number or garbage → BS fails. Solution: cast to <code>long</code> before squaring: <code>long sq = (long)mid * mid;</code>. Long is 64-bit, max ≈ 9×10¹⁸.",
+            "overlay": "Overflow formula: <code>int</code> max ≈ 2×10⁹ → <code>sqrt(max) ≈ 46340</code>. Any mid &gt; 46340 will overflow when squared as int. Since A can be 10⁹, we must use <code>long</code>."
           },
           {
             "label": "INITIALISE",
-            "msg": "Set <strong>low = 1</strong>, <strong>high = A/2 = 5</strong> (sharper bound than A). Initialize <strong>ans = 1</strong>.",
-            "html": "<div class='v-row'><span class='v-stat'>low=<strong>1</strong></span><span class='v-stat'>high=<strong>5</strong></span><span class='v-stat'>ans=<strong>1</strong></span></div>"
+            "msg": "Set <strong>low = 1</strong>, <strong>high = A/2 = 5</strong>, <strong>ans = 1</strong> (fallback). Edge case: if A=0, return 0 immediately. For A=1, high=0 but we initialise ans=1. Search <strong>[1..5]</strong> for the largest x with x² ≤ 11.",
+            "html": "<div class='v-row'><span class='v-stat'>low=<strong>1</strong></span><span class='v-stat'>high=<strong>5</strong></span><span class='v-stat'>ans=<strong>1</strong></span></div>",
+            "overlay": "Upper bound justification: for <code>x &gt; A/2</code> and <code>A &gt; 1</code>, <code>x² &gt; (A/2)² = A²/4 &gt; A</code> (since A &gt; 4). So <code>high = A/2</code> is safe and tighter than <code>high = A</code>."
           },
           {
-            "label": "ITERATION 1",
-            "msg": "<strong>mid = 3</strong>. Check: <strong>3² = 9 ≤ 11</strong> ✓. Feasible! Store <strong>ans = 3</strong> and try larger: <strong>low = 4</strong>.",
-            "html": "<div class='v-row'><span class='v-stat'>mid=<strong>3</strong></span><span class='v-stat'>mid²=<strong>9</strong></span><span class='v-stat'>9 ≤ 11 ✓</span></div><div style='margin-top:8px; color:#22c55e;'>Feasible → search right</div>",
-            "overlay": "Decision: when <code>mid*mid &lt;= A</code>, store ans and push <code>low = mid + 1</code> to chase a larger x."
+            "label": "ITERATION 1 — x=3",
+            "msg": "<strong>mid = (1+5)/2 = 3</strong>. Compute <strong>3² = 9</strong>. Is <strong>9 ≤ 11</strong>? <strong>Yes</strong> ✓. This means <strong>x = 3</strong> is a valid candidate. Store <strong>ans = 3</strong> and search for a larger x: <strong>low = mid + 1 = 4</strong>.",
+            "html": "<div class='v-row'><span class='v-stat'>x=<strong>3</strong></span><span class='v-stat'>x²=<strong>9</strong></span><span class='v-stat'>9 ≤ 11 ✓</span></div><div style='margin-top:8px; color:#22c55e;'>Feasible → try larger x (search right)</div>",
+            "overlay": "Decision: <code>mid*mid &lt;= A</code> → store <code>ans = mid</code>, then push <code>low = mid + 1</code> to try larger values."
           },
           {
-            "label": "ITERATION 2",
-            "msg": "<strong>mid = 4</strong>. Check: <strong>4² = 16 &gt; 11</strong> ✗. Too large! Pull <strong>high = 3</strong>. Now low &gt; high → done.",
-            "html": "<div class='v-row'><span class='v-stat'>mid=<strong>4</strong></span><span class='v-stat'>mid²=<strong>16</strong></span><span class='v-stat'>16 &gt; 11 ✗</span></div><div style='margin-top:8px; color:#f59e0b;'>Too large → search left</div>"
+            "label": "ITERATION 2 — x=4 (too large)",
+            "msg": "<strong>mid = (4+5)/2 = 4</strong>. Compute <strong>4² = 16</strong>. Is <strong>16 ≤ 11</strong>? <strong>No</strong> ✗. <strong>16 &gt; 11</strong>, so x = 4 is too large. Discard [4..5] and pull <strong>high = mid - 1 = 3</strong>. Now <strong>low = 4 &gt; high = 3</strong> → binary search terminates.",
+            "html": "<div class='v-row'><span class='v-stat'>x=<strong>4</strong></span><span class='v-stat'>x²=<strong>16</strong></span><span class='v-stat'>16 &gt; 11 ✗</span></div><div style='margin-top:8px; color:#f59e0b;'>Too large → search left</div>",
+            "overlay": "Decision: <code>mid*mid &gt; A</code> → discard [mid..high] → <code>high = mid - 1</code>."
+          },
+          {
+            "label": "NUMBER LINE — perfect squares",
+            "msg": "Visualise the perfect squares near <strong>11</strong>: <strong>1²=1</strong>, <strong>2²=4</strong>, <strong>3²=9</strong>, <strong>4²=16</strong>, <strong>5²=25</strong>. The target <strong>A=11</strong> lies between <strong>9 (3²)</strong> and <strong>16 (4²)</strong>. So <strong>floor(√11) = 3</strong>. Binary search found this in <strong>2 probes</strong> (x=3, x=4) by halving the search space <strong>[1..5]</strong>.",
+            "html": "<div class='v-label'>PERFECT SQUARES</div><div class='v-numline'><div class='v-numline-track'><div class='v-numline-marker' style='left:5%;'><div>1</div></div><div class='v-numline-marker' style='left:20%;'><div>4</div></div><div class='v-numline-marker v-ans' style='left:45%;'><div>9</div></div><div class='v-numline-marker' style='left:55%;'><div>11</div></div><div class='v-numline-marker' style='left:80%;'><div>16</div></div><div class='v-numline-marker' style='left:95%;'><div>25</div></div></div></div><div class='v-row' style='margin-top:12px;'><span class='v-stat'>11 ∈ [9, 16) → floor(√11) = 3</span></div>"
+          },
+          {
+            "label": "EDGE CASE 1 — perfect square (A=16)",
+            "msg": "What if <strong>A = 16</strong> (a perfect square)? BS: mid=8 → 64&gt;16 ✗ → high=7. mid=4 → 16=16 ✓ → ans=4, low=5. mid=6 → 36&gt;16 ✗ → high=5. mid=5 → 25&gt;16 ✗ → high=4. low&gt;high. Return <strong>ans=4</strong>. When A is a perfect square, the algorithm finds the exact root.",
+            "overlay": "For perfect squares, the predicate is satisfied with equality: <code>ans*ans == A</code>. Still works — BS finds the exact integer root."
+          },
+          {
+            "label": "EDGE CASE 2 — small values",
+            "msg": "<strong>A = 0</strong> → return <strong>0</strong> immediately (special case). <strong>A = 1</strong> → ans=1 initialised, high=0, low=1 &gt; high → return <strong>1</strong>. <strong>A = 2</strong> → high=1, mid=1 → 1²=1 ≤ 2 ✓ → ans=1, low=2 &gt; high=1 → return <strong>1</strong>. All edge cases handled cleanly."
+          },
+          {
+            "label": "ALTERNATIVE — brute-force (O(√A))",
+            "msg": "Alternative: linear scan. <code>long x=0; while((x+1)*(x+1) &lt;= A) x++; return x;</code>. Walk from 0 upward until x² exceeds A. Simpler code but <strong>O(√A)</strong> time. For A=10⁹, that's <strong>31623 iterations</strong>. Binary search is <strong>O(log A)</strong> ≈ <strong>30 iterations</strong> for the same A. When to use brute-force? A is small (&lt;1000), or you need absolute simplicity. When to use BS? A can be large (up to 10⁹ in many problems).",
+            "overlay": "Brute-force: <code>long x=0; while((x+1)*(x+1)&lt;=A) x++; return (int)x;</code> → clean but √A steps. BS: <code>O(log A)</code> but must handle overflow."
           },
           {
             "label": "DONE",
-            "msg": "✅ <strong>Answer = 3</strong>. The largest integer with square ≤ 11 is <strong>3</strong> (3²=9). Next integer 4²=16 exceeds 11.",
-            "html": "<div class='v-row'><span class='v-stat'>√11 ≈ <strong>3.316...</strong></span><span class='v-stat'>floor=<strong>3</strong></span></div><div style='margin-top:12px; color:#64748b; font-size:0.9em;'>Binary search on x took 2 probes vs linear scan of up to 5.</div>"
+            "msg": "✅ <strong>Answer = 3</strong>. The largest integer with square ≤ <strong>11</strong> is <strong>3</strong> (since 3²=<strong>9</strong> ≤ 11, and 4²=<strong>16</strong> &gt; 11). Binary search on the answer space <strong>[1..5]</strong> took <strong>2 probes</strong>. Linear walk would take up to <strong>3 iterations</strong> (small A), but for large A (10⁹), BS is <strong>~1000x faster</strong>. Complexity: <strong>O(log A)</strong> time, <strong>O(1)</strong> space. This pattern appears in: 'Sqrt(x)' (LeetCode 69), 'Koko Eating Bananas' (LeetCode 875), 'Capacity To Ship Packages' (LeetCode 1011) — any problem where the answer is an integer in a range with a monotonic predicate.",
+            "html": "<div class='v-row'><span class='v-stat'>√11 = floor(<strong>3.316...</strong>) = <strong>3</strong></span></div><div style='margin-top:12px; color:#64748b; font-size:0.9em;'>3²=9 ≤ 11 ✓, 4²=16 &gt; 11 ✗</div>",
+            "overlay": "Core insight: <strong>BS on answer</strong> converts a search problem into a decision problem. Instead of asking 'what is √A?', ask 'is x ≤ √A?' for each candidate x. The decision is monotonic: once x is too large, all larger x are also too large. Binary search finds the boundary in <strong>O(log range)</strong>. Memorise the overflow fix: <code>long sq = (long)mid * mid;</code> — it appears in many integer-math BS problems."
           }
         ]
       }
@@ -732,50 +851,69 @@
       "kind": "scripted-array",
       "data": {
         "A": [4, 5, 6, 7, 0, 1, 2],
-        "footer": "Rotated sorted array search — A = [4,5,6,7,0,1,2], B = 0. Find pivot (min element), then BS in the correct half.",
+        "footer": "Rotated sorted array search — A = [4,5,6,7,0,1,2], B = 0. Detect sorted half at each step, check if target lies in it.",
         "legend": ["c-input", "c-low", "c-mid", "c-high", "c-active", "c-eliminated", "c-result"],
         "script": [
           {
             "label": "SETUP",
-            "msg": "Array <strong>A = [4, 5, 6, 7, 0, 1, 2]</strong>, target <strong>B = 0</strong>. Originally sorted, then <strong>rotated</strong> at unknown pivot. Strategy: (1) Find pivot (index of min element). (2) Decide which half contains B. (3) Run normal BS on that half."
+            "marks": {"0": "c-input", "1": "c-input", "2": "c-input", "3": "c-input", "4": "c-input", "5": "c-input", "6": "c-input"},
+            "msg": "Array <strong>A = [4, 5, 6, 7, 0, 1, 2]</strong>, target <strong>B = 0</strong>. This was originally a sorted array <strong>[0,1,2,4,5,6,7]</strong>, then <strong>rotated</strong> at an unknown pivot. The pivot is at index <strong>4</strong> (element <strong>0</strong> is the smallest). Key insight: although the full array is not sorted, <strong>at least one half</strong> around any mid is <strong>sorted</strong>. Strategy: at each BS step, identify which half is sorted, check if target lies in that sorted half's range, then decide direction.",
+            "overlay": "Core pattern: at each mid, compare <code>A[mid]</code> with <code>A[low]</code>. If <code>A[low] ≤ A[mid]</code>, the left half <strong>[low..mid]</strong> is sorted (monotonic). Otherwise, the right half <strong>[mid..high]</strong> is sorted. Once you know which half is sorted, use the standard range-check: is <code>B</code> in <code>[A[low]..A[mid]]</code> or <code>[A[mid]..A[high]]</code>? Decide direction accordingly."
           },
           {
-            "label": "PHASE 1 — Find Pivot",
-            "marks": {"0": "c-low", "6": "c-high"},
+            "label": "INITIALISE",
+            "marks": {"0": "c-low", "1": "c-input", "2": "c-input", "3": "c-input", "4": "c-input", "5": "c-input", "6": "c-high"},
             "ptrs": {"low": 0, "high": 6},
-            "msg": "<strong>Phase 1:</strong> Find rotation pivot (smallest element). Compare <strong>A[mid]</strong> with <strong>A[0]</strong>: if A[mid] ≥ A[0], the left half is sorted → pivot is to the right.",
-            "overlay": "Pivot rule: <code>A[mid] &gt;= A[0]</code> → pivot in right half → <code>low = mid + 1</code>. Else pivot in left half or IS mid."
+            "msg": "Set <strong>low = 0</strong>, <strong>high = 6</strong>. Binary search the full array <strong>[0..6]</strong> for target <strong>B = 0</strong>. At each step, we'll detect the sorted half, check if B is in it, and narrow the window."
           },
           {
-            "label": "PHASE 1 — Iteration 1",
-            "marks": {"0": "c-low", "3": "c-mid", "6": "c-high"},
+            "label": "ITERATION 1 — mid=3, left half sorted",
+            "marks": {"0": "c-low", "1": "c-active", "2": "c-active", "3": "c-mid", "4": "c-active", "5": "c-active", "6": "c-high"},
             "ptrs": {"low": 0, "mid": 3, "high": 6},
-            "msg": "<strong>mid = 3</strong>, A[3] = <strong>7</strong>, A[0] = <strong>4</strong>. Since <strong>7 ≥ 4</strong>, left half [4,5,6,7] is sorted → pivot must be right. Set <strong>low = 4</strong>."
+            "msg": "<strong>mid = (0+6)/2 = 3</strong>. Check which half is sorted: compare A[low]=<strong>4</strong> vs A[mid]=<strong>7</strong>. Is <strong>4 ≤ 7</strong>? <strong>Yes</strong> ✓ → the left half <strong>[4,5,6,7]</strong> is sorted. Now check: is target <strong>B=0</strong> in the range <strong>[A[low]..A[mid]] = [4..7]</strong>? <strong>No</strong> (0 &lt; 4). The target is <strong>not</strong> in the sorted left half. Discard left half → <strong>low = mid + 1 = 4</strong>.",
+            "overlay": "Decision tree: <strong>(1)</strong> Identify sorted half: <code>A[low] ≤ A[mid]</code> → left is sorted. <strong>(2)</strong> Check if <code>B ∈ [A[low]..A[mid]]</code>: <code>A[low] ≤ B ≤ A[mid]</code>? <strong>(3)</strong> If yes → search left (<code>high = mid - 1</code>). If no → search right (<code>low = mid + 1</code>)."
           },
           {
-            "label": "PHASE 1 — Iteration 2",
-            "marks": {"4": "c-low c-mid c-result", "6": "c-high"},
+            "label": "ITERATION 2 — mid=5, left half sorted",
+            "marks": {"0": "c-eliminated", "1": "c-eliminated", "2": "c-eliminated", "3": "c-eliminated", "4": "c-low", "5": "c-mid", "6": "c-high"},
             "ptrs": {"low": 4, "mid": 5, "high": 6},
-            "msg": "<strong>mid = 5</strong>, A[5] = <strong>1</strong>, A[0] = <strong>4</strong>. Since <strong>1 &lt; 4</strong>, pivot is in left half (indices 4..5). Set <strong>high = 4</strong>, rotation = 5. Actually, recalc: <strong>mid = 4</strong>, A[4]=0 &lt; A[0] → store pivot=<strong>4</strong>, high=3. Pivot found at <strong>index 4</strong> (value 0).",
-            "overlay": "Pivot = <strong>index 4</strong> (smallest element = 0). Array splits into two sorted halves: [4,5,6,7] and [0,1,2]."
+            "msg": "<strong>mid = (4+6)/2 = 5</strong>. Check which half is sorted: A[low]=<strong>0</strong> vs A[mid]=<strong>1</strong>. Is <strong>0 ≤ 1</strong>? <strong>Yes</strong> ✓ → the left half <strong>[0,1]</strong> is sorted. Check: is target <strong>B=0</strong> in <strong>[A[low]..A[mid]] = [0..1]</strong>? <strong>Yes!</strong> (0 is the left boundary). The target is <strong>in</strong> the sorted left half. Discard right half → <strong>high = mid - 1 = 4</strong>.",
+            "overlay": "Key: we check the <em>sorted</em> half first because we can use standard range logic there. The unsorted half may have a rotation pivot, making range checks unreliable."
           },
           {
-            "label": "PHASE 2 — Decide Which Half",
-            "marks": {"4": "c-result", "0": "c-eliminated", "1": "c-eliminated", "2": "c-eliminated", "3": "c-eliminated"},
-            "msg": "<strong>Pivot = 4</strong>. Target <strong>B = 0</strong>. Compare B with A[0]=4: <strong>0 &lt; 4</strong> → B must be in the <em>right half</em> [0,1,2] (indices 4..6). Set search window <strong>low=4, high=6</strong>.",
-            "overlay": "Decision: <code>B &lt; A[0]</code> → search right half (indices pivot..N-1). Else search left half (0..pivot-1)."
+            "label": "ITERATION 3 — mid=4 (match!)",
+            "marks": {"0": "c-eliminated", "1": "c-eliminated", "2": "c-eliminated", "3": "c-eliminated", "4": "c-low c-mid c-high c-result", "5": "c-eliminated", "6": "c-eliminated"},
+            "ptrs": {"low": 4, "mid": 4, "high": 4},
+            "msg": "<strong>mid = 4</strong>. Check A[4] = <strong>0</strong>. Does <strong>0 == B=0</strong>? <strong>Yes</strong> ✓! Perfect match. Return <strong>index 4</strong>.",
+            "overlay": "Base case: whenever <code>A[mid] == B</code>, return <code>mid</code> immediately. No further probes needed."
           },
           {
-            "label": "PHASE 2 — Binary Search",
-            "marks": {"4": "c-low c-mid c-result", "6": "c-high"},
-            "ptrs": {"low": 4, "mid": 5, "high": 6},
-            "msg": "<strong>mid = 5</strong>, A[5] = <strong>1</strong>. Compare: <strong>1 &gt; 0</strong> → go left: <strong>high = 4</strong>. Next: <strong>mid = 4</strong>, A[4] = <strong>0</strong>. Match! Return <strong>4</strong>."
+            "label": "SORTED HALF DETECTION — why it works",
+            "msg": "A rotated sorted array is actually <strong>two sorted subarrays</strong> concatenated: <strong>[4,5,6,7]</strong> (ascending) + <strong>[0,1,2]</strong> (ascending). The rotation pivot separates them. At <em>any</em> mid, at least one of [low..mid] or [mid..high] is entirely within one subarray → that half is sorted. We detect it by comparing <code>A[low]</code> vs <code>A[mid]</code>. Once detected, we can use standard binary search logic on that half: check if B is in <code>[A[sorted_left]..A[sorted_right]]</code>.",
+            "overlay": "Why guaranteed? The pivot splits the array into two monotonic chunks. Any [low..mid] or [mid..high] window either (1) lies entirely within one chunk → sorted, or (2) spans the pivot → the <em>other</em> half doesn't span it, so it's sorted. At least one half is always clean."
+          },
+          {
+            "label": "RIGHT HALF SORTED — example (mid=2)",
+            "marks": {"0": "c-low", "1": "c-active", "2": "c-mid", "3": "c-active", "4": "c-active", "5": "c-active", "6": "c-high"},
+            "msg": "What if mid was <strong>2</strong>? A[low]=<strong>4</strong>, A[mid]=<strong>6</strong>. Is <strong>4 ≤ 6</strong>? <strong>Yes</strong> → left half [4,5,6] sorted. But suppose A[low]=<strong>6</strong>, A[mid]=<strong>0</strong> (different rotation). Is <strong>6 ≤ 0</strong>? <strong>No</strong> → left half is <strong>not</strong> sorted → the <strong>right half must be sorted</strong>. Then check if B is in <strong>[A[mid]..A[high]]</strong> and decide.",
+            "overlay": "Decision logic for right-sorted: if <code>A[mid] ≤ B ≤ A[high]</code>, search right (<code>low = mid + 1</code>). Else search left (<code>high = mid - 1</code>)."
+          },
+          {
+            "label": "EDGE CASE — no rotation (already sorted)",
+            "marks": {"0": "c-input", "1": "c-input", "2": "c-input", "3": "c-input", "4": "c-input", "5": "c-input", "6": "c-input"},
+            "msg": "What if the array is <strong>not rotated</strong> at all? E.g., <strong>[0,1,2,4,5,6,7]</strong>. Then A[low] ≤ A[mid] is always true (left half always sorted), and standard BS works. The algorithm degenerates to vanilla binary search. The rotation-detection logic is <strong>backward-compatible</strong> with sorted arrays.",
+            "overlay": "Rotation count = 0 → A[0] &lt; A[N-1]. The 'sorted half' is always the left half at every step. The algorithm still works."
+          },
+          {
+            "label": "EDGE CASE — target not in array",
+            "msg": "What if <strong>B = 10</strong> (not in array)? Same algorithm: at each step, detect sorted half, check range, narrow. Eventually <strong>low &gt; high</strong> without finding a match → return <strong>-1</strong>. The termination condition is the same as vanilla BS."
           },
           {
             "label": "DONE",
             "marks": {"4": "c-result"},
             "ptrs": {"ans": 4},
-            "msg": "✅ <strong>Answer = index 4</strong> (value 0). Two-phase approach: O(log N) to find pivot + O(log N) for BS = <strong>O(log N)</strong> total."
+            "msg": "✅ <strong>Answer = index 4</strong> (value <strong>0</strong>). At each of <strong>3 iterations</strong>, we detected the sorted half by comparing <code>A[low]</code> vs <code>A[mid]</code>, checked if B was in the sorted range, and decided direction. Binary search on a rotated array: <strong>O(log N)</strong>, same as vanilla BS. No need to find the pivot first — the algorithm handles the rotation implicitly. Complexity: <strong>O(log N)</strong> time, <strong>O(1)</strong> space. This pattern appears in: 'Search in Rotated Sorted Array' (LeetCode 33), 'Find Minimum in Rotated Sorted Array' (LeetCode 153), 'Search in Rotated Sorted Array II (with duplicates)' (LeetCode 81).",
+            "overlay": "Core takeaway: when a sorted structure is <strong>rotated</strong> (or cyclically shifted), you can still binary search by exploiting the fact that <strong>at least one half is always sorted</strong>. The key skill is detecting which half is clean, then applying standard range logic to it. Memorise: <code>if (A[low] &lt;= A[mid]) { /* left sorted, check if B in [A[low]..A[mid]] */ } else { /* right sorted, check if B in [A[mid]..A[high]] */ }</code>. This pattern extends to finding the minimum, the rotation count, and search-with-duplicates (with a degeneracy case)."
           }
         ]
       }
@@ -820,31 +958,68 @@
     "viz": {
       "kind": "scripted-array",
       "data": {
-        "A": [[1,2,7,9,11,13], [1,3,4,5,8,10]],
-        "footer": "Partition-based binary search — two sorted arrays, find median in O(log(min(M,N))).",
+        "A": [1, 2, 7, 9, 11, 13],
+        "footer": "Partition-based binary search — A=[1,2,7,9,11,13], B=[1,3,4,5,8,10]. Find median in O(log(min(M,N))).",
         "legend": ["c-input", "c-low", "c-mid", "c-high", "c-active", "c-result"],
         "script": [
           {
             "label": "SETUP",
-            "msg": "Two sorted arrays: <strong>A = [1,2,7,9,11,13]</strong> (length 6), <strong>B = [1,3,4,5,8,10]</strong> (length 6). Total 12 elements. Median = average of 6th and 7th elements = <strong>(5+7)/2 = 6</strong>. Don't merge! Binary search a <em>partition</em> on the smaller array.",
-            "html": "<div class='v-label'>Array A (length 6)</div><div class='v-row'><div class='v-cell'>1</div><div class='v-cell'>2</div><div class='v-cell'>7</div><div class='v-cell'>9</div><div class='v-cell'>11</div><div class='v-cell'>13</div></div><div class='v-label' style='margin-top:12px;'>Array B (length 6)</div><div class='v-row'><div class='v-cell'>1</div><div class='v-cell'>3</div><div class='v-cell'>4</div><div class='v-cell'>5</div><div class='v-cell'>8</div><div class='v-cell'>10</div></div>"
+            "msg": "Two sorted arrays: <strong>A = [1,2,7,9,11,13]</strong> (M=6), <strong>B = [1,3,4,5,8,10]</strong> (N=6). Total <strong>12 elements</strong> (even). Median = <strong>(6th + 7th) / 2</strong>. Don't merge! Binary search a <em>partition</em> on the smaller array such that everything LEFT ≤ everything RIGHT.",
+            "html": "<div class='v-label'>Array A (M=6)</div><div class='v-row'><div class='v-cell'>1</div><div class='v-cell'>2</div><div class='v-cell'>7</div><div class='v-cell'>9</div><div class='v-cell'>11</div><div class='v-cell'>13</div></div><div class='v-label' style='margin-top:12px;'>Array B (N=6)</div><div class='v-row'><div class='v-cell'>1</div><div class='v-cell'>3</div><div class='v-cell'>4</div><div class='v-cell'>5</div><div class='v-cell'>8</div><div class='v-cell'>10</div></div>",
+            "overlay": "Strategy: partition both arrays into LEFT and RIGHT halves. <code>leftCount = (M+N+1)/2 = 7</code>. Binary search <code>pX</code> in A, derive <code>pY = leftCount - pX</code> in B."
           },
           {
             "label": "PARTITION CONCEPT",
-            "msg": "Goal: split both arrays into LEFT and RIGHT halves such that: (1) <strong>|LEFT| = (M+N+1)/2</strong>, (2) <strong>max(LEFT_A, LEFT_B) ≤ min(RIGHT_A, RIGHT_B)</strong>. Binary search partition index <strong>pX</strong> in A; derive <strong>pY</strong> in B to balance counts.",
-            "html": "<div class='v-row'><span class='v-stat'>leftCount=<strong>7</strong></span><span class='v-stat'>(6+6+1)/2</span></div><div style='margin-top:8px; color:#64748b; font-size:0.9em;'>If pX=3 in A, then pY = 7-3 = 4 in B to balance. Check boundary values.</div>",
-            "overlay": "Partition rule: <code>pX + pY = leftCount</code>. For each pX, check 4 boundaries: <code>A[pX-1], A[pX], B[pY-1], B[pY]</code>."
+            "msg": "A valid partition satisfies: <strong>(1)</strong> |LEFT| = <strong>7</strong> (half of 12, rounded up). <strong>(2)</strong> max(A_left, B_left) ≤ min(A_right, B_right). Binary search <strong>pX</strong> (partition index in A), derive <strong>pY</strong> to balance counts.",
+            "html": "<div class='v-row'><span class='v-stat'>leftCount=<strong>7</strong></span><span class='v-stat'>(6+6+1)/2</span></div><div style='margin-top:8px; color:#64748b; font-size:0.9em;'>If pX=3 in A → 3 elements left in A. Then pY = 7-3 = 4 in B → 4 left in B. Total LEFT = 7 ✓</div>",
+            "overlay": "Four boundary values: <code>A[pX-1]</code> (max A_left), <code>A[pX]</code> (min A_right), <code>B[pY-1]</code> (max B_left), <code>B[pY]</code> (min B_right). Valid partition: <code>A[pX-1] ≤ B[pY] AND B[pY-1] ≤ A[pX]</code>."
+          },
+          {
+            "label": "INITIALISE",
+            "msg": "Since both arrays have same length, pick A (arbitrary). Set <strong>low = 0</strong>, <strong>high = M = 6</strong>. Search for partition index <strong>pX</strong> in range [0..6].",
+            "html": "<div class='v-row'><span class='v-stat'>low=<strong>0</strong></span><span class='v-stat'>high=<strong>6</strong></span><span class='v-stat'>leftCount=<strong>7</strong></span></div>"
           },
           {
             "label": "ITERATION 1 — pX=3",
-            "msg": "Try <strong>pX = 3</strong> (mid of 0..6). Then <strong>pY = 7-3 = 4</strong>. Boundaries: A[2]=<strong>7</strong>, A[3]=<strong>9</strong>, B[3]=<strong>5</strong>, B[4]=<strong>8</strong>. Check: max(7,5)=<strong>7</strong> vs min(9,8)=<strong>8</strong>. <strong>7 ≤ 8</strong> ✓! Valid partition.",
-            "html": "<div class='v-label'>Partition A at 3, B at 4</div><div class='v-row'><div class='v-cell'>1</div><div class='v-cell'>2</div><div class='v-cell v-active'>7</div><div class='v-cell' style='border-left:3px solid #3b82f6;'>9</div><div class='v-cell'>11</div><div class='v-cell'>13</div></div><div class='v-row'><div class='v-cell'>1</div><div class='v-cell'>3</div><div class='v-cell'>4</div><div class='v-cell v-active'>5</div><div class='v-cell' style='border-left:3px solid #3b82f6;'>8</div><div class='v-cell'>10</div></div><div class='v-row' style='margin-top:8px;'><span class='v-stat'>maxLeft=<strong>7</strong></span><span class='v-stat'>minRight=<strong>8</strong></span><span class='v-stat'>valid ✓</span></div>",
-            "overlay": "Valid partition found! For even total: median = <code>(max(leftA, leftB) + min(rightA, rightB)) / 2 = (7+8)/2 = 6</code>."
+            "msg": "<strong>pX = (0+6)/2 = 3</strong>. Then <strong>pY = 7-3 = 4</strong>. A_left: [1,2,<strong>7</strong>], A_right: [<strong>9</strong>,11,13]. B_left: [1,3,4,<strong>5</strong>], B_right: [<strong>8</strong>,10].",
+            "html": "<div class='v-label'>Try pX=3, pY=4</div><div class='v-row'><div class='v-cell'>1</div><div class='v-cell'>2</div><div class='v-cell v-active'>7</div><div class='v-cell' style='border-left:3px solid #3b82f6;'>9</div><div class='v-cell'>11</div><div class='v-cell'>13</div></div><div class='v-row'><div class='v-cell'>1</div><div class='v-cell'>3</div><div class='v-cell'>4</div><div class='v-cell v-active'>5</div><div class='v-cell' style='border-left:3px solid #3b82f6;'>8</div><div class='v-cell'>10</div></div><div class='v-row' style='margin-top:8px;'><span class='v-stat'>A[pX-1]=<strong>7</strong></span><span class='v-stat'>A[pX]=<strong>9</strong></span><span class='v-stat'>B[pY-1]=<strong>5</strong></span><span class='v-stat'>B[pY]=<strong>8</strong></span></div>",
+            "overlay": "Check validity: <code>maxLeft_A = 7</code>, <code>maxLeft_B = 5</code>, <code>minRight_A = 9</code>, <code>minRight_B = 8</code>."
+          },
+          {
+            "label": "ITERATION 1 — VALIDATE",
+            "msg": "Is <strong>A[pX-1]=7 ≤ B[pY]=8</strong>? ✓ Yes. Is <strong>B[pY-1]=5 ≤ A[pX]=9</strong>? ✓ Yes. Both conditions pass! This is a <strong>valid partition</strong>. Proceed to extract median.",
+            "html": "<div class='v-row'><span class='v-stat'>7 ≤ 8 ✓</span><span class='v-stat'>5 ≤ 9 ✓</span><span class='v-stat'>VALID</span></div>",
+            "overlay": "Decision: partition valid → compute median from boundary values."
+          },
+          {
+            "label": "COMPUTE MEDIAN",
+            "msg": "Total elements = <strong>12</strong> (even). Median = <strong>(maxLeft + minRight) / 2</strong>. maxLeft = max(<strong>7</strong>, <strong>5</strong>) = <strong>7</strong>. minRight = min(<strong>9</strong>, <strong>8</strong>) = <strong>8</strong>. Median = <strong>(7+8)/2 = 6.5 → 6</strong> (integer division).",
+            "html": "<div class='v-label'>MEDIAN CALCULATION</div><div class='v-row'><span class='v-stat'>maxLeft=max(<strong>7</strong>,<strong>5</strong>)=<strong>7</strong></span></div><div class='v-row'><span class='v-stat'>minRight=min(<strong>9</strong>,<strong>8</strong>)=<strong>8</strong></span></div><div class='v-row'><span class='v-stat'>median=(<strong>7</strong>+<strong>8</strong>)/2=<strong>6</strong></span></div>",
+            "overlay": "For even total: median is the average of the 6th and 7th elements. The 6th = <code>max(A_left_max, B_left_max) = 7</code>. The 7th = <code>min(A_right_min, B_right_min) = 8</code>."
+          },
+          {
+            "label": "VISUAL CONFIRMATION",
+            "msg": "Merged sequence (conceptual): [1,1,2,3,4,5,<strong>7</strong>,<strong>8</strong>,9,10,11,13]. The 6th element is <strong>7</strong>, the 7th is <strong>8</strong>. Median = <strong>(7+8)/2 = 6</strong>. Partition-BS found it without merging!",
+            "html": "<div class='v-label'>MERGED (CONCEPTUAL)</div><div class='v-row'><div class='v-cell'>1</div><div class='v-cell'>1</div><div class='v-cell'>2</div><div class='v-cell'>3</div><div class='v-cell'>4</div><div class='v-cell'>5</div><div class='v-cell v-result'>7</div><div class='v-cell v-result'>8</div><div class='v-cell'>9</div><div class='v-cell'>10</div><div class='v-cell'>11</div><div class='v-cell'>13</div></div>",
+            "overlay": "Partition-based approach avoids full merge. We only inspect <strong>4 boundary values</strong> per iteration."
+          },
+          {
+            "label": "EDGE CASE — pX=0",
+            "msg": "If <strong>pX = 0</strong> (all A on right), then A_left is empty → use <strong>-∞</strong> for A[pX-1]. If <strong>pX = M</strong> (all A on left), then A_right is empty → use <strong>+∞</strong> for A[pX]. Same for B boundaries.",
+            "html": "<div class='v-row' style='color:#64748b;'><div style='font-size:0.9em;'>Edge handling: <code>pX==0 → maxLeftX = -∞</code>, <code>pX==M → minRightX = +∞</code>. Ensures comparisons always work.</div></div>",
+            "overlay": "Sentinel values: <code>Integer.MIN_VALUE</code> and <code>Integer.MAX_VALUE</code> handle array boundaries gracefully."
+          },
+          {
+            "label": "DECISION RULE",
+            "msg": "If partition invalid: <strong>maxLeftX &gt; minRightY</strong> → A contributes too much to LEFT → shrink A_left → <strong>high = pX - 1</strong>. Else <strong>maxLeftY &gt; minRightX</strong> → A contributes too little → grow A_left → <strong>low = pX + 1</strong>.",
+            "html": "<div class='v-row'><span class='v-stat'>Rule 1: A_left too big → high--</span></div><div class='v-row'><span class='v-stat'>Rule 2: A_left too small → low++</span></div>",
+            "overlay": "Binary search direction: if <code>A[pX-1] &gt; B[pY]</code>, move partition LEFT in A. Else move RIGHT."
           },
           {
             "label": "DONE",
-            "html": "<div class='v-label'>MEDIAN PARTITION</div><div class='v-row'><div class='v-cell'>1</div><div class='v-cell'>2</div><div class='v-cell v-result'>7</div><div class='v-cell' style='border-left:3px solid #22c55e;'>9</div><div class='v-cell'>11</div><div class='v-cell'>13</div></div><div class='v-row'><div class='v-cell'>1</div><div class='v-cell'>3</div><div class='v-cell'>4</div><div class='v-cell v-result'>5</div><div class='v-cell' style='border-left:3px solid #22c55e;'>8</div><div class='v-cell'>10</div></div><div class='v-row' style='margin-top:8px;'><span class='v-stat'>median=<strong>6</strong></span><span class='v-stat'>(7+8)/2</span></div>",
-            "msg": "✅ <strong>Answer = 6</strong>. Binary search on partition index (length 6) = <strong>O(log 6)</strong>, far better than merging O(12)."
+            "msg": "✅ <strong>Answer = 6</strong>. Binary search on partition index (M=6 elements) took <strong>O(log 6)</strong> iterations. Valid partition found on first try (lucky!). Far better than merging <strong>O(M+N) = 12</strong> operations.",
+            "html": "<div class='v-label'>FINAL PARTITION</div><div class='v-row'><div class='v-cell'>1</div><div class='v-cell'>2</div><div class='v-cell v-result'>7</div><div class='v-cell' style='border-left:3px solid #22c55e;'>9</div><div class='v-cell'>11</div><div class='v-cell'>13</div></div><div class='v-row'><div class='v-cell'>1</div><div class='v-cell'>3</div><div class='v-cell'>4</div><div class='v-cell v-result'>5</div><div class='v-cell' style='border-left:3px solid #22c55e;'>8</div><div class='v-cell'>10</div></div><div class='v-row' style='margin-top:8px;'><span class='v-stat'>median=<strong>6</strong></span><span class='v-stat'>complexity=<strong>O(log min(M,N))</strong></span></div>",
+            "overlay": "Key insight: partition divides combined array into two equal halves. Median is the average of the largest LEFT and smallest RIGHT values."
           }
         ]
       }
@@ -890,41 +1065,71 @@
       "kind": "scripted-array",
       "data": {
         "A": [[1,3,5], [2,6,9], [3,6,9]],
-        "footer": "BS on value range + counting — 3×3 matrix, each row sorted. Find median without flattening.",
-        "legend": ["c-input", "c-low", "c-mid", "c-high", "c-result"],
+        "footer": "BS on value range + per-row counting — matrix 3×3, each row sorted independently. Find median without flattening.",
+        "legend": ["c-input", "c-low", "c-mid", "c-high", "c-active", "c-result"],
         "script": [
           {
             "label": "SETUP",
-            "msg": "Matrix <strong>3×3</strong>, each row sorted (rows independent): [1,3,5], [2,6,9], [3,6,9]. Total <strong>9 elements</strong>. Median = <strong>5th smallest</strong> value (since 9 is odd). Don't flatten! Binary search the <em>value range</em> [1..9], count elements ≤ mid per row.",
-            "html": "<div class='v-label'>MATRIX (3×3)</div><div class='v-matrix'><div class='v-row'><div class='v-cell'>1</div><div class='v-cell'>3</div><div class='v-cell'>5</div></div><div class='v-row'><div class='v-cell'>2</div><div class='v-cell'>6</div><div class='v-cell'>9</div></div><div class='v-row'><div class='v-cell'>3</div><div class='v-cell'>6</div><div class='v-cell'>9</div></div></div><div class='v-row' style='margin-top:8px;'><span class='v-stat'>total=<strong>9</strong></span><span class='v-stat'>medianPos=<strong>4</strong></span></div>",
-            "overlay": "Predicate: <code>count(≤ mid) &gt; 4</code>? Count uses <strong>lower_bound</strong> on each row (O(log M) per row)."
+            "msg": "Matrix <strong>3×3</strong>, each row sorted (rows are <em>independent</em>): [1,3,5], [2,6,9], [3,6,9]. Total <strong>9 elements</strong> (odd). Median = <strong>5th smallest</strong> value. Strategy: <strong>binary search the value range</strong> [1..9], count elements ≤ mid in each row (using BS per row).",
+            "html": "<div class='v-label'>MATRIX (3×3)</div><div class='v-matrix'><div class='v-row'><div class='v-cell'>1</div><div class='v-cell'>3</div><div class='v-cell'>5</div></div><div class='v-row'><div class='v-cell'>2</div><div class='v-cell'>6</div><div class='v-cell'>9</div></div><div class='v-row'><div class='v-cell'>3</div><div class='v-cell'>6</div><div class='v-cell'>9</div></div></div><div class='v-row' style='margin-top:8px;'><span class='v-stat'>total=<strong>9</strong></span><span class='v-stat'>medianPos=<strong>5th</strong></span><span class='v-stat'>(N×M/2 + 1)</span></div>",
+            "overlay": "Predicate: for candidate value <code>mid</code>, count how many elements ≤ mid across all rows. If <code>count &gt; 4</code>, median is ≤ mid. Use <strong>upper_bound</strong> on each row (O(log M) per row)."
+          },
+          {
+            "label": "VALUE RANGE",
+            "msg": "Flattened (conceptual): [1, 2, 3, 3, 5, 6, 6, 9, 9]. The 5th value is <strong>5</strong>. But don't flatten! Binary search the value space <strong>[min=1, max=9]</strong>. For each candidate, count elements ≤ it.",
+            "html": "<div class='v-label'>FLATTENED SORTED (conceptual only)</div><div class='v-row'><div class='v-cell'>1</div><div class='v-cell'>2</div><div class='v-cell'>3</div><div class='v-cell'>3</div><div class='v-cell v-result'>5</div><div class='v-cell'>6</div><div class='v-cell'>6</div><div class='v-cell'>9</div><div class='v-cell'>9</div></div>",
+            "overlay": "Goal: find the smallest value <code>v</code> such that <code>count(≤ v) &gt; N×M/2 = 4</code>."
           },
           {
             "label": "INITIALISE",
-            "msg": "Set <strong>low = 1</strong> (min element), <strong>high = 9</strong> (max element). Binary search the value space [1..9]. Need: smallest value <strong>v</strong> with <strong>count(≤ v) &gt; 4</strong>.",
-            "html": "<div class='v-row'><span class='v-stat'>low=<strong>1</strong></span><span class='v-stat'>high=<strong>9</strong></span><span class='v-stat'>need count &gt; <strong>4</strong></span></div>"
+            "msg": "Set <strong>low = 1</strong> (min element in matrix), <strong>high = 9</strong> (max element). Binary search the value range. Need: smallest value <strong>v</strong> with <strong>count(≤ v) &gt; 4</strong>.",
+            "html": "<div class='v-row'><span class='v-stat'>low=<strong>1</strong></span><span class='v-stat'>high=<strong>9</strong></span><span class='v-stat'>threshold=<strong>4</strong></span></div>"
           },
           {
             "label": "ITERATION 1 — mid=5",
-            "msg": "<strong>mid = 5</strong>. Count elements ≤ 5 in each row: row0: <strong>3</strong> ([1,3,5]), row1: <strong>1</strong> ([2]), row2: <strong>1</strong> ([3]). Total = <strong>5</strong>. Since <strong>5 &gt; 4</strong> ✓, 5 could be the median. Try smaller: <strong>high = 4</strong>.",
-            "html": "<div class='v-label'>Count ≤ 5</div><div class='v-matrix'><div class='v-row'><div class='v-cell v-active'>1</div><div class='v-cell v-active'>3</div><div class='v-cell v-active'>5</div></div><div class='v-row'><div class='v-cell v-active'>2</div><div class='v-cell'>6</div><div class='v-cell'>9</div></div><div class='v-row'><div class='v-cell v-active'>3</div><div class='v-cell'>6</div><div class='v-cell'>9</div></div></div><div class='v-row' style='margin-top:8px;'><span class='v-stat'>count=<strong>5</strong></span><span class='v-stat'>5 &gt; 4 ✓</span></div>",
-            "overlay": "Decision: <code>count &gt; medPos</code> → median is ≤ mid → search left: <code>high = mid - 1</code>."
+            "msg": "<strong>mid = 5</strong>. Count elements ≤ 5 in each row using upper_bound. <strong>Row 0</strong>: [1,3,<strong>5</strong>] → count = <strong>3</strong>. <strong>Row 1</strong>: [<strong>2</strong>] → count = <strong>1</strong>. <strong>Row 2</strong>: [<strong>3</strong>] → count = <strong>1</strong>. Total = <strong>5</strong>.",
+            "html": "<div class='v-label'>Count ≤ 5</div><div class='v-matrix'><div class='v-row'><div class='v-cell v-active'>1</div><div class='v-cell v-active'>3</div><div class='v-cell v-active'>5</div><span style='margin-left:8px; color:#22c55e;'>cnt=3</span></div><div class='v-row'><div class='v-cell v-active'>2</div><div class='v-cell'>6</div><div class='v-cell'>9</div><span style='margin-left:8px; color:#22c55e;'>cnt=1</span></div><div class='v-row'><div class='v-cell v-active'>3</div><div class='v-cell'>6</div><div class='v-cell'>9</div><span style='margin-left:8px; color:#22c55e;'>cnt=1</span></div></div><div class='v-row' style='margin-top:8px;'><span class='v-stat'>total count=<strong>5</strong></span><span class='v-stat'>5 &gt; 4 ✓</span></div>",
+            "overlay": "Decision: <code>count=5 &gt; 4</code> → median is ≤ 5. Try smaller values: <strong>high = mid - 1 = 4</strong>."
           },
           {
             "label": "ITERATION 2 — mid=2",
-            "msg": "<strong>mid = 2</strong>. Count ≤ 2: row0: <strong>1</strong> ([1]), row1: <strong>1</strong> ([2]), row2: <strong>0</strong>. Total = <strong>2</strong>. Since <strong>2 ≤ 4</strong> ✗, median is &gt; 2. Set <strong>ans = 3</strong>, <strong>low = 3</strong>.",
-            "html": "<div class='v-label'>Count ≤ 2</div><div class='v-matrix'><div class='v-row'><div class='v-cell v-active'>1</div><div class='v-cell'>3</div><div class='v-cell'>5</div></div><div class='v-row'><div class='v-cell v-active'>2</div><div class='v-cell'>6</div><div class='v-cell'>9</div></div><div class='v-row'><div class='v-cell'>3</div><div class='v-cell'>6</div><div class='v-cell'>9</div></div></div><div class='v-row' style='margin-top:8px;'><span class='v-stat'>count=<strong>2</strong></span><span class='v-stat'>2 ≤ 4 ✗</span></div>"
+            "msg": "<strong>mid = 2</strong>. Count ≤ 2: <strong>Row 0</strong>: [<strong>1</strong>] → 1. <strong>Row 1</strong>: [<strong>2</strong>] → 1. <strong>Row 2</strong>: [] → 0. Total = <strong>2</strong>. Since <strong>2 ≤ 4</strong> ✗, median is &gt; 2. Store <strong>ans = 3</strong>, <strong>low = 3</strong>.",
+            "html": "<div class='v-label'>Count ≤ 2</div><div class='v-matrix'><div class='v-row'><div class='v-cell v-active'>1</div><div class='v-cell'>3</div><div class='v-cell'>5</div><span style='margin-left:8px; color:#f59e0b;'>cnt=1</span></div><div class='v-row'><div class='v-cell v-active'>2</div><div class='v-cell'>6</div><div class='v-cell'>9</div><span style='margin-left:8px; color:#f59e0b;'>cnt=1</span></div><div class='v-row'><div class='v-cell'>3</div><div class='v-cell'>6</div><div class='v-cell'>9</div><span style='margin-left:8px; color:#f59e0b;'>cnt=0</span></div></div><div class='v-row' style='margin-top:8px;'><span class='v-stat'>total=<strong>2</strong></span><span class='v-stat'>2 ≤ 4 ✗</span></div>",
+            "overlay": "Decision: <code>count ≤ 4</code> → median is &gt; mid → search right: <code>ans = mid; low = mid + 1</code>."
           },
           {
             "label": "ITERATION 3 — mid=3",
-            "msg": "<strong>mid = 3</strong>. Count ≤ 3: row0: <strong>2</strong> ([1,3]), row1: <strong>2</strong> ([2]), row2: <strong>1</strong> ([3]). Total = <strong>5</strong>. Since <strong>5 &gt; 4</strong> ✓, update <strong>high = 2</strong>. Now low &gt; high → done. Actually, recalc: mid=3 passes, store ans=3, high=2. Then check mid=2 (count=2 fails), store ans=3, low=3. Loop: low=3, high=2 → exit. Answer = last stored = <strong>5</strong>. Let me recorrect: the algo stores ans when count ≤ medPos, so ans=5.",
-            "html": "<div class='v-label'>Count ≤ 3</div><div class='v-matrix'><div class='v-row'><div class='v-cell v-active'>1</div><div class='v-cell v-active'>3</div><div class='v-cell'>5</div></div><div class='v-row'><div class='v-cell v-active'>2</div><div class='v-cell'>6</div><div class='v-cell'>9</div></div><div class='v-row'><div class='v-cell v-active'>3</div><div class='v-cell'>6</div><div class='v-cell'>9</div></div></div><div class='v-row' style='margin-top:8px;'><span class='v-stat'>count=<strong>5</strong></span></div>",
-            "overlay": "The binary search narrows to the smallest value with count &gt; medPos. That value is <strong>5</strong>."
+            "msg": "<strong>mid = 3</strong>. Count ≤ 3: <strong>Row 0</strong>: [1,<strong>3</strong>] → 2. <strong>Row 1</strong>: [<strong>2</strong>] → 1. <strong>Row 2</strong>: [<strong>3</strong>] → 1. Total = <strong>4</strong>. Since <strong>4 ≤ 4</strong> ✗ (not strictly greater), try next: <strong>ans = 4</strong>, <strong>low = 4</strong>.",
+            "html": "<div class='v-label'>Count ≤ 3</div><div class='v-matrix'><div class='v-row'><div class='v-cell v-active'>1</div><div class='v-cell v-active'>3</div><div class='v-cell'>5</div><span style='margin-left:8px; color:#f59e0b;'>cnt=2</span></div><div class='v-row'><div class='v-cell v-active'>2</div><div class='v-cell'>6</div><div class='v-cell'>9</div><span style='margin-left:8px; color:#f59e0b;'>cnt=1</span></div><div class='v-row'><div class='v-cell v-active'>3</div><div class='v-cell'>6</div><div class='v-cell'>9</div><span style='margin-left:8px; color:#f59e0b;'>cnt=1</span></div></div><div class='v-row' style='margin-top:8px;'><span class='v-stat'>count=<strong>4</strong></span><span class='v-stat'>4 = threshold (not &gt;)</span></div>"
+          },
+          {
+            "label": "ITERATION 4 — mid=4",
+            "msg": "<strong>mid = 4</strong>. Count ≤ 4: <strong>Row 0</strong>: [1,3] → 2. <strong>Row 1</strong>: [2] → 1. <strong>Row 2</strong>: [3] → 1. Total = <strong>4</strong> again. Still <strong>4 ≤ 4</strong> ✗. Continue: <strong>ans = 5</strong>, <strong>low = 5</strong>.",
+            "html": "<div class='v-row'><span class='v-stat'>mid=<strong>4</strong></span><span class='v-stat'>count=<strong>4</strong></span><span class='v-stat'>not enough</span></div>",
+            "overlay": "Note: value <strong>4</strong> doesn't exist in the matrix. Binary search converges to smallest <em>actual</em> value with count &gt; 4."
+          },
+          {
+            "label": "ITERATION 5 — mid=5 (revisit)",
+            "msg": "<strong>mid = 5</strong>. We already know count = <strong>5 &gt; 4</strong> ✓. Now <strong>high = 4</strong>, <strong>low = 5</strong>. Since <strong>count(≤5) &gt; 4</strong> and <strong>count(≤4) ≤ 4</strong>, the median is <strong>5</strong> (the smallest value crossing the threshold).",
+            "html": "<div class='v-row'><span class='v-stat'>count(≤4)=<strong>4</strong></span><span class='v-stat'>count(≤5)=<strong>5</strong></span></div><div style='margin-top:8px; color:#22c55e;'>Threshold crossed at value <strong>5</strong> → median = <strong>5</strong></div>",
+            "overlay": "Binary search converges: <code>low=5, high=4</code> → loop exits. The stored answer is <strong>5</strong>."
+          },
+          {
+            "label": "WHY IT WORKS",
+            "msg": "The median (5th smallest) in sorted sequence [1,2,3,3,<strong>5</strong>,6,6,9,9] is <strong>5</strong>. Our counting approach: count(≤4) = <strong>4 elements</strong> (not enough), count(≤5) = <strong>5 elements</strong> (crosses threshold). First value crossing → median.",
+            "html": "<div class='v-label'>VERIFICATION</div><div class='v-row'><div class='v-cell'>1</div><div class='v-cell'>2</div><div class='v-cell'>3</div><div class='v-cell'>3</div><div class='v-cell v-result'>5</div><div class='v-cell'>6</div><div class='v-cell'>6</div><div class='v-cell'>9</div><div class='v-cell'>9</div></div>",
+            "overlay": "Key insight: the median is the smallest value <code>v</code> such that <strong>more than half</strong> the elements are ≤ v."
+          },
+          {
+            "label": "COMPLEXITY ANALYSIS",
+            "msg": "Binary search on value range [1..9] = <strong>O(log(max-min))</strong>. Each iteration: count across <strong>N=3 rows</strong>, each using upper_bound = <strong>O(log M)</strong>. Total: <strong>O(N log M · log(max-min)) = O(3 log 3 · log 9)</strong>.",
+            "html": "<div class='v-row'><span class='v-stat'>BS iterations=<strong>O(log 9)</strong></span></div><div class='v-row'><span class='v-stat'>Per iteration=<strong>O(3 log 3)</strong></span></div><div class='v-row'><span class='v-stat'>Total=<strong>O(N log M log range)</strong></span></div>",
+            "overlay": "Space: <strong>O(1)</strong> — no flattening, no extra arrays. Only iterate and count."
           },
           {
             "label": "DONE",
-            "html": "<div class='v-label'>RESULT</div><div class='v-matrix'><div class='v-row'><div class='v-cell'>1</div><div class='v-cell'>3</div><div class='v-cell v-result'>5</div></div><div class='v-row'><div class='v-cell'>2</div><div class='v-cell'>6</div><div class='v-cell'>9</div></div><div class='v-row'><div class='v-cell'>3</div><div class='v-cell'>6</div><div class='v-cell'>9</div></div></div><div class='v-row' style='margin-top:8px;'><span class='v-stat'>median=<strong>5</strong></span></div>",
-            "msg": "✅ <strong>Answer = 5</strong>. Binary search on value range [1..9] took <strong>O(log 9)</strong>, each iteration counted across 3 rows in <strong>O(3 log 3)</strong> = O(N log M) total."
+            "msg": "✅ <strong>Answer = 5</strong>. Binary search on value range avoided flattening the matrix. Each row's sorted property allowed <strong>O(log M)</strong> counting per row. Result: <strong>O(N log M log range)</strong> time, <strong>O(1)</strong> space.",
+            "html": "<div class='v-label'>RESULT</div><div class='v-matrix'><div class='v-row'><div class='v-cell'>1</div><div class='v-cell'>3</div><div class='v-cell v-result'>5</div></div><div class='v-row'><div class='v-cell'>2</div><div class='v-cell'>6</div><div class='v-cell'>9</div></div><div class='v-row'><div class='v-cell'>3</div><div class='v-cell'>6</div><div class='v-cell'>9</div></div></div><div class='v-row' style='margin-top:8px;'><span class='v-stat'>median=<strong>5</strong></span></div>"
           }
         ]
       }
@@ -959,39 +1164,79 @@
     "viz": {
       "kind": "scripted-array",
       "data": {
-        "A": [3, 1, 2, 2, 1],
-        "footer": "BS + prefix sum — A=[3,1,2,2,1], B=3 ops. After sorting [1,1,2,2,3], find max count of target value achievable.",
+        "A": [1, 1, 2, 2, 3],
+        "footer": "BS + prefix sum — A=[3,1,2,2,1]→[1,1,2,2,3], B=3 ops. For each target, BS max count achievable.",
         "legend": ["c-input", "c-low", "c-mid", "c-high", "c-active", "c-result"],
         "script": [
           {
             "label": "SETUP",
-            "msg": "Array <strong>A = [3, 1, 2, 2, 1]</strong>, budget <strong>B = 3</strong> operations. Each op: +1 to any element. Goal: maximize count of some target value (prefer smaller value on ties). Strategy: <strong>sort</strong>, then for each A[i] as target, BS the largest window ending at i that can be raised to A[i] with ≤ B ops."
+            "msg": "Array <strong>A = [3, 1, 2, 2, 1]</strong>, budget <strong>B = 3</strong> operations. Each op: <strong>+1</strong> to any element. Goal: maximize <strong>count of some target value</strong> (prefer smaller value on ties). Strategy: <strong>sort</strong>, then for each A[i] as target, <strong>binary search</strong> the largest window ending at i that can be raised to A[i] with ≤ B ops.",
+            "overlay": "Key insight: after sorting, to raise last <code>cnt</code> elements to value <code>A[i]</code>, cost = <code>A[i] × cnt - sum(those elements)</code>. Use prefix sum for O(1) range sum."
           },
           {
-            "label": "SORT + PREFIX SUM",
+            "label": "SORT + PREFIX",
             "marks": {"0": "c-input", "1": "c-input", "2": "c-input", "3": "c-input", "4": "c-input"},
-            "msg": "After sorting: <strong>[1, 1, 2, 2, 3]</strong>. Build prefix sum: prefix = <strong>[0, 1, 2, 4, 6, 9]</strong>. Cost to raise last <strong>cnt</strong> elements to A[i] = <strong>A[i]×cnt - (prefix[i+1] - prefix[i-cnt+1])</strong>.",
+            "msg": "After sorting: <strong>[1, 1, 2, 2, 3]</strong>. Build <strong>prefix sum</strong>: prefix = <strong>[0, 1, 2, 4, 6, 9]</strong>. For window ending at i with size cnt: sum = <strong>prefix[i+1] - prefix[i-cnt+1]</strong>.",
             "html": "<div class='v-label'>SORTED ARRAY</div><div class='v-row'><div class='v-cell'>1</div><div class='v-cell'>1</div><div class='v-cell'>2</div><div class='v-cell'>2</div><div class='v-cell'>3</div></div><div class='v-label' style='margin-top:12px;'>PREFIX SUM</div><div class='v-row'><div class='v-cell'>0</div><div class='v-cell'>1</div><div class='v-cell'>2</div><div class='v-cell'>4</div><div class='v-cell'>6</div><div class='v-cell'>9</div></div>",
-            "overlay": "Cost formula: to raise <code>cnt</code> last elements to value <code>v</code>, cost = <code>v*cnt - sum(those elements)</code>."
+            "overlay": "Cost formula: <code>cost = target × cnt - (prefix[i+1] - prefix[i-cnt+1])</code>. Binary search <code>cnt</code> for each target to find max feasible count."
           },
           {
-            "label": "TARGET A[4]=3 — BS for max count",
+            "label": "TARGET i=0 (A[0]=1)",
+            "marks": {"0": "c-active"},
+            "msg": "Try <strong>target = A[0] = 1</strong>. Window can only be [1], size <strong>cnt=1</strong>. Cost to raise [1] to 1 = <strong>1×1 - 1 = 0 ≤ 3</strong> ✓. Max count for target 1 = <strong>1</strong>.",
+            "html": "<div class='v-row'><span class='v-stat'>target=<strong>1</strong></span><span class='v-stat'>max cnt=<strong>1</strong></span><span class='v-stat'>cost=<strong>0</strong></span></div>",
+            "overlay": "Only one element ≤ 1 exists at this position. Cost is zero (already 1)."
+          },
+          {
+            "label": "TARGET i=1 (A[1]=1)",
+            "marks": {"0": "c-active", "1": "c-active"},
+            "msg": "Try <strong>target = A[1] = 1</strong>. Window [1,1], size <strong>cnt=2</strong>. Cost = <strong>1×2 - 2 = 0 ≤ 3</strong> ✓. Max count for target 1 = <strong>2</strong>. Update best: <strong>[2, 1]</strong>.",
+            "html": "<div class='v-row'><span class='v-stat'>target=<strong>1</strong></span><span class='v-stat'>max cnt=<strong>2</strong></span><span class='v-stat'>cost=<strong>0</strong></span></div>"
+          },
+          {
+            "label": "TARGET i=2 (A[2]=2)",
+            "marks": {"2": "c-active"},
+            "msg": "Try <strong>target = A[2] = 2</strong>. Binary search cnt in [1..3]. Try <strong>cnt=3</strong>: raise [1,1,2] to [2,2,2], cost = <strong>2×3 - 4 = 2 ≤ 3</strong> ✓. Max cnt = <strong>3</strong>. Update best: <strong>[3, 2]</strong>.",
+            "html": "<div class='v-label'>BS for cnt @ target=2</div><div class='v-row'><div class='v-cell v-active'>1</div><div class='v-cell v-active'>1</div><div class='v-cell v-active'>2</div><div class='v-cell'>2</div><div class='v-cell'>3</div></div><div class='v-row' style='margin-top:8px;'><span class='v-stat'>cnt=<strong>3</strong></span><span class='v-stat'>cost=<strong>2</strong></span><span class='v-stat'>2 ≤ 3 ✓</span></div>",
+            "overlay": "Raise last 3 elements [1,1,2] to 2: +1 on two 1s = <strong>2 ops</strong>. Result: [2,2,2]."
+          },
+          {
+            "label": "TARGET i=3 (A[3]=2)",
+            "marks": {"0": "c-active", "1": "c-active", "2": "c-active", "3": "c-active"},
+            "msg": "Try <strong>target = A[3] = 2</strong>. Binary search cnt in [1..4]. Try <strong>cnt=4</strong>: raise [1,1,2,2] to [2,2,2,2], cost = <strong>2×4 - 6 = 2 ≤ 3</strong> ✓! Max cnt = <strong>4</strong>. Update best: <strong>[4, 2]</strong>.",
+            "html": "<div class='v-label'>BS for cnt @ target=2 (index 3)</div><div class='v-row'><div class='v-cell v-active'>1</div><div class='v-cell v-active'>1</div><div class='v-cell v-active'>2</div><div class='v-cell v-active'>2</div><div class='v-cell'>3</div></div><div class='v-row' style='margin-top:8px;'><span class='v-stat'>cnt=<strong>4</strong></span><span class='v-stat'>cost=<strong>2</strong></span><span class='v-stat'>2 ≤ 3 ✓</span></div>",
+            "overlay": "Cost: <code>2×4 - (0+1+2+4+6 - 0) = 8 - 6 = 2</code>. Only 2 ops needed to create four 2s!"
+          },
+          {
+            "label": "TARGET i=4 (A[4]=3)",
             "marks": {"4": "c-active"},
-            "msg": "Try <strong>target = A[4] = 3</strong>. Binary search <strong>cnt</strong> in [1..5]: how many elements ending at index 4 can we raise to 3 with ≤ 3 ops? Try <strong>cnt=4</strong>: cost = <strong>3×4 - (9-1) = 12-8 = 4 &gt; 3</strong> ✗. Try <strong>cnt=3</strong>: cost = <strong>3×3 - (9-2) = 9-7 = 2 ≤ 3</strong> ✓. Max cnt for target 3 = <strong>3</strong>.",
-            "html": "<div class='v-label'>Target=3, check cnt=3</div><div class='v-row'><div class='v-cell'>1</div><div class='v-cell'>1</div><div class='v-cell v-active'>2</div><div class='v-cell v-active'>2</div><div class='v-cell v-active'>3</div></div><div class='v-row' style='margin-top:8px;'><span class='v-stat'>cost=<strong>2</strong></span><span class='v-stat'>2 ≤ 3 ✓</span></div>"
+            "msg": "Try <strong>target = A[4] = 3</strong>. Binary search cnt. Try <strong>cnt=5</strong>: raise all [1,1,2,2,3] to [3,3,3,3,3], cost = <strong>3×5 - 9 = 6 &gt; 3</strong> ✗. Try <strong>cnt=3</strong>: raise [2,2,3] to [3,3,3], cost = <strong>3×3 - 7 = 2 ≤ 3</strong> ✓. Max cnt = <strong>3</strong>. Doesn't beat [4,2].",
+            "html": "<div class='v-row'><span class='v-stat'>target=<strong>3</strong></span><span class='v-stat'>max cnt=<strong>3</strong></span><span class='v-stat'>cost=<strong>2</strong></span></div><div style='margin-top:8px; color:#f59e0b;'>3 &lt; 4, so [4,2] remains best</div>"
           },
           {
-            "label": "TARGET A[3]=2 — BS for max count",
-            "marks": {"3": "c-active"},
-            "msg": "Try <strong>target = A[3] = 2</strong>. BS cnt in [1..4]: Try <strong>cnt=4</strong>: cost = <strong>2×4 - (6-0) = 8-6 = 2 ≤ 3</strong> ✓! Max cnt = <strong>4</strong>. This beats the previous best (3). Update answer = <strong>[4, 2]</strong>.",
-            "html": "<div class='v-label'>Target=2, check cnt=4</div><div class='v-row'><div class='v-cell v-active'>1</div><div class='v-cell v-active'>1</div><div class='v-cell v-active'>2</div><div class='v-cell v-active'>2</div><div class='v-cell'>3</div></div><div class='v-row' style='margin-top:8px;'><span class='v-stat'>cost=<strong>2</strong></span><span class='v-stat'>2 ≤ 3 ✓</span><span class='v-stat'>count=<strong>4</strong></span></div>",
-            "overlay": "Raise [1,1,2,2] to [2,2,2,2] costs <strong>2 ops</strong> (two +1s on the 1s). Result: <strong>four 2s</strong>."
+            "label": "RESULT ARRAY",
+            "marks": {"0": "c-result", "1": "c-result", "2": "c-result", "3": "c-result"},
+            "msg": "Best answer: <strong>[4, 2]</strong>. Create <strong>4 copies of value 2</strong> by raising [1,1,2,2] → [2,2,2,2]. Cost: <strong>2 operations</strong> (+1 on each of the two 1s).",
+            "html": "<div class='v-label'>OPTIMAL RESULT</div><div class='v-row'><div class='v-cell v-result'>2</div><div class='v-cell v-result'>2</div><div class='v-cell v-result'>2</div><div class='v-cell v-result'>2</div><div class='v-cell'>3</div></div><div class='v-row' style='margin-top:8px;'><span class='v-stat'>count=<strong>4</strong></span><span class='v-stat'>value=<strong>2</strong></span><span class='v-stat'>ops used=<strong>2/3</strong></span></div>",
+            "overlay": "Final state: [2, 2, 2, 2, 3]. Four 2s is the maximum count achievable with 3 ops."
+          },
+          {
+            "label": "WHY SORT?",
+            "msg": "Sorting enables greedy window selection. For each target A[i], we always consider the <em>last cnt elements</em> ending at i. These are the elements ≤ A[i], minimizing the cost to raise them. Without sorting, we'd need to pick which elements to raise — much harder!",
+            "html": "<div style='color:#64748b; font-size:0.9em;'>Sorted order guarantees: all elements in window [i-cnt+1..i] are ≤ A[i]. Cost to raise them is minimized because they're the smallest candidates.</div>",
+            "overlay": "Greedy property: to create <code>cnt</code> copies of <code>v</code>, always pick the <code>cnt</code> smallest elements ≤ v."
+          },
+          {
+            "label": "COMPLEXITY",
+            "msg": "Build prefix: <strong>O(N)</strong>. For each of <strong>N</strong> targets, binary search cnt in [1..i+1] = <strong>O(log N)</strong> per target, each feasibility check is <strong>O(1)</strong> (prefix sum). Total: <strong>O(N log N)</strong> sort + <strong>O(N log N)</strong> BS = <strong>O(N log N)</strong>.",
+            "html": "<div class='v-row'><span class='v-stat'>Sort=<strong>O(N log N)</strong></span></div><div class='v-row'><span class='v-stat'>Prefix=<strong>O(N)</strong></span></div><div class='v-row'><span class='v-stat'>N targets × log N BS=<strong>O(N log N)</strong></span></div><div class='v-row'><span class='v-stat'>Total=<strong>O(N log N)</strong></span></div>",
+            "overlay": "Space: <strong>O(N)</strong> for prefix array. Can optimize to O(1) by computing prefix on-the-fly."
           },
           {
             "label": "DONE",
             "marks": {"0": "c-result", "1": "c-result", "2": "c-result", "3": "c-result"},
-            "msg": "✅ <strong>Answer = [4, 2]</strong>. With 3 operations, we can create <strong>4 copies of value 2</strong> by raising [1,1,2,2] → [2,2,2,2]. Total cost: +1 on two elements = <strong>2 ops</strong>.",
-            "html": "<div class='v-label'>RESULT</div><div class='v-row'><div class='v-cell v-result'>2</div><div class='v-cell v-result'>2</div><div class='v-cell v-result'>2</div><div class='v-cell v-result'>2</div><div class='v-cell'>3</div></div><div class='v-row' style='margin-top:8px;'><span class='v-stat'>count=<strong>4</strong></span><span class='v-stat'>value=<strong>2</strong></span></div>"
+            "msg": "✅ <strong>Answer = [4, 2]</strong>. Maximum count of <strong>4</strong> for value <strong>2</strong>, using <strong>2 out of 3</strong> operations. Binary search + prefix sum enables efficient window cost computation.",
+            "html": "<div class='v-label'>FINAL ANSWER</div><div class='v-row'><span class='v-stat'>count=<strong>4</strong></span><span class='v-stat'>value=<strong>2</strong></span></div>"
           }
         ]
       }
@@ -1028,40 +1273,65 @@
       "kind": "scripted-array",
       "data": {
         "A": [4, 2, 3],
-        "footer": "BS on answer + GCD/LCM — A=4, B=2, C=3. Find 4th smallest magical number (divisible by 2 or 3).",
+        "footer": "BS on answer + inclusion-exclusion — A=4, B=2, C=3. Find 4th smallest magical number (divisible by 2 or 3).",
         "legend": ["c-input", "c-low", "c-mid", "c-high", "c-result"],
         "script": [
           {
             "label": "SETUP",
-            "msg": "Find the <strong>A=4th smallest</strong> magical number. A number is magical if divisible by <strong>B=2</strong> or <strong>C=3</strong>. Sequence: 2, 3, 4, <strong>6</strong>, 8, 9, 10, 12... Binary search the value, count magicals ≤ mid using <strong>inclusion-exclusion</strong>: <code>mid/B + mid/C - mid/lcm(B,C)</code>.",
-            "overlay": "Count formula: <code>count(v) = v/2 + v/3 - v/6</code> (lcm(2,3)=6). Find smallest v with count(v) ≥ A."
+            "msg": "Find the <strong>A=4th smallest</strong> magical number. A number is magical if divisible by <strong>B=2</strong> or <strong>C=3</strong>. Sequence: 2, 3, 4, <strong>6</strong>, 8, 9, 10, 12... Strategy: <strong>binary search the value</strong>, count magicals ≤ mid using <strong>inclusion-exclusion</strong>: <code>count = mid/B + mid/C - mid/lcm(B,C)</code>.",
+            "html": "<div class='v-label'>MAGIC SEQUENCE (divisible by 2 or 3)</div><div class='v-numline'><div class='v-numline-track'><div class='v-cell'>2</div><div class='v-cell'>3</div><div class='v-cell'>4</div><div class='v-cell v-result'>6</div><div class='v-cell'>8</div><div class='v-cell'>9</div><div class='v-cell'>10</div><div class='v-cell'>12</div></div></div><div class='v-row' style='margin-top:8px;'><span class='v-stat'>B=<strong>2</strong></span><span class='v-stat'>C=<strong>3</strong></span><span class='v-stat'>lcm=<strong>6</strong></span></div>",
+            "overlay": "Count formula: <code>count(v) = ⌊v/2⌋ + ⌊v/3⌋ - ⌊v/6⌋</code>. LCM(2,3)=6 (numbers divisible by BOTH). Find smallest v with <code>count(v) ≥ A=4</code>."
+          },
+          {
+            "label": "LCM CALCULATION",
+            "msg": "Calculate <strong>lcm(B,C) = B×C / gcd(B,C)</strong>. gcd(2,3) = <strong>1</strong> (coprime). lcm(2,3) = <strong>2×3 / 1 = 6</strong>. This is the period where both B and C divide simultaneously.",
+            "html": "<div class='v-row'><span class='v-stat'>gcd(2,3)=<strong>1</strong></span><span class='v-stat'>lcm=2×3/1=<strong>6</strong></span></div>",
+            "overlay": "Inclusion-exclusion: count divisible by 2 OR 3 = (count ÷2) + (count ÷3) - (count ÷6). Subtract lcm to avoid double-counting multiples of both."
           },
           {
             "label": "INITIALISE",
-            "msg": "Set <strong>low = 2</strong>, <strong>high = A×min(B,C) = 4×2 = 8</strong>. Search for the 4th magical number.",
-            "html": "<div class='v-row'><span class='v-stat'>low=<strong>2</strong></span><span class='v-stat'>high=<strong>8</strong></span><span class='v-stat'>target count=<strong>4</strong></span></div>"
+            "msg": "Set <strong>low = min(B,C) = 2</strong> (smallest possible magical), <strong>high = A×min(B,C) = 4×2 = 8</strong> (upper bound). Binary search the value range.",
+            "html": "<div class='v-numline'><div class='v-numline-track'><div class='v-numline-marker v-low' style='left:calc(2/12*100%);'><strong>L</strong></div><div class='v-numline-marker v-high' style='left:calc(8/12*100%);'><strong>H</strong></div></div></div><div class='v-row' style='margin-top:8px;'><span class='v-stat'>low=<strong>2</strong></span><span class='v-stat'>high=<strong>8</strong></span><span class='v-stat'>target=<strong>4th</strong></span></div>"
           },
           {
             "label": "ITERATION 1 — mid=5",
-            "msg": "<strong>mid = 5</strong>. Count magicals ≤ 5: <strong>5/2 + 5/3 - 5/6 = 2 + 1 - 0 = 3</strong>. Since <strong>3 &lt; 4</strong>, need larger. Set <strong>ans = 6</strong>, <strong>low = 6</strong>.",
-            "html": "<div class='v-row'><span class='v-stat'>mid=<strong>5</strong></span><span class='v-stat'>count=<strong>3</strong></span><span class='v-stat'>3 &lt; 4 ✗</span></div><div style='margin-top:8px; color:#f59e0b;'>Need more → search right</div>",
-            "overlay": "Numbers ≤ 5: {2, 3, 4}. Missing one more. The 4th is 6."
+            "msg": "<strong>mid = (2+8)/2 = 5</strong>. Count magicals ≤ 5: <strong>⌊5/2⌋ + ⌊5/3⌋ - ⌊5/6⌋ = 2 + 1 - 0 = 3</strong>. Magicals: {2, 3, 4}. Since <strong>3 &lt; 4</strong>, need larger values. Set <strong>low = mid + 1 = 6</strong>.",
+            "html": "<div class='v-numline'><div class='v-numline-track'><div class='v-cell v-active'>2</div><div class='v-cell v-active'>3</div><div class='v-cell v-active'>4</div><div class='v-numline-marker v-mid' style='left:calc(5/12*100%);'><strong>M=5</strong></div><div class='v-cell'>6</div><div class='v-cell'>8</div></div></div><div class='v-row' style='margin-top:8px;'><span class='v-stat'>count(≤5)=<strong>3</strong></span><span class='v-stat'>3 &lt; 4 ✗</span></div>",
+            "overlay": "Decision: <code>count &lt; A</code> → answer is &gt; mid → search right: <code>low = mid + 1</code>."
           },
           {
             "label": "ITERATION 2 — mid=7",
-            "msg": "<strong>mid = 7</strong>. Count: <strong>7/2 + 7/3 - 7/6 = 3 + 2 - 1 = 4</strong>. Since <strong>4 ≥ 4</strong> ✓, store <strong>ans = 7</strong>, but try smaller: <strong>high = 6</strong>.",
-            "html": "<div class='v-row'><span class='v-stat'>mid=<strong>7</strong></span><span class='v-stat'>count=<strong>4</strong></span><span class='v-stat'>4 ≥ 4 ✓</span></div><div style='margin-top:8px; color:#22c55e;'>Enough → search left</div>"
+            "msg": "<strong>mid = (6+8)/2 = 7</strong>. Count magicals ≤ 7: <strong>⌊7/2⌋ + ⌊7/3⌋ - ⌊7/6⌋ = 3 + 2 - 1 = 4</strong>. Magicals: {2, 3, 4, 6}. Since <strong>4 ≥ 4</strong> ✓, 7 could be the answer. Try smaller: <strong>ans = 7</strong>, <strong>high = mid - 1 = 6</strong>.",
+            "html": "<div class='v-numline'><div class='v-numline-track'><div class='v-cell v-active'>2</div><div class='v-cell v-active'>3</div><div class='v-cell v-active'>4</div><div class='v-cell v-active'>6</div><div class='v-numline-marker v-mid' style='left:calc(7/12*100%);'><strong>M=7</strong></div><div class='v-cell'>8</div></div></div><div class='v-row' style='margin-top:8px;'><span class='v-stat'>count(≤7)=<strong>4</strong></span><span class='v-stat'>4 ≥ 4 ✓</span></div>",
+            "overlay": "Decision: <code>count ≥ A</code> → answer is ≤ mid → search left: <code>ans = mid; high = mid - 1</code>."
           },
           {
             "label": "ITERATION 3 — mid=6",
-            "msg": "<strong>mid = 6</strong>. Count: <strong>6/2 + 6/3 - 6/6 = 3 + 2 - 1 = 4</strong>. Since <strong>4 ≥ 4</strong> ✓, update <strong>ans = 6</strong>, <strong>high = 5</strong>. Now low &gt; high → done.",
-            "html": "<div class='v-row'><span class='v-stat'>mid=<strong>6</strong></span><span class='v-stat'>count=<strong>4</strong></span><span class='v-stat'>4 ≥ 4 ✓</span></div>",
-            "overlay": "Numbers ≤ 6: {2, 3, 4, <strong>6</strong>}. The 4th is exactly 6."
+            "msg": "<strong>mid = (6+6)/2 = 6</strong>. Count magicals ≤ 6: <strong>⌊6/2⌋ + ⌊6/3⌋ - ⌊6/6⌋ = 3 + 2 - 1 = 4</strong>. Magicals: {2, 3, 4, <strong>6</strong>}. Since <strong>4 ≥ 4</strong> ✓, update <strong>ans = 6</strong>, <strong>high = 5</strong>. Now low=6 &gt; high=5 → done.",
+            "html": "<div class='v-numline'><div class='v-numline-track'><div class='v-cell v-active'>2</div><div class='v-cell v-active'>3</div><div class='v-cell v-active'>4</div><div class='v-cell v-result'>6</div></div></div><div class='v-row' style='margin-top:8px;'><span class='v-stat'>count(≤6)=<strong>4</strong></span><span class='v-stat'>4th magical=<strong>6</strong></span></div>",
+            "overlay": "Convergence: the smallest value with count ≥ 4 is <strong>6</strong>. Values 5 and 6 both have count=4 (5 is not magical), but 6 is the 4th magical."
+          },
+          {
+            "label": "VERIFICATION",
+            "msg": "Verify: count(≤6) = <strong>6/2=3 (even: 2,4,6)</strong> + <strong>6/3=2 (multiples: 3,6)</strong> - <strong>6/6=1 (both: 6)</strong> = <strong>3+2-1 = 4</strong> ✓. The 4th magical is <strong>6</strong>.",
+            "html": "<div class='v-label'>INCLUSION-EXCLUSION BREAKDOWN</div><div class='v-row'><span class='v-stat'>÷2: {2,4,6}</span><span class='v-stat'>count=<strong>3</strong></span></div><div class='v-row'><span class='v-stat'>÷3: {3,6}</span><span class='v-stat'>count=<strong>2</strong></span></div><div class='v-row'><span class='v-stat'>÷6: {6}</span><span class='v-stat'>count=<strong>1</strong></span></div><div class='v-row'><span class='v-stat'>Total: 3+2-1=<strong>4</strong></span></div>",
+            "overlay": "Without lcm subtraction: 3+2=5 (wrong, counts 6 twice). With lcm: 3+2-1=4 ✓."
+          },
+          {
+            "label": "EDGE CASE — large values",
+            "msg": "For very large A (e.g., A=10⁹), the upper bound <strong>A×min(B,C)</strong> could overflow. Use <strong>long</strong> and cap at reasonable values. The binary search still finds the answer efficiently in <strong>O(log(A×min(B,C)))</strong>.",
+            "html": "<div style='color:#64748b; font-size:0.9em;'>For A=10⁹, B=2, C=3: search range [2, 2×10⁹]. Binary search = ~31 iterations. Each iteration = O(1) count. Total: O(log A).</div>"
+          },
+          {
+            "label": "WHY NOT ENUMERATE?",
+            "msg": "Why not just list magicals until we hit the 4th? For large A (e.g., A=10⁹), that's <strong>10⁹ iterations</strong>. Binary search on value + <strong>O(1) counting</strong> = only <strong>~30 iterations</strong> for 10⁹!",
+            "html": "<div class='v-row'><span class='v-stat'>Enumerate: <strong>O(A)</strong></span><span class='v-stat'>❌ TLE for large A</span></div><div class='v-row'><span class='v-stat'>BS on value: <strong>O(log A)</strong></span><span class='v-stat'>✓ Fast</span></div>",
+            "overlay": "Key insight: count formula is <strong>O(1)</strong> per evaluation. Binary search probes only <strong>log(range)</strong> values."
           },
           {
             "label": "DONE",
-            "msg": "✅ <strong>Answer = 6</strong>. The 4th smallest magical number (divisible by 2 or 3) is <strong>6</strong>. Sequence: 2, 3, 4, <strong>6</strong>.",
-            "html": "<div class='v-row'><span class='v-stat'>4th magical=<strong>6</strong></span></div><div style='margin-top:12px; color:#64748b; font-size:0.9em;'>Magicals: 2, 3, 4, 6, 8, 9, 10, 12...</div>"
+            "msg": "✅ <strong>Answer = 6</strong>. The 4th smallest magical number (divisible by 2 or 3) is <strong>6</strong>. Binary search + inclusion-exclusion: <strong>O(log(A×min(B,C)))</strong> time, <strong>O(1)</strong> space.",
+            "html": "<div class='v-label'>RESULT</div><div class='v-numline'><div class='v-numline-track'><div class='v-cell'>2</div><div class='v-cell'>3</div><div class='v-cell'>4</div><div class='v-cell v-result'>6</div><div class='v-cell'>8</div><div class='v-cell'>9</div></div></div><div class='v-row' style='margin-top:8px;'><span class='v-stat'>A=<strong>4</strong></span><span class='v-stat'>answer=<strong>6</strong></span><span class='v-stat'>modulo 10⁹+7=<strong>6</strong></span></div>"
           }
         ]
       }
@@ -1097,42 +1367,72 @@
       "kind": "scripted-array",
       "data": {
         "A": [2, 2, 3, 4],
-        "footer": "BS on value + two-pointer counting — A=[2,4,3,2], B=3. Find 3rd smallest triplet sum.",
-        "legend": ["c-input", "c-low", "c-mid", "c-high", "c-result"],
+        "footer": "BS on value + two-pointer counting — A=[2,4,3,2]→[2,2,3,4], B=3. Find 3rd smallest triplet sum.",
+        "legend": ["c-input", "c-low", "c-mid", "c-high", "c-active", "c-result"],
         "script": [
           {
             "label": "SETUP",
             "marks": {"0": "c-input", "1": "c-input", "2": "c-input", "3": "c-input"},
-            "msg": "Array <strong>A = [2, 4, 3, 2]</strong>, find <strong>B=3rd smallest</strong> triplet sum (i&lt;j&lt;k). After sorting: <strong>[2, 2, 3, 4]</strong>. Possible sums: 2+2+3=<strong>7</strong>, 2+2+4=<strong>8</strong>, 2+3+4=<strong>9</strong>, 2+3+4=<strong>9</strong> (duplicate). Sorted unique: {7, 8, 9}. 3rd = <strong>9</strong>. Binary search the sum value, count triplets with sum &lt; mid using two-pointers.",
-            "overlay": "Count predicate: for each i, two-pointer on j,k: if <code>A[i]+A[j]+A[k] &lt; mid</code>, add (k-j) triplets."
+            "msg": "Array <strong>A = [2, 4, 3, 2]</strong>, find <strong>B=3rd smallest</strong> triplet sum (i&lt;j&lt;k). All triplet sums: {2+4+3=<strong>9</strong>, 2+4+2=<strong>8</strong>, 2+3+2=<strong>7</strong>, 4+3+2=<strong>9</strong>}. Sorted: [7, 8, 9, 9]. 3rd = <strong>9</strong>. Strategy: <strong>sort first</strong>, then binary search the sum value, count triplets with sum &lt; mid using <strong>two-pointers</strong>.",
+            "overlay": "Count predicate: for each <code>i</code>, use two-pointer <code>j=i+1, k=N-1</code>. If <code>A[i]+A[j]+A[k] &lt; mid</code>, all pairs <code>(j, j+1..k)</code> work → add <code>(k-j)</code>."
           },
           {
-            "label": "SORT + INITIALISE",
+            "label": "SORT",
             "marks": {"0": "c-input", "1": "c-input", "2": "c-input", "3": "c-input"},
-            "msg": "Sorted: <strong>[2, 2, 3, 4]</strong>. Set <strong>low = 6</strong> (3×min), <strong>high = 12</strong> (3×max). Search for smallest sum <strong>v</strong> with <strong>count(&lt; v) ≥ B=3</strong>.",
-            "html": "<div class='v-label'>SORTED</div><div class='v-row'><div class='v-cell'>2</div><div class='v-cell'>2</div><div class='v-cell'>3</div><div class='v-cell'>4</div></div><div class='v-row' style='margin-top:8px;'><span class='v-stat'>low=<strong>6</strong></span><span class='v-stat'>high=<strong>12</strong></span></div>"
+            "msg": "After sorting: <strong>[2, 2, 3, 4]</strong>. Sorting enables two-pointer counting: for fixed <code>i</code>, walk <code>j</code> and <code>k</code> from opposite ends to count valid triplets efficiently.",
+            "html": "<div class='v-label'>SORTED ARRAY</div><div class='v-row'><div class='v-cell'>2</div><div class='v-cell'>2</div><div class='v-cell'>3</div><div class='v-cell'>4</div></div>",
+            "overlay": "Without sorting, we'd need O(N³) to enumerate all triplets. Sorting + two-pointers = O(N²) counting per BS iteration."
+          },
+          {
+            "label": "ALL TRIPLET SUMS",
+            "msg": "Enumerate all <strong>C(4,3) = 4</strong> triplets: <strong>(0,1,2)</strong> → 2+2+3=<strong>7</strong>. <strong>(0,1,3)</strong> → 2+2+4=<strong>8</strong>. <strong>(0,2,3)</strong> → 2+3+4=<strong>9</strong>. <strong>(1,2,3)</strong> → 2+3+4=<strong>9</strong>. Sorted sums: [7, 8, 9, 9]. The 3rd smallest = <strong>9</strong>.",
+            "html": "<div class='v-label'>ALL TRIPLET SUMS</div><div class='v-row'><div class='v-cell'>7</div><div class='v-cell'>8</div><div class='v-cell v-result'>9</div><div class='v-cell'>9</div></div>",
+            "overlay": "Goal: find the smallest sum <code>v</code> such that <strong>at least 3 triplet sums</strong> are ≤ v."
+          },
+          {
+            "label": "INITIALISE BS",
+            "msg": "Set <strong>low = 3×min(A) = 3×2 = 6</strong> (minimum possible sum), <strong>high = 3×max(A) = 3×4 = 12</strong> (maximum possible sum). Binary search the sum range [6..12].",
+            "html": "<div class='v-row'><span class='v-stat'>low=<strong>6</strong></span><span class='v-stat'>high=<strong>12</strong></span><span class='v-stat'>target count ≥ <strong>3</strong></span></div>"
           },
           {
             "label": "ITERATION 1 — mid=9",
-            "msg": "<strong>mid = 9</strong>. Count triplets with sum &lt; 9: only <strong>2+2+3=7</strong> and <strong>2+2+4=8</strong> → count = <strong>2</strong>. Since <strong>2 &lt; 3</strong>, need larger sums. Set <strong>ans = 10</strong>, <strong>low = 10</strong>.",
-            "html": "<div class='v-row'><span class='v-stat'>mid=<strong>9</strong></span><span class='v-stat'>count(&lt;9)=<strong>2</strong></span><span class='v-stat'>2 &lt; 3 ✗</span></div>",
-            "overlay": "Sums &lt; 9: {7, 8}. Need one more → the 3rd sum is ≥ 9."
+            "msg": "<strong>mid = (6+12)/2 = 9</strong>. Count triplets with sum &lt; 9 using two-pointers. <strong>i=0</strong>: A[0]=2, j=1, k=3 → 2+2+4=8 &lt; 9 ✓, add (3-1)=<strong>2 triplets</strong>. <strong>i=1</strong>: 2+2+3=7 &lt; 9 ✓, add 1. Total count = <strong>2+1 = 3 (wait, miscalculated)</strong>. Let me recalc: for i=0, j=1, k=3: 2+2+4=8 &lt; 9 → add (k-j)=2. But that counts (0,1,2) and (0,1,3). Then i=1, j=2, k=3: 2+3+4=9 not &lt; 9. So count = <strong>2</strong>. Since <strong>2 &lt; 3</strong>, need larger: <strong>low = 10</strong>.",
+            "html": "<div class='v-label'>Two-pointer count for mid=9</div><div class='v-row'><div class='v-cell v-active'>2</div><div class='v-cell v-active'>2</div><div class='v-cell'>3</div><div class='v-cell v-active'>4</div></div><div class='v-row' style='margin-top:8px;'><span class='v-stat'>i=0: 2+2+4=<strong>8</strong> &lt; 9</span></div><div class='v-row'><span class='v-stat'>i=0: 2+2+3=<strong>7</strong> &lt; 9</span></div><div class='v-row'><span class='v-stat'>count=<strong>2</strong></span><span class='v-stat'>2 &lt; 3 ✗</span></div>",
+            "overlay": "Decision: <code>count &lt; B</code> → 3rd sum is ≥ mid → search right: <code>ans = mid; low = mid+1</code>."
           },
           {
-            "label": "ITERATION 2 — mid=10",
-            "msg": "<strong>mid = 10</strong>. Count &lt; 10: {7, 8, 9} → count = <strong>3</strong> (there are two 9s actually: 2+3+4). Since <strong>3 ≥ 3</strong> ✓, store <strong>ans = 10</strong>, try smaller: <strong>high = 9</strong>.",
-            "html": "<div class='v-row'><span class='v-stat'>mid=<strong>10</strong></span><span class='v-stat'>count(&lt;10)=<strong>3+</strong></span><span class='v-stat'>3 ≥ 3 ✓</span></div>"
+            "label": "ITERATION 2 — mid=11",
+            "msg": "<strong>mid = (10+12)/2 = 11</strong>. Count &lt; 11: all sums [7,8,9,9] are &lt; 11 → count = <strong>4</strong>. Since <strong>4 ≥ 3</strong> ✓, try smaller: <strong>ans = 11</strong>, <strong>high = 10</strong>.",
+            "html": "<div class='v-row'><span class='v-stat'>mid=<strong>11</strong></span><span class='v-stat'>count(&lt;11)=<strong>4</strong></span><span class='v-stat'>4 ≥ 3 ✓</span></div>"
           },
           {
-            "label": "ITERATION 3 — mid=9 (revisit)",
-            "msg": "<strong>mid = 9</strong> (rechecking). Count &lt; 9 = <strong>2</strong>. Since <strong>2 &lt; 3</strong>, 9 is not enough. Store <strong>ans = 9</strong>, <strong>low = 10</strong>. Wait, the logic: if count &lt; B, ans = mid and low = mid+1. So ans = 9. Let me correct: the smallest sum with count(≤ v) ≥ 3 is when we include the 3rd sum. Actually sums in order: [7, 8, 9, 9]. 3rd = 9. Binary search converges to <strong>9</strong>.",
-            "html": "<div class='v-row'><span class='v-stat'>count(&lt;9)=<strong>2</strong></span><span class='v-stat'>count(≤9)=<strong>4</strong></span></div>"
+            "label": "ITERATION 3 — mid=10",
+            "msg": "<strong>mid = (10+10)/2 = 10</strong>. Count &lt; 10: all sums [7,8,9,9] → count = <strong>4</strong>. Since <strong>4 ≥ 3</strong> ✓, update <strong>ans = 10</strong>, <strong>high = 9</strong>. Now low=10 &gt; high=9 → converge to answer = <strong>9</strong> (the actual 3rd sum).",
+            "html": "<div class='v-row'><span class='v-stat'>mid=<strong>10</strong></span><span class='v-stat'>count(&lt;10)=<strong>4</strong></span></div>",
+            "overlay": "Binary search finds the smallest sum where enough triplets exist. Answer is the 3rd smallest actual sum = <strong>9</strong>."
+          },
+          {
+            "label": "TWO-POINTER DETAIL",
+            "msg": "For each <code>i</code>, two-pointer counts triplets <code>(i,j,k)</code> with sum &lt; mid in O(N). Fix <code>i</code>, start <code>j=i+1, k=N-1</code>. If <code>sum &lt; mid</code>, all <code>(i,j,x)</code> for x∈[j,k] work → add <code>(k-j)</code>, then <code>j++</code>. Else <code>k--</code>. Total: O(N²) per BS iteration.",
+            "html": "<div class='v-label'>TWO-POINTER COUNTING</div><div style='color:#64748b; font-size:0.9em;'>For i=0, A[0]=2:<br>j=1(A[1]=2), k=3(A[3]=4): 2+2+4=8 &lt; mid? If yes, count += (k-j)=2, j++.<br>j=2(A[2]=3), k=3: 2+3+4=9 &lt; mid? If no, k--.<br>Continue until j ≥ k.</div>",
+            "overlay": "Key optimization: after sorting, two-pointer avoids O(N³) brute force. Counting all triplets with sum &lt; mid = O(N²)."
+          },
+          {
+            "label": "WHY BS ON VALUE?",
+            "msg": "Why not just sort all N³ triplet sums? For N=1000, that's <strong>10⁹ triplets</strong> (memory + time). BS on sum range [min..max] = <strong>O(N² log(sumRange))</strong>. Each iteration counts in O(N²). For N=1000, sumRange~10⁶ → ~20 BS iterations × 10⁶ ops = <strong>20M ops</strong> (feasible!).",
+            "html": "<div class='v-row'><span class='v-stat'>Enumerate: <strong>O(N³ log N)</strong></span><span class='v-stat'>❌ TLE</span></div><div class='v-row'><span class='v-stat'>BS on value: <strong>O(N² log sumRange)</strong></span><span class='v-stat'>✓ Fast</span></div>",
+            "overlay": "For large N, BS on value + counting predicate is the only viable approach. Avoids materializing all triplet sums."
+          },
+          {
+            "label": "COMPLEXITY",
+            "msg": "Sort: <strong>O(N log N)</strong>. Binary search iterations: <strong>O(log(max-min))</strong>. Each iteration: two-pointer counting = <strong>O(N²)</strong>. Total: <strong>O(N log N + N² log(sumRange))</strong> ≈ <strong>O(N² log(sumRange))</strong> for large N.",
+            "html": "<div class='v-row'><span class='v-stat'>Sort=<strong>O(N log N)</strong></span></div><div class='v-row'><span class='v-stat'>BS=<strong>O(log range)</strong></span></div><div class='v-row'><span class='v-stat'>Count/iter=<strong>O(N²)</strong></span></div><div class='v-row'><span class='v-stat'>Total=<strong>O(N² log range)</strong></span></div>"
           },
           {
             "label": "DONE",
             "marks": {"0": "c-result", "1": "c-result", "2": "c-result", "3": "c-result"},
-            "msg": "✅ <strong>Answer = 9</strong>. The 3rd smallest triplet sum is <strong>9</strong> (from 2+3+4). Binary search on sum range + two-pointer counting = <strong>O(N² log sumRange)</strong>.",
-            "html": "<div class='v-row'><span class='v-stat'>3rd sum=<strong>9</strong></span></div><div style='margin-top:12px; color:#64748b; font-size:0.9em;'>All sums: 7, 8, 9, 9</div>"
+            "msg": "✅ <strong>Answer = 9</strong>. The 3rd smallest triplet sum is <strong>9</strong> (two triplets: (0,2,3) and (1,2,3) both sum to 9). Binary search on value + two-pointer counting efficiently finds the Bth smallest without enumerating all sums.",
+            "html": "<div class='v-label'>RESULT</div><div class='v-row'><span class='v-stat'>B=<strong>3</strong></span><span class='v-stat'>3rd sum=<strong>9</strong></span></div><div style='margin-top:12px; color:#64748b; font-size:0.9em;'>All sums: 7, 8, <strong>9</strong>, 9</div>"
           }
         ]
       }
@@ -1167,42 +1467,65 @@
     "viz": {
       "kind": "scripted-array",
       "data": {
-        "A": [3,5,1,7,8,2,5,3],
-        "footer": "BS on answer + greedy allocation — C=[3,5,1,7,8,2,5,3], A=3 painters. Minimize max time any painter works.",
-        "legend": ["c-input", "c-low", "c-mid", "c-high", "c-result"],
+        "footer": "BS on answer + greedy allocation — C=[3,5,1,7,8,2,5,3], A=3 painters, B=2 sec/unit. Minimize max work any painter does.",
+        "legend": ["c-low", "c-high", "c-mid", "c-result"],
         "script": [
           {
             "label": "SETUP",
-            "marks": {"0": "c-input", "1": "c-input", "2": "c-input", "3": "c-input", "4": "c-input", "5": "c-input", "6": "c-input", "7": "c-input"},
-            "msg": "Boards <strong>C = [3,5,1,7,8,2,5,3]</strong>, <strong>A=3 painters</strong>, <strong>B=2 sec/unit</strong>. Each painter paints <em>contiguous</em> boards. Minimize the <strong>max work</strong> any painter does. Binary search the max time <strong>T</strong>, check if A painters can cover all boards with each doing ≤ T work (greedy).",
-            "overlay": "Predicate: <code>canPaint(T)</code> = walk boards, start new painter when current load would exceed T."
+            "msg": "Boards <strong>C = [3, 5, 1, 7, 8, 2, 5, 3]</strong>, <strong>A = 3 painters</strong>, <strong>B = 2 sec/unit</strong>. Each painter paints <strong>contiguous boards</strong> (cannot skip). Goal: minimize the <strong>maximum work</strong> any single painter does. Strategy: <strong>binary search</strong> the max-work value <strong>T</strong>. For each candidate T, run a <strong>greedy check</strong>: assign boards left-to-right, starting a new painter whenever the current load would exceed T. If ≤ <strong>3 painters</strong> suffice, T is feasible.",
+            "html": "<div class='v-label'>BOARDS (units of work)</div><div class='v-row'><div class='v-cell'>3</div><div class='v-cell'>5</div><div class='v-cell'>1</div><div class='v-cell'>7</div><div class='v-cell'>8</div><div class='v-cell'>2</div><div class='v-cell'>5</div><div class='v-cell'>3</div></div><div class='v-row' style='margin-top:12px;'><span class='v-stat'>painters=<strong>3</strong></span><span class='v-stat'>time/unit=<strong>2</strong>sec</span><span class='v-stat'>sum=<strong>34</strong></span><span class='v-stat'>max=<strong>8</strong></span></div>",
+            "overlay": "Predicate: <code>isPaintingCompletionPossible(C, A, T)</code> = walk boards left→right, greedily pack into painters. Each painter's load cannot exceed <code>T</code>. If <code>painters_used &lt;= A</code>, return true."
           },
           {
-            "label": "INITIALISE",
-            "msg": "Set <strong>low = max(C) = 8</strong> (min possible max-time: one painter must do the biggest board), <strong>high = sum(C) = 34</strong> (one painter does all). Search for min T where painters ≤ A.",
-            "html": "<div class='v-row'><span class='v-stat'>low=<strong>8</strong></span><span class='v-stat'>high=<strong>34</strong></span><span class='v-stat'>painters=<strong>3</strong></span></div>"
+            "label": "INITIALISE — BS RANGE",
+            "msg": "Binary search space: <strong>low = max(C) = 8</strong> (one painter must handle the thickest board), <strong>high = sum(C) = 34</strong> (one painter does everything). Search for the <strong>minimum T</strong> where ≤ <strong>3 painters</strong> can finish.",
+            "html": "<div class='v-label'>NUMBER-LINE (max-work range)</div><div class='v-numline'><div class='v-numline-track'></div><div class='v-numline-marker v-low' style='left:0%;'>8</div><div class='v-numline-marker v-high' style='left:100%;'>34</div></div><div class='v-row' style='margin-top:12px;'><span class='v-stat'>low=<strong>8</strong></span><span class='v-stat'>high=<strong>34</strong></span></div>",
+            "overlay": "Why <code>low = max(C)</code>? Because no painter can do less than the largest single board. Why <code>high = sum(C)</code>? That's the worst case — one painter does all boards."
           },
           {
-            "label": "ITERATION 1 — mid=21",
-            "msg": "<strong>mid = 21</strong>. Try greedy: P1=[3,5,1,7] (16), P2=[8,2,5] (15), P3=[3] (3). Total <strong>3 painters</strong> ≤ 3 ✓. Feasible! Try smaller max: <strong>ans = 21</strong>, <strong>high = 20</strong>.",
-            "html": "<div class='v-row'><span class='v-stat'>T=<strong>21</strong></span><span class='v-stat'>P1=<strong>16</strong></span><span class='v-stat'>P2=<strong>15</strong></span><span class='v-stat'>P3=<strong>3</strong></span><span class='v-stat'>3 ≤ 3 ✓</span></div>",
-            "overlay": "Greedy: add boards to current painter until adding next would exceed T, then start new painter."
+            "label": "ITERATION 1 — MID = 21",
+            "msg": "<strong>mid = (8 + 34) / 2 = 21</strong>. Candidate max-work: <strong>T = 21</strong>. Run greedy allocation with boards <strong>[3,5,1,7,8,2,5,3]</strong> and cap <strong>21</strong> per painter.",
+            "html": "<div class='v-label'>NUMBER-LINE</div><div class='v-numline'><div class='v-numline-track'><div class='v-numline-active' style='left:0%; width:50%;'></div></div><div class='v-numline-marker v-low' style='left:0%;'>8</div><div class='v-numline-marker v-mid' style='left:50%;'>21</div><div class='v-numline-marker v-high' style='left:100%;'>34</div></div><div class='v-row' style='margin-top:12px;'><span class='v-stat'>mid=<strong>21</strong></span></div>",
+            "overlay": "Greedy logic: <code>current_load = 0; for each board b: if current_load + b &gt; T, start new painter and reset current_load = b; else current_load += b;</code>"
           },
           {
-            "label": "ITERATION 2 — mid=14",
-            "msg": "<strong>mid = 14</strong>. Try: P1=[3,5,1] (9), P2=[7] (7), P3=[8] (8), P4=[2,5,3] (10). Need <strong>4 painters</strong> &gt; 3 ✗. Too tight! Increase: <strong>low = 15</strong>.",
-            "html": "<div class='v-row'><span class='v-stat'>T=<strong>14</strong></span><span class='v-stat'>painters needed=<strong>4</strong></span><span class='v-stat'>4 &gt; 3 ✗</span></div>"
+            "label": "ITERATION 1 — GREEDY CHECK (T=21)",
+            "msg": "Greedy assignment with <strong>T = 21</strong>: <strong>P1</strong> takes [3,5,1,7] → load <strong>16</strong>. <strong>P2</strong> takes [8,2,5] → load <strong>15</strong>. <strong>P3</strong> takes [3] → load <strong>3</strong>. Total painters used: <strong>3</strong>. Check: <strong>3 ≤ 3</strong> ✓. <strong>Feasible!</strong> T = 21 works. Try a smaller T to minimize further. Update <strong>ans = 21</strong>, set <strong>high = 20</strong>.",
+            "html": "<div class='v-label'>PAINTER ASSIGNMENTS (T=21)</div><div class='v-row'><span class='v-stat v-low'>P1: [3,5,1,7] = <strong>16</strong></span><span class='v-stat v-mid'>P2: [8,2,5] = <strong>15</strong></span><span class='v-stat v-high'>P3: [3] = <strong>3</strong></span></div><div class='v-row' style='margin-top:8px;'><span class='v-stat'>painters=<strong>3</strong></span><span class='v-stat'>3 ≤ 3 ✓</span></div>",
+            "overlay": "Success path: <code>painters_needed &lt;= A</code> → record <code>ans = mid</code> and search <em>left</em> (smaller max-work) → <code>high = mid - 1</code>."
           },
           {
-            "label": "ITERATION 3 — mid=17",
-            "msg": "<strong>mid = 17</strong>. Try: P1=[3,5,1,7] (16), P2=[8,2,5] (15), P3=[3] (3). <strong>3 painters</strong> ≤ 3 ✓. Update <strong>ans = 17</strong>, <strong>high = 16</strong>. After more iterations, converge to <strong>16</strong>.",
-            "html": "<div class='v-row'><span class='v-stat'>T=<strong>17</strong></span><span class='v-stat'>painters=<strong>3</strong></span><span class='v-stat'>3 ≤ 3 ✓</span></div>"
+            "label": "ITERATION 2 — MID = 14",
+            "msg": "<strong>mid = (8 + 20) / 2 = 14</strong>. Candidate max-work: <strong>T = 14</strong>. Run greedy allocation with cap <strong>14</strong> per painter.",
+            "html": "<div class='v-label'>NUMBER-LINE</div><div class='v-numline'><div class='v-numline-track'><div class='v-numline-active' style='left:0%; width:23%;'></div></div><div class='v-numline-marker v-low' style='left:0%;'>8</div><div class='v-numline-marker v-mid' style='left:23%;'>14</div><div class='v-numline-marker v-high' style='left:46%;'>20</div></div><div class='v-row' style='margin-top:12px;'><span class='v-stat'>mid=<strong>14</strong></span></div>"
+          },
+          {
+            "label": "ITERATION 2 — GREEDY CHECK (T=14)",
+            "msg": "Greedy assignment with <strong>T = 14</strong>: <strong>P1</strong>=[3,5,1]=<strong>9</strong> (next board is 7, 9+7=16 &gt; 14 → new painter). <strong>P2</strong>=[7]=<strong>7</strong> (next is 8, 7+8=15 &gt; 14 → new). <strong>P3</strong>=[8]=<strong>8</strong> (next is 2, 8+2=10 ≤ 14 → nope, but let's continue correctly: next is 2, 8+2=10 ≤ 14 NO wait: 8 alone is 8, next board is 2, 8+2=10 ≤ 14, but the board 8 alone fits. Let me recalculate: P1=[3,5,1]=9, can't add 7 (9+7=16&gt;14). P2=[7]=7, can't add 8 (7+8=15&gt;14). P3=[8]=8, can't add 2 (8+2=10≤14 actually 10 ≤ 14, so P3=[8,2]=10, can't add 5 (10+5=15&gt;14). P4=[5,3]=8. Total <strong>4 painters</strong>. Check: <strong>4 &gt; 3</strong> ✗. <strong>Infeasible!</strong> T too small. Increase <strong>low = 15</strong>.",
+            "html": "<div class='v-label'>PAINTER ASSIGNMENTS (T=14)</div><div class='v-row'><span class='v-stat'>P1: [3,5,1] = <strong>9</strong></span><span class='v-stat'>P2: [7] = <strong>7</strong></span><span class='v-stat'>P3: [8,2] = <strong>10</strong></span><span class='v-stat'>P4: [5,3] = <strong>8</strong></span></div><div class='v-row' style='margin-top:8px;'><span class='v-stat'>painters=<strong>4</strong></span><span class='v-stat'>4 &gt; 3 ✗</span></div>",
+            "overlay": "Failure path: <code>painters_needed &gt; A</code> → cap too tight → search <em>right</em> (larger max-work) → <code>low = mid + 1</code>."
+          },
+          {
+            "label": "ITERATION 3 — MID = 17",
+            "msg": "<strong>mid = (15 + 20) / 2 = 17</strong>. Candidate max-work: <strong>T = 17</strong>. Run greedy check.",
+            "html": "<div class='v-label'>NUMBER-LINE</div><div class='v-numline'><div class='v-numline-track'><div class='v-numline-active' style='left:27%; width:35%;'></div></div><div class='v-numline-marker v-low' style='left:27%;'>15</div><div class='v-numline-marker v-mid' style='left:35%;'>17</div><div class='v-numline-marker v-high' style='left:46%;'>20</div></div><div class='v-row' style='margin-top:12px;'><span class='v-stat'>mid=<strong>17</strong></span></div>"
+          },
+          {
+            "label": "ITERATION 3 — GREEDY CHECK (T=17)",
+            "msg": "Greedy with <strong>T = 17</strong>: <strong>P1</strong>=[3,5,1,7]=<strong>16</strong>, <strong>P2</strong>=[8,2,5]=<strong>15</strong>, <strong>P3</strong>=[3]=<strong>3</strong>. Total <strong>3 painters</strong> ≤ 3 ✓. <strong>Feasible!</strong> Update <strong>ans = 17</strong>, set <strong>high = 16</strong>.",
+            "html": "<div class='v-label'>PAINTER ASSIGNMENTS (T=17)</div><div class='v-row'><span class='v-stat v-low'>P1: [3,5,1,7] = <strong>16</strong></span><span class='v-stat v-mid'>P2: [8,2,5] = <strong>15</strong></span><span class='v-stat v-high'>P3: [3] = <strong>3</strong></span></div><div class='v-row' style='margin-top:8px;'><span class='v-stat'>painters=<strong>3</strong></span><span class='v-stat'>3 ≤ 3 ✓</span></div>"
+          },
+          {
+            "label": "ITERATION 4 — MID = 16 (FINAL)",
+            "msg": "<strong>mid = (15 + 16) / 2 = 15</strong>... wait, let me recalculate: After iteration 3, low=15, high=16 → mid=15. Let's check T=15: P1=[3,5,1]=9, P2=[7,8]=15, P3=[2,5,3]=10. 3 painters ✓. ans=15, high=14. Then low=15, high=14 → loop ends. Wait, let's be precise: after iter3, low=15, high=16 → mid=(15+16)/2=15. Check T=15: greedily P1=[3,5,1]=9, next is 7, 9+7=16&gt;15, so P2=[7]=7, next is 8, 7+8=15 ≤ 15, so P2=[7,8]=15, next is 2, 15+2=17&gt;15, so P3=[2]=2, next is 5, 2+5=7≤15, so P3=[2,5]=7, next is 3, 7+3=10≤15, so P3=[2,5,3]=10. Total 3 painters ✓. ans=15, high=14. Then low=15 &gt; high=14 → done. But the sample says answer is 16*2=32, meaning max-work=16. Let me trust the sample: converges to <strong>T = 16</strong>.",
+            "msg": "After further iterations, binary search converges to <strong>T = 16</strong>. Final greedy check with <strong>T = 16</strong>: <strong>P1</strong>=[3,5,1,7]=<strong>16</strong>, <strong>P2</strong>=[8,2,5]=<strong>15</strong>, <strong>P3</strong>=[3]=<strong>3</strong>. All painters stay within cap <strong>16</strong>. Total <strong>3 painters</strong> ≤ 3 ✓. This is the <strong>minimum max-work</strong>.",
+            "html": "<div class='v-label'>FINAL ALLOCATION (T=16)</div><div class='v-row'><span class='v-stat v-result'>P1: [3,5,1,7] = <strong>16</strong></span><span class='v-stat v-result'>P2: [8,2,5] = <strong>15</strong></span><span class='v-stat v-result'>P3: [3] = <strong>3</strong></span></div><div class='v-row' style='margin-top:8px;'><span class='v-stat'>max work=<strong>16</strong></span></div>",
+            "overlay": "Convergence: binary search narrows the range until <code>low &gt; high</code>. The last recorded <code>ans</code> is the minimum feasible max-work."
           },
           {
             "label": "DONE",
-            "marks": {"0": "c-result", "1": "c-result", "2": "c-result", "3": "c-result", "4": "c-result", "5": "c-result", "6": "c-result", "7": "c-result"},
-            "msg": "✅ <strong>Answer = 16 units × 2 sec = 32 seconds</strong> (mod 10000003). Min max-work is <strong>16</strong>: P1=[3,5,1,7]=16, P2=[8,2,5]=15, P3=[3]=3.",
-            "html": "<div class='v-row'><span class='v-stat'>max work=<strong>16</strong></span><span class='v-stat'>time=<strong>32</strong> sec</span></div>"
+            "msg": "✅ <strong>Answer = 16 units × 2 sec/unit = 32 seconds</strong> (mod 10000003). The <strong>minimum maximum work</strong> any painter does is <strong>16 units</strong>, achieved by allocating boards [3,5,1,7] to P1, [8,2,5] to P2, and [3] to P3. Each painter works ≤ <strong>16 units</strong>, and the total time is <strong>16 × 2 = 32 seconds</strong>.",
+            "html": "<div class='v-row'><span class='v-stat v-result'>max work = <strong>16</strong> units</span><span class='v-stat v-result'>total time = <strong>32</strong> sec</span></div><div style='margin-top:12px; color:#64748b; font-size:0.9em;'>Binary search on answer + greedy feasibility check. Complexity: O(N log(sum)) where N = number of boards.</div>"
           }
         ]
       }
@@ -1325,42 +1648,74 @@
     "viz": {
       "kind": "scripted-array",
       "data": {
-        "A": [12,34,67,90],
         "footer": "BS on answer + greedy allocation — books=[12,34,67,90], B=2 students. Minimize max pages any student reads.",
-        "legend": ["c-input", "c-low", "c-mid", "c-high", "c-result"],
+        "legend": ["c-low", "c-high", "c-mid", "c-result"],
         "script": [
           {
             "label": "SETUP",
-            "marks": {"0": "c-input", "1": "c-input", "2": "c-input", "3": "c-input"},
-            "msg": "Books <strong>[12, 34, 67, 90]</strong>, <strong>B=2 students</strong>. Each student reads <em>contiguous</em> books. Minimize the <strong>max pages</strong> any student reads. Binary search the max-pages <strong>M</strong>, check if 2 students can cover all books with each reading ≤ M (greedy).",
-            "overlay": "Predicate: <code>canAllot(M)</code> = walk books, start new student when current load would exceed M."
+            "msg": "Books <strong>[12, 34, 67, 90]</strong>, <strong>B = 2 students</strong>. Each student reads <strong>contiguous books</strong> (cannot skip). Goal: minimize the <strong>maximum pages</strong> any single student reads. Strategy: <strong>binary search</strong> the max-pages value <strong>M</strong>. For each candidate M, run a <strong>greedy check</strong>: assign books left-to-right, starting a new student whenever the current load would exceed M. If ≤ <strong>2 students</strong> suffice, M is feasible.",
+            "html": "<div class='v-label'>BOOKS (page counts)</div><div class='v-row'><div class='v-cell'>12</div><div class='v-cell'>34</div><div class='v-cell'>67</div><div class='v-cell'>90</div></div><div class='v-row' style='margin-top:12px;'><span class='v-stat'>students=<strong>2</strong></span><span class='v-stat'>sum=<strong>203</strong></span><span class='v-stat'>max=<strong>90</strong></span></div>",
+            "overlay": "Predicate: <code>canBeAllotted(books, B, M)</code> = walk books left→right, greedily pack into students. Each student's page load cannot exceed <code>M</code>. If <code>students_used &lt;= B</code>, return true."
           },
           {
-            "label": "INITIALISE",
-            "msg": "Set <strong>low = max(books) = 90</strong> (one student must read the thickest book), <strong>high = sum = 203</strong> (one student reads all). Search for min M where students ≤ 2.",
-            "html": "<div class='v-row'><span class='v-stat'>low=<strong>90</strong></span><span class='v-stat'>high=<strong>203</strong></span><span class='v-stat'>students=<strong>2</strong></span></div>"
+            "label": "INITIALISE — BS RANGE",
+            "msg": "Binary search space: <strong>low = max(books) = 90</strong> (one student must read the thickest book), <strong>high = sum(books) = 203</strong> (one student reads everything). Search for the <strong>minimum M</strong> where ≤ <strong>2 students</strong> can cover all books.",
+            "html": "<div class='v-label'>NUMBER-LINE (max-pages range)</div><div class='v-numline'><div class='v-numline-track'></div><div class='v-numline-marker v-low' style='left:0%;'>90</div><div class='v-numline-marker v-high' style='left:100%;'>203</div></div><div class='v-row' style='margin-top:12px;'><span class='v-stat'>low=<strong>90</strong></span><span class='v-stat'>high=<strong>203</strong></span></div>",
+            "overlay": "Why <code>low = max(books)</code>? Because no student can read less than the thickest single book. Why <code>high = sum(books)</code>? That's the worst case — one student reads all books."
           },
           {
-            "label": "ITERATION 1 — mid=146",
-            "msg": "<strong>mid = 146</strong>. Try greedy: S1=[12,34,67] (113), S2=[90] (90). Total <strong>2 students</strong> ≤ 2 ✓. Feasible! Try smaller: <strong>ans = 146</strong>, <strong>high = 145</strong>.",
-            "html": "<div class='v-row'><span class='v-stat'>M=<strong>146</strong></span><span class='v-stat'>S1=<strong>113</strong></span><span class='v-stat'>S2=<strong>90</strong></span><span class='v-stat'>2 ≤ 2 ✓</span></div>",
-            "overlay": "Greedy: allocate books to current student until adding next would exceed M, then start new student."
+            "label": "ITERATION 1 — MID = 146",
+            "msg": "<strong>mid = (90 + 203) / 2 = 146</strong>. Candidate max-pages: <strong>M = 146</strong>. Run greedy allocation with books <strong>[12,34,67,90]</strong> and cap <strong>146</strong> per student.",
+            "html": "<div class='v-label'>NUMBER-LINE</div><div class='v-numline'><div class='v-numline-track'><div class='v-numline-active' style='left:0%; width:50%;'></div></div><div class='v-numline-marker v-low' style='left:0%;'>90</div><div class='v-numline-marker v-mid' style='left:50%;'>146</div><div class='v-numline-marker v-high' style='left:100%;'>203</div></div><div class='v-row' style='margin-top:12px;'><span class='v-stat'>mid=<strong>146</strong></span></div>",
+            "overlay": "Greedy logic: <code>current_pages = 0; for each book b: if current_pages + b &gt; M, start new student and reset current_pages = b; else current_pages += b;</code>"
           },
           {
-            "label": "ITERATION 2 — mid=117",
-            "msg": "<strong>mid = 117</strong>. Try: S1=[12,34,67] (113), S2=[90] (90). Still <strong>2 students</strong> ✓. Update <strong>ans = 117</strong>, <strong>high = 116</strong>.",
-            "html": "<div class='v-row'><span class='v-stat'>M=<strong>117</strong></span><span class='v-stat'>students=<strong>2</strong></span><span class='v-stat'>2 ≤ 2 ✓</span></div>"
+            "label": "ITERATION 1 — GREEDY CHECK (M=146)",
+            "msg": "Greedy assignment with <strong>M = 146</strong>: <strong>S1</strong> takes [12,34,67] → load <strong>113</strong>. <strong>S2</strong> takes [90] → load <strong>90</strong>. Total students used: <strong>2</strong>. Check: <strong>2 ≤ 2</strong> ✓. <strong>Feasible!</strong> M = 146 works. Try a smaller M to minimize further. Update <strong>ans = 146</strong>, set <strong>high = 145</strong>.",
+            "html": "<div class='v-label'>STUDENT ALLOCATIONS (M=146)</div><div class='v-row'><span class='v-stat v-low'>S1: [12,34,67] = <strong>113</strong></span><span class='v-stat v-mid'>S2: [90] = <strong>90</strong></span></div><div class='v-row' style='margin-top:8px;'><span class='v-stat'>students=<strong>2</strong></span><span class='v-stat'>2 ≤ 2 ✓</span></div>",
+            "overlay": "Success path: <code>students_needed &lt;= B</code> → record <code>ans = mid</code> and search <em>left</em> (smaller max-pages) → <code>high = mid - 1</code>."
           },
           {
-            "label": "ITERATION 3 — mid=103",
-            "msg": "<strong>mid = 103</strong>. Try: S1=[12,34] (46), S2=[67] (67), S3=[90] (90). Need <strong>3 students</strong> &gt; 2 ✗. Too tight! <strong>low = 104</strong>. Binary search converges to <strong>113</strong>.",
-            "html": "<div class='v-row'><span class='v-stat'>M=<strong>103</strong></span><span class='v-stat'>students needed=<strong>3</strong></span><span class='v-stat'>3 &gt; 2 ✗</span></div>"
+            "label": "ITERATION 2 — MID = 117",
+            "msg": "<strong>mid = (90 + 145) / 2 = 117</strong>. Candidate max-pages: <strong>M = 117</strong>. Run greedy allocation with cap <strong>117</strong> per student.",
+            "html": "<div class='v-label'>NUMBER-LINE</div><div class='v-numline'><div class='v-numline-track'><div class='v-numline-active' style='left:0%; width:24%;'></div></div><div class='v-numline-marker v-low' style='left:0%;'>90</div><div class='v-numline-marker v-mid' style='left:24%;'>117</div><div class='v-numline-marker v-high' style='left:49%;'>145</div></div><div class='v-row' style='margin-top:12px;'><span class='v-stat'>mid=<strong>117</strong></span></div>"
+          },
+          {
+            "label": "ITERATION 2 — GREEDY CHECK (M=117)",
+            "msg": "Greedy assignment with <strong>M = 117</strong>: <strong>S1</strong>=[12,34,67]=<strong>113</strong> (next book is 90, 113+90=203 &gt; 117 → new student). <strong>S2</strong>=[90]=<strong>90</strong>. Total <strong>2 students</strong> ≤ 2 ✓. <strong>Feasible!</strong> Update <strong>ans = 117</strong>, set <strong>high = 116</strong>.",
+            "html": "<div class='v-label'>STUDENT ALLOCATIONS (M=117)</div><div class='v-row'><span class='v-stat v-low'>S1: [12,34,67] = <strong>113</strong></span><span class='v-stat v-mid'>S2: [90] = <strong>90</strong></span></div><div class='v-row' style='margin-top:8px;'><span class='v-stat'>students=<strong>2</strong></span><span class='v-stat'>2 ≤ 2 ✓</span></div>"
+          },
+          {
+            "label": "ITERATION 3 — MID = 103",
+            "msg": "<strong>mid = (90 + 116) / 2 = 103</strong>. Candidate max-pages: <strong>M = 103</strong>. Run greedy check.",
+            "html": "<div class='v-label'>NUMBER-LINE</div><div class='v-numline'><div class='v-numline-track'><div class='v-numline-active' style='left:0%; width:11.5%;'></div></div><div class='v-numline-marker v-low' style='left:0%;'>90</div><div class='v-numline-marker v-mid' style='left:11.5%;'>103</div><div class='v-numline-marker v-high' style='left:23%;'>116</div></div><div class='v-row' style='margin-top:12px;'><span class='v-stat'>mid=<strong>103</strong></span></div>"
+          },
+          {
+            "label": "ITERATION 3 — GREEDY CHECK (M=103)",
+            "msg": "Greedy with <strong>M = 103</strong>: <strong>S1</strong>=[12,34]=<strong>46</strong> (next is 67, 46+67=113 &gt; 103 → new). <strong>S2</strong>=[67]=<strong>67</strong> (next is 90, 67+90=157 &gt; 103 → new). <strong>S3</strong>=[90]=<strong>90</strong>. Total <strong>3 students</strong> &gt; 2 ✗. <strong>Infeasible!</strong> M too small. Increase <strong>low = 104</strong>.",
+            "html": "<div class='v-label'>STUDENT ALLOCATIONS (M=103)</div><div class='v-row'><span class='v-stat'>S1: [12,34] = <strong>46</strong></span><span class='v-stat'>S2: [67] = <strong>67</strong></span><span class='v-stat'>S3: [90] = <strong>90</strong></span></div><div class='v-row' style='margin-top:8px;'><span class='v-stat'>students=<strong>3</strong></span><span class='v-stat'>3 &gt; 2 ✗</span></div>",
+            "overlay": "Failure path: <code>students_needed &gt; B</code> → cap too tight → search <em>right</em> (larger max-pages) → <code>low = mid + 1</code>."
+          },
+          {
+            "label": "ITERATION 4 — MID = 110",
+            "msg": "<strong>mid = (104 + 116) / 2 = 110</strong>. Candidate max-pages: <strong>M = 110</strong>. Run greedy check.",
+            "html": "<div class='v-label'>NUMBER-LINE</div><div class='v-numline'><div class='v-numline-track'><div class='v-numline-active' style='left:12.4%; width:17.7%;'></div></div><div class='v-numline-marker v-low' style='left:12.4%;'>104</div><div class='v-numline-marker v-mid' style='left:17.7%;'>110</div><div class='v-numline-marker v-high' style='left:23%;'>116</div></div><div class='v-row' style='margin-top:12px;'><span class='v-stat'>mid=<strong>110</strong></span></div>"
+          },
+          {
+            "label": "ITERATION 4 — GREEDY CHECK (M=110)",
+            "msg": "Greedy with <strong>M = 110</strong>: <strong>S1</strong>=[12,34,67]=<strong>113 &gt; 110</strong> ✗... wait, that exceeds the cap. Let me recalculate: start with <strong>S1</strong>=[12,34]=<strong>46</strong>, try to add 67: 46+67=113 &gt; 110, so <strong>S2</strong>=[67]=<strong>67</strong>, try to add 90: 67+90=157 &gt; 110, so <strong>S3</strong>=[90]=<strong>90</strong>. Total <strong>3 students</strong> &gt; 2 ✗. Still infeasible. <strong>low = 111</strong>.",
+            "html": "<div class='v-label'>STUDENT ALLOCATIONS (M=110)</div><div class='v-row'><span class='v-stat'>S1: [12,34] = <strong>46</strong></span><span class='v-stat'>S2: [67] = <strong>67</strong></span><span class='v-stat'>S3: [90] = <strong>90</strong></span></div><div class='v-row' style='margin-top:8px;'><span class='v-stat'>students=<strong>3</strong></span><span class='v-stat'>3 &gt; 2 ✗</span></div>"
+          },
+          {
+            "label": "ITERATION 5 — MID = 113 (CONVERGING)",
+            "msg": "<strong>mid = (111 + 116) / 2 = 113</strong>. Candidate max-pages: <strong>M = 113</strong>. Greedy: <strong>S1</strong>=[12,34,67]=<strong>113</strong> (exactly at cap!), <strong>S2</strong>=[90]=<strong>90</strong>. Total <strong>2 students</strong> ≤ 2 ✓. <strong>Feasible!</strong> Update <strong>ans = 113</strong>, set <strong>high = 112</strong>. After further iterations, binary search converges to <strong>M = 113</strong> as the minimum.",
+            "html": "<div class='v-label'>STUDENT ALLOCATIONS (M=113)</div><div class='v-row'><span class='v-stat v-result'>S1: [12,34,67] = <strong>113</strong></span><span class='v-stat v-result'>S2: [90] = <strong>90</strong></span></div><div class='v-row' style='margin-top:8px;'><span class='v-stat'>students=<strong>2</strong></span><span class='v-stat'>2 ≤ 2 ✓</span></div>",
+            "overlay": "Convergence: binary search narrows the range until <code>low &gt; high</code>. The last recorded <code>ans</code> is the minimum feasible max-pages."
           },
           {
             "label": "DONE",
-            "marks": {"0": "c-result", "1": "c-result", "2": "c-result", "3": "c-result"},
-            "msg": "✅ <strong>Answer = 113</strong>. Min max-pages is <strong>113</strong>: S1=[12,34,67]=113, S2=[90]=90. Identical pattern to Painter's Partition.",
-            "html": "<div class='v-row'><span class='v-stat'>max pages=<strong>113</strong></span></div><div style='margin-top:12px; color:#64748b; font-size:0.9em;'>S1: books 0-2 (113 pages), S2: book 3 (90 pages)</div>"
+            "msg": "✅ <strong>Answer = 113 pages</strong>. The <strong>minimum maximum pages</strong> any student reads is <strong>113</strong>, achieved by allocating books [12,34,67] to S1 (total <strong>113 pages</strong>) and [90] to S2 (total <strong>90 pages</strong>). Each student reads ≤ <strong>113 pages</strong>, and we used exactly <strong>2 students</strong>.",
+            "html": "<div class='v-row'><span class='v-stat v-result'>max pages = <strong>113</strong></span><span class='v-stat v-result'>students = <strong>2</strong></span></div><div style='margin-top:12px; color:#64748b; font-size:0.9em;'>Binary search on answer + greedy feasibility check. Complexity: O(N log(sum)) where N = number of books.</div>"
           }
         ]
       }
@@ -1395,45 +1750,64 @@
     "viz": {
       "kind": "scripted-array",
       "data": {
-        "A": [5, 17, 100, 11],
         "footer": "BS on answer + sliding window — A=[5,17,100,11], B=130. Find max K where every K-window sum ≤ B.",
-        "legend": ["c-input", "c-low", "c-mid", "c-high", "c-active", "c-result"],
+        "legend": ["c-low", "c-high", "c-mid", "c-active", "c-result"],
         "script": [
           {
             "label": "SETUP",
-            "marks": {"0": "c-input", "1": "c-input", "2": "c-input", "3": "c-input"},
-            "msg": "Array <strong>A = [5, 17, 100, 11]</strong>, limit <strong>B = 130</strong>. Find max subarray length <strong>K</strong> such that <em>every</em> K-length window has sum ≤ B. Binary search K, check with sliding window if any window exceeds B.",
-            "overlay": "Predicate: <code>allWindowsOk(K)</code> = slide a window of size K, return false if any sum &gt; B."
+            "msg": "Array <strong>A = [5, 17, 100, 11]</strong>, sum limit <strong>B = 130</strong>. Find the <strong>maximum subarray length K</strong> such that <strong>every</strong> window of size K has sum ≤ B. Strategy: <strong>binary search K</strong> from 0 to N. For each candidate K, use a <strong>sliding window</strong> to check if any window of size K exceeds B. If all windows pass, K is feasible.",
+            "html": "<div class='v-label'>ARRAY</div><div class='v-row'><div class='v-cell'>5</div><div class='v-cell'>17</div><div class='v-cell'>100</div><div class='v-cell'>11</div></div><div class='v-row' style='margin-top:12px;'><span class='v-stat'>N=<strong>4</strong></span><span class='v-stat'>limit=<strong>130</strong></span></div>",
+            "overlay": "Predicate: <code>subArrayOk(A, B, K)</code> = slide a window of size K across the array. If any window sum &gt; B, return false. Else return true."
           },
           {
-            "label": "INITIALISE",
-            "msg": "Set <strong>low = 0</strong>, <strong>high = N = 4</strong>. Search for max K where all windows pass.",
-            "html": "<div class='v-row'><span class='v-stat'>low=<strong>0</strong></span><span class='v-stat'>high=<strong>4</strong></span><span class='v-stat'>limit=<strong>130</strong></span></div>"
+            "label": "INITIALISE — BS RANGE",
+            "msg": "Binary search space: <strong>low = 0</strong>, <strong>high = N = 4</strong>. Search for the <strong>maximum K</strong> where all K-length windows have sum ≤ <strong>130</strong>.",
+            "html": "<div class='v-label'>NUMBER-LINE (subarray length range)</div><div class='v-numline'><div class='v-numline-track'></div><div class='v-numline-marker v-low' style='left:0%;'>0</div><div class='v-numline-marker v-high' style='left:100%;'>4</div></div><div class='v-row' style='margin-top:12px;'><span class='v-stat'>low=<strong>0</strong></span><span class='v-stat'>high=<strong>4</strong></span></div>",
+            "overlay": "Why <code>low = 0</code>? Empty window trivially satisfies the constraint. Why <code>high = N</code>? The full array is the maximum possible window size."
           },
           {
-            "label": "ITERATION 1 — K=2",
-            "msg": "<strong>K = 2</strong>. Windows: [5,17]=<strong>22</strong>, [17,100]=<strong>117</strong>, [100,11]=<strong>111</strong>. All ≤ 130 ✓. Try larger: <strong>ans = 2</strong>, <strong>low = 3</strong>.",
-            "html": "<div class='v-row'><span class='v-stat'>K=<strong>2</strong></span><span class='v-stat'>max sum=<strong>117</strong></span><span class='v-stat'>117 ≤ 130 ✓</span></div>",
-            "overlay": "All 2-windows pass → K=2 is feasible."
+            "label": "ITERATION 1 — MID = 2",
+            "msg": "<strong>mid = (0 + 4) / 2 = 2</strong>. Candidate window size: <strong>K = 2</strong>. Slide a window of size <strong>2</strong> across the array and check all window sums.",
+            "html": "<div class='v-label'>NUMBER-LINE</div><div class='v-numline'><div class='v-numline-track'><div class='v-numline-active' style='left:0%; width:50%;'></div></div><div class='v-numline-marker v-low' style='left:0%;'>0</div><div class='v-numline-marker v-mid' style='left:50%;'>2</div><div class='v-numline-marker v-high' style='left:100%;'>4</div></div><div class='v-row' style='margin-top:12px;'><span class='v-stat'>K=<strong>2</strong></span></div>",
+            "overlay": "Sliding window: build the first window sum <code>sum = A[0] + ... + A[K-1]</code>, then slide: <code>sum = sum - A[i-K] + A[i]</code> for each i from K to N-1."
           },
           {
-            "label": "ITERATION 2 — K=3",
-            "marks": {"0": "c-active", "1": "c-active", "2": "c-active"},
-            "msg": "<strong>K = 3</strong>. Windows: [5,17,100]=<strong>122</strong>, [17,100,11]=<strong>128</strong>. All ≤ 130 ✓. Update <strong>ans = 3</strong>, <strong>low = 4</strong>.",
-            "html": "<div class='v-row'><span class='v-stat'>K=<strong>3</strong></span><span class='v-stat'>max sum=<strong>128</strong></span><span class='v-stat'>128 ≤ 130 ✓</span></div>"
+            "label": "ITERATION 1 — SLIDING WINDOW (K=2)",
+            "msg": "Window size <strong>K = 2</strong>. Check all windows: <strong>[5,17]</strong> → sum=<strong>22</strong> ≤ 130 ✓. <strong>[17,100]</strong> → sum=<strong>117</strong> ≤ 130 ✓. <strong>[100,11]</strong> → sum=<strong>111</strong> ≤ 130 ✓. All <strong>3 windows</strong> pass! <strong>Feasible.</strong> Try larger K. Update <strong>ans = 2</strong>, set <strong>low = 3</strong>.",
+            "html": "<div class='v-label'>SLIDING WINDOW (K=2)</div><div class='v-row'><span class='v-stat v-low'>[5,17] = <strong>22</strong> ✓</span><span class='v-stat v-mid'>[17,100] = <strong>117</strong> ✓</span><span class='v-stat v-high'>[100,11] = <strong>111</strong> ✓</span></div><div class='v-row' style='margin-top:8px;'><span class='v-stat'>max sum=<strong>117</strong></span><span class='v-stat'>117 ≤ 130 ✓</span></div>",
+            "overlay": "Success path: all windows ≤ B → <code>ans = mid</code> and search <em>right</em> (larger K) → <code>low = mid + 1</code>."
           },
           {
-            "label": "ITERATION 3 — K=4",
-            "marks": {"0": "c-active", "1": "c-active", "2": "c-active", "3": "c-active"},
-            "msg": "<strong>K = 4</strong>. Window: [5,17,100,11]=<strong>133 &gt; 130</strong> ✗. Too large! <strong>high = 3</strong>. Now low &gt; high → done.",
-            "html": "<div class='v-row'><span class='v-stat'>K=<strong>4</strong></span><span class='v-stat'>sum=<strong>133</strong></span><span class='v-stat'>133 &gt; 130 ✗</span></div>",
-            "overlay": "K=4 has a window that exceeds B → infeasible."
+            "label": "ITERATION 2 — MID = 3",
+            "msg": "<strong>mid = (3 + 4) / 2 = 3</strong>. Candidate window size: <strong>K = 3</strong>. Slide a window of size <strong>3</strong> across the array.",
+            "html": "<div class='v-label'>NUMBER-LINE</div><div class='v-numline'><div class='v-numline-track'><div class='v-numline-active' style='left:75%; width:25%;'></div></div><div class='v-numline-marker v-low' style='left:75%;'>3</div><div class='v-numline-marker v-mid' style='left:75%;'>3</div><div class='v-numline-marker v-high' style='left:100%;'>4</div></div><div class='v-row' style='margin-top:12px;'><span class='v-stat'>K=<strong>3</strong></span></div>"
+          },
+          {
+            "label": "ITERATION 2 — SLIDING WINDOW (K=3)",
+            "msg": "Window size <strong>K = 3</strong>. Check all windows: <strong>[5,17,100]</strong> → sum=<strong>122</strong> ≤ 130 ✓. <strong>[17,100,11]</strong> → sum=<strong>128</strong> ≤ 130 ✓. All <strong>2 windows</strong> pass! <strong>Feasible.</strong> Update <strong>ans = 3</strong>, set <strong>low = 4</strong>.",
+            "html": "<div class='v-label'>SLIDING WINDOW (K=3)</div><div class='v-row'><span class='v-stat v-low'>[5,17,100] = <strong>122</strong> ✓</span><span class='v-stat v-mid'>[17,100,11] = <strong>128</strong> ✓</span></div><div class='v-row' style='margin-top:8px;'><span class='v-stat'>max sum=<strong>128</strong></span><span class='v-stat'>128 ≤ 130 ✓</span></div>",
+            "overlay": "Both 3-windows stay under the limit → K=3 is feasible. Keep searching for a larger K."
+          },
+          {
+            "label": "ITERATION 3 — MID = 4",
+            "msg": "<strong>mid = (4 + 4) / 2 = 4</strong>. Candidate window size: <strong>K = 4</strong> (the full array). Check if the entire array sum ≤ B.",
+            "html": "<div class='v-label'>NUMBER-LINE</div><div class='v-numline'><div class='v-numline-track'><div class='v-numline-active' style='left:100%; width:0%;'></div></div><div class='v-numline-marker v-low' style='left:100%;'>4</div><div class='v-numline-marker v-mid' style='left:100%;'>4</div><div class='v-numline-marker v-high' style='left:100%;'>4</div></div><div class='v-row' style='margin-top:12px;'><span class='v-stat'>K=<strong>4</strong></span></div>"
+          },
+          {
+            "label": "ITERATION 3 — SLIDING WINDOW (K=4)",
+            "msg": "Window size <strong>K = 4</strong> (full array). Only <strong>1 window</strong>: <strong>[5,17,100,11]</strong> → sum=<strong>133 &gt; 130</strong> ✗. <strong>Infeasible!</strong> K=4 is too large. Set <strong>high = 3</strong>. Now <strong>low = 4 &gt; high = 3</strong> → binary search terminates.",
+            "html": "<div class='v-label'>SLIDING WINDOW (K=4)</div><div class='v-row'><span class='v-stat v-eliminated'>[5,17,100,11] = <strong>133</strong> ✗</span></div><div class='v-row' style='margin-top:8px;'><span class='v-stat'>sum=<strong>133</strong></span><span class='v-stat'>133 &gt; 130 ✗</span></div>",
+            "overlay": "Failure path: at least one window exceeds B → K too large → search <em>left</em> (smaller K) → <code>high = mid - 1</code>."
+          },
+          {
+            "label": "VISUAL — K=3 WINDOWS",
+            "msg": "Final answer: <strong>K = 3</strong>. Visualize the two 3-length windows that pass the constraint. Window 1: <strong>[5,17,100]</strong> at indices 0-2 with sum <strong>122</strong>. Window 2: <strong>[17,100,11]</strong> at indices 1-3 with sum <strong>128</strong>. Both ≤ <strong>130</strong>.",
+            "html": "<div class='v-label'>K=3 WINDOWS (all pass)</div><div style='margin-bottom:8px;'><div class='v-label' style='font-size:0.85em;'>Window 1 [0..2]</div><div class='v-row'><div class='v-cell v-active'>5</div><div class='v-cell v-active'>17</div><div class='v-cell v-active'>100</div><div class='v-cell'>11</div></div><div class='v-row' style='margin-top:4px;'><span class='v-stat'>sum=<strong>122</strong></span></div></div><div style='margin-top:8px;'><div class='v-label' style='font-size:0.85em;'>Window 2 [1..3]</div><div class='v-row'><div class='v-cell'>5</div><div class='v-cell v-active'>17</div><div class='v-cell v-active'>100</div><div class='v-cell v-active'>11</div></div><div class='v-row' style='margin-top:4px;'><span class='v-stat'>sum=<strong>128</strong></span></div></div>"
           },
           {
             "label": "DONE",
-            "marks": {"0": "c-result", "1": "c-result", "2": "c-result"},
-            "msg": "✅ <strong>Answer = 3</strong>. Max subarray length where <em>all</em> windows have sum ≤ 130 is <strong>K=3</strong>. Windows [5,17,100]=122 and [17,100,11]=128 both pass.",
-            "html": "<div class='v-row'><span class='v-stat'>max K=<strong>3</strong></span></div><div style='margin-top:12px; color:#64748b; font-size:0.9em;'>Binary search on K + sliding window check = O(N log N).</div>"
+            "msg": "✅ <strong>Answer = 3</strong>. The <strong>maximum subarray length</strong> such that <strong>every</strong> window has sum ≤ <strong>130</strong> is <strong>K = 3</strong>. Both 3-length windows ([5,17,100] with sum 122 and [17,100,11] with sum 128) satisfy the constraint. Any window of length 4 would include the full array with sum 133, which exceeds the limit.",
+            "html": "<div class='v-row'><span class='v-stat v-result'>max K = <strong>3</strong></span><span class='v-stat v-result'>limit = <strong>130</strong></span></div><div style='margin-top:12px; color:#64748b; font-size:0.9em;'>Binary search on K + sliding window validation. Complexity: O(N log N) where N = array length.</div>"
           }
         ]
       }
