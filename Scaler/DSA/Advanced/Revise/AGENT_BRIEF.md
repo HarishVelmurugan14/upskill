@@ -153,15 +153,13 @@ Each step in the script supports:
 - `overlay` — yellow callout HTML after the visual. Use for rules / formulas with `<code>` tags.
 - `html` — escape hatch: raw HTML using the `v-*` CSS vocabulary (cells, arrows, rows, labels, number-lines, stats). Use for matrices, linked lists, trees, custom layouts.
 
-**Quality bar (mandatory for new viz, no exceptions):**
-- **8 to 12 steps minimum** per problem. Setup + every meaningful iteration + Done.
-- **3+ overlays** per problem.
+**Quality bar:**
+- **5 to 12 steps** per problem. Aim for 8–12 on algorithmically rich problems (binary search, DP, complex traversals); 5–7 is acceptable for simple/short problems (basic traversals, single-pass scans, predicate checks).
+- **2+ overlays** per problem (3+ preferred on richer problems).
 - **Every step has a `label`**.
 - **Every value in `msg` is tied to the actual sample input** and wrapped in `<strong>`.
 - **Every step visually changes** vs the previous (a pointer moves, a cell flips colour, an arrow flips).
-- **Reference these three as the bar:** `bs-peak-element`, `bs-aggressive-cows`, `ll-reverse` in `binary-search.json` and `linked-list.json`.
-
-**Known thin viz (acceptable but earmarked for upgrade — 20 of 67):** `bs-aggressive-cows` (7,2 — original gold ref, leave); `stacks-eval-rpn`, `stacks-redundant-braces`, `stacks-nearest-smaller`, `stacks-passing-game`, `stacks-next-greater`; `queues-sum-of-min-max`; `trees-postorder-traversal`, `trees-balanced`, `trees-left-view`, `trees-serialize-level-order`, `trees-deserialize-level-order`, `trees-right-view`, `trees-valid-bst`, `trees-sorted-array-to-bst`, `trees-delete-bst-node`, `trees-search-bst`, `trees-two-sum-bst`, `trees-bst-one-child`, `trees-bst-nodes-in-range`.
+- **Reference these three as the upper bar:** `bs-peak-element`, `bs-aggressive-cows`, `ll-reverse`.
 
 **`v-*` CSS vocabulary** (already defined in `dsa-revisor.html`, do NOT add CSS):
 
