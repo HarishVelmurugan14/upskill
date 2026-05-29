@@ -1039,6 +1039,8 @@
     "sampleInput": "A = [[1, 3, 5], [2, 6, 9], [3, 6, 9]]",
     "sampleOutput": "5",
     "story": "Don't sort the matrix. Guess a value v, count how many elements ≤ v across all rows (each row uses BS). The smallest v with count > N*M/2 is the median.",
+    "plain": "The matrix has N rows and M columns, every row sorted but the columns are not. The median is the middle value once you imagine all N*M numbers laid out in sorted order. Instead of actually merging or sorting, you binary search the value itself. For each candidate value v, you ask 'how many numbers in the whole matrix are ≤ v?' — and because each row is sorted, you answer that with one binary search per row. The smallest v whose count crosses (N*M)/2 is the median.",
+    "tale": "In a high tower lived a king whose treasury was stacked in N rows of M coins each. Every row was sorted by weight, but the rows themselves were stacked in no order. The king demanded the median coin — the one in the exact middle — but forbade his clerks from emptying the chests onto the floor. A clever clerk proposed a game: 'Name any weight v, and I will tell you, in a single sweep, how many coins are no heavier than v — because each row is sorted, I only need to feel where v fits in that row.' The king began guessing weights. Too few coins below? Guess heavier. Too many? Guess lighter. With each guess he halved the range of possible weights, and his clerk's sweeps grew faster. In a handful of guesses the king had cornered the exact weight where the count first crossed the halfway mark — and that was the median coin, found without ever disturbing the stacks.",
     "solutions": [
       {
         "label": "Brute — flatten and sort",
@@ -1046,6 +1048,14 @@
           "time": "O(N·M log(N·M))",
           "space": "O(N·M)"
         },
+        "plain": "Copy every element of the matrix into a single flat array. Sort that array. Return the element at index (N*M)/2 — that's the middle value. Simple but uses O(N*M) extra memory, which the problem forbids.",
+        "tale": "An impatient apprentice ignores the king's rule. He tips every chest onto the marble floor, lines up all N×M coins by weight from light to heavy, walks to the exact middle of the line, and points. Correct answer, but the king is furious — the treasury is a mess and the rule was broken.",
+        "approach": [
+          "Allocate a flat array of size N*M.",
+          "Walk every row of the matrix and copy each element into the flat array.",
+          "Sort the flat array.",
+          "Return the element at index (N*M)/2."
+        ],
         "pseudocode": "copy to flat array; sort; return middle",
         "story": "Works but violates 'no extra memory'.",
         "code": "public int flattenSort(int[][] A) {\n    int n = A.length, m = A[0].length;\n    int[] flat = new int[n * m];\n    int k = 0;\n    for (int[] row : A) for (int v : row) flat[k++] = v;\n    Arrays.sort(flat);\n    return flat[(n * m) / 2];\n}"
@@ -1056,6 +1066,17 @@
           "time": "O(log(maxVal) · N · log M)",
           "space": "O(1)"
         },
+        "plain": "Binary search the value, not a position. The answer must be some integer between 1 and the largest possible matrix value (1e9 is safe). For a candidate mid, count how many numbers in the matrix are strictly less than mid — for each row that's a lower_bound in O(log M). If that count is greater than (N*M)/2, the median is mid or smaller, so shrink high. Otherwise the median is larger, so record mid as a candidate and push low up. The last recorded answer is the median.",
+        "tale": "The clerk holds up a number on a slate. 'Sweep!' the king commands. Every row whispers back how many of its coins sit below that weight; the clerk adds them up. Too many already? The slate's number is too generous — write a smaller one. Not enough yet? Remember this number as a possible answer and try heavier. With every sweep the range of slates halves, and the clerk's hand moves faster and faster, until the king and clerk agree on the smallest weight that still has more than half the treasury beneath it — that is the median.",
+        "approach": [
+          "Set low = 0 and high = 1e9 (covers any matrix value).",
+          "Let medPos = N*M/2 — we need strictly more than medPos elements below or equal to the answer.",
+          "While low <= high, compute mid = low + (high - low)/2.",
+          "Count = sum over all rows of lowerBound(row, mid) — the number of elements strictly less than mid in that row.",
+          "If count > medPos, the answer is on the left: high = mid - 1.",
+          "Otherwise store ans = mid and push low = mid + 1.",
+          "When the loop ends, ans holds the smallest value whose 'elements < value' count fails to exceed medPos — i.e. the median itself."
+        ],
         "pseudocode": "low=1, high=1e9; need = N*M/2\nLoop:\n  mid = ...\n  count = sum over rows of lowerBound(row, mid)\n  if count > need: high = mid - 1\n  else: ans = mid; low = mid + 1\nreturn ans",
         "story": "Binary search the VALUE, not the position. For each guess, count things ≤ it. The median is the smallest value with enough things below it.",
         "code": "public int findMatrixMedian(int[][] A) {\n    int n = A.length, m = A[0].length;\n    int low = 0, high = 1_000_000_000;\n    int medPos = n * m / 2, ans = -1;\n\n    while (low <= high) {\n        int mid = (high - low) / 2 + low;\n        int cnt = 0;\n        for (int i = 0; i < n; i++) cnt += lowerBound(A[i], mid);\n        if (cnt > medPos) high = mid - 1;\n        else { ans = mid; low = mid + 1; }\n    }\n    return ans;\n}\n\nprivate int lowerBound(int[] A, int val) {\n    int l = 0, h = A.length - 1, ans = -1;\n    while (l <= h) {\n        int mid = (h - l) / 2 + l;\n        if (A[mid] < val) { ans = mid; l = mid + 1; }\n        else h = mid - 1;\n    }\n    return ans + 1;\n}"
