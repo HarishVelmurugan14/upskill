@@ -2946,11 +2946,6 @@
     populateSubTopicDropdown();
     updateProblemCount();
   }
-    if (!quotes.length) return;
-    const q = quotes[Math.floor(Math.random() * quotes.length)];
-    document.getElementById('quoteText').textContent = q.q;
-    document.getElementById('quoteAuthor').textContent = '— ' + q.a;
-  }
 
   // ─────────────────────────────────────────────────────────────────────
   //  TOPIC + SUB-TOPIC FILTERS
