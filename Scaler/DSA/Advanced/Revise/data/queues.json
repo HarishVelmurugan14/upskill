@@ -10,7 +10,7 @@
       "Monotonic Deque",
       "Maximum"
     ],
-    "description": "Imagine you're an ice cream truck driver in a beachside town. The beach is divided into several sections, and each section has varying numbers of beachgoers wanting ice cream given by the array of integers A.\n\nFor simplicity, let's say the beach is divided into 8 sections. One day, you note down the number of potential customers in each section: [5, 12, 3, 4, 8, 10, 2, 7]. This means there are 5 people in the first section, 12 in the second, and so on.\n\nYou can only stop your truck in B consecutive sections at a time because of parking restrictions. To maximize sales, you want to park where the most customers are clustered together.\n\nFor all B consecutive sections, identify the busiest stretch to park your ice cream truck and serve the most customers. Return an array C, where C[i] is the busiest section in each of the B consecutive sections.\n\nNOTE: If B > length of the array, return 1 element with the max of the array.",
+    "description": "Problem Description\nImagine you're an ice cream truck driver in a beachside town. The beach is divided into several sections, and each section has varying numbers of beachgoers wanting ice cream given by the array of integers A.\n\nFor simplicity, let's say the beach is divided into 8 sections. One day, you note down the number of potential customers in each section: [5, 12, 3, 4, 8, 10, 2, 7]. This means there are 5 people in the first section, 12 in the second, and so on.\n\nYou can only stop your truck in B consecutive sections at a time because of parking restrictions. To maximize sales, you want to park where the most customers are clustered together.\n\nFor all B consecutive sections, identify the busiest stretch to park your ice cream truck and serve the most customers. Return an array C, where C[i] is the busiest section in each of the B consecutive sections. Refer to the given example for clarity.\nNOTE: If B > length of the array, return 1 element with the max of the array.\n\nProblem Constraints\n1 <= |A|, B <= 10^6\n\nInput Format\nThe first argument given is the integer array A.\nThe second argument given is the integer B.\n\nOutput Format\nReturn an array C, where C[i] is the maximum value from the i-th window of B consecutive sections in A.",
     "sampleInput": "A = [5, 12, 3, 4, 8, 10, 2, 7]\nB = 3",
     "sampleOutput": "[12, 12, 8, 10, 10, 10]",
     "image": "images/queues/queues-01.png",
@@ -169,7 +169,7 @@
       "Two Stacks",
       "Amortized O(1)"
     ],
-    "description": "Implement a First In First Out (FIFO) queue using stacks only.\n\nThe implemented queue should support all the functions of a normal queue (push, peek, pop, and empty).\n\nImplement the UserQueue class:\n• void push(int X): Pushes element X to the back of the queue.\n• int pop(): Removes the element from the front of the queue and returns it.\n• int peek(): Returns the element at the front of the queue.\n• boolean empty(): Returns true if the queue is empty, false otherwise.\n\nNOTES:\n• You must use only standard operations of a stack, which means only push to top, peek/pop from top, size, and is empty operations are valid.\n• Depending on your language, the stack may not be supported natively. You may simulate a stack using a list or deque (double-ended queue) as long as you use only a stack's standard operations.",
+    "description": "Problem Description\nImplement a First In First Out (FIFO) queue using stacks only.\nThe implemented queue should support all the functions of a normal queue (push, peek, pop, and empty).\nImplement the UserQueue class:\n• void push(int X) : Pushes element X to the back of the queue.\n• int pop() : Removes the element from the front of the queue and returns it.\n• int peek() : Returns the element at the front of the queue.\n• boolean empty() : Returns true if the queue is empty, false otherwise.\nNOTES:\n• You must use only standard operations of a stack, which means only push to top, peek/pop from top, size, and is empty operations are valid.\n• Depending on your language, the stack may not be supported natively. You may simulate a stack using a list or deque (double-ended queue) as long as you use only a stack's standard operations.\n\nProblem Constraints\n1 <= X <= 10^9\nAt most 1000 calls will be made to push, pop, peek, and empty function.\nAll the calls to pop and peek are valid. i.e. pop and peek are called only when the queue is non-empty.\n\nInput Format\nA sequence of operations is performed on the UserQueue instance.\n\nOutput Format\nFor each pop / peek call, return the corresponding integer value.",
     "sampleInput": "UserQueue q = new UserQueue();\nq.push(3);\nq.push(4);\nq.push(5);\nq.push(6);\nq.peek();  // returns 3\nq.pop();   // returns 3\nq.push(7);\nq.peek();  // returns 4",
     "sampleOutput": "3\n3\n4",
     "image": "images/queues/queues-02.png",
@@ -276,7 +276,7 @@
       "Number Generation",
       "Level Order"
     ],
-    "description": "Given an integer A. Find and Return first positive A integers in ascending order containing only digits 1, 2, and 3.\n\nNOTE: All the A integers will fit in 32-bit integers.",
+    "description": "Problem Description\nGiven an integer, A. Find and Return first positive A integers in ascending order containing only digits 1, 2, and 3.\nNOTE: All the A integers will fit in 32-bit integers.\n\nProblem Constraints\n1 <= A <= 29500\n\nInput Format\nThe only argument given is integer A.\n\nOutput Format\nReturn an integer array denoting the first positive A integers in ascending order containing only digits 1, 2 and 3.",
     "sampleInput": "A = 3",
     "sampleOutput": "[1, 2, 3]",
     "image": "images/queues/queues-03.png",
@@ -396,7 +396,7 @@
       "First Non-Repeating",
       "Character Stream"
     ],
-    "description": "Imagine you're a teacher. You ask students to call out a letter one by one. After each letter, you jot down the very first letter that's only been called out once. If all letters have been repeated, you write \"#\".\n\nHere's a scenario:\n\nA student says \"a\". It's the first letter. You write \"a\".\nNext, a student says \"b\", \"a\" is still unique, so you add \"a\". Now it's \"aa\".\nA student says \"a\" again. Now, \"b\" is the unique one. You add \"b\", making it \"aab\".\nA student says \"b\". All letters so far are repeated. You add \"#\". It becomes \"aab#\".\nA student says \"c\". \"c\" is unique. You add \"c\". The final is \"aab#c\".\n\nYour task? Given the sequence the students call out A, determine the string on the board.",
+    "description": "Problem Description\nImagine you're a teacher. You ask students to call out a letter one by one. After each letter, you jot down the very first letter that's only been called out once. If all letters have been repeated, you write \"#\".\n\nHere's a scenario:\n\nA student says \"a\". It's the first letter. You write \"a\".\nNext, a student says \"b\", \"a\" is still unique, so you add \"a\". Now it's \"aa\".\nA student says \"a\" again. Now, \"b\" is the unique one. You add \"b\", making it \"aab\".\nA student says \"b\". All letters so far are repeated. You add \"#\". It becomes \"aab#\".\nA student says \"c\". \"c\" is unique. You add \"c\". The final is \"aab#c\".\nYour task? Given the sequence the students call out A, determine the string on the board.\n\nProblem Constraints\n1 <= |A| <= 100000\n\nInput Format\nThe only argument given is string A.\n\nOutput Format\nReturn a string after processing the stream of lowercase alphabets A.",
     "sampleInput": "A = \"abadbc\"",
     "sampleOutput": "\"aabbdd\"",
     "image": "images/queues/queues-04.png",
@@ -521,7 +521,7 @@
       "Min-Max Tracking",
       "Two Deques"
     ],
-    "description": "Given an array A of both positive and negative integers.\n\nYour task is to compute the sum of minimum and maximum elements of all sub-array of size B.\n\nNOTE: Since the answer can be very large, you are required to return the sum modulo 10^9 + 7.",
+    "description": "Problem Description\nGiven an array A of both positive and negative integers.\nYour task is to compute the sum of minimum and maximum elements of all sub-array of size B.\nNOTE: Since the answer can be very large, you are required to return the sum modulo 10^9 + 7.\n\nProblem Constraints\n1 <= size of array A <= 10^5\n-10^9 <= A[i] <= 10^9\n1 <= B <= size of array\n\nInput Format\nThe first argument denotes the integer array A.\nThe second argument denotes the value B.\n\nOutput Format\nReturn an integer that denotes the required value.",
     "sampleInput": "A = [2, 5, -1, 7, -3, -1, -2]\nB = 4",
     "sampleOutput": "18",
     "image": "images/queues/queues-05.png",

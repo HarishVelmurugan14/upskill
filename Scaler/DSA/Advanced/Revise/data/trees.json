@@ -9,7 +9,7 @@
       "DFS",
       "Recursion"
     ],
-    "description": "Given a binary tree, return the inorder traversal of its nodes' values.\nInorder: Left → Root → Right",
+    "description": "Problem Description\nGiven a binary tree, return the inorder traversal of its nodes' values.\n\nProblem Constraints\n1 <= number of nodes <= 10^5\n\nInput Format\nFirst and only argument is root node of the binary tree, A.\n\nOutput Format\nReturn an integer array denoting the inorder traversal of the given binary tree.",
     "sampleInput": "Tree:\n    1\n     \\\n      2\n     /\n    3",
     "sampleOutput": "[1, 3, 2]",
     "image": "images/trees/trees-01.png",
@@ -106,7 +106,7 @@
       "DFS",
       "Recursion"
     ],
-    "description": "Given a binary tree, return the preorder traversal of its nodes' values.\nPreorder: Root → Left → Right",
+    "description": "Problem Description\nGiven a binary tree, return the preorder traversal of its nodes values.\n\nProblem Constraints\n1 <= number of nodes <= 10^5\n\nInput Format\nFirst and only argument is root node of the binary tree, A.\n\nOutput Format\nReturn an integer array denoting the preorder traversal of the given binary tree.",
     "sampleInput": "Tree:\n    1\n   / \\\n  6   2\n     /\n    3",
     "sampleOutput": "[1, 6, 2, 3]",
     "image": "images/trees/trees-02.png",
@@ -202,7 +202,7 @@
       "DFS",
       "Recursion"
     ],
-    "description": "Given a binary tree and a sum, determine if the tree has a root-to-leaf path such that adding up all the values along the path equals the given sum.\n\nReturn 1 if such path exists, else return 0.",
+    "description": "Problem Description\nGiven a binary tree and a sum, determine if the tree has a root-to-leaf path such that adding up all the values along the path equals the given sum.\n\nProblem Constraints\n1 <= number of nodes <= 10^5\n-100000 <= B, value of nodes <= 100000\n\nInput Format\nFirst argument is a root node of the binary tree, A.\nSecond argument is an integer B denoting the sum.\n\nOutput Format\nReturn 1, if there exist root-to-leaf path such that adding up all the values along the path equals the given sum. Else, return 0.",
     "sampleInput": "Tree:\n      5\n     / \\\n    4   8\n   /   / \\\n  11  13  4\n / \\       \\\n7   2       1\n\nB = 22",
     "sampleOutput": "1",
     "image": "images/trees/trees-03.png",
@@ -300,7 +300,7 @@
       "Subtree Sum",
       "Post-order"
     ],
-    "description": "Given a binary tree A. Check whether it is possible to partition the tree to two trees which have equal sum of values after removing exactly one edge on the original tree.\n\nReturn 1 if the tree can be partitioned into two trees of equal sum else return 0.",
+    "description": "Problem Description\nGiven a binary tree A. Check whether it is possible to partition the tree to two trees which have equal sum of values after removing exactly one edge on the original tree.\n\nProblem Constraints\n1 <= size of tree <= 100000\n0 <= value of node <= 10^9\n\nInput Format\nFirst and only argument is head of tree A.\n\nOutput Format\nReturn 1 if the tree can be partitioned into two trees of equal sum else return 0.",
     "sampleInput": "Tree:\n      5\n     / \\\n    3   7\n   / \\ / \\\n  4  6 5  6",
     "sampleOutput": "1",
     "image": "images/trees/trees-04.png",
@@ -403,7 +403,7 @@
       "DFS",
       "Recursion"
     ],
-    "description": "Given a binary tree, return the postorder traversal of its nodes' values.\nPostorder: Left → Right → Root",
+    "description": "Problem Description\nGiven a binary tree, return the Postorder traversal of its nodes values.\n\nProblem Constraints\n1 <= number of nodes <= 10^5\n\nInput Format\nFirst and only argument is root node of the binary tree, A.\n\nOutput Format\nReturn an integer array denoting the Postorder traversal of the given binary tree.",
     "sampleInput": "Tree:\n    1\n     \\\n      2\n     /\n    3",
     "sampleOutput": "[3, 2, 1]",
     "image": "images/trees/trees-05.png",
@@ -494,7 +494,7 @@
       "Post-order",
       "Recursion"
     ],
-    "description": "Given a binary tree, check whether it is a Sum-binary Tree or not.\n\nSum-binary Tree is a Binary Tree where the value of every node is equal to sum of the nodes present in its left subtree and right subtree.\n\nAn empty tree is Sum-binary Tree and sum of an empty tree can be considered as 0. A leaf node is also considered as SumTree.\n\nReturn 1 if it is sum-binary tree else return 0.",
+    "description": "Problem Description\nGiven a binary tree. Check whether the given tree is a Sum-binary Tree or not.\nSum-binary Tree is a Binary Tree where the value of a every node is equal to sum of the nodes present in its left subtree and right subtree.\nAn empty tree is Sum-binary Tree and sum of an empty tree can be considered as 0. A leaf node is also considered as SumTree.\nReturn 1 if it sum-binary tree else return 0.\n\nProblem Constraints\n1 <= length of the array <= 100000\n0 <= node values <= 50\n\nInput Format\nThe only argument given is the root node of tree A.\n\nOutput Format\nReturn 1 if it is sum-binary tree else return 0.",
     "sampleInput": "Tree:\n    26\n   /  \\\n  10   3\n /  \\   \\\n4    6   3",
     "sampleOutput": "1",
     "image": "images/trees/trees-06.png",
@@ -596,7 +596,7 @@
       "BFS",
       "Queue"
     ],
-    "description": "Given a binary tree, return the level order traversal of its nodes' values. (i.e., from left to right, level by level).\n\nReturn a 2D integer array denoting the level order traversal of the given binary tree.",
+    "description": "Problem Description\nGiven a binary tree, return the level order traversal of its nodes' values. (i.e., from left to right, level by level).\n\nProblem Constraints\n1 <= number of nodes <= 10^5\n\nInput Format\nFirst and only argument is root node of the binary tree, A.\n\nOutput Format\nReturn a 2D integer array denoting the level order traversal of the given binary tree.",
     "sampleInput": "Tree:\n    3\n   / \\\n  9  20\n    /  \\\n   15   7",
     "sampleOutput": "[[3], [9, 20], [15, 7]]",
     "image": "images/trees/trees-07.png",
@@ -695,7 +695,7 @@
       "Postorder",
       "Recursion"
     ],
-    "description": "Given the inorder and postorder traversal of a tree, construct the binary tree.\n\nNOTE: You may assume that duplicates do not exist in the tree.",
+    "description": "Problem Description\nGiven the inorder and postorder traversal of a tree, construct the binary tree.\nNOTE: You may assume that duplicates do not exist in the tree.\n\nProblem Constraints\n1 <= number of nodes <= 10^5\n\nInput Format\nFirst argument is an integer array A denoting the inorder traversal of the tree.\nSecond argument is an integer array B denoting the postorder traversal of the tree.\n\nOutput Format\nReturn the root node of the binary tree.",
     "sampleInput": "A = [2, 1, 3]\nB = [2, 3, 1]",
     "sampleOutput": "Tree:\n  1\n / \\\n2   3",
     "image": "images/trees/trees-08.png",
@@ -803,7 +803,7 @@
       "Post-order",
       "Recursion"
     ],
-    "description": "Given a root of binary tree A, determine if it is height-balanced.\n\nA height-balanced binary tree is defined as a binary tree in which the depth of the two subtrees of every node never differ by more than 1.\n\nReturn 0 / 1 ( 0 for false, 1 for true ) for this problem.",
+    "description": "Problem Description\nGiven a root of binary tree A, determine if it is height-balanced.\nA height-balanced binary tree is defined as a binary tree in which the depth of the two subtrees of every node never differ by more than 1.\n\nProblem Constraints\n1 <= size of tree <= 100000\n\nInput Format\nFirst and only argument is the root of the tree A.\n\nOutput Format\nReturn 0 / 1 ( 0 for false, 1 for true ) for this problem.",
     "sampleInput": "Tree:\n  1\n / \\\n2   3",
     "sampleOutput": "1",
     "image": "images/trees/trees-09.png",
@@ -887,7 +887,7 @@
       "BFS",
       "Level Order"
     ],
-    "description": "Given a binary tree of integers. Return an array of integers representing the left view of the Binary tree.\n\nLeft view of a Binary Tree is a set of nodes visible when the tree is visited from Left side.\n\nNOTE: The value that comes first in the array which have lower level.",
+    "description": "Problem Description\nGiven a binary tree of integers. Return an array of integers representing the left view of the Binary tree.\nLeft view of a Binary Tree is a set of nodes visible when the tree is visited from Left side\nNOTE: The value comes first in the array which have lower level.\n\nProblem Constraints\n1 <= Number of nodes in binary tree <= 100000\n0 <= node values <= 10^9\n\nInput Format\nFirst and only argument is a root node of the binary tree, A.\n\nOutput Format\nReturn an integer array denoting the left view of the Binary tree.",
     "sampleInput": "Tree:\n      1\n     / \\\n    2   3\n   / \\ / \\\n  4  5 6  7\n /\n8",
     "sampleOutput": "[1, 2, 4, 8]",
     "image": "images/trees/trees-10.png",
@@ -979,7 +979,7 @@
       "Inorder",
       "Recursion"
     ],
-    "description": "Given preorder and inorder traversal of a tree, construct the binary tree.\n\nNOTE: You may assume that duplicates do not exist in the tree.",
+    "description": "Problem Description\nGiven preorder and inorder traversal of a tree, construct the binary tree.\nNOTE: You may assume that duplicates do not exist in the tree.\n\nProblem Constraints\n1 <= number of nodes <= 10^5\n\nInput Format\nFirst argument is an integer array A denoting the preorder traversal of the tree.\nSecond argument is an integer array B denoting the inorder traversal of the tree.\n\nOutput Format\nReturn the root node of the binary tree.",
     "sampleInput": "A = [1, 2, 3]\nB = [2, 1, 3]",
     "sampleOutput": "Tree:\n  1\n / \\\n2   3",
     "image": "images/trees/trees-11.png",
@@ -1081,7 +1081,7 @@
       "BFS",
       "Serialization"
     ],
-    "description": "Given the root node of a Binary Tree, serialize it into an integer array denoting the Level Order Traversal of the given Binary Tree.\n\nNOTE:\n• In the array, the NULL/None child is denoted by -1.\n• For more clarification check the Example Input.",
+    "description": "Problem Description\nGiven the root node of a Binary Tree denoted by A. You have to Serialize the given Binary Tree in the described format.\nSerialize means encode it into a integer array denoting the Level Order Traversal of the given Binary Tree.\nNOTE:\n• In the array, the NULL/None child is denoted by -1.\n• For more clarification check the Example Input.\n\nProblem Constraints\n1 <= number of nodes <= 10^5\n\nInput Format\nOnly argument is a A denoting the root node of a Binary Tree.\n\nOutput Format\nReturn an integer array denoting the Level Order Traversal of the given Binary Tree.",
     "sampleInput": "Tree:\n     1\n    / \\\n   2   3\n  / \\\n 4   5",
     "sampleOutput": "[1, 2, 3, 4, 5, -1, -1, -1, -1, -1, -1]",
     "image": "images/trees/trees-12.png",
@@ -1188,7 +1188,7 @@
       "BFS",
       "Deserialization"
     ],
-    "description": "You are given an integer array A denoting the Level Order Traversal of the Binary Tree.\n\nYou have to Deserialize the given Traversal in the Binary Tree and return the root of the Binary Tree.\n\nNOTE:\n• In the array, the NULL/None child is denoted by -1.\n• For more clarification check the Example Input.",
+    "description": "Problem Description\nYou are given an integer array A denoting the Level Order Traversal of the Binary Tree.\nYou have to Deserialize the given Traversal in the Binary Tree and return the root of the Binary Tree.\nNOTE:\n• In the array, the NULL/None child is denoted by -1.\n• For more clarification check the Example Input.\n\nProblem Constraints\n1 <= number of nodes <= 10^5\n-1 <= A[i] <= 10^5\n\nInput Format\nOnly argument is an integer array A denoting the Level Order Traversal of the Binary Tree.\n\nOutput Format\nReturn the root node of the Binary Tree.",
     "sampleInput": "A = [1, 2, 3, 4, 5, -1, -1, -1, -1, -1, -1]",
     "sampleOutput": "Tree:\n     1\n    / \\\n   2   3\n  / \\\n 4   5",
     "image": "images/trees/trees-13.png",
@@ -1336,7 +1336,7 @@
       "BFS",
       "Right View"
     ],
-    "description": "Given a binary tree of integers denoted by root A. Return an array of integers representing the right view of the Binary tree.\n\nRight view of a Binary Tree is a set of nodes visible when the tree is visited from Right side.",
+    "description": "Problem Description\nGiven a binary tree of integers denoted by root A. Return an array of integers representing the right view of the Binary tree.\nRight view of a Binary Tree is a set of nodes visible when the tree is visited from Right side.\n\nProblem Constraints\n1 <= Number of nodes in binary tree <= 100000\n0 <= node values <= 10^9\n\nInput Format\nFirst and only argument is head of the binary tree A.\n\nOutput Format\nReturn an array, representing the right view of the binary tree.",
     "sampleInput": "Tree:\n     1\n    / \\\n   2   3\n  / \\ / \\\n 4  5 6  7\n/\n8",
     "sampleOutput": "[1, 3, 7, 8]",
     "image": "images/trees/trees-14.png",
@@ -1440,7 +1440,7 @@
       "Recursion",
       "DFS"
     ],
-    "description": "You are given a binary tree represented by root A. You need to check if it is a Binary Search Tree or not.\n\nAssume a BST is defined as follows:\n1) The left subtree of a node contains only nodes with keys less than the node's key.\n2) The right subtree of a node contains only nodes with keys greater than the node's key.\n3) Both the left and right subtrees must also be binary search trees.",
+    "description": "Problem Description\nYou are given a binary tree represented by root A. You need to check if it is a Binary Search Tree or not.\nAssume a BST is defined as follows:\n1) The left subtree of a node contains only nodes with keys less than the node's key.\n2) The right subtree of a node contains only nodes with keys greater than the node's key.\n3) Both the left and right subtrees must also be binary search trees.\n\nProblem Constraints\n1 <= Number of nodes in binary tree <= 10^5\n0 <= node values <= 2^32 - 1\n\nInput Format\nFirst and only argument is head of the binary tree A.\n\nOutput Format\nReturn 0 if false and 1 if true.",
     "sampleInput": "Tree:\n   1\n  / \\\n 2   3",
     "sampleOutput": "0 (false)",
     "image": "images/trees/trees-15.png",
@@ -1531,7 +1531,7 @@
       "Balanced Tree",
       "Divide and Conquer"
     ],
-    "description": "Given an array where elements are sorted in ascending order, convert it to a height Balanced Binary Search Tree (BBST).\n\nBalanced tree: a height-balanced binary tree is defined as a binary tree in which the depth of the two subtrees of every node never differ by more than 1.",
+    "description": "Problem Description\nGiven an array where elements are sorted in ascending order, convert it to a height Balanced Binary Search Tree (BBST).\nBalanced tree : a height-balanced binary tree is defined as a binary tree in which the depth of the two subtrees of every node never differ by more than 1.\n\nProblem Constraints\n1 <= length of array <= 100000\n\nInput Format\nFirst argument is an integer array A.\n\nOutput Format\nReturn a root node of the Binary Search Tree.",
     "sampleInput": "A = [1, 2, 3]",
     "sampleOutput": "Tree:\n   2\n  / \\\n 1   3",
     "image": "images/trees/trees-16.png",
@@ -1679,7 +1679,7 @@
       "Deletion",
       "Inorder Successor"
     ],
-    "description": "Given a Binary Search Tree(BST) A. If there is a node with value B present in the tree delete it and return the tree.\n\nNote - If there are multiple options, always replace a node by its in-order predecessor.",
+    "description": "Problem Description\nGiven a Binary Search Tree(BST) A. If there is a node with value B present in the tree delete it and return the tree.\n\nNote - If there are multiple options, always replace a node by its in-order predecessor\n\nProblem Constraints\n2 <= No. of nodes in BST <= 10^5\n1 <= value of nodes <= 10^9\nEach node has a unique value\n\nInput Format\nThe first argument is the root node of a Binary Search Tree A.\nThe second argument is the value B.\n\nOutput Format\nDelete the given node if found and return the root of the BST.",
     "sampleInput": "Tree:\n      15\n     /  \\\n   12    20\n  / \\   / \\\n10  14 16 27\n/\n8\n\nB = 10",
     "sampleOutput": "Tree with 10 removed (replaced by 8)",
     "image": "images/trees/trees-17.png",
@@ -1782,7 +1782,7 @@
       "Search",
       "Recursion"
     ],
-    "description": "Given a Binary Search Tree A. Check whether there exists a node with value B in the BST.",
+    "description": "Problem Description\nGiven a Binary Search Tree A. Check whether there exists a node with value B in the BST.\n\nProblem Constraints\n1 <= Number of nodes in binary tree <= 10^5\n0 <= B <= 10^6\n\nInput Format\nFirst argument is a root node of the binary tree, A.\nSecond argument is an integer B.\n\nOutput Format\nReturn 1 if such a node exist and 0 otherwise",
     "sampleInput": "Tree:\n      15\n     /  \\\n   12    20\n  / \\   / \\\n10  14 16 27\n/\n8\n\nB = 16",
     "sampleOutput": "1 (true)",
     "image": "images/trees/trees-18.png",
@@ -1877,7 +1877,7 @@
       "Inorder",
       "HashSet"
     ],
-    "description": "Given a binary search tree A, where each node contains a positive integer, and an integer B, you have to find whether or not there exist two different nodes X and Y such that X.value + Y.value = B.\n\nReturn 1 to denote that two such nodes exist. Return 0, otherwise.",
+    "description": "Problem Description\nGiven a binary search tree A, where each node contains a positive integer, and an integer B, you have to find whether or not there exist two different nodes X and Y such that X.value + Y.value = B.\nReturn 1 to denote that two such nodes exist. Return 0, otherwise.\n\nProblem Constraints\n1 <= size of tree <= 100000\n1 <= B <= 10^9\n\nInput Format\nFirst argument is the head of the tree A.\nSecond argument is the integer B.\n\nOutput Format\nReturn 1 if such a pair can be found, 0 otherwise.",
     "sampleInput": "Tree:\n    10\n   /  \\\n  9    20\n\nB = 19",
     "sampleOutput": "1 (9 + 10 = 19)",
     "image": "images/trees/trees-19.png",
@@ -2017,7 +2017,7 @@
       "Preorder",
       "One Child"
     ],
-    "description": "Given preorder traversal of a binary tree, check if it is possible that it is also a preorder traversal of a Binary Search Tree (BST), where each internal node (non-leaf nodes) have exactly one child.",
+    "description": "Problem Description\nGiven preorder traversal of a binary tree, check if it is possible that it is also a preorder traversal of a Binary Search Tree (BST), where each internal node (non-leaf nodes) have exactly one child.\n\nProblem Constraints\n1 <= number of nodes <= 100000\n\nInput Format\nFirst and only argument is an integer array denoting the preorder traversal of binary tree.\n\nOutput Format\nReturn a string \"YES\" if true else \"NO\".",
     "sampleInput": "A = [4, 10, 5, 8]",
     "sampleOutput": "YES",
     "image": "images/trees/trees-20.png",
@@ -2131,7 +2131,7 @@
       "Range Query",
       "DFS"
     ],
-    "description": "Given a binary search tree of integers. You are given a range B and C. Return the count of the number of nodes that lie in the given range.",
+    "description": "Problem Description\nGiven a binary search tree of integers. You are given a range B and C.\nReturn the count of the number of nodes that lie in the given range.\n\nProblem Constraints\n1 <= Number of nodes in binary tree <= 100000\n0 <= B < = C <= 10^9\n\nInput Format\nFirst argument is a root node of the binary tree, A.\nSecond argument is an integer B.\nThird argument is an integer C.\n\nOutput Format\nReturn the count of the number of nodes that lies in the given range.",
     "sampleInput": "Tree:\n      15\n     /  \\\n   12    20\n  / \\   / \\\n10  14 16 27\n/\n8\n\nB = 12\nC = 20",
     "sampleOutput": "5 (nodes: 12, 14, 15, 16, 20)",
     "image": "images/trees/trees-21.png",
