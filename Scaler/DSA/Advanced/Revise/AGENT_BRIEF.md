@@ -29,10 +29,13 @@ Both must be registered in `data/index.json`:
 ```json
 {
   "name": "<Display Name>",
+  "section": "Section <N>",
   "file": "<slug>.json",
   "notesFile": "<slug>.notes.json"
 }
 ```
+
+The `section` field groups topics in the UI's Section filter (above Topic). All Part 2 topics use `"Section 2"`. Use `"Section 0"`, `"Section 1"`, `"Section 3"`, `"Section 4"` for Part 0/1/3/4 topics when adding them. New topics MUST include a `section` field.
 
 If a topic doesn't exist yet, create both files and register them.
 

@@ -106,7 +106,7 @@
     /* ── Filters ── */
     .filters {
       display: grid;
-      grid-template-columns: 1fr 1fr auto;
+      grid-template-columns: 1fr 1.2fr 1.2fr auto;
       gap: 12px;
       align-items: end;
       margin-bottom: 18px;
@@ -115,7 +115,7 @@
       border: 1px solid var(--border);
       border-radius: 10px;
     }
-    @media (max-width: 720px) {
+    @media (max-width: 820px) {
       .filters { grid-template-columns: 1fr; }
     }
     .filter-block label {
@@ -2650,6 +2650,11 @@
   <!-- Filters -->
   <div class="filters">
     <div class="filter-block">
+      <label>Section</label>
+      <input type="text" id="sectionFilter" list="sectionList" placeholder="All Sections" oninput="onSectionChange()" autocomplete="off">
+      <datalist id="sectionList"><option value="All Sections"></datalist>
+    </div>
+    <div class="filter-block">
       <label>Topic</label>
       <input type="text" id="topicFilter" list="topicList" placeholder="All Topics" oninput="onTopicChange()" autocomplete="off">
       <datalist id="topicList"><option value="All Topics"></datalist>
@@ -2892,6 +2897,7 @@
       return;
     }
 
+    populateSectionDropdown();
     populateTopicDropdown();
     populateSubTopicDropdown();
     updateProblemCount();
@@ -2906,12 +2912,53 @@
   }
 
   // ─────────────────────────────────────────────────────────────────────
+  //  SECTION + TOPIC + SUB-TOPIC FILTERS
+  // ─────────────────────────────────────────────────────────────────────
+  function populateSectionDropdown() {
+    const dl = document.getElementById('sectionList');
+    dl.innerHTML = '<option value="All Sections">';
+    const sections = Array.from(new Set(topicIndex.map(t => t.section).filter(Boolean))).sort();
+    sections.forEach(n => {
+      const o = document.createElement('option');
+      o.value = n;
+      dl.appendChild(o);
+    });
+  }
+
+  function getSelectedSection() {
+    const v = document.getElementById('sectionFilter').value.trim();
+    if (!v || v.toLowerCase() === 'all sections') return null;
+    return v;
+  }
+
+  function topicsInSection() {
+    const s = getSelectedSection();
+    if (!s) return topicIndex;
+    return topicIndex.filter(t => (t.section || '').toLowerCase() === s.toLowerCase());
+  }
+
+  async function onSectionChange() {
+    // Clear downstream filters when section changes
+    document.getElementById('topicFilter').value = '';
+    document.getElementById('subTopicFilter').value = '';
+    populateTopicDropdown();
+    await ensureSelectedTopicLoaded();
+    populateSubTopicDropdown();
+    updateProblemCount();
+  }
+    if (!quotes.length) return;
+    const q = quotes[Math.floor(Math.random() * quotes.length)];
+    document.getElementById('quoteText').textContent = q.q;
+    document.getElementById('quoteAuthor').textContent = '— ' + q.a;
+  }
+
+  // ─────────────────────────────────────────────────────────────────────
   //  TOPIC + SUB-TOPIC FILTERS
   // ─────────────────────────────────────────────────────────────────────
   function populateTopicDropdown() {
     const dl = document.getElementById('topicList');
     dl.innerHTML = '<option value="All Topics">';
-    topicIndex.map(t => t.name).sort().forEach(n => {
+    topicsInSection().map(t => t.name).sort().forEach(n => {
       const o = document.createElement('option');
       o.value = n;
       dl.appendChild(o);
@@ -2926,8 +2973,12 @@
 
   function problemsInTopic() {
     const t = getSelectedTopic();
-    if (!t) return problems;
-    return problems.filter(p => p.topicName && p.topicName.toLowerCase() === t.toLowerCase());
+    if (t) {
+      return problems.filter(p => p.topicName && p.topicName.toLowerCase() === t.toLowerCase());
+    }
+    // No topic → constrain by section if one is picked
+    const sectionTopics = new Set(topicsInSection().map(x => x.name.toLowerCase()));
+    return problems.filter(p => p.topicName && sectionTopics.has(p.topicName.toLowerCase()));
   }
 
   async function ensureTopicLoaded(name) {
@@ -2956,8 +3007,12 @@
 
   async function ensureSelectedTopicLoaded() {
     const t = getSelectedTopic();
-    if (t) await ensureTopicLoaded(t);
-    else   await Promise.all(topicIndex.map(t => ensureTopicLoaded(t.name)));
+    if (t) {
+      await ensureTopicLoaded(t);
+    } else {
+      // Load only topics matching the section filter (or everything if no section)
+      await Promise.all(topicsInSection().map(x => ensureTopicLoaded(x.name)));
+    }
   }
 
   async function onTopicChange() {

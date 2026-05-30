@@ -2,26 +2,31 @@
   "topics": [
     {
       "name": "Binary Search",
+      "section": "Section 2",
       "file": "binary-search.json",
       "notesFile": "binary-search.notes.json"
     },
     {
       "name": "Linked List",
+      "section": "Section 2",
       "file": "linked-list.json",
       "notesFile": "linked-list.notes.json"
     },
     {
       "name": "Stacks",
+      "section": "Section 2",
       "file": "stacks.json",
       "notesFile": "stacks.notes.json"
     },
     {
       "name": "Queues",
+      "section": "Section 2",
       "file": "queues.json",
       "notesFile": "queues.notes.json"
     },
     {
       "name": "Trees",
+      "section": "Section 2",
       "file": "trees.json",
       "notesFile": "trees.notes.json"
     }
