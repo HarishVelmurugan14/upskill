@@ -163,11 +163,13 @@
             <li>"Find the missing number in 1..N"</li>
             <li>Counting total subarrays of an array (N*(N+1)/2)</li>
             <li>Triangular number / staircase totals</li>
+            <li>Brute upper bound for staircase / sqrt problems</li>
           </ul>
           <div class="used-row">
             <span class="lbl">Used in</span>
+            <span class="used-in">bs-staircase</span>
+            <span class="used-in">bs-special-integer</span>
             <span class="used-in">missing number variants</span>
-            <span class="used-in">subarray counters</span>
           </div>
         </div>
       </div>
@@ -221,6 +223,37 @@
         </div>
       </div>
       <div class="pat-note">Identical to "sum of 1..N" — every left endpoint <code>l</code> pairs with <code>N - l</code> right endpoints.</div>
+    </div>
+  </div>
+
+  <div class="pat-card">
+    <div class="pat-hdr">
+      <div class="pat-hdr-name">Inclusion–Exclusion (divisible by A or B)</div>
+      <div class="pat-day">d23</div>
+    </div>
+    <div class="pat-body">
+      <div class="pat-cols">
+        <div>
+          <div class="formula-eq">
+            #(<span class="num">1</span>..<span class="var">N</span> divisible by <span class="var">A</span> or <span class="var">B</span>)<br>
+            &nbsp;&nbsp;= ⌊<span class="var">N</span> <span class="op">/</span> <span class="var">A</span>⌋ <span class="op">+</span> ⌊<span class="var">N</span> <span class="op">/</span> <span class="var">B</span>⌋ <span class="op">−</span> ⌊<span class="var">N</span> <span class="op">/</span> lcm(<span class="var">A</span>, <span class="var">B</span>)⌋
+          </div>
+          <div class="mini-ex"><strong>Ex:</strong> N=12, A=2, B=3 → 6 + 4 − 2 = <strong>8</strong> (numbers: 2,3,4,6,8,9,10,12).</div>
+        </div>
+        <div>
+          <span class="sig-label">When to reach for it</span>
+          <ul class="sig-list">
+            <li>"K-th magical number divisible by A or B"</li>
+            <li>BS on answer where the predicate is "count ≤ mid ≥ K"</li>
+            <li>Any two-set "OR" count over [1..N]</li>
+          </ul>
+          <div class="used-row">
+            <span class="lbl">Used in</span>
+            <span class="used-in">bs-magical-number</span>
+          </div>
+        </div>
+      </div>
+      <div class="pat-note">Subtraction prevents double-counting multiples of <code>lcm(A,B)</code>. Generalizes to 3+ sets with alternating signs.</div>
     </div>
   </div>
 
@@ -317,12 +350,187 @@
     </div>
   </div>
 
+  <div class="pat-card">
+    <div class="pat-hdr">
+      <div class="pat-hdr-name">Integer Square Root via BS</div>
+      <div class="pat-day">d21, d23</div>
+    </div>
+    <div class="pat-body">
+      <div class="pat-cols">
+        <div>
+          <div class="formula-eq">
+            ⌊√<span class="var">N</span>⌋ = largest <span class="var">mid</span> with <span class="var">mid</span> <span class="op">*</span> <span class="var">mid</span> <span class="op">≤</span> <span class="var">N</span><br>
+            <span class="com">// search space: low=0, high=N (or 46341 cap if N fits in int)</span><br>
+            <span class="com">// use (long) cast on mid*mid to avoid overflow</span>
+          </div>
+          <div class="mini-ex"><strong>Ex:</strong> N=11 → mid=3 (9 ≤ 11 ✓), mid=4 (16 &gt; 11 ✗) → <strong>3</strong>.</div>
+        </div>
+        <div>
+          <span class="sig-label">When to reach for it</span>
+          <ul class="sig-list">
+            <li>"⌊√N⌋ without Math.sqrt"</li>
+            <li>Staircase: smallest k with k(k+1)/2 ≥ N</li>
+            <li>Any "largest x with monotone predicate"</li>
+          </ul>
+          <div class="used-row">
+            <span class="lbl">Used in</span>
+            <span class="used-in">bs-sqrt</span>
+            <span class="used-in">bs-staircase</span>
+          </div>
+        </div>
+      </div>
+      <div class="pat-note">Cast: <code>long sq = (long) mid * mid;</code> — int*int overflows when N ≥ 2³¹.</div>
+    </div>
+  </div>
+
+  <div class="pat-card">
+    <div class="pat-hdr">
+      <div class="pat-hdr-name">BS-on-Answer Bounds</div>
+      <div class="pat-day">d23</div>
+    </div>
+    <div class="pat-body">
+      <div class="pat-cols">
+        <div>
+          <div class="formula-eq">
+            <span class="com">// minimize-max (painters, books, paint cost):</span><br>
+            low = max(items)  <span class="com">// can't go below largest single item</span><br>
+            high = sum(items) <span class="com">// 1 worker takes everything</span><br><br>
+            <span class="com">// maximize-min (aggressive cows):</span><br>
+            low = <span class="num">1</span>                          <span class="com">// smallest gap</span><br>
+            high = max(items) <span class="op">−</span> min(items) <span class="com">// widest possible gap</span>
+          </div>
+          <div class="mini-ex"><strong>Painters [10, 20, 30, 40]:</strong> low=40, high=100. Feasible(70)? → yes → try 60.</div>
+        </div>
+        <div>
+          <span class="sig-label">When to reach for it</span>
+          <ul class="sig-list">
+            <li>BS on answer space — picking the right bounds is half the work</li>
+            <li>Wrong bounds (low=0 or low=1 for minimize-max) → infinite-loop or wrong answer</li>
+          </ul>
+          <div class="used-row">
+            <span class="lbl">Used in</span>
+            <span class="used-in">bs-painters</span>
+            <span class="used-in">bs-allocate-books</span>
+            <span class="used-in">bs-aggressive-cows</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="pat-card">
+    <div class="pat-hdr">
+      <div class="pat-hdr-name">Pivot Detection in Rotated Sorted Array</div>
+      <div class="pat-day">d22</div>
+    </div>
+    <div class="pat-body">
+      <div class="pat-cols">
+        <div>
+          <div class="formula-eq">
+            <span class="com">// At each step exactly one half is sorted:</span><br>
+            if (<span class="var">A</span>[low] <span class="op">≤</span> <span class="var">A</span>[mid])  → <span class="op">left</span> half is sorted<br>
+            else                       → <span class="op">right</span> half is sorted<br><br>
+            <span class="com">// Then check if target lies inside the sorted half:</span><br>
+            if (target in [<span class="var">A</span>[low], <span class="var">A</span>[mid])) → go left, else → go right
+          </div>
+          <div class="mini-ex"><strong>Ex:</strong> A=[4,5,6,7,0,1,2], target=0. mid=3 (A[mid]=7). A[low]=4 ≤ 7 → left sorted, target 0 ∉ [4,7), go right.</div>
+        </div>
+        <div>
+          <span class="sig-label">When to reach for it</span>
+          <ul class="sig-list">
+            <li>Search in a rotated sorted array (no duplicates)</li>
+            <li>Find min in rotated sorted array (same half-test)</li>
+          </ul>
+          <div class="used-row">
+            <span class="lbl">Used in</span>
+            <span class="used-in">bs-rotated-search</span>
+          </div>
+        </div>
+      </div>
+      <div class="pat-note">Use <code>&lt;=</code> not <code>&lt;</code> on the left-sorted check — handles the case where low == mid.</div>
+    </div>
+  </div>
+
+  <div class="pat-card">
+    <div class="pat-hdr">
+      <div class="pat-hdr-name">Median by Partition (Two Sorted Arrays)</div>
+      <div class="pat-day">d23</div>
+    </div>
+    <div class="pat-body">
+      <div class="pat-cols">
+        <div>
+          <div class="formula-eq">
+            <span class="com">// Let N ≤ M; BS over partitionA in [0..N]:</span><br>
+            partitionA = (low <span class="op">+</span> high) <span class="op">/</span> <span class="num">2</span><br>
+            partitionB = (<span class="var">N</span> <span class="op">+</span> <span class="var">M</span> <span class="op">+</span> <span class="num">1</span>) <span class="op">/</span> <span class="num">2</span> <span class="op">−</span> partitionA<br><br>
+            <span class="com">// Valid when:</span><br>
+            maxLeftA <span class="op">≤</span> minRightB <span class="op">&&</span> maxLeftB <span class="op">≤</span> minRightA<br><br>
+            <span class="com">// Median:</span><br>
+            odd  → max(maxLeftA, maxLeftB)<br>
+            even → (max(maxLeftA, maxLeftB) <span class="op">+</span> min(minRightA, minRightB)) <span class="op">/</span> <span class="num">2.0</span>
+          </div>
+          <div class="mini-ex"><strong>Ex:</strong> A=[1,3], B=[2]. N=1, M=2. Trying partitionA=1, partitionB=1 → maxLeftA=1, minRightB=∞, maxLeftB=2, minRightA=3 → valid → median = max(1,2) = <strong>2</strong>.</div>
+        </div>
+        <div>
+          <span class="sig-label">When to reach for it</span>
+          <ul class="sig-list">
+            <li>Median of two sorted arrays in O(log(min(N, M)))</li>
+            <li>K-th element of two sorted arrays (similar partition trick)</li>
+          </ul>
+          <div class="used-row">
+            <span class="lbl">Used in</span>
+            <span class="used-in">bs-median-two-sorted</span>
+          </div>
+        </div>
+      </div>
+      <div class="pat-note">Use <code>Integer.MIN_VALUE</code> / <code>MAX_VALUE</code> as sentinels when a partition lands at the array edge.</div>
+    </div>
+  </div>
+
   </div>
   <!-- end BS -->
 
   <!-- ════════════════ STACK / MONOTONIC ════════════════ -->
   <div class="sec">
   <div class="sec-title">Stack &amp; Monotonic Patterns</div>
+
+  <div class="pat-card">
+    <div class="pat-hdr">
+      <div class="pat-hdr-name">Min-Stack Encode/Decode (O(1) extra space)</div>
+      <div class="pat-day">d26</div>
+    </div>
+    <div class="pat-body">
+      <div class="pat-cols">
+        <div>
+          <div class="formula-eq">
+            <span class="com">// push x:</span><br>
+            if (stack empty) → push x, min = x<br>
+            else if (x <span class="op">&gt;=</span> min) → push x<br>
+            else → push (<span class="num">2</span><span class="op">*</span>x <span class="op">−</span> min), min = x<br><br>
+            <span class="com">// top:</span><br>
+            if (top <span class="op">&lt;</span> min) → return min  <span class="com">// encoded marker</span><br>
+            else → return top<br><br>
+            <span class="com">// pop:</span><br>
+            if (top <span class="op">&lt;</span> min) → min = <span class="num">2</span><span class="op">*</span>min <span class="op">−</span> top  <span class="com">// recover old min</span><br>
+            then pop
+          </div>
+          <div class="mini-ex"><strong>Why it works:</strong> when new x &lt; min, store the "deviation" 2x−min. Since 2x−min &lt; x &lt; min, it acts as a sentinel; on pop we reverse to get the previous min.</div>
+        </div>
+        <div>
+          <span class="sig-label">When to reach for it</span>
+          <ul class="sig-list">
+            <li>Min/Max stack with O(1) per op and O(1) extra space</li>
+            <li>Interview classic when "no auxiliary stack" is required</li>
+          </ul>
+          <div class="used-row">
+            <span class="lbl">Used in</span>
+            <span class="used-in">stacks-min-stack</span>
+          </div>
+        </div>
+      </div>
+      <div class="pat-note">Use <code>long</code> if values can be near MAX_INT — <code>2*x − min</code> can underflow int.</div>
+    </div>
+  </div>
 
   <div class="pat-card">
     <div class="pat-hdr">
@@ -460,6 +668,72 @@
   <!-- ════════════════ TREE / RECURSION ════════════════ -->
   <div class="sec">
   <div class="sec-title">Tree &amp; Recursion Identities</div>
+
+  <div class="pat-card">
+    <div class="pat-hdr">
+      <div class="pat-hdr-name">Balanced-Tree Check</div>
+      <div class="pat-day">d30</div>
+    </div>
+    <div class="pat-body">
+      <div class="pat-cols">
+        <div>
+          <div class="formula-eq">
+            isBalanced(node):<br>
+            &nbsp;&nbsp;hL = height(left), hR = height(right)<br>
+            &nbsp;&nbsp;return |hL <span class="op">−</span> hR| <span class="op">≤</span> <span class="num">1</span> <span class="op">&&</span> isBalanced(left) <span class="op">&&</span> isBalanced(right)<br><br>
+            <span class="com">// O(N) trick: return -1 from height() if any subtree is unbalanced</span><br>
+            heightOrFail(node):<br>
+            &nbsp;&nbsp;if (hL == -1 <span class="op">||</span> hR == -1 <span class="op">||</span> |hL−hR| <span class="op">&gt;</span> <span class="num">1</span>) return <span class="num">−1</span>
+          </div>
+          <div class="mini-ex"><strong>Ex:</strong> tree with hL=2, hR=4 at root → |2−4| = 2 → NOT balanced.</div>
+        </div>
+        <div>
+          <span class="sig-label">When to reach for it</span>
+          <ul class="sig-list">
+            <li>AVL property check (every node)</li>
+            <li>Any "no two subtrees differ by more than k"</li>
+          </ul>
+          <div class="used-row">
+            <span class="lbl">Used in</span>
+            <span class="used-in">trees-balanced</span>
+          </div>
+        </div>
+      </div>
+      <div class="pat-note">The "-1 sentinel" trick avoids re-computing height per recursion call — turns O(N²) into O(N).</div>
+    </div>
+  </div>
+
+  <div class="pat-card">
+    <div class="pat-hdr">
+      <div class="pat-hdr-name">BST Validity (range carry)</div>
+      <div class="pat-day">d31</div>
+    </div>
+    <div class="pat-body">
+      <div class="pat-cols">
+        <div>
+          <div class="formula-eq">
+            isBST(node, min, max):<br>
+            &nbsp;&nbsp;if (node == null) return true<br>
+            &nbsp;&nbsp;if (node.val <span class="op">≤</span> min <span class="op">||</span> node.val <span class="op">≥</span> max) return false<br>
+            &nbsp;&nbsp;return isBST(left, min, node.val) <span class="op">&&</span> isBST(right, node.val, max)<br><br>
+            <span class="com">// initial call: isBST(root, Long.MIN_VALUE, Long.MAX_VALUE)</span>
+          </div>
+          <div class="mini-ex"><strong>Why long:</strong> a node with val = Integer.MIN_VALUE would fail the int-range check at the root — promote bounds to <code>long</code>.</div>
+        </div>
+        <div>
+          <span class="sig-label">When to reach for it</span>
+          <ul class="sig-list">
+            <li>Validate BST property recursively</li>
+            <li>Any "every node must respect ancestor constraints"</li>
+          </ul>
+          <div class="used-row">
+            <span class="lbl">Used in</span>
+            <span class="used-in">trees-valid-bst</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
 
   <div class="pat-card">
     <div class="pat-hdr">
@@ -645,6 +919,14 @@
             <li>Any product where both operands can reach √MAX_LONG</li>
             <li>Contribution sums multiplying counts × values</li>
           </ul>
+          <div class="used-row">
+            <span class="lbl">Used in</span>
+            <span class="used-in">bs-add-or-not</span>
+            <span class="used-in">bs-painters</span>
+            <span class="used-in">bs-staircase</span>
+            <span class="used-in">bs-magical-number</span>
+            <span class="used-in">trees-valid-bst</span>
+          </div>
         </div>
       </div>
     </div>

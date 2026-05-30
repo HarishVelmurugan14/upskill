@@ -220,6 +220,27 @@ There is a dedicated sibling page **Formulas** (nav pill: amber). It holds the r
 
 Group cards into sections: Math Basics, Binary Search, Stack & Monotonic, Tree & Recursion, Modular. Add more sections as topics expand. Do not duplicate explanations that live in `key-patterns.html` — formulas page is for the equation itself, key-patterns is for the algorithm skeleton.
 
+**Audit checklist for every new problem.** Before marking a problem done, scan its solution code for these formula markers — each one should either match an existing card (add the problem id to its `used-in` pills) or warrant a new card:
+
+| Marker in code | Formula |
+|---|---|
+| `low + (high - low) / 2` | Safe Mid (no overflow) |
+| `Math.sqrt`, `mid * mid` | Integer Square Root via BS |
+| `(long) a * b`, `% MOD` | Modular Product / Safe Modulo of Subtraction |
+| `gcd`, `lcm`, `N / A + N / B - N / lcm` | GCD / LCM / Inclusion–Exclusion |
+| `N * (N + 1) / 2` | Sum of First N / Total Subarrays |
+| `low = max(items)`, `high = sum(items)` | BS-on-Answer Bounds |
+| `peekFirst`, deque eviction | Sliding-Window Min/Max via Deque |
+| `prevSmaller`, `nextGreater`, monotonic stack | Contribution Technique / Largest Rectangle |
+| `height(left)`, `Math.max(hL, hR) + 1` | Height of a Node / Balanced check |
+| `isBST(node, min, max)` with long bounds | BST Validity (range carry) |
+| `2*x - min` push trick | Min-Stack Encode/Decode |
+| `A[low] <= A[mid]` | Pivot Detection (rotated array) |
+| `partitionA + partitionB = (N+M+1)/2` | Median by Partition |
+| `lower_bound`, `upper_bound` on sorted row | Lower Bound count |
+
+If a new problem introduces a recurring identity not in the table, add it both to `formulas.html` and to this checklist.
+
 ---
 
 ## 7. Topic notes schema (`<slug>.notes.json`)
