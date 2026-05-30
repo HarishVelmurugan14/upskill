@@ -209,6 +209,19 @@ The page renders it as a faint reference thumbnail under the problem description
 
 ---
 
+## 6b. Formulas page (`Part2/formulas.html`)
+
+There is a dedicated sibling page **Formulas** (nav pill: amber). It holds the reusable identities we keep reaching for — gcd, lcm, sum of N, contribution technique, mid-overflow guard, modular subtraction, BST range pruning, etc.
+
+**Rule:** when you author a new problem and notice it leans on a recurring formula or identity, add a card to `formulas.html` (or extend the existing one's "Used in" pill list). Each card has:
+- Left column: the formula in the `formula-eq` block + a one-line `mini-ex` example.
+- Right column: a Signals list (when to reach for it) + a `used-in` pill row listing the problem ids that use it.
+- Optional bottom `pat-note` for the gotcha.
+
+Group cards into sections: Math Basics, Binary Search, Stack & Monotonic, Tree & Recursion, Modular. Add more sections as topics expand. Do not duplicate explanations that live in `key-patterns.html` — formulas page is for the equation itself, key-patterns is for the algorithm skeleton.
+
+---
+
 ## 7. Topic notes schema (`<slug>.notes.json`)
 
 ```json
