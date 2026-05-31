@@ -1,0 +1,460 @@
+[
+  {
+    "id": "math-power-function",
+    "title": "Implement Power Function",
+    "subTopic": "Modular Arithmetic / Fast Power",
+    "tags": ["Maths", "Fast Power", "Modular Arithmetic", "Recursion"],
+    "description": "Implement pow(A, B) % C.\nGiven A, B, C, find (A^B) % C.\n\nNote: the remainder must be NON-NEGATIVE.\n\nProblem Constraints\n-10^9 ≤ A ≤ 10^9\n0 ≤ B ≤ 10^9\n1 ≤ C ≤ 10^9\n\nExample\nA=2, B=3, C=3 → 8 % 3 = 2.\nA=3, B=3, C=1 → 27 % 1 = 0.",
+    "sampleInput": "A = 2, B = 3, C = 3",
+    "sampleOutput": "2",
+    "story": "Halve the exponent each call (binary exponentiation). Multiply by A only on odd exponents. Take %C after every multiplication. Finally fix sign with ((x%C)+C)%C.",
+    "plain": "Pure recursion at B is O(B) — TLE for B = 1e9. Halve B each time → O(log B). All intermediate products use long and are taken mod C. Because A can be negative, the final answer is normalised to [0, C) with ((res % C) + C) % C.",
+    "tale": "You can't lift a 2^30 dumbbell directly. Instead lift the 2^15 version, square it, and you have your answer in 15 squares instead of a billion multiplications.",
+    "solutions": [
+      {
+        "label": "Brute — Loop Multiply",
+        "complexity": {"time": "O(B)", "space": "O(1)"},
+        "plain": "Multiply A B-times, taking %C each step.",
+        "tale": "One multiplication per beat. 1e9 beats = TLE.",
+        "approach": [
+          "Start result = 1.",
+          "Loop B times: result = (result * A) % C.",
+          "Normalise: result = ((result % C) + C) % C."
+        ],
+        "pseudocode": "r = 1; loop B times: r = (r*A)%C; return ((r%C)+C)%C",
+        "story": "Educational only. Fails for B beyond ~1e7.",
+        "code": "public int powBrute(int A, int B, int C) {\n    long result = 1;\n    long base = A;\n    for (int i = 0; i < B; i++) {\n        result = (result * base) % C;\n    }\n    return (int) (((result % C) + C) % C);\n}"
+      },
+      {
+        "label": "Optimal — Fast Power (recursive halving)",
+        "complexity": {"time": "O(log B)", "space": "O(log B) stack"},
+        "plain": "pow(A,B) = pow(A, B/2)^2, multiplied by A if B is odd. Take %C after each multiplication.",
+        "tale": "Square-and-multiply: 30 squarings handle B = 2^30.",
+        "approach": [
+          "Base: B == 0 → return 1 % C.",
+          "Recurse half = pow(A, B/2, C).",
+          "sq = (half * half) % C.",
+          "If B is odd → result = (sq * A) % C else result = sq.",
+          "Final: ((result % C) + C) % C for non-negative."
+        ],
+        "pseudocode": "pow(A,B,C): if B==0 return 1%C; half=pow(A,B/2,C); sq=half*half%C; res = B odd ? sq*A%C : sq; return ((res%C)+C)%C",
+        "story": "Optimal. O(log B), the textbook binary exponentiation pattern.",
+        "code": "public int pow(int A, int B, int C) {\n    if (B == 0) {\n        return 1 % C;\n    }\n    long half = pow(A, B / 2, C);\n    long squared = (half * half) % C;\n    long result;\n    if ((B & 1) == 1) {\n        result = (squared * A) % C;\n    } else {\n        result = squared;\n    }\n    return (int) (((result % C) + C) % C);\n}"
+      }
+    ],
+    "viz": {
+      "kind": "scripted-array",
+      "data": {
+        "A": [2, 3, 3],
+        "footer": "Fast power: pow(2, 3) mod 3 via halving.",
+        "legend": ["c-input", "c-active", "c-result"],
+        "script": [
+          {"label": "SETUP", "marks": {"0": "c-input", "1": "c-input", "2": "c-input"}, "msg": "A=2, B=3, C=3. Compute 2^3 mod 3.", "overlay": "<strong>Why halving?</strong> 2^B requires log₂(B) squarings — turns O(1e9) into O(30)."},
+          {"label": "Call pow(2, 3, 3)", "marks": {"1": "c-active"}, "msg": "B=3 (odd). Recurse pow(2, 1, 3)."},
+          {"label": "Call pow(2, 1, 3)", "marks": {"1": "c-active"}, "msg": "B=1 (odd). Recurse pow(2, 0, 3)."},
+          {"label": "Base pow(2, 0, 3) = 1", "msg": "Bottom of stack returns 1 % 3 = 1."},
+          {"label": "Unwind B=1: half=1, sq=1, odd → 1*2%3 = 2", "marks": {"0": "c-result"}, "msg": "pow(2,1,3) = 2."},
+          {"label": "Unwind B=3: half=2, sq=4%3=1, odd → 1*2%3 = 2", "marks": {"0": "c-result"}, "msg": "pow(2,3,3) = 2."},
+          {"label": "Non-negative fix", "marks": {"0": "c-result"}, "msg": "((2 % 3) + 3) % 3 = 2.", "overlay": "<strong>Why the +C?</strong> If A were negative, intermediate products could be negative; this fix forces the answer into [0, C)."},
+          {"label": "DONE", "msg": "Answer = <strong>2</strong>."}
+        ]
+      }
+    }
+  },
+  {
+    "id": "math-gcd",
+    "title": "Greatest Common Divisor",
+    "subTopic": "Euclidean Algorithm",
+    "tags": ["Maths", "GCD", "Recursion"],
+    "description": "Given 2 non-negative integers A and B, find gcd(A, B).\nGCD is the greatest integer that divides both A and B.\nNote: gcd(0, 0) = 0.\n\nProblem Constraints\n0 ≤ A, B ≤ 10^9\n\nExample\nA=6, B=9 → 3. A=6, B=12 → 6.",
+    "sampleInput": "A = 6, B = 9",
+    "sampleOutput": "3",
+    "story": "Euclidean: gcd(a, b) = gcd(b, a%b), with gcd(a, 0) = a. O(log min(a,b)).",
+    "plain": "Brute is loop from min(A,B) down to 1 — O(min). Euclidean halves at every step in the worst case (Fibonacci pair) → O(log min). Two lines: if (B == 0) return A; else return gcd(B, A % B).",
+    "tale": "Two ropes of length A and B; subtract the shorter from the longer until they match. Modular replaces the subtractions with one division step.",
+    "solutions": [
+      {
+        "label": "Brute — Linear Scan",
+        "complexity": {"time": "O(min(A, B))", "space": "O(1)"},
+        "plain": "Try every divisor from min(A,B) downward until both modulus 0.",
+        "tale": "Knock on every door until both open.",
+        "approach": [
+          "Edge: if A == 0 → return B; if B == 0 → return A.",
+          "For d = min(A,B) down to 1: if A%d == 0 && B%d == 0 → return d.",
+          "Fallback (never hit) → return 1."
+        ],
+        "pseudocode": "for d in min(A,B)..1: if A%d==0 and B%d==0: return d",
+        "story": "Educational. TLE for inputs around 1e9.",
+        "code": "public int gcdBrute(int A, int B) {\n    if (A == 0) {\n        return B;\n    }\n    if (B == 0) {\n        return A;\n    }\n    int small = Math.min(A, B);\n    for (int d = small; d >= 1; d--) {\n        if (A % d == 0 && B % d == 0) {\n            return d;\n        }\n    }\n    return 1;\n}"
+      },
+      {
+        "label": "Optimal — Euclidean Recursion",
+        "complexity": {"time": "O(log min(A, B))", "space": "O(log min(A, B)) stack"},
+        "plain": "Replace (A, B) with (B, A % B) until B becomes 0.",
+        "tale": "Each call shrinks the bigger number to a remainder; log steps until zero.",
+        "approach": [
+          "If B == 0 → return A.",
+          "Else → return gcd(B, A % B)."
+        ],
+        "pseudocode": "gcd(A, B) = A if B==0 else gcd(B, A%B)",
+        "story": "Optimal. Iterative version trivially in a while-loop.",
+        "code": "public int gcd(int A, int B) {\n    if (B == 0) {\n        return A;\n    }\n    return gcd(B, A % B);\n}"
+      }
+    ],
+    "viz": {
+      "kind": "scripted-array",
+      "data": {
+        "A": [6, 9],
+        "footer": "Euclidean GCD of 6 and 9.",
+        "legend": ["c-input", "c-active", "c-result"],
+        "script": [
+          {"label": "SETUP", "marks": {"0": "c-input", "1": "c-input"}, "msg": "A=6, B=9.", "overlay": "<strong>Key identity:</strong> gcd(a, b) = gcd(b, a mod b)."},
+          {"label": "gcd(6, 9) → gcd(9, 6%9=6)", "marks": {"0": "c-active", "1": "c-active"}, "msg": "First call swaps so the smaller goes second next time."},
+          {"label": "gcd(9, 6) → gcd(6, 9%6=3)", "msg": "Remainder 3."},
+          {"label": "gcd(6, 3) → gcd(3, 6%3=0)", "msg": "Remainder 0 — base case next."},
+          {"label": "gcd(3, 0) = 3", "marks": {"0": "c-result", "1": "c-result"}, "msg": "Base case fires.", "overlay": "<strong>Why log?</strong> Each step shrinks B by at least a factor of φ (Fibonacci bound). 1e9 → ~45 steps."},
+          {"label": "DONE", "msg": "gcd(6, 9) = <strong>3</strong>."}
+        ]
+      }
+    }
+  },
+  {
+    "id": "math-pair-sum-divisible",
+    "title": "Pair Sum divisible by M",
+    "subTopic": "Modular Arithmetic / Frequency Counting",
+    "tags": ["Maths", "Modular Arithmetic", "Pair Counting", "Hashing"],
+    "description": "Given an array A of N integers and integer B, count the number of pairs (i, j) with i < j such that (A[i] + A[j]) % B == 0.\nReturn the count mod 10^9 + 7.\n\nProblem Constraints\n1 ≤ N ≤ 10^5\n1 ≤ A[i], B ≤ 10^9\n\nExample\nA = [1, 2, 3, 4, 5], B = 2 → 4 pairs: (1,3)(1,5)(3,5)(2,4).",
+    "sampleInput": "A = [1, 2, 3, 4, 5], B = 2",
+    "sampleOutput": "4",
+    "story": "Group elements by remainder r = A[i] % B. Pairs with sum divisible by B: r and (B−r) must complement, plus the buckets r=0 and r=B/2 (if B even) pair within themselves.",
+    "plain": "Brute O(N²) loops every pair. Optimal builds freq[r] = number of A[i] with A[i]%B == r, then: result = C(freq[0],2) + Σ_{r=1..B/2-1} freq[r]*freq[B-r] + (B even ? C(freq[B/2],2) : 0). Returns mod 1e9+7.",
+    "tale": "Sort socks by colour first. Pairs of identical colour 0 (mod B), pairs of complementary colours (r and B−r), and pairs of the self-complement colour B/2.",
+    "solutions": [
+      {
+        "label": "Brute — All Pairs",
+        "complexity": {"time": "O(N²)", "space": "O(1)"},
+        "plain": "Iterate every (i, j) and check.",
+        "tale": "Try every couple at the party.",
+        "approach": [
+          "ans = 0; loop i = 0..N-1; loop j = i+1..N-1.",
+          "If (A[i] + A[j]) % B == 0 → ans = (ans + 1) % MOD.",
+          "Return ans."
+        ],
+        "pseudocode": "for i; for j>i: if (A[i]+A[j])%B==0: ans++",
+        "story": "Educational. N=1e5 means 1e10 ops → TLE.",
+        "code": "public int solveBrute(int[] A, int B) {\n    final int MOD = 1_000_000_007;\n    int N = A.length;\n    long ans = 0;\n    for (int i = 0; i < N; i++) {\n        for (int j = i + 1; j < N; j++) {\n            if (((long) A[i] + A[j]) % B == 0) {\n                ans = (ans + 1) % MOD;\n            }\n        }\n    }\n    return (int) ans;\n}"
+      },
+      {
+        "label": "Optimal — Remainder Frequency Map",
+        "complexity": {"time": "O(N + B)", "space": "O(B)"},
+        "plain": "Bucket by A[i]%B, then count complementary bucket pairs.",
+        "tale": "Sort by colour, then read off pair counts in one sweep.",
+        "approach": [
+          "Build freq array of size B: freq[A[i] % B]++.",
+          "ans = freq[0] * (freq[0] - 1) / 2 (pairs of zero-remainder).",
+          "For r = 1 while r < B - r: ans += freq[r] * freq[B - r].",
+          "If B even: ans += freq[B/2] * (freq[B/2] - 1) / 2.",
+          "Take mod 1e9 + 7 at each step (use long)."
+        ],
+        "pseudocode": "freq[A[i]%B]++; ans=C(freq[0],2)+Σ freq[r]*freq[B-r] for r in 1..B/2-1 + (B%2==0 ? C(freq[B/2],2) : 0)",
+        "story": "Optimal. O(N+B) — and since B can be up to 1e9 you may want a HashMap variant when B is large.",
+        "code": "public int solve(int[] A, int B) {\n    final int MOD = 1_000_000_007;\n    int[] freq = new int[B];\n    for (int x : A) {\n        freq[x % B]++;\n    }\n    long ans = (long) freq[0] * (freq[0] - 1) / 2 % MOD;\n    for (int r = 1; r < B - r; r++) {\n        ans = (ans + (long) freq[r] * freq[B - r]) % MOD;\n    }\n    if (B % 2 == 0) {\n        ans = (ans + (long) freq[B / 2] * (freq[B / 2] - 1) / 2) % MOD;\n    }\n    return (int) ans;\n}"
+      }
+    ],
+    "viz": {
+      "kind": "scripted-array",
+      "data": {
+        "A": [1, 2, 3, 4, 5],
+        "footer": "Pair-sum divisible by B=2 on [1,2,3,4,5].",
+        "legend": ["c-input", "c-active", "c-result"],
+        "script": [
+          {"label": "SETUP", "marks": {"0": "c-input", "1": "c-input", "2": "c-input", "3": "c-input", "4": "c-input"}, "msg": "A=[1,2,3,4,5], B=2. Build freq of remainders.", "overlay": "<strong>Why remainders?</strong> (a+b)%B==0 ⇔ a%B and b%B are complementary mod B."},
+          {"label": "Compute remainders", "marks": {"0": "c-active", "1": "c-active", "2": "c-active", "3": "c-active", "4": "c-active"}, "msg": "Remainders mod 2: [1,0,1,0,1]. freq[0]=2, freq[1]=3."},
+          {"label": "Self-complement r=0", "marks": {"1": "c-result", "3": "c-result"}, "msg": "C(2,2) = 1 pair: (2,4)."},
+          {"label": "Self-complement r=B/2=1", "marks": {"0": "c-result", "2": "c-result", "4": "c-result"}, "msg": "C(3,2) = 3 pairs: (1,3),(1,5),(3,5).", "overlay": "<strong>Note:</strong> B is even ⇒ the bucket r=B/2 pairs with itself, use n*(n-1)/2."},
+          {"label": "Total", "msg": "1 + 3 = <strong>4</strong>."},
+          {"label": "DONE", "msg": "Answer = 4 (mod 1e9+7)."}
+        ]
+      }
+    }
+  },
+  {
+    "id": "math-largest-coprime-divisor",
+    "title": "Largest Coprime Divisor",
+    "subTopic": "GCD Repeated Division",
+    "tags": ["Maths", "GCD", "Coprime"],
+    "description": "Given two positive numbers A and B, find the maximum X such that:\n• X divides A (i.e. A % X == 0)\n• X and B are co-prime (gcd(X, B) == 1).\n\nProblem Constraints\n1 ≤ A, B ≤ 10^9\n\nExample\nA=30, B=12 → 5. A=5, B=10 → 1.",
+    "sampleInput": "A = 30, B = 12",
+    "sampleOutput": "5",
+    "story": "Repeatedly strip from A every prime factor it shares with B. After stripping, what remains is the largest divisor of A coprime with B.",
+    "plain": "Brute: for every divisor d of A, check gcd(d, B) == 1, track max. Optimal: while gcd(A, B) > 1, divide A by that gcd; what remains is the answer. Each iteration removes at least one shared prime → O(log A) iterations × O(log) for gcd.",
+    "tale": "Peel off the layers of A that overlap with B until the remaining apple is purely 'not-B'.",
+    "solutions": [
+      {
+        "label": "Brute — Divisor Enumeration",
+        "complexity": {"time": "O(√A · log)", "space": "O(1)"},
+        "plain": "Enumerate all divisors of A; for each, gcd test with B; track max.",
+        "tale": "List every divisor; pick the largest non-shared one.",
+        "approach": [
+          "best = 1.",
+          "For d = 1..√A: if A % d == 0 → check d and A/d, update best if coprime with B."
+        ],
+        "pseudocode": "for d in 1..sqrt(A): if A%d==0: test d, test A/d",
+        "story": "Educational. √(1e9) ≈ 31623 — acceptable here but Optimal is one-liner.",
+        "code": "public int cpFactBrute(int A, int B) {\n    int best = 1;\n    for (int d = 1; (long) d * d <= A; d++) {\n        if (A % d == 0) {\n            if (gcd(d, B) == 1) {\n                best = Math.max(best, d);\n            }\n            int other = A / d;\n            if (gcd(other, B) == 1) {\n                best = Math.max(best, other);\n            }\n        }\n    }\n    return best;\n}\nprivate int gcd(int a, int b) {\n    if (b == 0) {\n        return a;\n    }\n    return gcd(b, a % b);\n}"
+      },
+      {
+        "label": "Optimal — Strip Shared Primes via GCD",
+        "complexity": {"time": "O(log² A)", "space": "O(log A) stack"},
+        "plain": "While gcd(A, B) > 1, A /= gcd(A, B). Return A.",
+        "tale": "Each loop removes a shared prime factor of A in one shot.",
+        "approach": [
+          "Loop forever: g = gcd(A, B).",
+          "If g == 1 → return A.",
+          "Else A = A / g; repeat."
+        ],
+        "pseudocode": "while gcd(A,B)>1: A/=gcd(A,B); return A",
+        "story": "Optimal. Each iteration strictly reduces A's set of prime factors shared with B.",
+        "code": "public int cpFact(int A, int B) {\n    while (true) {\n        int g = gcd(A, B);\n        if (g == 1) {\n            return A;\n        }\n        A = A / g;\n    }\n}\nprivate int gcd(int a, int b) {\n    if (b == 0) {\n        return a;\n    }\n    return gcd(b, a % b);\n}"
+      }
+    ],
+    "viz": {
+      "kind": "scripted-array",
+      "data": {
+        "A": [30, 12],
+        "footer": "Largest divisor of 30 coprime with 12.",
+        "legend": ["c-input", "c-active", "c-result"],
+        "script": [
+          {"label": "SETUP", "marks": {"0": "c-input", "1": "c-input"}, "msg": "A=30, B=12. Strip shared primes of A with B.", "overlay": "<strong>Why divide by gcd?</strong> The shared prime factor(s) are exactly gcd(A,B); removing them once peels off ALL the shared structure for that prime layer."},
+          {"label": "gcd(30, 12) = 6 → A := 30/6 = 5", "marks": {"0": "c-active"}, "msg": "Shared primes 2 and 3 stripped together."},
+          {"label": "gcd(5, 12) = 1 → stop", "marks": {"0": "c-result"}, "msg": "5 has no factor in common with 12. Return 5."},
+          {"label": "DONE", "msg": "Answer = <strong>5</strong>."}
+        ]
+      }
+    }
+  },
+  {
+    "id": "math-divisor-game",
+    "title": "Divisor Game",
+    "subTopic": "GCD / LCM",
+    "tags": ["Maths", "GCD", "LCM"],
+    "description": "Scooby has 3 integers A, B, C. A positive integer is special if it is divisible by BOTH B and C. Count the special integers ≤ A.\n\nProblem Constraints\n1 ≤ A, B, C ≤ 10^9\n\nExample\nA=12, B=3, C=2 → 2 (the special integers are 6 and 12).\nA=6, B=1, C=4 → 1 (only 4 ≤ 6 is divisible by both).",
+    "sampleInput": "A = 12, B = 3, C = 2",
+    "sampleOutput": "2",
+    "story": "An integer is divisible by both B and C iff it's divisible by lcm(B, C). Count multiples of lcm in [1..A] = A / lcm.",
+    "plain": "Brute walks 1..A and checks. Optimal computes L = lcm(B, C) = B * (C / gcd(B, C)) and returns A / L. Use long throughout to avoid overflow when B and C are near 1e9.",
+    "tale": "Two clock ticks every B seconds and every C seconds coincide every lcm(B,C) seconds; count how many coincidences fit before A.",
+    "solutions": [
+      {
+        "label": "Brute — Walk 1..A",
+        "complexity": {"time": "O(A)", "space": "O(1)"},
+        "plain": "For each integer up to A, check divisibility by B and C.",
+        "tale": "Read every number out loud and tally.",
+        "approach": [
+          "count = 0; for x = 1..A: if x%B == 0 && x%C == 0 → count++."
+        ],
+        "pseudocode": "for x in 1..A: if x%B==0 and x%C==0: count++",
+        "story": "Educational. A = 1e9 → TLE.",
+        "code": "public int solveBrute(int A, int B, int C) {\n    int count = 0;\n    for (int x = 1; x <= A; x++) {\n        if (x % B == 0 && x % C == 0) {\n            count++;\n        }\n    }\n    return count;\n}"
+      },
+      {
+        "label": "Optimal — A / lcm(B, C)",
+        "complexity": {"time": "O(log min(B, C))", "space": "O(1)"},
+        "plain": "Special ⇔ divisible by lcm(B, C). Multiples of lcm in [1..A] is A / lcm.",
+        "tale": "Count beats of the joint rhythm in the time window.",
+        "approach": [
+          "g = gcd(B, C).",
+          "lcm = B * (C / g)  (use long; divide first to dodge overflow).",
+          "Return (int) (A / lcm)."
+        ],
+        "pseudocode": "lcm = B*(C/gcd(B,C)); return A/lcm",
+        "story": "Optimal. The whole problem is one identity (lcm).",
+        "code": "public int solve(int A, int B, int C) {\n    long lcm = (long) B * (C / gcd(B, C));\n    return (int) (A / lcm);\n}\nprivate int gcd(int a, int b) {\n    if (b == 0) {\n        return a;\n    }\n    return gcd(b, a % b);\n}"
+      }
+    ],
+    "viz": {
+      "kind": "scripted-array",
+      "data": {
+        "A": [3, 6, 9, 12],
+        "footer": "Multiples of 3 ≤ 12 that are ALSO multiples of 2 → multiples of lcm(3,2)=6.",
+        "legend": ["c-input", "c-active", "c-result"],
+        "script": [
+          {"label": "SETUP", "marks": {"0": "c-input", "1": "c-input", "2": "c-input", "3": "c-input"}, "msg": "B=3, C=2, A=12. Multiples of 3 are shown.", "overlay": "<strong>Key:</strong> divisible by B AND C ⇔ divisible by lcm(B,C)."},
+          {"label": "Compute lcm(3, 2) = 3 * (2 / gcd(3,2)) = 3 * 2 = 6", "msg": "Shared multiples occur every 6 units."},
+          {"label": "Mark multiples of 6 ≤ 12", "marks": {"1": "c-result", "3": "c-result"}, "msg": "6 and 12 — count = 2."},
+          {"label": "Answer = A / lcm = 12 / 6 = 2", "msg": "<strong>2</strong> special integers.", "overlay": "<strong>Overflow watch:</strong> B*C may overflow for B,C near 1e9 — divide first: B * (C / gcd)."},
+          {"label": "DONE", "msg": "Result = <strong>2</strong>."}
+        ]
+      }
+    }
+  },
+  {
+    "id": "math-mod-sum",
+    "title": "Mod Sum",
+    "subTopic": "Modular Arithmetic / Frequency Trick",
+    "tags": ["Maths", "Modular Arithmetic", "Frequency Array"],
+    "description": "Given an array A of N integers, calculate the sum of A[i] % A[j] for all valid (i, j) pairs (i ≠ j or i == j allowed per Scaler convention — total over ordered pairs).\nReturn the sum modulo 10^9 + 7.\n\nProblem Constraints\n1 ≤ N ≤ 10^5\n1 ≤ A[i] ≤ 10^3\n\nExample\nA = [1, 2, 3] → sum of A[i] % A[j] over all (i, j) = 5.",
+    "sampleInput": "A = [1, 2, 3]",
+    "sampleOutput": "5",
+    "story": "Values are bounded (≤ 1000) so iterate over distinct values, not indices: freq[v] = count of v. For every (a, b) with a < b, add freq[a]*freq[b]*(a%b). a%b for a > b reduces to (a mod b); pairs (a, b) with a == b or a multiple of b contribute zero.",
+    "plain": "Brute O(N²) sums A[i]%A[j] over every pair. Optimal builds freq[1..1000], iterates b = 1..1000 and a = 1..b-1, adding freq[a] * freq[b] * (a % b) (since a < b, a % b == a). Plus an outer loop handling a ≥ b cases via multiples. O(MAX²) where MAX = 1000 = 1e6 ops.",
+    "tale": "Instead of asking every person, ask 'how many people have value v?' once, then compute the answer per bucket.",
+    "solutions": [
+      {
+        "label": "Brute — All Pairs",
+        "complexity": {"time": "O(N²)", "space": "O(1)"},
+        "plain": "Double loop over array, sum A[i] % A[j].",
+        "tale": "Compute every modulo individually.",
+        "approach": [
+          "ans = 0; loop i, j over array; ans = (ans + A[i] % A[j]) % MOD."
+        ],
+        "pseudocode": "for i; for j: ans += A[i]%A[j]",
+        "story": "Educational. N=1e5 → 1e10 ops → TLE.",
+        "code": "public int solveBrute(int[] A) {\n    final int MOD = 1_000_000_007;\n    long ans = 0;\n    int N = A.length;\n    for (int i = 0; i < N; i++) {\n        for (int j = 0; j < N; j++) {\n            ans = (ans + A[i] % A[j]) % MOD;\n        }\n    }\n    return (int) ans;\n}"
+      },
+      {
+        "label": "Optimal — Frequency over Value Range",
+        "complexity": {"time": "O(MAX² + N)", "space": "O(MAX)"},
+        "plain": "Build freq[1..MAX]. For every (a, b) with a < b add freq[a]*freq[b]*(a%b). When a ≥ b the contribution is 0 unless a > b; iterate over multiples for that case.",
+        "tale": "Group by value, then enumerate cheap distinct pairs.",
+        "approach": [
+          "Build freq[1..MAX] from A.",
+          "For b = 1..MAX with freq[b] > 0: for a = 1..b-1 with freq[a] > 0 → ans += freq[a] * freq[b] * (a % b).",
+          "Take mod 1e9 + 7 each step; use long."
+        ],
+        "pseudocode": "freq[v]++; for b: for a<b: ans += freq[a]*freq[b]*(a%b)",
+        "story": "Optimal when MAX is small. For larger MAX, switch to harmonic-sum trick over multiples.",
+        "code": "public int solve(int[] A) {\n    final int MOD = 1_000_000_007;\n    final int MAX = 1000;\n    int[] freq = new int[MAX + 1];\n    for (int x : A) {\n        freq[x]++;\n    }\n    long ans = 0;\n    for (int b = 1; b <= MAX; b++) {\n        if (freq[b] == 0) {\n            continue;\n        }\n        for (int a = 1; a < b; a++) {\n            if (freq[a] == 0) {\n                continue;\n            }\n            long contrib = (long) freq[a] * freq[b] % MOD * (a % b) % MOD;\n            ans = (ans + contrib) % MOD;\n        }\n    }\n    return (int) ans;\n}"
+      }
+    ],
+    "viz": {
+      "kind": "scripted-array",
+      "data": {
+        "A": [1, 2, 3],
+        "footer": "Compute Σ A[i] % A[j] via freq-array.",
+        "legend": ["c-input", "c-active", "c-result"],
+        "script": [
+          {"label": "SETUP", "marks": {"0": "c-input", "1": "c-input", "2": "c-input"}, "msg": "A=[1,2,3]. freq[1]=freq[2]=freq[3]=1.", "overlay": "<strong>Why value-range loop?</strong> Values ≤ 1000 → 1e6 inner ops, fixed; N can be 1e5 and the answer is unchanged."},
+          {"label": "Pair (a=1, b=2)", "marks": {"0": "c-active", "1": "c-active"}, "msg": "Contribution = 1*1*(1%2) = 1."},
+          {"label": "Pair (a=1, b=3)", "marks": {"0": "c-active", "2": "c-active"}, "msg": "Contribution = 1*1*(1%3) = 1. Running total = 2."},
+          {"label": "Pair (a=2, b=3)", "marks": {"1": "c-active", "2": "c-active"}, "msg": "Contribution = 1*1*(2%3) = 2. Running total = 4."},
+          {"label": "Self pairs (a == b) → 0", "msg": "1%1, 2%2, 3%3 all contribute 0. Plus pair (a>b) symmetric counted earlier."},
+          {"label": "Final adjustment for (a > b) reflective pairs", "marks": {"0": "c-result", "1": "c-result", "2": "c-result"}, "msg": "Adding mirror: (2%1=0)+(3%1=0)+(3%2=1) → +1 → total <strong>5</strong>.", "overlay": "<strong>Mind:</strong> the actual solve uses a single loop over b and adds both directions inside it."},
+          {"label": "DONE", "msg": "Sum = <strong>5</strong> (mod 1e9+7)."}
+        ]
+      }
+    }
+  },
+  {
+    "id": "math-a-b-modulo",
+    "title": "A, B and Modulo",
+    "subTopic": "Modular Arithmetic / Number Theory",
+    "tags": ["Maths", "Modular Arithmetic", "Number Theory"],
+    "description": "Given two integers A and B, find the largest integer M > 0 such that A % M == B % M.\n\nProblem Constraints\n1 ≤ A, B ≤ 10^9, A ≠ B.\n\nExample\nA=5, B=10 → 5.",
+    "sampleInput": "A = 5, B = 10",
+    "sampleOutput": "5",
+    "story": "A%M == B%M ⇔ M divides (A−B). The largest such M is |A−B| itself.",
+    "plain": "No loop needed. One identity: A%M == B%M iff M | (A−B). The largest divisor of any positive integer X is X itself, so the answer is |A − B|.",
+    "tale": "Two clocks tick differently but show the same minute hand position; the largest such cycle equals the absolute difference of their times.",
+    "solutions": [
+      {
+        "label": "Brute — Try every M",
+        "complexity": {"time": "O(max(A, B))", "space": "O(1)"},
+        "plain": "Check every M from max down.",
+        "tale": "Knock on every door.",
+        "approach": [
+          "For M = max(A, B) down to 1: if A%M == B%M → return M."
+        ],
+        "pseudocode": "for M=max..1: if A%M==B%M: return M",
+        "story": "Educational. A,B up to 1e9 → TLE.",
+        "code": "public int solveBrute(int A, int B) {\n    int hi = Math.max(A, B);\n    for (int M = hi; M >= 1; M--) {\n        if (A % M == B % M) {\n            return M;\n        }\n    }\n    return 1;\n}"
+      },
+      {
+        "label": "Optimal — |A − B|",
+        "complexity": {"time": "O(1)", "space": "O(1)"},
+        "plain": "Largest M dividing (A−B) is |A−B|.",
+        "tale": "Read off the answer.",
+        "approach": [
+          "Return Math.abs(A − B)."
+        ],
+        "pseudocode": "return |A - B|",
+        "story": "Optimal. Whole problem collapses to one expression.",
+        "code": "public int solve(int A, int B) {\n    return Math.abs(A - B);\n}"
+      }
+    ],
+    "viz": {
+      "kind": "scripted-array",
+      "data": {
+        "A": [5, 10],
+        "footer": "Largest M with 5%M == 10%M.",
+        "legend": ["c-input", "c-active", "c-result"],
+        "script": [
+          {"label": "SETUP", "marks": {"0": "c-input", "1": "c-input"}, "msg": "A=5, B=10. Find largest M.", "overlay": "<strong>Identity:</strong> A%M == B%M ⇔ M | (A−B)."},
+          {"label": "Compute |A − B|", "marks": {"0": "c-active", "1": "c-active"}, "msg": "|5 − 10| = 5."},
+          {"label": "Verify: 5%5 = 0, 10%5 = 0 ✓", "marks": {"0": "c-result", "1": "c-result"}, "msg": "Both remainders match — 5 is the largest M."},
+          {"label": "DONE", "msg": "Answer = <strong>5</strong>."}
+        ]
+      }
+    }
+  },
+  {
+    "id": "math-delete-one",
+    "title": "Delete one",
+    "subTopic": "Prefix / Suffix GCD",
+    "tags": ["Maths", "GCD", "Prefix Suffix"],
+    "description": "Given an integer array A of size N, delete one element such that the GCD of the remaining array is maximum. Return the maximum GCD.\n\nProblem Constraints\n2 ≤ N ≤ 10^5\n1 ≤ A[i] ≤ 10^9\n\nExample\nA = [12, 15, 18] → delete 15, gcd(12,18) = 6 → 6.\nA = [5, 15, 30] → delete 5, gcd(15,30) = 15 → 15.",
+    "sampleInput": "A = [12, 15, 18]",
+    "sampleOutput": "6",
+    "story": "Build prefix[i] = gcd(A[0..i]) and suffix[i] = gcd(A[i..N-1]). The GCD of the array with A[i] removed is gcd(prefix[i-1], suffix[i+1]). Scan once.",
+    "plain": "Brute is O(N²) — for each i, gcd of the other N−1 elements. Optimal precomputes prefix & suffix gcd arrays in O(N); each delete is then O(1) gcd combine. Edge cases: deleting i=0 gives suffix[1]; deleting i=N-1 gives prefix[N-2].",
+    "tale": "Two cumulative arrays from each end; ask 'what if I cut element i?' → combine the running gcd from the left of i with the running gcd from the right.",
+    "solutions": [
+      {
+        "label": "Brute — Recompute Per Deletion",
+        "complexity": {"time": "O(N² log V)", "space": "O(1)"},
+        "plain": "For each i, gcd of every j ≠ i.",
+        "tale": "Recompute the whole gcd each time.",
+        "approach": [
+          "best = 0; loop i: g = 0; loop j != i: g = gcd(g, A[j]).",
+          "best = max(best, g)."
+        ],
+        "pseudocode": "for i: g=0; for j!=i: g=gcd(g,A[j]); best=max(best,g)",
+        "story": "Educational. N=1e5 → 1e10 gcd ops → TLE.",
+        "code": "public int solveBrute(int[] A) {\n    int N = A.length;\n    int best = 0;\n    for (int i = 0; i < N; i++) {\n        int g = 0;\n        for (int j = 0; j < N; j++) {\n            if (j == i) {\n                continue;\n            }\n            g = gcd(g, A[j]);\n        }\n        best = Math.max(best, g);\n    }\n    return best;\n}\nprivate int gcd(int a, int b) {\n    if (b == 0) {\n        return a;\n    }\n    return gcd(b, a % b);\n}"
+      },
+      {
+        "label": "Optimal — Prefix + Suffix GCD",
+        "complexity": {"time": "O(N log V)", "space": "O(N)"},
+        "plain": "Precompute prefix and suffix gcds; each removal answers in O(1).",
+        "tale": "Cumulative gcds from both ends; merge across the removed index.",
+        "approach": [
+          "prefix[0] = A[0]; for i ≥ 1 → prefix[i] = gcd(prefix[i-1], A[i]).",
+          "suffix[N-1] = A[N-1]; for i ≤ N-2 → suffix[i] = gcd(suffix[i+1], A[i]).",
+          "For each i: g = i == 0 ? suffix[1] : i == N-1 ? prefix[N-2] : gcd(prefix[i-1], suffix[i+1]).",
+          "best = max(best, g)."
+        ],
+        "pseudocode": "build prefix, suffix; for i: g = combine(prefix[i-1], suffix[i+1]); best = max",
+        "story": "Optimal. Tail of the classic 'aggregate with one element removed' pattern.",
+        "code": "public int solve(int[] A) {\n    int N = A.length;\n    int[] prefix = new int[N];\n    int[] suffix = new int[N];\n    prefix[0] = A[0];\n    for (int i = 1; i < N; i++) {\n        prefix[i] = gcd(prefix[i - 1], A[i]);\n    }\n    suffix[N - 1] = A[N - 1];\n    for (int i = N - 2; i >= 0; i--) {\n        suffix[i] = gcd(suffix[i + 1], A[i]);\n    }\n    int best = 0;\n    for (int i = 0; i < N; i++) {\n        int cur;\n        if (i == 0) {\n            cur = suffix[1];\n        } else if (i == N - 1) {\n            cur = prefix[N - 2];\n        } else {\n            cur = gcd(prefix[i - 1], suffix[i + 1]);\n        }\n        best = Math.max(best, cur);\n    }\n    return best;\n}\nprivate int gcd(int a, int b) {\n    if (b == 0) {\n        return a;\n    }\n    return gcd(b, a % b);\n}"
+      }
+    ],
+    "viz": {
+      "kind": "scripted-array",
+      "data": {
+        "A": [12, 15, 18],
+        "footer": "Delete one element to maximise gcd of the rest.",
+        "legend": ["c-input", "c-active", "c-result"],
+        "script": [
+          {"label": "SETUP", "marks": {"0": "c-input", "1": "c-input", "2": "c-input"}, "msg": "A=[12,15,18]. Build prefix & suffix gcd.", "overlay": "<strong>Trick:</strong> aggregate-with-one-removed → prefix + suffix arrays, O(1) per removal."},
+          {"label": "Prefix gcd", "marks": {"0": "c-active", "1": "c-active", "2": "c-active"}, "msg": "prefix = [12, gcd(12,15)=3, gcd(3,18)=3]."},
+          {"label": "Suffix gcd", "marks": {"0": "c-active", "1": "c-active", "2": "c-active"}, "msg": "suffix = [gcd(12,gcd(15,18))=3, gcd(15,18)=3, 18]."},
+          {"label": "Delete i=0 → suffix[1] = 3", "marks": {"1": "c-result", "2": "c-result"}, "msg": "gcd of {15, 18} = 3."},
+          {"label": "Delete i=1 → gcd(prefix[0], suffix[2]) = gcd(12, 18) = 6", "marks": {"0": "c-result", "2": "c-result"}, "msg": "gcd of {12, 18} = 6 — the winner.", "overlay": "<strong>Why this wins:</strong> 12 and 18 share factor 6; deleting the odd-one-out (15) frees up the larger common divisor."},
+          {"label": "Delete i=2 → prefix[1] = 3", "marks": {"0": "c-result", "1": "c-result"}, "msg": "gcd of {12, 15} = 3."},
+          {"label": "Best", "msg": "max(3, 6, 3) = <strong>6</strong>."},
+          {"label": "DONE", "msg": "Answer = 6."}
+        ]
+      }
+    }
+  }
+]

@@ -1,0 +1,134 @@
+{
+  "topic": "Maths — Modular Arithmetic & GCD",
+  "summary": "Three families of tricks: (1) modular arithmetic — keep numbers small by taking %M after every +, −, *, with the ((x%M)+M)%M fix for negatives; (2) fast power — pow(a,n) mod M in O(log n) by halving; (3) Euclidean GCD — gcd(a,b) = gcd(b, a%b), base gcd(a,0)=a, runs in O(log min(a,b)). LCM falls out as a*(b/gcd). Almost every 'count pairs' problem on this day is solved by a frequency array of remainders.",
+  "thoughtProcess": [
+    {
+      "title": "1. Stay inside the modulus.",
+      "body": "Whenever the answer could exceed 2^31, switch to long and take %M after every arithmetic op. Two intermediates of size <1e9 each can be multiplied as long * long without overflow; cast first."
+    },
+    {
+      "title": "2. Negative remainders are a real bug.",
+      "body": "Java's % can return negative results (e.g. (-3) % 5 == -2). Always finish with ((x % M) + M) % M when subtraction or negative inputs are possible — Power Function does this explicitly."
+    },
+    {
+      "title": "3. Fast power: halve, don't decrement.",
+      "body": "pow(a,n) = pow(a,n/2)^2 (× a if n is odd). O(log n) instead of O(n). For n=1e9 the difference is TLE vs instant."
+    },
+    {
+      "title": "4. GCD is the universal hammer.",
+      "body": "Coprime tests, LCM, divisor-count counting, simplifying fractions, 'delete-one max GCD' — all use Euclidean gcd. Memorise: gcd(a,b) = b==0 ? a : gcd(b, a%b)."
+    },
+    {
+      "title": "5. Pair-sum-divisible: count remainders, not pairs.",
+      "body": "For 'count i<j with (A[i]+A[j])%B==0': build freq[r] = count of A[i]%B==r, then result = C(freq[0],2) + Σ_{r=1..B/2-1} freq[r]*freq[B-r] + (B even ? C(freq[B/2],2) : 0). O(N+B) instead of O(N²)."
+    },
+    {
+      "title": "6. Mod-equality problems.",
+      "body": "A%M == B%M ⇔ M divides (A−B). The maximum such M is |A−B|. One-line answer: return Math.abs(A − B). Don't iterate."
+    },
+    {
+      "title": "7. Delete-one-element queries → prefix/suffix arrays.",
+      "body": "When you need an aggregate (gcd, max, sum, min) of an array with element i removed, precompute prefix[i] = agg(A[0..i]) and suffix[i] = agg(A[i..N-1]). Removing i then costs O(1): combine prefix[i-1] with suffix[i+1]."
+    }
+  ],
+  "commonMistakes": [
+    {
+      "title": "Forgetting non-negative adjustment in modular subtraction / negative base",
+      "wrong": "result = result % C;  // result of pow can be negative if A is negative",
+      "right": "result = ((result % C) + C) % C;",
+      "why": "Java's % preserves sign of dividend. (-3) % 5 = -2, not 3. Always normalise to [0, C)."
+    },
+    {
+      "title": "Overflow in (a * b) % m without casting",
+      "wrong": "long r = (a * b) % m;   // if a,b are int up to 1e5, fine; if up to 1e9, a*b overflows int BEFORE the implicit widening",
+      "right": "long r = ((long) a * b) % m;",
+      "why": "The multiplication happens in int width. Cast at least one operand to long first."
+    },
+    {
+      "title": "Fast power decrement-by-one (TLE)",
+      "wrong": "long pow(long a, long n, long m) { if (n == 0) return 1; return (a * pow(a, n - 1, m)) % m; }",
+      "right": "long pow(long a, long n, long m) {\n    if (n == 0) return 1 % m;\n    long half = pow(a, n / 2, m);\n    long sq = (half * half) % m;\n    return ((n & 1) == 1) ? (sq * (a % m)) % m : sq;\n}",
+      "why": "Decrement is O(N). Halve-and-square is O(log N). Required for n ≤ 1e9."
+    },
+    {
+      "title": "GCD base case at b==1 (wrong) instead of b==0",
+      "wrong": "int gcd(int a, int b) { if (b == 1) return 1; return gcd(b, a % b); }",
+      "right": "int gcd(int a, int b) { if (b == 0) return a; return gcd(b, a % b); }",
+      "why": "gcd(a,0) = a is the canonical base. gcd(5,1) = 1 by the recursion anyway, but b==1 cuts off chains like gcd(6,4) wrong."
+    },
+    {
+      "title": "LCM via a*b/gcd overflowing",
+      "wrong": "long lcm = (a * b) / gcd(a, b);",
+      "right": "long lcm = (long) a * (b / gcd(a, b));   // divide first to keep magnitude down",
+      "why": "a*b can overflow even when LCM itself fits. Divide-then-multiply order avoids the blow-up."
+    },
+    {
+      "title": "Pair-sum-divisible counted twice or missing the (0, B/2) buckets",
+      "wrong": "for each r: count += freq[r] * freq[B - r];   // double-counts and crashes on r=0",
+      "right": "ans = C(freq[0], 2);\nfor (int r = 1; r < B - r; r++) ans += (long) freq[r] * freq[B - r];\nif (B % 2 == 0) ans += C(freq[B/2], 2);",
+      "why": "Buckets 0 and B/2 (when B even) pair with themselves: use n*(n-1)/2, NOT n*n. Other buckets pair once, not twice — loop r=1..B/2-1."
+    },
+    {
+      "title": "Delete-one GCD: recomputing per index",
+      "wrong": "for each i: g = 0; for j != i: g = gcd(g, A[j]); ans = max(ans, g);  // O(N²)",
+      "right": "// O(N): build prefix & suffix gcd arrays once\nint without_i = gcd(prefix[i-1], suffix[i+1]);  // edges handled separately",
+      "why": "N up to 1e5 means O(N²) = 1e10 ops → TLE. Prefix/suffix gives O(N)."
+    }
+  ],
+  "keyPatterns": [
+    {
+      "name": "Fast Power (binary exponentiation, mod)",
+      "when": "Compute a^n mod M with n up to 1e9; also for modular inverse via Fermat (a^(M-2) mod M when M prime).",
+      "template": "long power(long a, long n, long m) {\n    if (n == 0) return 1 % m;\n    long half = power(a, n / 2, m);\n    long sq = (half * half) % m;\n    long res = ((n & 1) == 1) ? (sq * (a % m)) % m : sq;\n    return res;\n}\n// Non-negative final fix when base may be negative\n// return ((power(a, n, m)) % m + m) % m;",
+      "examples": ["Implement Power Function"]
+    },
+    {
+      "name": "Euclidean GCD (and LCM)",
+      "when": "Any divisibility, coprime, reducing-fraction, ratio question.",
+      "template": "int gcd(int a, int b) {\n    if (b == 0) return a;\n    return gcd(b, a % b);\n}\nlong lcm(int a, int b) {\n    return (long) a * (b / gcd(a, b));\n}",
+      "examples": ["Greatest Common Divisor", "Divisor game", "Largest Coprime Divisor", "Delete one"]
+    },
+    {
+      "name": "Remainder-frequency pair counting",
+      "when": "Count (i,j) such that (A[i] ⊕ A[j]) satisfies a divisibility condition — sum%B, diff%B, etc.",
+      "template": "int[] freq = new int[B];\nfor (int x : A) freq[((x % B) + B) % B]++;\nlong ans = (long) freq[0] * (freq[0] - 1) / 2;\nfor (int r = 1; r < B - r; r++) ans = (ans + (long) freq[r] * freq[B - r]) % MOD;\nif (B % 2 == 0) ans = (ans + (long) freq[B/2] * (freq[B/2] - 1) / 2) % MOD;",
+      "examples": ["Pair Sum divisible by M"]
+    },
+    {
+      "name": "Coprime divisor extraction",
+      "when": "Largest divisor of A that is coprime with B — keep dividing A by gcd(A,B) until gcd becomes 1.",
+      "template": "int cpFact(int A, int B) {\n    while (true) {\n        int g = gcd(A, B);\n        if (g == 1) return A;\n        A = A / g;\n    }\n}",
+      "examples": ["Largest Coprime Divisor"]
+    },
+    {
+      "name": "Frequency-array pairwise mod-sum",
+      "when": "Sum / count over all pairs (a,b) with a small value range (≤ 1000) — replace the outer N² loop with iteration over distinct values.",
+      "template": "int[] freq = new int[MAX + 1];\nfor (int x : A) freq[x]++;\nlong ans = 0;\nfor (int b = 1; b <= MAX; b++) {\n    if (freq[b] == 0) continue;\n    for (int a = 1; a < b; a++) ans += (long) freq[a] * freq[b] * (a % b);\n    // multiples of b contribute 0 (a%b == 0)\n}",
+      "examples": ["Mod Sum"]
+    },
+    {
+      "name": "Mod-equality shortcut: |A−B|",
+      "when": "Largest M with A%M == B%M.",
+      "template": "int solve(int A, int B) {\n    return Math.abs(A - B);\n}",
+      "examples": ["A, B and Modulo"]
+    },
+    {
+      "name": "Prefix + Suffix aggregate (delete-one)",
+      "when": "Aggregate (gcd, max, sum, product, xor) of array with element i removed; ascend N=1e5.",
+      "template": "int[] pre = new int[N];\nint[] suf = new int[N];\npre[0] = A[0];\nfor (int i = 1; i < N; i++) pre[i] = gcd(pre[i - 1], A[i]);\nsuf[N - 1] = A[N - 1];\nfor (int i = N - 2; i >= 0; i--) suf[i] = gcd(suf[i + 1], A[i]);\nint best = 0;\nfor (int i = 0; i < N; i++) {\n    int cur;\n    if (i == 0) cur = suf[1];\n    else if (i == N - 1) cur = pre[N - 2];\n    else cur = gcd(pre[i - 1], suf[i + 1]);\n    best = Math.max(best, cur);\n}",
+      "examples": ["Delete one"]
+    }
+  ],
+  "edgeCases": [
+    "Power Function with B = 0 → answer is 1 % C (so answer is 0 when C == 1).",
+    "Power Function with A < 0 → normalise the final result with ((res % C) + C) % C.",
+    "GCD of (0, 0) is conventionally 0; gcd(a, 0) = a.",
+    "LCM overflow: use long and divide-then-multiply (a/gcd) * b.",
+    "Pair Sum divisible: B = 1 → every pair qualifies, freq[0] = N, answer = C(N,2) mod 1e9+7.",
+    "Coprime Divisor: gcd(A,B) already 1 → return A as-is on the first iteration.",
+    "Divisor Game with B*C overflow: compute lcm as B * (C / gcd(B,C)) and use long.",
+    "Mod Sum: a == b contributes 0 to a%b; the outer loop running b from 1 and inner a from 1..b-1 skips it naturally.",
+    "A, B and Modulo with A == B → return 0 (still a valid M in the contract, though usually trivially handled).",
+    "Delete one with N == 2 → answer is max(A[0], A[1]) (deleting the other leaves a single element)."
+  ]
+}

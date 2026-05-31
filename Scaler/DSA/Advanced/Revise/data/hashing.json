@@ -1,0 +1,1614 @@
+[
+  {
+    "id": "hash-frequency-query",
+    "title": "Frequency of element query",
+    "subTopic": "HashMap — Frequency Counting",
+    "tags": [
+      "Hashing",
+      "HashMap",
+      "Frequency"
+    ],
+    "description": "Given an integer array A of N elements and an array B of Q queries. For each query B[i], return the frequency of B[i] in A.\n\nProblem Constraints\n1 ≤ N, Q ≤ 10^5\n1 ≤ A[i], B[i] ≤ 10^9\n\nExample\nA = [1,2,1,1], B = [1,2] → [3, 1].",
+    "sampleInput": "A = [1,2,1,1], B = [1,2]",
+    "sampleOutput": "[3, 1]",
+    "story": "Build freq HashMap in O(N); each query is O(1) average.",
+    "plain": "Brute: per query, scan A — O(N*Q). Optimal: one pass to build HashMap<value, count>, then answer each query with map.getOrDefault(B[i], 0).",
+    "tale": "Pre-bake a phonebook of names→counts; answer 'how many John?' instantly instead of re-counting the room each time.",
+    "solutions": [
+      {
+        "label": "Brute — Scan per Query",
+        "complexity": {
+          "time": "O(N*Q)",
+          "space": "O(1)"
+        },
+        "plain": "Per query, walk A counting matches.",
+        "tale": "Recount the room for every name.",
+        "approach": [
+          "For each query q in B: walk A, count occurrences of q.",
+          "Push count to result."
+        ],
+        "pseudocode": "for q in B: c=0; for x in A: if x==q: c++; res.add(c)",
+        "story": "Educational; N=Q=1e5 → 1e10 ops → TLE.",
+        "code": "public int[] solveBrute(int[] A, int[] B) {\n    int[] res = new int[B.length];\n    for (int i = 0; i < B.length; i++) {\n        int c = 0;\n        for (int x : A) {\n            if (x == B[i]) {\n                c++;\n            }\n        }\n        res[i] = c;\n    }\n    return res;\n}"
+      },
+      {
+        "label": "Optimal — HashMap Frequency",
+        "complexity": {
+          "time": "O(N + Q) avg",
+          "space": "O(N)"
+        },
+        "plain": "Build one freq map; query in O(1).",
+        "tale": "Phonebook lookups.",
+        "approach": [
+          "Build HashMap<Integer, Integer> freq from A using merge / getOrDefault.",
+          "For each query: result[i] = freq.getOrDefault(B[i], 0)."
+        ],
+        "pseudocode": "freq[A[i]]++; for q in B: res.add(freq.get(q) or 0)",
+        "story": "Optimal. Standard HashMap pattern.",
+        "code": "public int[] solve(int[] A, int[] B) {\n    Map<Integer, Integer> freq = new HashMap<>();\n    for (int x : A) {\n        freq.merge(x, 1, Integer::sum);\n    }\n    int[] res = new int[B.length];\n    for (int i = 0; i < B.length; i++) {\n        res[i] = freq.getOrDefault(B[i], 0);\n    }\n    return res;\n}"
+      }
+    ],
+    "viz": {
+      "kind": "scripted-array",
+      "data": {
+        "A": [
+          1,
+          2,
+          1,
+          1
+        ],
+        "footer": "Frequency map of A then 2 queries.",
+        "legend": [
+          "c-input",
+          "c-active",
+          "c-result"
+        ],
+        "script": [
+          {
+            "label": "SETUP",
+            "marks": {
+              "0": "c-input",
+              "1": "c-input",
+              "2": "c-input",
+              "3": "c-input"
+            },
+            "msg": "A=[1,2,1,1]. Build freq map.",
+            "overlay": "<strong>Why HashMap?</strong> Values can be up to 1e9 — an int[] indexed by value won't fit."
+          },
+          {
+            "label": "Build freq",
+            "marks": {
+              "0": "c-active",
+              "1": "c-active",
+              "2": "c-active",
+              "3": "c-active"
+            },
+            "msg": "freq = {1→3, 2→1}."
+          },
+          {
+            "label": "Query B[0]=1",
+            "marks": {
+              "0": "c-result",
+              "2": "c-result",
+              "3": "c-result"
+            },
+            "msg": "freq[1] = 3."
+          },
+          {
+            "label": "Query B[1]=2",
+            "marks": {
+              "1": "c-result"
+            },
+            "msg": "freq[2] = 1."
+          },
+          {
+            "label": "DONE",
+            "msg": "Result = <strong>[3, 1]</strong>.",
+            "overlay": "<strong>Tip:</strong> use merge or getOrDefault to avoid NullPointerException."
+          }
+        ]
+      }
+    }
+  },
+  {
+    "id": "hash-count-distinct",
+    "title": "Count Distinct Elements",
+    "subTopic": "HashSet — Membership",
+    "tags": [
+      "Hashing",
+      "HashSet",
+      "Distinct"
+    ],
+    "description": "Given an array A of N integers, return the number of distinct elements.\n\nProblem Constraints\n1 ≤ N ≤ 10^5\n1 ≤ A[i] ≤ 10^9\n\nExample\nA = [3, 4, 3, 6, 6] → 3 (distinct = {3,4,6}).",
+    "sampleInput": "A = [3, 4, 3, 6, 6]",
+    "sampleOutput": "3",
+    "story": "Drop everything into a HashSet; answer is set.size().",
+    "plain": "Brute: sort and count groups O(N log N). Optimal: HashSet insertion + size() in O(N) average.",
+    "tale": "Put each marble in a labelled jar; the number of non-empty jars is the answer.",
+    "solutions": [
+      {
+        "label": "Brute — Sort & Count Groups",
+        "complexity": {
+          "time": "O(N log N)",
+          "space": "O(N) sort"
+        },
+        "plain": "Sort the array; count positions where value differs from previous.",
+        "tale": "Line everyone up, then count colour changes.",
+        "approach": [
+          "Copy & sort.",
+          "distinct = (N > 0 ? 1 : 0); for i = 1..N-1 if A[i] != A[i-1] → distinct++."
+        ],
+        "pseudocode": "sort(A); count = 1 + Σ_{i=1..N-1} (A[i]!=A[i-1])",
+        "story": "OK but O(N log N) vs hashing's O(N).",
+        "code": "public int solveBrute(int[] A) {\n    if (A.length == 0) {\n        return 0;\n    }\n    int[] B = A.clone();\n    java.util.Arrays.sort(B);\n    int distinct = 1;\n    for (int i = 1; i < B.length; i++) {\n        if (B[i] != B[i - 1]) {\n            distinct++;\n        }\n    }\n    return distinct;\n}"
+      },
+      {
+        "label": "Optimal — HashSet",
+        "complexity": {
+          "time": "O(N) avg",
+          "space": "O(N)"
+        },
+        "plain": "Add to a HashSet; size() is the answer.",
+        "tale": "Drop each element into a unique-by-construction bag.",
+        "approach": [
+          "Set<Integer> seen = new HashSet<>();",
+          "for x in A: seen.add(x);",
+          "return seen.size()."
+        ],
+        "pseudocode": "set = HashSet; add each; return set.size()",
+        "story": "Optimal. The HashSet absorbs duplicates automatically.",
+        "code": "public int solve(int[] A) {\n    Set<Integer> seen = new HashSet<>();\n    for (int x : A) {\n        seen.add(x);\n    }\n    return seen.size();\n}"
+      }
+    ],
+    "viz": {
+      "kind": "scripted-array",
+      "data": {
+        "A": [
+          3,
+          4,
+          3,
+          6,
+          6
+        ],
+        "footer": "HashSet absorbs duplicates.",
+        "legend": [
+          "c-input",
+          "c-active",
+          "c-result"
+        ],
+        "script": [
+          {
+            "label": "SETUP",
+            "marks": {
+              "0": "c-input",
+              "1": "c-input",
+              "2": "c-input",
+              "3": "c-input",
+              "4": "c-input"
+            },
+            "msg": "A=[3,4,3,6,6].",
+            "overlay": "<strong>Why a set?</strong> Insertions are O(1) average and duplicates are silently ignored."
+          },
+          {
+            "label": "Add 3",
+            "marks": {
+              "0": "c-active"
+            },
+            "msg": "set = {3}."
+          },
+          {
+            "label": "Add 4",
+            "marks": {
+              "1": "c-active"
+            },
+            "msg": "set = {3, 4}."
+          },
+          {
+            "label": "Add 3 (already present)",
+            "marks": {
+              "2": "c-eliminated"
+            },
+            "msg": "No change. set = {3, 4}."
+          },
+          {
+            "label": "Add 6",
+            "marks": {
+              "3": "c-active"
+            },
+            "msg": "set = {3, 4, 6}."
+          },
+          {
+            "label": "Add 6 (already present)",
+            "marks": {
+              "4": "c-eliminated"
+            },
+            "msg": "No change."
+          },
+          {
+            "label": "DONE",
+            "marks": {
+              "0": "c-result",
+              "1": "c-result",
+              "3": "c-result"
+            },
+            "msg": "Distinct = <strong>3</strong>."
+          }
+        ]
+      }
+    }
+  },
+  {
+    "id": "hash-first-repeating",
+    "title": "First Repeating element",
+    "subTopic": "HashMap — Frequency + Linear Scan",
+    "tags": [
+      "Hashing",
+      "HashMap",
+      "Frequency"
+    ],
+    "description": "Given an integer array A, return the first repeating element (the element that appears more than once and whose FIRST occurrence has the smallest index). If no repeating element exists, return -1.\n\nProblem Constraints\n1 ≤ N ≤ 10^5\n1 ≤ A[i] ≤ 10^9\n\nExample\nA = [10, 5, 3, 4, 3, 5, 6] → 5 (5 repeats and its first occurrence is at index 1, before 3's first at index 2).",
+    "sampleInput": "A = [10, 5, 3, 4, 3, 5, 6]",
+    "sampleOutput": "5",
+    "story": "Two passes: (1) build freq map; (2) walk A left-to-right and return the first element with freq > 1.",
+    "plain": "Brute O(N²) per element. Optimal: 1 pass to build HashMap<value, count>, then 1 pass to scan in order and return first key with count > 1.",
+    "tale": "Take attendance to know who has a twin in the room, then point to the FIRST person whose twin you spotted.",
+    "solutions": [
+      {
+        "label": "Brute — Pairwise Search",
+        "complexity": {
+          "time": "O(N²)",
+          "space": "O(1)"
+        },
+        "plain": "For each i, scan j > i for a match.",
+        "tale": "Hand-check pair by pair.",
+        "approach": [
+          "For i = 0..N-1: for j = i+1..N-1: if A[i]==A[j] → return A[i].",
+          "Return -1."
+        ],
+        "pseudocode": "for i; for j>i: if A[i]==A[j]: return A[i]; return -1",
+        "story": "Educational. TLE at N=1e5.",
+        "code": "public int solveBrute(int[] A) {\n    for (int i = 0; i < A.length; i++) {\n        for (int j = i + 1; j < A.length; j++) {\n            if (A[i] == A[j]) {\n                return A[i];\n            }\n        }\n    }\n    return -1;\n}"
+      },
+      {
+        "label": "Optimal — Frequency Map + Linear Scan",
+        "complexity": {
+          "time": "O(N) avg",
+          "space": "O(N)"
+        },
+        "plain": "Build freq, then scan in order for freq > 1.",
+        "tale": "First attendance, then first twin.",
+        "approach": [
+          "Build HashMap<Integer, Integer> freq from A.",
+          "For x in A in order: if freq.get(x) > 1 → return x.",
+          "Return -1."
+        ],
+        "pseudocode": "freq=build; for x in A: if freq[x]>1: return x; return -1",
+        "story": "Optimal. Two linear passes, total O(N).",
+        "code": "public int solve(int[] A) {\n    Map<Integer, Integer> freq = new HashMap<>();\n    for (int x : A) {\n        freq.merge(x, 1, Integer::sum);\n    }\n    for (int x : A) {\n        if (freq.get(x) > 1) {\n            return x;\n        }\n    }\n    return -1;\n}"
+      }
+    ],
+    "viz": {
+      "kind": "scripted-array",
+      "data": {
+        "A": [
+          10,
+          5,
+          3,
+          4,
+          3,
+          5,
+          6
+        ],
+        "footer": "First repeating element by first-occurrence index.",
+        "legend": [
+          "c-input",
+          "c-active",
+          "c-result"
+        ],
+        "script": [
+          {
+            "label": "SETUP",
+            "marks": {
+              "0": "c-input",
+              "1": "c-input",
+              "2": "c-input",
+              "3": "c-input",
+              "4": "c-input",
+              "5": "c-input",
+              "6": "c-input"
+            },
+            "msg": "A=[10,5,3,4,3,5,6]. Build freq.",
+            "overlay": "<strong>Why two passes?</strong> Pass 1 = counts; Pass 2 = order. HashMap iteration order is undefined, so walk the array."
+          },
+          {
+            "label": "Pass 1: freq map",
+            "msg": "freq = {10:1, 5:2, 3:2, 4:1, 6:1}."
+          },
+          {
+            "label": "Pass 2: scan",
+            "marks": {
+              "0": "c-eliminated"
+            },
+            "msg": "x=10, freq[10]=1 → skip."
+          },
+          {
+            "label": "x=5",
+            "marks": {
+              "1": "c-active"
+            },
+            "msg": "freq[5]=2 → HIT."
+          },
+          {
+            "label": "DONE",
+            "marks": {
+              "1": "c-result",
+              "5": "c-result"
+            },
+            "msg": "Return <strong>5</strong>."
+          }
+        ]
+      }
+    }
+  },
+  {
+    "id": "hash-subarray-zero-sum",
+    "title": "Sub-array with 0 sum",
+    "subTopic": "Prefix Sum + HashSet",
+    "tags": [
+      "Hashing",
+      "Prefix Sum",
+      "HashSet"
+    ],
+    "description": "Given an array A of N integers, return 1 if there exists a (contiguous) sub-array with sum 0; else return 0.\n\nProblem Constraints\n1 ≤ N ≤ 10^5\n-10^9 ≤ A[i] ≤ 10^9\n\nExample\nA = [1, -2, 1, 2] → 1 ([1,-2,1] sums to 0).\nA = [5, 6, -3, 4] → 0.",
+    "sampleInput": "A = [1, -2, 1, 2]",
+    "sampleOutput": "1",
+    "story": "Walk prefix sums; if any prefix repeats OR a prefix equals 0, found.",
+    "plain": "Brute O(N²) — try all subarrays. Optimal: running prefix sum + HashSet of seen prefixes (include 0 sentinel). If currentSum is already in the set, subarray strictly after the previous occurrence sums to 0.",
+    "tale": "Tally as you walk. If you ever return to a previously-seen total, the steps between were zero net.",
+    "solutions": [
+      {
+        "label": "Brute — All Subarrays",
+        "complexity": {
+          "time": "O(N²)",
+          "space": "O(1)"
+        },
+        "plain": "Double loop; running sum reset per start.",
+        "tale": "Sum every window.",
+        "approach": [
+          "For l = 0..N-1: s = 0; for r = l..N-1: s += A[r]; if s == 0 → return 1.",
+          "Return 0."
+        ],
+        "pseudocode": "for l; s=0; for r>=l: s+=A[r]; if s==0 return 1",
+        "story": "Educational; N=1e5 → TLE.",
+        "code": "public int solveBrute(int[] A) {\n    for (int l = 0; l < A.length; l++) {\n        long s = 0;\n        for (int r = l; r < A.length; r++) {\n            s += A[r];\n            if (s == 0) {\n                return 1;\n            }\n        }\n    }\n    return 0;\n}"
+      },
+      {
+        "label": "Optimal — Prefix Sum + HashSet",
+        "complexity": {
+          "time": "O(N) avg",
+          "space": "O(N)"
+        },
+        "plain": "Running sum; check if it's been seen (including 0).",
+        "tale": "Return-to-tally trick.",
+        "approach": [
+          "Set<Long> seen = new HashSet<>(); seen.add(0L); long sum = 0.",
+          "For x in A: sum += x; if seen.contains(sum) → return 1; seen.add(sum).",
+          "Return 0."
+        ],
+        "pseudocode": "seen={0}; sum=0; for x: sum+=x; if sum in seen: return 1; seen.add(sum)",
+        "story": "Optimal. Use long to dodge overflow.",
+        "code": "public int solve(int[] A) {\n    Set<Long> seen = new HashSet<>();\n    seen.add(0L);\n    long sum = 0;\n    for (int x : A) {\n        sum += x;\n        if (seen.contains(sum)) {\n            return 1;\n        }\n        seen.add(sum);\n    }\n    return 0;\n}"
+      }
+    ],
+    "viz": {
+      "kind": "scripted-array",
+      "data": {
+        "A": [
+          1,
+          -2,
+          1,
+          2
+        ],
+        "footer": "Prefix-sum return-to-tally trick.",
+        "legend": [
+          "c-input",
+          "c-active",
+          "c-result"
+        ],
+        "script": [
+          {
+            "label": "SETUP",
+            "marks": {
+              "0": "c-input",
+              "1": "c-input",
+              "2": "c-input",
+              "3": "c-input"
+            },
+            "msg": "A=[1,-2,1,2]. seen = {0}.",
+            "overlay": "<strong>Why include 0?</strong> So a subarray starting at index 0 with sum 0 is detected (sum == 0 matches the sentinel)."
+          },
+          {
+            "label": "i=0: sum=1, not in seen → add",
+            "marks": {
+              "0": "c-active"
+            },
+            "msg": "seen = {0, 1}."
+          },
+          {
+            "label": "i=1: sum=-1, not in seen → add",
+            "marks": {
+              "1": "c-active"
+            },
+            "msg": "seen = {0, 1, -1}."
+          },
+          {
+            "label": "i=2: sum=0, IN seen → HIT",
+            "marks": {
+              "0": "c-result",
+              "1": "c-result",
+              "2": "c-result"
+            },
+            "msg": "Subarray A[0..2] sums to 0."
+          },
+          {
+            "label": "DONE",
+            "msg": "Return <strong>1</strong>."
+          }
+        ]
+      }
+    }
+  },
+  {
+    "id": "hash-common-elements",
+    "title": "Common Elements",
+    "subTopic": "HashMap — Multiset Intersection",
+    "tags": [
+      "Hashing",
+      "HashMap",
+      "Intersection"
+    ],
+    "description": "Given two arrays A and B, find their common elements respecting multiplicity. If an element x appears p times in A and q times in B, it should appear min(p, q) times in the output. Return the output in any (consistent) order — typically the order in which they appear in B.\n\nProblem Constraints\n1 ≤ |A|, |B| ≤ 10^5\n1 ≤ A[i], B[i] ≤ 10^9\n\nExample\nA = [1, 2, 2, 1], B = [2, 3, 1, 2] → [2, 1, 2] (B-order intersection).",
+    "sampleInput": "A = [1, 2, 2, 1], B = [2, 3, 1, 2]",
+    "sampleOutput": "[2, 1, 2]",
+    "story": "Build freq map of A; walk B and for each x present in the map, emit it and decrement.",
+    "plain": "Brute O(N*M) cross-search. Optimal: HashMap<value, count> of A; for each x in B: if count > 0, output x and decrement count. Order follows B.",
+    "tale": "Hand A a bag of coloured marbles with counts. Walk B; each time you find a colour with stock, give one back.",
+    "solutions": [
+      {
+        "label": "Brute — Cross Search with Used Flags",
+        "complexity": {
+          "time": "O(N*M)",
+          "space": "O(N)"
+        },
+        "plain": "For each x in B, scan A for an unused match.",
+        "tale": "Pair off one-by-one with bookkeeping.",
+        "approach": [
+          "boolean[] used = new boolean[A.length].",
+          "For x in B: scan A; first j with !used[j] && A[j]==x → mark, append.",
+          "Return list."
+        ],
+        "pseudocode": "used=false; for x in B: for j: if !used[j] and A[j]==x: used[j]=true; out.add(x); break",
+        "story": "Educational; 1e10 ops → TLE.",
+        "code": "public int[] solveBrute(int[] A, int[] B) {\n    boolean[] used = new boolean[A.length];\n    List<Integer> out = new ArrayList<>();\n    for (int x : B) {\n        for (int j = 0; j < A.length; j++) {\n            if (!used[j] && A[j] == x) {\n                used[j] = true;\n                out.add(x);\n                break;\n            }\n        }\n    }\n    int[] res = new int[out.size()];\n    for (int i = 0; i < res.length; i++) {\n        res[i] = out.get(i);\n    }\n    return res;\n}"
+      },
+      {
+        "label": "Optimal — Frequency Map of A",
+        "complexity": {
+          "time": "O(N + M) avg",
+          "space": "O(N)"
+        },
+        "plain": "Map of A's counts; walk B and emit while count > 0.",
+        "tale": "Stock check at the counter.",
+        "approach": [
+          "Build freq map of A.",
+          "List out = new ArrayList<>().",
+          "For x in B: int c = freq.getOrDefault(x, 0); if c > 0 → out.add(x); freq.put(x, c - 1).",
+          "Return out as int[]."
+        ],
+        "pseudocode": "freq=A; for x in B: c=freq[x]; if c>0: out.add(x); freq[x]=c-1",
+        "story": "Optimal. Order matches B which most graders expect.",
+        "code": "public int[] solve(int[] A, int[] B) {\n    Map<Integer, Integer> freq = new HashMap<>();\n    for (int x : A) {\n        freq.merge(x, 1, Integer::sum);\n    }\n    List<Integer> out = new ArrayList<>();\n    for (int x : B) {\n        int c = freq.getOrDefault(x, 0);\n        if (c > 0) {\n            out.add(x);\n            freq.put(x, c - 1);\n        }\n    }\n    int[] res = new int[out.size()];\n    for (int i = 0; i < res.length; i++) {\n        res[i] = out.get(i);\n    }\n    return res;\n}"
+      }
+    ],
+    "viz": {
+      "kind": "scripted-array",
+      "data": {
+        "A": [
+          1,
+          2,
+          2,
+          1
+        ],
+        "footer": "Intersection respecting multiplicity (output follows B).",
+        "legend": [
+          "c-input",
+          "c-active",
+          "c-result"
+        ],
+        "script": [
+          {
+            "label": "SETUP",
+            "marks": {
+              "0": "c-input",
+              "1": "c-input",
+              "2": "c-input",
+              "3": "c-input"
+            },
+            "msg": "A=[1,2,2,1]. freq = {1:2, 2:2}. B = [2,3,1,2].",
+            "overlay": "<strong>Why a multimap (freq)?</strong> A simple set would lose multiplicity — [2,2] vs [2] would collide."
+          },
+          {
+            "label": "B[0]=2: freq[2]=2>0",
+            "marks": {
+              "1": "c-active"
+            },
+            "msg": "Emit 2. freq[2]=1."
+          },
+          {
+            "label": "B[1]=3: freq[3]=0",
+            "msg": "Skip."
+          },
+          {
+            "label": "B[2]=1: freq[1]=2>0",
+            "marks": {
+              "0": "c-active"
+            },
+            "msg": "Emit 1. freq[1]=1."
+          },
+          {
+            "label": "B[3]=2: freq[2]=1>0",
+            "marks": {
+              "2": "c-active"
+            },
+            "msg": "Emit 2. freq[2]=0."
+          },
+          {
+            "label": "DONE",
+            "marks": {
+              "0": "c-result",
+              "1": "c-result",
+              "2": "c-result"
+            },
+            "msg": "Out = <strong>[2, 1, 2]</strong>."
+          }
+        ]
+      }
+    }
+  },
+  {
+    "id": "hash-count-unique",
+    "title": "Count Unique Elements",
+    "subTopic": "HashMap — Filter by Count",
+    "tags": [
+      "Hashing",
+      "HashMap",
+      "Frequency"
+    ],
+    "description": "Given an array A, count the number of elements that appear EXACTLY once in A.\n\nProblem Constraints\n1 ≤ N ≤ 10^5\n1 ≤ A[i] ≤ 10^9\n\nExample\nA = [1, 2, 3, 1, 2, 4] → 2 ({3, 4} are unique).",
+    "sampleInput": "A = [1, 2, 3, 1, 2, 4]",
+    "sampleOutput": "2",
+    "story": "Build freq map; count entries with value == 1.",
+    "plain": "Brute O(N²). Optimal: HashMap freq pass + count of entries with count == 1.",
+    "tale": "Take attendance; count seats with exactly one person.",
+    "solutions": [
+      {
+        "label": "Brute — Pairwise Check",
+        "complexity": {
+          "time": "O(N²)",
+          "space": "O(1)"
+        },
+        "plain": "For each i, count occurrences in A. If 1, ans++.",
+        "tale": "Recount per element.",
+        "approach": [
+          "ans=0; for i: c=0; for j: if A[j]==A[i]: c++; if c==1: ans++."
+        ],
+        "pseudocode": "for i: c=count(A[i] in A); if c==1: ans++",
+        "story": "Educational; TLE for N=1e5.",
+        "code": "public int solveBrute(int[] A) {\n    int ans = 0;\n    for (int i = 0; i < A.length; i++) {\n        int c = 0;\n        for (int j = 0; j < A.length; j++) {\n            if (A[j] == A[i]) {\n                c++;\n            }\n        }\n        if (c == 1) {\n            ans++;\n        }\n    }\n    return ans;\n}"
+      },
+      {
+        "label": "Optimal — Frequency Map",
+        "complexity": {
+          "time": "O(N) avg",
+          "space": "O(N)"
+        },
+        "plain": "Build freq, count entries with value 1.",
+        "tale": "Attendance, then count singletons.",
+        "approach": [
+          "Build HashMap<Integer, Integer> freq.",
+          "Count entries where value == 1."
+        ],
+        "pseudocode": "freq=build; return count(e.value==1)",
+        "story": "Optimal.",
+        "code": "public int solve(int[] A) {\n    Map<Integer, Integer> freq = new HashMap<>();\n    for (int x : A) {\n        freq.merge(x, 1, Integer::sum);\n    }\n    int ans = 0;\n    for (int v : freq.values()) {\n        if (v == 1) {\n            ans++;\n        }\n    }\n    return ans;\n}"
+      }
+    ],
+    "viz": {
+      "kind": "scripted-array",
+      "data": {
+        "A": [
+          1,
+          2,
+          3,
+          1,
+          2,
+          4
+        ],
+        "footer": "Count of elements appearing exactly once.",
+        "legend": [
+          "c-input",
+          "c-active",
+          "c-result"
+        ],
+        "script": [
+          {
+            "label": "SETUP",
+            "marks": {
+              "0": "c-input",
+              "1": "c-input",
+              "2": "c-input",
+              "3": "c-input",
+              "4": "c-input",
+              "5": "c-input"
+            },
+            "msg": "A=[1,2,3,1,2,4]. Build freq.",
+            "overlay": "<strong>Note:</strong> 'unique' here means frequency == 1, not 'distinct'."
+          },
+          {
+            "label": "Build freq",
+            "msg": "freq = {1:2, 2:2, 3:1, 4:1}."
+          },
+          {
+            "label": "Filter v == 1",
+            "marks": {
+              "2": "c-result",
+              "5": "c-result"
+            },
+            "msg": "Keys 3 and 4 qualify. Count = 2."
+          },
+          {
+            "label": "DONE",
+            "msg": "Answer = <strong>2</strong>."
+          }
+        ]
+      }
+    }
+  },
+  {
+    "id": "hash-count-subarray-zero",
+    "title": "Count Subarray Zero Sum",
+    "subTopic": "Prefix Sum + HashMap",
+    "tags": [
+      "Hashing",
+      "Prefix Sum",
+      "HashMap"
+    ],
+    "description": "Given an array A, count the number of contiguous sub-arrays whose sum is zero. Return the count modulo 10^9 + 7.\n\nProblem Constraints\n1 ≤ N ≤ 10^5\n-10^9 ≤ A[i] ≤ 10^9\n\nExample\nA = [1, -1, 2, -2] → 3 ([1,-1], [2,-2], [1,-1,2,-2]).",
+    "sampleInput": "A = [1, -1, 2, -2]",
+    "sampleOutput": "3",
+    "story": "Running prefix sum; HashMap<prefix, count of times seen>. For each new prefix, add count_of(currentSum) — number of earlier positions where same prefix appeared.",
+    "plain": "Brute O(N²) over all subarrays. Optimal: HashMap of prefix-sum frequencies, sentinel {0 → 1} so a subarray starting at index 0 is counted, accumulate getOrDefault(currentSum, 0) before incrementing the map.",
+    "tale": "Every time the running tally returns to a past value, the steps between net to zero — count all such return-pairs.",
+    "solutions": [
+      {
+        "label": "Brute — Pair-Sum All Subarrays",
+        "complexity": {
+          "time": "O(N²)",
+          "space": "O(1)"
+        },
+        "plain": "Try every (l, r).",
+        "tale": "Sum every window.",
+        "approach": [
+          "ans = 0; for l: s = 0; for r ≥ l: s += A[r]; if s == 0: ans = (ans+1) % MOD."
+        ],
+        "pseudocode": "for l; for r: s+=A[r]; if s==0: ans++",
+        "story": "Educational. TLE for large N.",
+        "code": "public int solveBrute(int[] A) {\n    final int MOD = 1_000_000_007;\n    long ans = 0;\n    for (int l = 0; l < A.length; l++) {\n        long s = 0;\n        for (int r = l; r < A.length; r++) {\n            s += A[r];\n            if (s == 0) {\n                ans = (ans + 1) % MOD;\n            }\n        }\n    }\n    return (int) ans;\n}"
+      },
+      {
+        "label": "Optimal — Prefix Sum + HashMap",
+        "complexity": {
+          "time": "O(N) avg",
+          "space": "O(N)"
+        },
+        "plain": "Count how many times each prefix sum has appeared; matches contribute pairs.",
+        "tale": "Return-to-tally counted.",
+        "approach": [
+          "Map<Long, Integer> seen = new HashMap<>(); seen.put(0L, 1); long sum = 0; long ans = 0.",
+          "For x in A: sum += x; ans += seen.getOrDefault(sum, 0); seen.merge(sum, 1, Integer::sum).",
+          "Return (int)(ans % MOD)."
+        ],
+        "pseudocode": "seen={0:1}; sum=0; for x: sum+=x; ans+=seen[sum]; seen[sum]++",
+        "story": "Optimal.",
+        "code": "public int solve(int[] A) {\n    final int MOD = 1_000_000_007;\n    Map<Long, Integer> seen = new HashMap<>();\n    seen.put(0L, 1);\n    long sum = 0;\n    long ans = 0;\n    for (int x : A) {\n        sum += x;\n        ans = (ans + seen.getOrDefault(sum, 0)) % MOD;\n        seen.merge(sum, 1, Integer::sum);\n    }\n    return (int) ans;\n}"
+      }
+    ],
+    "viz": {
+      "kind": "scripted-array",
+      "data": {
+        "A": [
+          1,
+          -1,
+          2,
+          -2
+        ],
+        "footer": "Count of zero-sum subarrays.",
+        "legend": [
+          "c-input",
+          "c-active",
+          "c-result"
+        ],
+        "script": [
+          {
+            "label": "SETUP",
+            "marks": {
+              "0": "c-input",
+              "1": "c-input",
+              "2": "c-input",
+              "3": "c-input"
+            },
+            "msg": "seen = {0:1}. sum = 0.",
+            "overlay": "<strong>Why a count map?</strong> If a prefix sum has appeared k times before, the current index creates k new zero-sum subarrays — one per past occurrence."
+          },
+          {
+            "label": "i=0: sum=1, seen[1]=0",
+            "marks": {
+              "0": "c-active"
+            },
+            "msg": "ans = 0. seen = {0:1, 1:1}."
+          },
+          {
+            "label": "i=1: sum=0, seen[0]=1 → +1",
+            "marks": {
+              "0": "c-result",
+              "1": "c-result"
+            },
+            "msg": "ans = 1. seen = {0:2, 1:1}."
+          },
+          {
+            "label": "i=2: sum=2, seen[2]=0",
+            "marks": {
+              "2": "c-active"
+            },
+            "msg": "ans = 1. seen = {0:2, 1:1, 2:1}."
+          },
+          {
+            "label": "i=3: sum=0, seen[0]=2 → +2",
+            "marks": {
+              "0": "c-result",
+              "1": "c-result",
+              "2": "c-result",
+              "3": "c-result"
+            },
+            "msg": "ans = 3 (one for the [2,-2] subarray, one for the whole array)."
+          },
+          {
+            "label": "DONE",
+            "msg": "Total = <strong>3</strong>."
+          }
+        ]
+      }
+    }
+  },
+  {
+    "id": "hash-check-pair-sum",
+    "title": "Check Pair Sum",
+    "subTopic": "HashSet — Complement Search",
+    "tags": [
+      "Hashing",
+      "HashSet",
+      "Two Sum"
+    ],
+    "description": "Given an array A and integer B, return 1 if there exists a pair (i, j) with i ≠ j and A[i] + A[j] == B; else return 0.\n\nProblem Constraints\n1 ≤ N ≤ 10^5\n-10^9 ≤ A[i], B ≤ 10^9\n\nExample\nA = [3, 5, 1, 2], B = 6 → 1 (5+1).\nA = [1, 2, 3], B = 8 → 0.",
+    "sampleInput": "A = [3, 5, 1, 2], B = 6",
+    "sampleOutput": "1",
+    "story": "Single-pass with HashSet of seen values; for each x, check if (B − x) was already seen.",
+    "plain": "Brute O(N²) over pairs. Optimal: walk once, maintain HashSet; on each x, if (B − x) ∈ set → return 1; else add x to set. O(N) average.",
+    "tale": "Walk a line of partygoers; before greeting each one, ask 'has my complement been here?'.",
+    "solutions": [
+      {
+        "label": "Brute — All Pairs",
+        "complexity": {
+          "time": "O(N²)",
+          "space": "O(1)"
+        },
+        "plain": "Try every pair.",
+        "tale": "Inspect every couple.",
+        "approach": [
+          "For i, for j > i: if A[i] + A[j] == B → return 1. Return 0."
+        ],
+        "pseudocode": "for i; for j>i: if A[i]+A[j]==B: return 1",
+        "story": "Educational; TLE for N=1e5.",
+        "code": "public int solveBrute(int[] A, int B) {\n    for (int i = 0; i < A.length; i++) {\n        for (int j = i + 1; j < A.length; j++) {\n            if ((long) A[i] + A[j] == B) {\n                return 1;\n            }\n        }\n    }\n    return 0;\n}"
+      },
+      {
+        "label": "Optimal — Single Pass HashSet",
+        "complexity": {
+          "time": "O(N) avg",
+          "space": "O(N)"
+        },
+        "plain": "Check complement in set before inserting.",
+        "tale": "Ask 'is my complement here?' as you walk.",
+        "approach": [
+          "Set<Integer> seen = new HashSet<>().",
+          "For x in A: if seen.contains(B − x) → return 1; seen.add(x).",
+          "Return 0."
+        ],
+        "pseudocode": "for x: if (B-x) in seen: return 1; seen.add(x)",
+        "story": "Optimal.",
+        "code": "public int solve(int[] A, int B) {\n    Set<Long> seen = new HashSet<>();\n    for (int x : A) {\n        long need = (long) B - x;\n        if (seen.contains(need)) {\n            return 1;\n        }\n        seen.add((long) x);\n    }\n    return 0;\n}"
+      }
+    ],
+    "viz": {
+      "kind": "scripted-array",
+      "data": {
+        "A": [
+          3,
+          5,
+          1,
+          2
+        ],
+        "footer": "Single-pass complement search, B = 6.",
+        "legend": [
+          "c-input",
+          "c-active",
+          "c-result"
+        ],
+        "script": [
+          {
+            "label": "SETUP",
+            "marks": {
+              "0": "c-input",
+              "1": "c-input",
+              "2": "c-input",
+              "3": "c-input"
+            },
+            "msg": "A=[3,5,1,2], B=6. seen = {}.",
+            "overlay": "<strong>Order matters:</strong> check complement first, THEN insert — otherwise B=2*x case would self-match."
+          },
+          {
+            "label": "x=3, need=3, seen={}",
+            "marks": {
+              "0": "c-active"
+            },
+            "msg": "Miss. seen={3}."
+          },
+          {
+            "label": "x=5, need=1, seen={3}",
+            "marks": {
+              "1": "c-active"
+            },
+            "msg": "Miss. seen={3,5}."
+          },
+          {
+            "label": "x=1, need=5, seen={3,5}",
+            "marks": {
+              "1": "c-result",
+              "2": "c-result"
+            },
+            "msg": "HIT — 5+1 = 6."
+          },
+          {
+            "label": "DONE",
+            "msg": "Return <strong>1</strong>."
+          }
+        ]
+      }
+    }
+  },
+  {
+    "id": "hash-count-pair-diff",
+    "title": "Count Pair Difference",
+    "subTopic": "HashMap — Frequency for Pair Difference",
+    "tags": [
+      "Hashing",
+      "HashMap",
+      "Pair Counting"
+    ],
+    "description": "Given an array A of N integers and integer B, count the number of pairs (i, j) with i ≠ j such that |A[i] − A[j]| == B. Unordered pairs — (i, j) is same as (j, i). Return count modulo 10^9 + 7.\n\nProblem Constraints\n1 ≤ N ≤ 10^5\n-10^9 ≤ A[i] ≤ 10^9\n0 ≤ B ≤ 10^9\n\nExample\nA = [1, 5, 3, 4, 2], B = 2 → 3 (pairs {5,3}, {3,1}, {4,2}).",
+    "sampleInput": "A = [1, 5, 3, 4, 2], B = 2",
+    "sampleOutput": "3",
+    "story": "Two-pass: build full freq, then for every distinct value x add freq[x] * freq[x+B]. Special-case B == 0 with C(freq[x], 2).",
+    "plain": "Brute O(N²). Optimal two-pass: (1) build HashMap<value, count> of A; (2) for each entry x add freq[x] * freq[x + B] to ans — captures both directions of |a−b|=B at once. Special case B == 0: result is Σ C(freq[x], 2).",
+    "tale": "Walking a line; ask 'how many people behind me are exactly B less than me?' and add to the tally.",
+    "solutions": [
+      {
+        "label": "Brute — All Pairs",
+        "complexity": {
+          "time": "O(N²)",
+          "space": "O(1)"
+        },
+        "plain": "Try every pair, count A[i] − A[j] == B.",
+        "tale": "Couple-by-couple.",
+        "approach": [
+          "ans = 0; for i, for j > i: if A[i] − A[j] == B → ans++."
+        ],
+        "pseudocode": "for i; for j>i: if A[i]-A[j]==B: ans++",
+        "story": "Educational; TLE.",
+        "code": "public int solveBrute(int[] A, int B) {\n    final int MOD = 1_000_000_007;\n    long ans = 0;\n    for (int i = 0; i < A.length; i++) {\n        for (int j = i + 1; j < A.length; j++) {\n            if ((long) A[i] - A[j] == B) {\n                ans = (ans + 1) % MOD;\n            }\n        }\n    }\n    return (int) ans;\n}"
+      },
+      {
+        "label": "Optimal — Two-Pass Frequency Map",
+        "complexity": {
+          "time": "O(N) avg",
+          "space": "O(N)"
+        },
+        "plain": "Build freq, then sum freq[x] * freq[x+B] over distinct x.",
+        "tale": "Histogram first, then count partner pairs.",
+        "approach": [
+          "Build HashMap<Long, Long> freq from A.",
+          "If B == 0: ans = Σ C(freq[x], 2) for each x; return ans % MOD.",
+          "Else: for each entry x: ans += freq[x] * freq.getOrDefault(x + B, 0L). Return ans % MOD."
+        ],
+        "pseudocode": "freq=build; B==0 ? Σ C(freq[x],2) : Σ freq[x]*freq[x+B]",
+        "story": "Optimal. Captures |a−b|=B in one direction (x as smaller, x+B as larger) so no double-count.",
+        "code": "public int solve(int[] A, int B) {\n    final int MOD = 1_000_000_007;\n    Map<Long, Long> freq = new HashMap<>();\n    for (int x : A) {\n        freq.merge((long) x, 1L, Long::sum);\n    }\n    long ans = 0;\n    if (B == 0) {\n        for (long c : freq.values()) {\n            ans = (ans + c * (c - 1) / 2) % MOD;\n        }\n        return (int) ans;\n    }\n    for (Map.Entry<Long, Long> e : freq.entrySet()) {\n        long x = e.getKey();\n        long c = e.getValue();\n        long partner = freq.getOrDefault(x + B, 0L);\n        ans = (ans + c * partner) % MOD;\n    }\n    return (int) ans;\n}"
+      }
+    ],
+    "viz": {
+      "kind": "scripted-array",
+      "data": {
+        "A": [
+          1,
+          5,
+          3,
+          4,
+          2
+        ],
+        "footer": "Count pairs (i<j) with A[i] − A[j] = 2.",
+        "legend": [
+          "c-input",
+          "c-active",
+          "c-result"
+        ],
+        "script": [
+          {
+            "label": "SETUP",
+            "marks": {
+              "0": "c-input",
+              "1": "c-input",
+              "2": "c-input",
+              "3": "c-input",
+              "4": "c-input"
+            },
+            "msg": "A=[1,5,3,4,2], B=2.",
+            "overlay": "<strong>Why two-pass?</strong> Single-pass complement-before-insert misses pairs where the larger value appears first (e.g. 5 then 3)."
+          },
+          {
+            "label": "Pass 1: build freq",
+            "marks": {
+              "0": "c-active",
+              "1": "c-active",
+              "2": "c-active",
+              "3": "c-active",
+              "4": "c-active"
+            },
+            "msg": "freq = {1:1, 5:1, 3:1, 4:1, 2:1}."
+          },
+          {
+            "label": "x=1: partner = freq[3] = 1 → +1",
+            "marks": {
+              "0": "c-result",
+              "2": "c-result"
+            },
+            "msg": "Pair {1, 3}. ans = 1."
+          },
+          {
+            "label": "x=5: partner = freq[7] = 0",
+            "marks": {
+              "1": "c-active"
+            },
+            "msg": "No partner."
+          },
+          {
+            "label": "x=3: partner = freq[5] = 1 → +1",
+            "marks": {
+              "1": "c-result",
+              "2": "c-result"
+            },
+            "msg": "Pair {3, 5}. ans = 2."
+          },
+          {
+            "label": "x=4: partner = freq[6] = 0",
+            "marks": {
+              "3": "c-active"
+            },
+            "msg": "No partner."
+          },
+          {
+            "label": "x=2: partner = freq[4] = 1 → +1",
+            "marks": {
+              "3": "c-result",
+              "4": "c-result"
+            },
+            "msg": "Pair {2, 4}. ans = 3.",
+            "overlay": "<strong>No double-count:</strong> each pair {a, b} (a<b) is counted once when x=a and partner=a+B=b."
+          },
+          {
+            "label": "DONE",
+            "msg": "Total = <strong>3</strong>."
+          }
+        ]
+      }
+    }
+  },
+  {
+    "id": "hash-subarray-sum-k",
+    "title": "Subarray Sum Equals K",
+    "subTopic": "Prefix Sum + HashMap",
+    "tags": [
+      "Hashing",
+      "Prefix Sum",
+      "HashMap"
+    ],
+    "description": "Given an array A of N integers and integer B (= K), count the number of contiguous subarrays with sum exactly equal to B.\n\nProblem Constraints\n1 ≤ N ≤ 10^5\n-10^3 ≤ A[i] ≤ 10^3 (typical)\n-10^9 ≤ B ≤ 10^9\n\nExample\nA = [1, 0, 1], B = 1 → 4 ([1], [0,1], [1,0], [1,0,1] has sum 2 — recount: actually [1] start 0, [1] start 2, [0,1] start 1, [1,0] start 0 sum 1) Standard answer: 4.",
+    "sampleInput": "A = [1, 0, 1], B = 1",
+    "sampleOutput": "4",
+    "story": "Walk prefix sums; ans += count of (currentSum − B) seen before.",
+    "plain": "Brute O(N²). Optimal: HashMap<prefix sum, count>. Init {0:1}. For each step: ans += map[currentSum − B], then map[currentSum]++.",
+    "tale": "Each prefix sum is a checkpoint; pair every current checkpoint with all past checkpoints exactly B below.",
+    "solutions": [
+      {
+        "label": "Brute — All Subarrays",
+        "complexity": {
+          "time": "O(N²)",
+          "space": "O(1)"
+        },
+        "plain": "Sum every subarray, compare with B.",
+        "tale": "Brute window sweep.",
+        "approach": [
+          "For l: s=0; for r ≥ l: s += A[r]; if s == B → ans++."
+        ],
+        "pseudocode": "for l; for r: s+=A[r]; if s==B: ans++",
+        "story": "Educational.",
+        "code": "public int solveBrute(int[] A, int B) {\n    int ans = 0;\n    for (int l = 0; l < A.length; l++) {\n        long s = 0;\n        for (int r = l; r < A.length; r++) {\n            s += A[r];\n            if (s == B) {\n                ans++;\n            }\n        }\n    }\n    return ans;\n}"
+      },
+      {
+        "label": "Optimal — Prefix Sum + HashMap",
+        "complexity": {
+          "time": "O(N) avg",
+          "space": "O(N)"
+        },
+        "plain": "Count of (sum − B) seen earlier.",
+        "tale": "Checkpoint pairing.",
+        "approach": [
+          "Map<Long, Integer> seen = new HashMap<>(); seen.put(0L, 1); long sum = 0; int ans = 0.",
+          "For x in A: sum += x; ans += seen.getOrDefault(sum − B, 0); seen.merge(sum, 1, Integer::sum).",
+          "Return ans."
+        ],
+        "pseudocode": "seen={0:1}; sum=0; for x: sum+=x; ans+=seen[sum-B]; seen[sum]++",
+        "story": "Optimal.",
+        "code": "public int solve(int[] A, int B) {\n    Map<Long, Integer> seen = new HashMap<>();\n    seen.put(0L, 1);\n    long sum = 0;\n    int ans = 0;\n    for (int x : A) {\n        sum += x;\n        ans += seen.getOrDefault(sum - B, 0);\n        seen.merge(sum, 1, Integer::sum);\n    }\n    return ans;\n}"
+      }
+    ],
+    "viz": {
+      "kind": "scripted-array",
+      "data": {
+        "A": [
+          1,
+          0,
+          1
+        ],
+        "footer": "Subarrays with sum = 1.",
+        "legend": [
+          "c-input",
+          "c-active",
+          "c-result"
+        ],
+        "script": [
+          {
+            "label": "SETUP",
+            "marks": {
+              "0": "c-input",
+              "1": "c-input",
+              "2": "c-input"
+            },
+            "msg": "A=[1,0,1], B=1. seen={0:1}. sum=0.",
+            "overlay": "<strong>Why seed seen[0]=1?</strong> So a prefix equal to B (subarray starting at index 0) is counted."
+          },
+          {
+            "label": "i=0: sum=1, need=0, seen[0]=1 → +1",
+            "marks": {
+              "0": "c-active"
+            },
+            "msg": "ans=1. seen={0:1,1:1}."
+          },
+          {
+            "label": "i=1: sum=1, need=0, seen[0]=1 → +1",
+            "marks": {
+              "1": "c-active"
+            },
+            "msg": "ans=2. seen={0:1,1:2}."
+          },
+          {
+            "label": "i=2: sum=2, need=1, seen[1]=2 → +2",
+            "marks": {
+              "2": "c-active"
+            },
+            "msg": "ans=4."
+          },
+          {
+            "label": "DONE",
+            "msg": "Total = <strong>4</strong>."
+          }
+        ]
+      }
+    }
+  },
+  {
+    "id": "hash-distinct-window",
+    "title": "Distinct Numbers in Window",
+    "subTopic": "Sliding Window + HashMap",
+    "tags": [
+      "Hashing",
+      "Sliding Window",
+      "HashMap"
+    ],
+    "description": "Given an array A of N integers and a window size B, return an array of length N−B+1 where each entry is the number of distinct integers in the corresponding window A[i..i+B−1].\n\nProblem Constraints\n1 ≤ B ≤ N ≤ 10^5\n1 ≤ A[i] ≤ 10^9\n\nExample\nA = [1, 2, 1, 3, 4, 3], B = 3 → [2, 3, 3, 2].",
+    "sampleInput": "A = [1, 2, 1, 3, 4, 3], B = 3",
+    "sampleOutput": "[2, 3, 3, 2]",
+    "story": "Sliding window; HashMap<value, count> maintained as the window moves. distinct = map.size() (drop keys when count → 0).",
+    "plain": "Brute O(N*B). Optimal: build the first window, then slide one step at a time — increment the new entrant, decrement the departing entry (remove key if its count hits 0). Emit map.size() after each step.",
+    "tale": "A moving spotlight on a parade; tally how many distinct costumes are visible at each moment.",
+    "solutions": [
+      {
+        "label": "Brute — Recount Each Window",
+        "complexity": {
+          "time": "O(N*B)",
+          "space": "O(B)"
+        },
+        "plain": "For each i, build a fresh set of A[i..i+B-1].",
+        "tale": "Recount per snapshot.",
+        "approach": [
+          "For i = 0..N−B: build Set of A[i..i+B−1]; push set.size()."
+        ],
+        "pseudocode": "for i: set={A[i..i+B-1]}; out.add(set.size())",
+        "story": "Educational; TLE at N=B=1e5 → 1e10.",
+        "code": "public int[] solveBrute(int[] A, int B) {\n    int N = A.length;\n    int[] out = new int[N - B + 1];\n    for (int i = 0; i <= N - B; i++) {\n        Set<Integer> s = new HashSet<>();\n        for (int j = i; j < i + B; j++) {\n            s.add(A[j]);\n        }\n        out[i] = s.size();\n    }\n    return out;\n}"
+      },
+      {
+        "label": "Optimal — Sliding Window with HashMap",
+        "complexity": {
+          "time": "O(N) avg",
+          "space": "O(B)"
+        },
+        "plain": "One-pass maintain freq map for the window.",
+        "tale": "Move the window, tweak the counts.",
+        "approach": [
+          "Build initial window: for i = 0..B−1 → freq.merge(A[i], 1, +).",
+          "out[0] = freq.size().",
+          "For i = B..N−1: freq.merge(A[i], 1, +); decrement A[i−B] (remove if 0); out[i−B+1] = freq.size()."
+        ],
+        "pseudocode": "build first window; slide: add new, remove old (drop key if 0); emit size",
+        "story": "Optimal. Always remember to drop zero-count keys.",
+        "code": "public int[] solve(int[] A, int B) {\n    int N = A.length;\n    int[] out = new int[N - B + 1];\n    Map<Integer, Integer> freq = new HashMap<>();\n    for (int i = 0; i < B; i++) {\n        freq.merge(A[i], 1, Integer::sum);\n    }\n    out[0] = freq.size();\n    for (int i = B; i < N; i++) {\n        freq.merge(A[i], 1, Integer::sum);\n        int old = A[i - B];\n        int c = freq.get(old) - 1;\n        if (c == 0) {\n            freq.remove(old);\n        } else {\n            freq.put(old, c);\n        }\n        out[i - B + 1] = freq.size();\n    }\n    return out;\n}"
+      }
+    ],
+    "viz": {
+      "kind": "scripted-array",
+      "data": {
+        "A": [
+          1,
+          2,
+          1,
+          3,
+          4,
+          3
+        ],
+        "footer": "Sliding window of size B=3, count distinct.",
+        "legend": [
+          "c-input",
+          "c-active",
+          "c-result"
+        ],
+        "script": [
+          {
+            "label": "SETUP",
+            "marks": {
+              "0": "c-input",
+              "1": "c-input",
+              "2": "c-input",
+              "3": "c-input",
+              "4": "c-input",
+              "5": "c-input"
+            },
+            "msg": "A=[1,2,1,3,4,3], B=3. Initial window: A[0..2].",
+            "overlay": "<strong>Why drop zero-count keys?</strong> map.size() counts all keys, not non-zero values; ghosts inflate the count."
+          },
+          {
+            "label": "Window [1,2,1]",
+            "marks": {
+              "0": "c-active",
+              "1": "c-active",
+              "2": "c-active"
+            },
+            "msg": "freq = {1:2, 2:1}. size = 2."
+          },
+          {
+            "label": "Slide → [2,1,3]",
+            "marks": {
+              "1": "c-active",
+              "2": "c-active",
+              "3": "c-active"
+            },
+            "msg": "Add A[3]=3 → {1:2,2:1,3:1}. Remove A[0]=1 → {1:1,2:1,3:1}. size = 3."
+          },
+          {
+            "label": "Slide → [1,3,4]",
+            "marks": {
+              "2": "c-active",
+              "3": "c-active",
+              "4": "c-active"
+            },
+            "msg": "Add 4, remove 2. freq = {1:1,3:1,4:1}. size = 3."
+          },
+          {
+            "label": "Slide → [3,4,3]",
+            "marks": {
+              "3": "c-active",
+              "4": "c-active",
+              "5": "c-active"
+            },
+            "msg": "Add 3, remove 1 (drop key). freq = {3:2,4:1}. size = 2."
+          },
+          {
+            "label": "DONE",
+            "marks": {
+              "0": "c-result",
+              "5": "c-result"
+            },
+            "msg": "Output = <strong>[2, 3, 3, 2]</strong>."
+          }
+        ]
+      }
+    }
+  },
+  {
+    "id": "hash-longest-subarray-zero",
+    "title": "Longest Subarray Zero Sum",
+    "subTopic": "Prefix Sum + HashMap (earliest index)",
+    "tags": [
+      "Hashing",
+      "Prefix Sum",
+      "HashMap"
+    ],
+    "description": "Given an array A of N integers, return the length of the longest contiguous sub-array whose sum is zero. If no such sub-array exists, return 0.\n\nProblem Constraints\n1 ≤ N ≤ 10^5\n-10^9 ≤ A[i] ≤ 10^9\n\nExample\nA = [1, -2, 1, 2] → 3 ([1,-2,1]).\nA = [3, 2, -1] → 0.",
+    "sampleInput": "A = [1, -2, 1, 2]",
+    "sampleOutput": "3",
+    "story": "Map<prefixSum, EARLIEST index>. If currentSum was seen at index k, subarray (k+1..i) sums to 0; length = i − k. Special case: if currentSum is 0 at index i, length = i + 1.",
+    "plain": "Brute O(N²). Optimal: prefix sum + HashMap of FIRST occurrence of each prefix; do NOT overwrite. If sum == 0 at index i → maxLen = max(maxLen, i+1). Else if seen → maxLen = max(maxLen, i − seen[sum]).",
+    "tale": "First time you reach a tally, plant a flag. Next time you pass it, measure the stretch back to the flag — longest such stretch is the answer.",
+    "solutions": [
+      {
+        "label": "Brute — All Subarrays",
+        "complexity": {
+          "time": "O(N²)",
+          "space": "O(1)"
+        },
+        "plain": "Try every subarray, track max length when sum == 0.",
+        "tale": "Brute sweep.",
+        "approach": [
+          "best = 0; for l: s = 0; for r ≥ l: s += A[r]; if s == 0 → best = max(best, r−l+1)."
+        ],
+        "pseudocode": "for l; for r: s+=A[r]; if s==0: best=max(best,r-l+1)",
+        "story": "Educational.",
+        "code": "public int solveBrute(int[] A) {\n    int best = 0;\n    for (int l = 0; l < A.length; l++) {\n        long s = 0;\n        for (int r = l; r < A.length; r++) {\n            s += A[r];\n            if (s == 0) {\n                best = Math.max(best, r - l + 1);\n            }\n        }\n    }\n    return best;\n}"
+      },
+      {
+        "label": "Optimal — Prefix Sum + Earliest-Index Map",
+        "complexity": {
+          "time": "O(N) avg",
+          "space": "O(N)"
+        },
+        "plain": "Store first occurrence of each prefix sum; max stretch back to it.",
+        "tale": "Earliest flag = longest stretch.",
+        "approach": [
+          "Map<Long, Integer> firstIndex = new HashMap<>(); long sum = 0; int best = 0.",
+          "For i = 0..N−1: sum += A[i]; if sum == 0 → best = max(best, i+1).",
+          "Else if firstIndex.containsKey(sum) → best = max(best, i − firstIndex.get(sum)).",
+          "Else firstIndex.put(sum, i)."
+        ],
+        "pseudocode": "for i: sum+=A[i]; if sum==0: best=max(best,i+1); elif sum in map: best=max(best,i-map[sum]); else map[sum]=i",
+        "story": "Optimal. Trick = NEVER overwrite the first index.",
+        "code": "public int solve(int[] A) {\n    Map<Long, Integer> firstIndex = new HashMap<>();\n    long sum = 0;\n    int best = 0;\n    for (int i = 0; i < A.length; i++) {\n        sum += A[i];\n        if (sum == 0) {\n            best = Math.max(best, i + 1);\n        } else if (firstIndex.containsKey(sum)) {\n            best = Math.max(best, i - firstIndex.get(sum));\n        } else {\n            firstIndex.put(sum, i);\n        }\n    }\n    return best;\n}"
+      }
+    ],
+    "viz": {
+      "kind": "scripted-array",
+      "data": {
+        "A": [
+          1,
+          -2,
+          1,
+          2
+        ],
+        "footer": "Longest zero-sum subarray.",
+        "legend": [
+          "c-input",
+          "c-active",
+          "c-result"
+        ],
+        "script": [
+          {
+            "label": "SETUP",
+            "marks": {
+              "0": "c-input",
+              "1": "c-input",
+              "2": "c-input",
+              "3": "c-input"
+            },
+            "msg": "firstIndex = {}. sum=0. best=0.",
+            "overlay": "<strong>Why earliest only?</strong> To maximise (i − firstIndex[sum]) you want firstIndex as small as possible."
+          },
+          {
+            "label": "i=0: sum=1, new → map[1]=0",
+            "marks": {
+              "0": "c-active"
+            },
+            "msg": "best=0."
+          },
+          {
+            "label": "i=1: sum=-1, new → map[-1]=1",
+            "marks": {
+              "1": "c-active"
+            },
+            "msg": "best=0."
+          },
+          {
+            "label": "i=2: sum=0 → length = i+1 = 3",
+            "marks": {
+              "0": "c-result",
+              "1": "c-result",
+              "2": "c-result"
+            },
+            "msg": "best=3."
+          },
+          {
+            "label": "i=3: sum=2, new → map[2]=3",
+            "marks": {
+              "3": "c-active"
+            },
+            "msg": "best stays 3."
+          },
+          {
+            "label": "DONE",
+            "msg": "Longest = <strong>3</strong>."
+          }
+        ]
+      }
+    }
+  },
+  {
+    "id": "hash-count-pair-sum",
+    "title": "Count Pair Sum",
+    "subTopic": "HashMap — Pair Counting (sum target)",
+    "tags": [
+      "Hashing",
+      "HashMap",
+      "Pair Counting"
+    ],
+    "description": "Given an array A of N integers and integer B, count the number of (unordered) pairs (i, j) with i ≠ j such that A[i] + A[j] == B. The pair (i, j) is the same as (j, i) and counted once. Return count modulo 10^9 + 7.\n\nProblem Constraints\n1 ≤ N ≤ 10^5\n1 ≤ A[i], B ≤ 10^9\n\nExample\nA = [3, 5, 1, 2], B = 8 → 1 (3+5).\nA = [1, 2, 1, 2], B = 3 → 4 ((1,2) pairs across indices).",
+    "sampleInput": "A = [3, 5, 1, 2], B = 8",
+    "sampleOutput": "1",
+    "story": "Walk once. For each x, ans += freq[B − x]; then freq[x]++. Enforces i < j and handles duplicates correctly.",
+    "plain": "Brute O(N²) over pairs. Optimal: HashMap<value, count>. Single pass: pairs += freq.getOrDefault(B − x, 0) BEFORE inserting x. The 'add before insert' ordering ensures each pair is counted exactly once.",
+    "tale": "Walk a queue; each person asks 'how many people behind me sum with me to B?'.",
+    "solutions": [
+      {
+        "label": "Brute — All Pairs",
+        "complexity": {
+          "time": "O(N²)",
+          "space": "O(1)"
+        },
+        "plain": "Loop i, j > i.",
+        "tale": "Pair sweep.",
+        "approach": [
+          "ans = 0; for i, j > i: if A[i] + A[j] == B → ans++."
+        ],
+        "pseudocode": "for i; for j>i: if A[i]+A[j]==B: ans++",
+        "story": "Educational; TLE.",
+        "code": "public int solveBrute(int[] A, int B) {\n    final int MOD = 1_000_000_007;\n    long ans = 0;\n    for (int i = 0; i < A.length; i++) {\n        for (int j = i + 1; j < A.length; j++) {\n            if ((long) A[i] + A[j] == B) {\n                ans = (ans + 1) % MOD;\n            }\n        }\n    }\n    return (int) ans;\n}"
+      },
+      {
+        "label": "Optimal — Single Pass HashMap",
+        "complexity": {
+          "time": "O(N) avg",
+          "space": "O(N)"
+        },
+        "plain": "Accumulate freq[B−x] before inserting x.",
+        "tale": "Complement-first pattern.",
+        "approach": [
+          "Map<Integer, Integer> freq = new HashMap<>(); long count = 0.",
+          "For x in A: count += freq.getOrDefault(B − x, 0); freq.merge(x, 1, Integer::sum).",
+          "Return (int)(count % MOD)."
+        ],
+        "pseudocode": "for x: count += freq[B-x]; freq[x]++",
+        "story": "Optimal. Correctly handles duplicates and i<j.",
+        "code": "public int solve(int[] A, int B) {\n    final int MOD = 1_000_000_007;\n    Map<Integer, Integer> freq = new HashMap<>();\n    long count = 0;\n    for (int x : A) {\n        int target = B - x;\n        count = (count + freq.getOrDefault(target, 0)) % MOD;\n        freq.merge(x, 1, Integer::sum);\n    }\n    return (int) count;\n}"
+      }
+    ],
+    "viz": {
+      "kind": "scripted-array",
+      "data": {
+        "A": [
+          3,
+          5,
+          1,
+          2
+        ],
+        "footer": "Pair count with sum B = 8.",
+        "legend": [
+          "c-input",
+          "c-active",
+          "c-result"
+        ],
+        "script": [
+          {
+            "label": "SETUP",
+            "marks": {
+              "0": "c-input",
+              "1": "c-input",
+              "2": "c-input",
+              "3": "c-input"
+            },
+            "msg": "A=[3,5,1,2], B=8. freq={}. count=0.",
+            "overlay": "<strong>Why complement-before-insert?</strong> Guarantees i<j; also dodges self-pairing when B=2x and the array has only one x."
+          },
+          {
+            "label": "x=3, need=5, freq={}",
+            "marks": {
+              "0": "c-active"
+            },
+            "msg": "count=0. freq={3:1}."
+          },
+          {
+            "label": "x=5, need=3, freq={3:1}",
+            "marks": {
+              "0": "c-result",
+              "1": "c-result"
+            },
+            "msg": "count=1 (pair (3,5)). freq={3:1,5:1}."
+          },
+          {
+            "label": "x=1, need=7, freq={3:1,5:1}",
+            "marks": {
+              "2": "c-active"
+            },
+            "msg": "freq[7]=0. count=1. freq={3:1,5:1,1:1}."
+          },
+          {
+            "label": "x=2, need=6, freq={...}",
+            "marks": {
+              "3": "c-active"
+            },
+            "msg": "freq[6]=0. count=1."
+          },
+          {
+            "label": "DONE",
+            "msg": "Total = <strong>1</strong> (mod 1e9+7)."
+          }
+        ]
+      }
+    }
+  },
+  {
+    "id": "hash-subarray-given-sum",
+    "title": "Subarray with given sum",
+    "subTopic": "Sliding Window (positive ints) OR Prefix Sum Map",
+    "tags": [
+      "Hashing",
+      "Sliding Window",
+      "Prefix Sum"
+    ],
+    "description": "Given an array A of POSITIVE integers and integer B, return the FIRST contiguous sub-array whose sum equals B (smallest start index). If no such sub-array exists, return an array containing a single -1.\n\nProblem Constraints\n1 ≤ N ≤ 10^5\n1 ≤ A[i] ≤ 10^9\n1 ≤ B ≤ 10^9\n\nExample\nA = [1, 2, 3, 4, 5], B = 5 → [2, 3].\nA = [5, 10, 20, 100, 105], B = 110 → [-1].",
+    "sampleInput": "A = [1, 2, 3, 4, 5], B = 5",
+    "sampleOutput": "[2, 3]",
+    "story": "All positive ⇒ shrink window when sum exceeds B (two pointers, O(N)). Alternative: prefix-sum + HashMap (works for negatives too).",
+    "plain": "Brute O(N²) over subarrays. Optimal (positives only): two pointers l, r; expand r adding to sum; while sum > B shrink from l; if sum == B → return A[l..r]. For first occurrence: take the smallest l that hits sum == B.",
+    "tale": "Inflate a balloon (advance r) until it overshoots, then deflate from the back (advance l) until it fits — perfectly positive-only logic.",
+    "solutions": [
+      {
+        "label": "Brute — All Subarrays",
+        "complexity": {
+          "time": "O(N²)",
+          "space": "O(1)"
+        },
+        "plain": "Try every (l, r).",
+        "tale": "Brute sweep.",
+        "approach": [
+          "For l: s = 0; for r ≥ l: s += A[r]; if s == B → return A[l..r]; if s > B → break (positives).",
+          "Return [-1]."
+        ],
+        "pseudocode": "for l; s=0; for r>=l: s+=A[r]; if s==B: return; if s>B: break",
+        "story": "Acceptable for small N; not for N=1e5.",
+        "code": "public int[] solveBrute(int[] A, int B) {\n    for (int l = 0; l < A.length; l++) {\n        long s = 0;\n        for (int r = l; r < A.length; r++) {\n            s += A[r];\n            if (s == B) {\n                int[] res = new int[r - l + 1];\n                for (int k = l; k <= r; k++) {\n                    res[k - l] = A[k];\n                }\n                return res;\n            }\n            if (s > B) {\n                break;\n            }\n        }\n    }\n    return new int[]{-1};\n}"
+      },
+      {
+        "label": "Optimal — Two Pointers (positives only)",
+        "complexity": {
+          "time": "O(N)",
+          "space": "O(1)"
+        },
+        "plain": "Expand r; shrink l while sum > B.",
+        "tale": "Inflate/deflate window.",
+        "approach": [
+          "l = 0; long sum = 0.",
+          "For r = 0..N−1: sum += A[r]; while (sum > B && l <= r) sum −= A[l++].",
+          "If sum == B → return A[l..r]; else continue.",
+          "Return [-1]."
+        ],
+        "pseudocode": "l=0,s=0; for r: s+=A[r]; while s>B: s-=A[l++]; if s==B: return l..r",
+        "story": "Optimal for positive arrays. Use long for the sum to avoid overflow.",
+        "code": "public int[] solve(int[] A, int B) {\n    int l = 0;\n    long sum = 0;\n    for (int r = 0; r < A.length; r++) {\n        sum += A[r];\n        while (sum > B && l <= r) {\n            sum -= A[l];\n            l++;\n        }\n        if (sum == B) {\n            int[] res = new int[r - l + 1];\n            for (int k = l; k <= r; k++) {\n                res[k - l] = A[k];\n            }\n            return res;\n        }\n    }\n    return new int[]{-1};\n}"
+      }
+    ],
+    "viz": {
+      "kind": "scripted-array",
+      "data": {
+        "A": [
+          1,
+          2,
+          3,
+          4,
+          5
+        ],
+        "footer": "First subarray with sum = 5 using two pointers.",
+        "legend": [
+          "c-input",
+          "c-active",
+          "c-result"
+        ],
+        "script": [
+          {
+            "label": "SETUP",
+            "marks": {
+              "0": "c-input",
+              "1": "c-input",
+              "2": "c-input",
+              "3": "c-input",
+              "4": "c-input"
+            },
+            "msg": "A=[1,2,3,4,5], B=5. l=0, sum=0.",
+            "overlay": "<strong>Why two pointers OK?</strong> All elements positive → expanding r only grows sum; shrinking l only shrinks it; both monotonic."
+          },
+          {
+            "label": "r=0: sum=1",
+            "marks": {
+              "0": "c-active"
+            },
+            "msg": "sum < B."
+          },
+          {
+            "label": "r=1: sum=3",
+            "marks": {
+              "0": "c-active",
+              "1": "c-active"
+            },
+            "msg": "sum < B."
+          },
+          {
+            "label": "r=2: sum=6 > B → shrink",
+            "marks": {
+              "0": "c-eliminated",
+              "1": "c-active",
+              "2": "c-active"
+            },
+            "msg": "Drop A[0]=1 → sum=5. l=1."
+          },
+          {
+            "label": "Check sum==B",
+            "marks": {
+              "1": "c-result",
+              "2": "c-result"
+            },
+            "msg": "5 == 5 → HIT. Return A[1..2] = [2, 3]."
+          },
+          {
+            "label": "DONE",
+            "msg": "Output = <strong>[2, 3]</strong>."
+          }
+        ]
+      }
+    }
+  }
+]

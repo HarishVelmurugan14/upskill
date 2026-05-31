@@ -1,0 +1,134 @@
+{
+  "topic": "Hashing — HashMaps, Sets & Prefix-Sum Maps",
+  "summary": "Hashing turns 'is X in this collection?' from O(N) into O(1) average. Three patterns cover ~90% of interview hashing problems: (1) frequency counting with HashMap<value, count>; (2) seen-before set for first-repeat / pair-sum-target / contains-duplicate; (3) prefix-sum map for 'subarray with sum K' style — store prefix sums in a map, look for (currentSum − target). Master long keys when sums can overflow int.",
+  "thoughtProcess": [
+    {
+      "title": "1. HashMap vs HashSet vs int[] frequency.",
+      "body": "If values are bounded (≤ 10^5 or so), an int[] is faster and avoids autoboxing. If values can be 10^9 or negative, use HashMap<Integer, Integer>. If you only need membership, HashSet is enough."
+    },
+    {
+      "title": "2. Pair-with-target = complement search.",
+      "body": "Walk the array once. For each x, check if map contains (target − x). If yes, you've found a pair. Otherwise put x in the map. Beats O(N²) brute."
+    },
+    {
+      "title": "3. Subarray sum = prefix sum + map of seen sums.",
+      "body": "currentSum after i is S[i]. A subarray (l, r] has sum S[r] − S[l]. So 'exists subarray with sum K' becomes 'exists earlier prefix S[l] = S[r] − K' — a single map lookup."
+    },
+    {
+      "title": "4. Subarray sum = 0 special case.",
+      "body": "Look for repeated prefix sums (S[l] == S[r]) OR a prefix sum that equals 0 (subarray from index 0). Use long for the running sum if values can swing wide."
+    },
+    {
+      "title": "5. Count distinct in sliding window.",
+      "body": "Slide a window of size B over the array. Maintain HashMap<value, count>. On window slide: increment new, decrement old; remove key when count hits 0. Distinct count = map.size()."
+    },
+    {
+      "title": "6. First repeating / unique — single pass with map.",
+      "body": "For first repeating: build freq map (full pass), then walk array left-to-right returning the first element with freq > 1. For 'count of elements with freq == 1' (unique count): two-pass or freq map + size filter."
+    },
+    {
+      "title": "7. Pair-count problems with duplicates need care.",
+      "body": "Counting pairs (i,j) i<j with A[i]+A[j]=B: walk once, for each x add freq[B-x] to ans BEFORE putting x in map (this enforces i<j and handles duplicates: e.g. [2,2] with B=4 contributes 1 not 4)."
+    }
+  ],
+  "commonMistakes": [
+    {
+      "title": "Forgetting that HashMap.get returns null for missing key",
+      "wrong": "int c = freq.get(x);  // NullPointerException when x not present",
+      "right": "int c = freq.getOrDefault(x, 0);",
+      "why": "HashMap returns null, autounboxing to int crashes. Use getOrDefault."
+    },
+    {
+      "title": "Double-counting pairs in 'sum equals B'",
+      "wrong": "for x in A: if map.containsKey(B - x): count++;\nmap.put(x, ...);  // OK\n// But if A=[2,2], B=4 → first 2: map empty; second 2: complement 2 in map → count=1, correct.\n// Wrong version: build freq first, then for each x add freq[B-x] → counts (2,2) twice.",
+      "right": "// Single-pass approach (handles i<j automatically)\nMap<Integer, Integer> seen = new HashMap<>();\nlong pairs = 0;\nfor (int x : A) {\n    pairs += seen.getOrDefault(B - x, 0);\n    seen.merge(x, 1, Integer::sum);\n}",
+      "why": "If you pre-build freq then iterate, you count each pair twice (once from each end). Single-pass with complement-before-put gives i<j cleanly."
+    },
+    {
+      "title": "Prefix sum subarray=0 missing the 'sum already 0' case",
+      "wrong": "for i in 0..N-1: sum += A[i]; if seen.contains(sum): return true; seen.add(sum);",
+      "right": "// Add sentinel 0 to the set BEFORE the loop so that sum becoming 0 at index i means subarray [0..i] sums to 0.\nseen.add(0L);\nfor (int x : A) {\n    sum += x;\n    if (seen.contains(sum)) return 1;\n    seen.add(sum);\n}\nreturn 0;",
+      "why": "Without the sentinel, you miss subarrays that start at index 0. Insert 0 first."
+    },
+    {
+      "title": "Int overflow in prefix sum",
+      "wrong": "int sum = 0; for (int x : A) sum += x;   // overflows when N=1e5 and |A[i]|=1e9",
+      "right": "long sum = 0; for (int x : A) sum += x;",
+      "why": "1e5 × 1e9 = 1e14 — far beyond int range. Always use long for prefix sums when |A[i]| can be large."
+    },
+    {
+      "title": "Distinct-in-window: forgetting to remove keys with count 0",
+      "wrong": "freq[A[l]]--;  // when count becomes 0 the key still occupies a slot — map.size() over-reports distinct",
+      "right": "int c = freq.get(A[l]) - 1;\nif (c == 0) freq.remove(A[l]);\nelse freq.put(A[l], c);",
+      "why": "map.size() counts keys, not non-zero values. Drop the key when count hits 0 so size reflects true distinct count."
+    },
+    {
+      "title": "First repeating: returning by position in map iteration",
+      "wrong": "for entry in freq.entrySet(): if entry.getValue() > 1: return entry.getKey();   // HashMap has no order!",
+      "right": "// Build freq with full first pass, THEN walk the array in order:\nfor (int x : A) if (freq.get(x) > 1) return x;",
+      "why": "HashMap iteration order is undefined. To find the FIRST repeating, walk the original array."
+    },
+    {
+      "title": "Longest-zero-subarray storing latest index instead of earliest",
+      "wrong": "map.put(prefixSum, i);  // always overwrites \u2192 only most-recent index kept",
+      "right": "if (!map.containsKey(prefixSum)) map.put(prefixSum, i);  // keep earliest only",
+      "why": "For longest zero-sum subarray you want the EARLIEST occurrence of each prefix sum so that (currentIndex − earliestIndex) is maximised."
+    }
+  ],
+  "keyPatterns": [
+    {
+      "name": "Frequency Map (count occurrences / queries)",
+      "when": "How many times does each value appear? Answer membership / count queries.",
+      "template": "Map<Integer, Integer> freq = new HashMap<>();\nfor (int x : A) freq.merge(x, 1, Integer::sum);\n// Query\nint cnt = freq.getOrDefault(query, 0);",
+      "examples": ["Frequency of element query", "Count Unique Elements"]
+    },
+    {
+      "name": "HashSet for distinct / duplicate / first-repeat",
+      "when": "'Are there duplicates?' or 'first element to repeat as I scan left-to-right'.",
+      "template": "Set<Integer> seen = new HashSet<>();\nfor (int x : A) {\n    if (!seen.add(x)) return x;  // first repeat\n}\nreturn -1;\n// Count distinct: set.size()",
+      "examples": ["Count distinct elements", "First Repeating element"]
+    },
+    {
+      "name": "Complement Pair Search (sum == B)",
+      "when": "'Does some pair sum to B?' or 'count pairs with sum B'.",
+      "template": "Map<Integer, Integer> seen = new HashMap<>();\nlong pairs = 0;\nfor (int x : A) {\n    pairs += seen.getOrDefault(B - x, 0);\n    seen.merge(x, 1, Integer::sum);\n}",
+      "examples": ["Check Pair Sum", "Count Pair Sum"]
+    },
+    {
+      "name": "Complement Pair Search (difference == B)",
+      "when": "'Count pairs (i,j) with |A[i] − A[j]| = B' (or signed diff).",
+      "template": "Map<Integer, Integer> freq = new HashMap<>();\nfor (int x : A) freq.merge(x, 1, Integer::sum);\nlong pairs = 0;\nfor (Map.Entry<Integer, Integer> e : freq.entrySet()) {\n    int v = e.getKey();\n    pairs += (long) e.getValue() * freq.getOrDefault(v + B, 0);\n}\nif (B == 0) pairs -= sum of freq (self-pairs counted) ... or special-case.",
+      "examples": ["Count Pair Difference"]
+    },
+    {
+      "name": "Prefix Sum + Map (subarray sum = K)",
+      "when": "Continuous subarray with given sum (positive, negative, zero).",
+      "template": "Map<Long, Integer> prefixCount = new HashMap<>();\nprefixCount.put(0L, 1);\nlong sum = 0; long count = 0;\nfor (int x : A) {\n    sum += x;\n    count += prefixCount.getOrDefault(sum - K, 0);\n    prefixCount.merge(sum, 1, Integer::sum);\n}",
+      "examples": ["Subarray with given sum", "Subarray Sum Equals K", "Sub-array with 0 sum", "Count Subarray Zero Sum", "Longest Subarray Zero Sum"]
+    },
+    {
+      "name": "Common-Elements with Multiplicity",
+      "when": "Intersection respecting duplicates (min(countA, countB) per value).",
+      "template": "Map<Integer, Integer> freqA = new HashMap<>();\nfor (int x : A) freqA.merge(x, 1, Integer::sum);\nList<Integer> out = new ArrayList<>();\nfor (int x : B) {\n    int c = freqA.getOrDefault(x, 0);\n    if (c > 0) { out.add(x); freqA.put(x, c - 1); }\n}",
+      "examples": ["Common Elements"]
+    },
+    {
+      "name": "Sliding Window with HashMap (distinct in window)",
+      "when": "Maintain stats over a moving window of fixed or variable size.",
+      "template": "Map<Integer, Integer> freq = new HashMap<>();\nList<Integer> ans = new ArrayList<>();\nfor (int i = 0; i < N; i++) {\n    freq.merge(A[i], 1, Integer::sum);\n    if (i >= B) {\n        int old = A[i - B];\n        int c = freq.get(old) - 1;\n        if (c == 0) freq.remove(old);\n        else freq.put(old, c);\n    }\n    if (i >= B - 1) ans.add(freq.size());\n}",
+      "examples": ["Distinct Numbers in Window"]
+    }
+  ],
+  "edgeCases": [
+    "Empty array → frequency map empty, set empty; first-repeat returns -1.",
+    "All elements same → first repeat is A[1]; distinct = 1; count unique = (N == 1 ? 1 : 0).",
+    "Subarray zero-sum with single zero in the array → return true; the prefix-sum map should include the sentinel 0 first.",
+    "Prefix sum overflow → use long; relevant when N=1e5 and |A[i]| can reach 1e9.",
+    "Pair sum count when B − x == x → don't add x with itself; the complement-then-put ordering already prevents this if duplicates exist.",
+    "Pair difference with B == 0 → counts (x, x) pairs; result = Σ C(freq[x], 2).",
+    "Distinct-in-window when window size B > N → output one entry: distinct of entire array.",
+    "Longest zero-sum subarray with sum reaching 0 at index i → length i+1, requires the (0, -1) sentinel in the index map.",
+    "Subarray with given sum (positive ints only) — sliding window (two pointers) is simpler and O(N), no map needed.",
+    "Common elements with multiplicity — order should be insertion order of B (or A, problem-specific); confirm expected order."
+  ]
+}

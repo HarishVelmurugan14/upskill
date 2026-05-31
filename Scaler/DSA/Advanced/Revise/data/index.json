@@ -25,6 +25,18 @@
       "notesFile": "recursion.notes.json"
     },
     {
+      "name": "Maths",
+      "section": "Section 1",
+      "file": "maths.json",
+      "notesFile": "maths.notes.json"
+    },
+    {
+      "name": "Hashing",
+      "section": "Section 1",
+      "file": "hashing.json",
+      "notesFile": "hashing.notes.json"
+    },
+    {
       "name": "Binary Search",
       "section": "Section 2",
       "file": "binary-search.json",
