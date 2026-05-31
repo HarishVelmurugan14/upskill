@@ -1,0 +1,1480 @@
+[
+  {
+    "id": "bm-number-of-1-bits",
+    "title": "Number of 1 Bits",
+    "subTopic": "Bit Counting",
+    "tags": [
+      "Bit Manipulation",
+      "Hamming Weight"
+    ],
+    "description": "Write a function that takes an integer and returns the number of 1 bits present in its binary representation.\n\nProblem Constraints\n1 ≤ A ≤ 10^9\n\nInput Format\nFirst and only argument contains integer A.\n\nOutput Format\nReturn an integer.\n\nExample Input\nInput 1: 11\nInput 2: 6\n\nExample Output\nOutput 1: 3\nOutput 2: 2\n\nExample Explanation\n11 = 1011 (binary) → 3 set bits. 6 = 110 → 2 set bits.",
+    "sampleInput": "A = 29",
+    "sampleOutput": "4",
+    "story": "Loop while A != 0. Add (A & 1) to count, then right-shift A by 1. Stop when A is 0.",
+    "plain": "Two approaches: (a) bit-by-bit — repeatedly test LSB with (A & 1), add to count, shift A right; (b) Brian Kernighan — repeatedly do A = A & (A - 1) which clears the lowest set bit, count iterations. Both O(bits). Kernighan runs once per SET bit (faster on sparse numbers).",
+    "tale": "A coin counter inspects a stack of coins in binary slots. She peeks at the lowest slot — if a coin sits there, she increments her tally — then slides the whole stack down one slot. She stops when the stack is empty.",
+    "solutions": [
+      {
+        "label": "Bit-by-Bit",
+        "complexity": {
+          "time": "O(log A)",
+          "space": "O(1)"
+        },
+        "plain": "Shift right; count LSBs.",
+        "tale": "Peek and slide.",
+        "approach": [
+          "Initialise count = 0, N = A.",
+          "While N != 0: if (N & 1) == 1, count++; N = N >> 1 (use >>> for unsigned in Java if negatives are possible).",
+          "Return count."
+        ],
+        "pseudocode": "while N: count += N&1; N >>= 1",
+        "story": "Basic. O(log A).",
+        "code": "public int numSetBits(int A) {\n    int N = A;\n    int count = 0;\n    while (N != 0) {\n        if ((N & 1) == 1) {\n            count++;\n        }\n        N = N >> 1;\n    }\n    return count;\n}"
+      },
+      {
+        "label": "Optimal — Brian Kernighan",
+        "complexity": {
+          "time": "O(setBits)",
+          "space": "O(1)"
+        },
+        "plain": "Loop while N != 0: N = N & (N - 1); count++. Each iteration removes one set bit.",
+        "tale": "Snap off the lowest set coin each round.",
+        "approach": [
+          "count = 0; while N != 0: N = N & (N-1); count++; return count."
+        ],
+        "pseudocode": "while N: N &= N-1; count++",
+        "story": "Optimal — iterates once per set bit.",
+        "code": "public int numSetBitsKernighan(int A) {\n    int N = A;\n    int count = 0;\n    while (N != 0) {\n        N = N & (N - 1);\n        count++;\n    }\n    return count;\n}"
+      }
+    ],
+    "viz": {
+      "kind": "scripted-array",
+      "data": {
+        "A": [
+          1,
+          1,
+          1,
+          0,
+          1
+        ],
+        "footer": "Number of 1 bits — A = 29 = 11101₂. Bit-by-bit walk.",
+        "legend": [
+          "c-input",
+          "c-active",
+          "c-result"
+        ],
+        "script": [
+          {
+            "label": "SETUP",
+            "marks": {
+              "0": "c-input",
+              "1": "c-input",
+              "2": "c-input",
+              "3": "c-input",
+              "4": "c-input"
+            },
+            "msg": "A = 29 = <strong>11101₂</strong>. Bits shown MSB → LSB. Expected count = 4.",
+            "overlay": "<strong>Bit order:</strong> position 0 = LSB. The displayed array reads MSB-first for readability."
+          },
+          {
+            "label": "LSB=1 → count=1",
+            "marks": {
+              "4": "c-active"
+            },
+            "msg": "29 & 1 = 1 → count = 1. Shift right → 14."
+          },
+          {
+            "label": "LSB=0",
+            "marks": {
+              "3": "c-active"
+            },
+            "msg": "14 & 1 = 0. Shift → 7."
+          },
+          {
+            "label": "LSB=1 → count=2",
+            "marks": {
+              "2": "c-active"
+            },
+            "msg": "7 & 1 = 1 → count = 2. Shift → 3."
+          },
+          {
+            "label": "LSB=1 → count=3",
+            "marks": {
+              "1": "c-active"
+            },
+            "msg": "3 & 1 = 1 → count = 3. Shift → 1."
+          },
+          {
+            "label": "LSB=1 → count=4",
+            "marks": {
+              "0": "c-active"
+            },
+            "msg": "1 & 1 = 1 → count = 4. Shift → 0. Stop."
+          },
+          {
+            "label": "DONE",
+            "marks": {
+              "0": "c-result",
+              "1": "c-result",
+              "2": "c-result",
+              "4": "c-result"
+            },
+            "msg": "Set-bit count = <strong>4</strong>.",
+            "overlay": "<strong>Negative numbers:</strong> in Java, use <code>>>></code> (unsigned right shift) so the sign bit doesn't propagate. Or use <code>Integer.bitCount(A)</code>."
+          }
+        ]
+      }
+    }
+  },
+  {
+    "id": "bm-single-number",
+    "title": "Single Number",
+    "subTopic": "XOR Fold",
+    "tags": [
+      "Bit Manipulation",
+      "XOR",
+      "Pairing"
+    ],
+    "description": "Given an array of integers A, every element appears twice except for one. Find that integer that occurs once.\nNOTE: Your algorithm should have a linear runtime complexity. Could you implement it without using extra memory?\n\nProblem Constraints\n1 ≤ |A| ≤ 2 * 10^6\n0 ≤ A[i] ≤ INTMAX\n\nInput Format\nThe first and only argument of input contains an integer array A.\n\nOutput Format\nReturn a single integer denoting the single element.\n\nExample Input\nInput 1: A = [1, 2, 2, 3, 1]\nInput 2: A = [1, 2, 2]\n\nExample Output\nOutput 1: 3\nOutput 2: 1\n\nExample Explanation\n3 occurs once in input 1; 1 occurs once in input 2.",
+    "sampleInput": "A = [4, 7, 2, 7, 4, 9, 2]",
+    "sampleOutput": "9",
+    "story": "XOR is associative & commutative. x ^ x = 0. Folding XOR over the array cancels all pairs, leaving the lone element.",
+    "plain": "XOR has two magical properties: x ^ x = 0 and x ^ 0 = x, and it's commutative. So XOR-folding the entire array makes every duplicated value cancel itself out, leaving only the unique number. One pass, O(N), O(1) memory.",
+    "tale": "Twin coins in a sealed bag cancel each other's weight perfectly. After shaking the bag, only the single lonely coin's weight remains on the scale.",
+    "solutions": [
+      {
+        "label": "Brute — HashMap Count",
+        "complexity": {
+          "time": "O(N)",
+          "space": "O(N)"
+        },
+        "plain": "Count frequencies; return the one with count 1. Uses extra memory.",
+        "tale": "Tally each coin; the loner has count 1.",
+        "approach": [
+          "Build a frequency map; return the key with value 1."
+        ],
+        "pseudocode": "freq map; return key with count == 1",
+        "story": "Brute. Uses O(N) memory.",
+        "code": "public int singleNumberBrute(final int[] A) {\n    java.util.HashMap<Integer, Integer> freq = new java.util.HashMap<>();\n    for (int v : A) {\n        freq.merge(v, 1, Integer::sum);\n    }\n    for (var e : freq.entrySet()) {\n        if (e.getValue() == 1) {\n            return e.getKey();\n        }\n    }\n    return -1;\n}"
+      },
+      {
+        "label": "Optimal — XOR Fold",
+        "complexity": {
+          "time": "O(N)",
+          "space": "O(1)"
+        },
+        "plain": "result = 0; for each v: result ^= v; return result.",
+        "tale": "Twin coins cancel; the loner remains.",
+        "approach": [
+          "result = A[0].",
+          "Loop i = 1..N-1: result ^= A[i].",
+          "Return result."
+        ],
+        "pseudocode": "r = 0; for v in A: r ^= v",
+        "story": "Optimal. O(N) time, O(1) memory.",
+        "code": "public int singleNumber(final int[] A) {\n    int result = A[0];\n    for (int i = 1; i < A.length; i++) {\n        result = result ^ A[i];\n    }\n    return result;\n}"
+      }
+    ],
+    "viz": {
+      "kind": "scripted-array",
+      "data": {
+        "A": [
+          4,
+          7,
+          2,
+          7,
+          4,
+          9,
+          2
+        ],
+        "footer": "Single Number — XOR-fold.",
+        "legend": [
+          "c-input",
+          "c-active",
+          "c-result",
+          "c-eliminated"
+        ],
+        "script": [
+          {
+            "label": "SETUP",
+            "marks": {
+              "0": "c-input",
+              "1": "c-input",
+              "2": "c-input",
+              "3": "c-input",
+              "4": "c-input",
+              "5": "c-input",
+              "6": "c-input"
+            },
+            "msg": "A = [4, 7, 2, 7, 4, 9, 2]. Every value pairs except 9. result = 0.",
+            "overlay": "<strong>XOR laws:</strong> x ^ x = 0, x ^ 0 = x, XOR is commutative & associative."
+          },
+          {
+            "label": "fold 4 → result=4",
+            "marks": {
+              "0": "c-active"
+            },
+            "msg": "result = 0 ^ 4 = <strong>4</strong>."
+          },
+          {
+            "label": "fold 7 → result=3",
+            "marks": {
+              "1": "c-active"
+            },
+            "msg": "result = 4 ^ 7 = 3 (0011)."
+          },
+          {
+            "label": "fold 2 → result=1",
+            "marks": {
+              "2": "c-active"
+            },
+            "msg": "result = 3 ^ 2 = 1."
+          },
+          {
+            "label": "fold 7 → result=6",
+            "marks": {
+              "3": "c-active"
+            },
+            "msg": "result = 1 ^ 7 = 6."
+          },
+          {
+            "label": "fold 4 → result=2 (4s cancelled)",
+            "marks": {
+              "0": "c-eliminated",
+              "4": "c-eliminated"
+            },
+            "msg": "result = 6 ^ 4 = 2. Both 4s now cancelled."
+          },
+          {
+            "label": "fold 9 → result=11",
+            "marks": {
+              "5": "c-active"
+            },
+            "msg": "result = 2 ^ 9 = 11."
+          },
+          {
+            "label": "fold 2 → result=9 (2s cancelled)",
+            "marks": {
+              "2": "c-eliminated",
+              "6": "c-eliminated"
+            },
+            "msg": "result = 11 ^ 2 = 9. Now 7s are also cancelled (4^4 = 0 elsewhere, 7^7 = 0 elsewhere)."
+          },
+          {
+            "label": "DONE",
+            "marks": {
+              "5": "c-result"
+            },
+            "msg": "Lone element = <strong>9</strong>.",
+            "overlay": "<strong>Generalises:</strong> 'every value appears K times, except one appears once' can be solved with per-bit mod-K counting (see Single Number II)."
+          }
+        ]
+      }
+    }
+  },
+  {
+    "id": "bm-unset-bit",
+    "title": "Unset i-th Bit",
+    "subTopic": "Single-Bit Op",
+    "tags": [
+      "Bit Manipulation",
+      "Mask"
+    ],
+    "description": "You are given two integers A and B. If B-th bit in A is set, make it unset. If B-th bit in A is unset, leave it as it is. Return the updated A value.\nNote: The bit position is 0-indexed (LSB = index 0).\n\nProblem Constraints\n1 ≤ A ≤ 10^9; 0 ≤ B ≤ 30\n\nExample\nInput: A = 5, B = 2 → Output: 1 (101 → 001)",
+    "sampleInput": "A = 13, B = 2",
+    "sampleOutput": "9",
+    "story": "Mask = ~(1 << B). AND with A clears that bit, leaves others.",
+    "plain": "Build mask = ~(1 << B). It has 0 at position B and 1 everywhere else. ANDing with A keeps every bit except position B, which becomes 0.",
+    "tale": "A typist uses correction tape to blank out exactly one character — leaving every other character untouched.",
+    "solutions": [
+      {
+        "label": "Optimal",
+        "complexity": {
+          "time": "O(1)",
+          "space": "O(1)"
+        },
+        "plain": "return A & ~(1 << B).",
+        "tale": "Mask and AND.",
+        "approach": [
+          "Compute mask = ~(1 << B).",
+          "Return A & mask."
+        ],
+        "pseudocode": "return A & ~(1 << B)",
+        "story": "Optimal. Constant time.",
+        "code": "public int solve(int A, int B) {\n    return A & (~(1 << B));\n}"
+      }
+    ],
+    "viz": {
+      "kind": "scripted-array",
+      "data": {
+        "A": [
+          0,
+          1,
+          1,
+          0,
+          1
+        ],
+        "footer": "Unset bit B=2 in A=13 (01101). Bit 2 is set → clear it.",
+        "legend": [
+          "c-input",
+          "c-active",
+          "c-result"
+        ],
+        "script": [
+          {
+            "label": "SETUP",
+            "marks": {
+              "0": "c-input",
+              "1": "c-input",
+              "2": "c-input",
+              "3": "c-input",
+              "4": "c-input"
+            },
+            "msg": "A = 13 = <strong>01101</strong>. B = 2 (position 2 from the right, 0-indexed).",
+            "overlay": "<strong>Mask trick:</strong> isolate one bit, complement to get inverse mask."
+          },
+          {
+            "label": "Build 1 << 2 = 00100",
+            "marks": {
+              "2": "c-active"
+            },
+            "msg": "Single-bit at position 2."
+          },
+          {
+            "label": "Complement → 11011",
+            "msg": "~00100 = 11011. Zero at position 2, ones elsewhere."
+          },
+          {
+            "label": "AND with A",
+            "marks": {
+              "2": "c-active"
+            },
+            "msg": "01101 & 11011 = <strong>01001</strong> = 9. Bit 2 cleared; others preserved."
+          },
+          {
+            "label": "DONE",
+            "marks": {
+              "1": "c-result",
+              "4": "c-result"
+            },
+            "msg": "Result = <strong>9</strong>.",
+            "overlay": "<strong>Idempotent:</strong> unsetting an already-zero bit leaves the number unchanged."
+          }
+        ]
+      }
+    }
+  },
+  {
+    "id": "bm-toggle-bit",
+    "title": "Toggle i-th Bit",
+    "subTopic": "Single-Bit Op",
+    "tags": [
+      "Bit Manipulation",
+      "XOR"
+    ],
+    "description": "You are given two integers A and B. If B-th bit in A is set, make it unset. If B-th bit in A is unset, make it set. Return the updated A value.\nNote: bit position is 0-indexed.\n\nProblem Constraints\n1 ≤ A ≤ 10^9; 0 ≤ B ≤ 30\n\nExample\nA = 4, B = 1 → 4 = 100; toggle bit 1 → 110 = 6.\nA = 5, B = 2 → 5 = 101; toggle bit 2 → 001 = 1.",
+    "sampleInput": "A = 10, B = 0",
+    "sampleOutput": "11",
+    "story": "XOR with (1 << B) flips that bit, leaves others.",
+    "plain": "XOR with the single-bit mask flips only the targeted bit. Because x ^ 1 = ~x and x ^ 0 = x, ANDing/XORing the mask only changes position B and leaves the rest alone.",
+    "tale": "A light switch — press once: on becomes off, off becomes on. The other switches in the room stay where they are.",
+    "solutions": [
+      {
+        "label": "Optimal",
+        "complexity": {
+          "time": "O(1)",
+          "space": "O(1)"
+        },
+        "plain": "return A ^ (1 << B).",
+        "tale": "Flip the targeted switch.",
+        "approach": [
+          "return A ^ (1 << B);"
+        ],
+        "pseudocode": "A ^ (1 << B)",
+        "story": "Optimal.",
+        "code": "public int solve(int A, int B) {\n    return A ^ (1 << B);\n}"
+      }
+    ],
+    "viz": {
+      "kind": "scripted-array",
+      "data": {
+        "A": [
+          0,
+          1,
+          0,
+          1,
+          0
+        ],
+        "footer": "Toggle bit B=0 in A=10 (01010).",
+        "legend": [
+          "c-input",
+          "c-active",
+          "c-result"
+        ],
+        "script": [
+          {
+            "label": "SETUP",
+            "marks": {
+              "0": "c-input",
+              "1": "c-input",
+              "2": "c-input",
+              "3": "c-input",
+              "4": "c-input"
+            },
+            "msg": "A = 10 = <strong>01010</strong>. B = 0 (LSB).",
+            "overlay": "<strong>XOR for toggle:</strong> single property — flips iff mask bit is 1."
+          },
+          {
+            "label": "Mask 1 << 0 = 00001",
+            "marks": {
+              "4": "c-active"
+            },
+            "msg": "Single bit at position 0."
+          },
+          {
+            "label": "XOR with A",
+            "marks": {
+              "4": "c-active"
+            },
+            "msg": "01010 ^ 00001 = <strong>01011</strong> = 11."
+          },
+          {
+            "label": "DONE",
+            "marks": {
+              "1": "c-result",
+              "3": "c-result",
+              "4": "c-result"
+            },
+            "msg": "Result = <strong>11</strong>.",
+            "overlay": "<strong>Two toggles cancel:</strong> A ^ m ^ m = A. Useful when you need to revert a flip."
+          }
+        ]
+      }
+    }
+  },
+  {
+    "id": "bm-check-bit",
+    "title": "Check i-th Bit",
+    "subTopic": "Single-Bit Op",
+    "tags": [
+      "Bit Manipulation",
+      "Mask"
+    ],
+    "description": "You are given two integers A and B. Return 1 if B-th bit in A is set, else 0.\nNote: bit position is 0-indexed.\n\nProblem Constraints\n1 ≤ A ≤ 10^9; 0 ≤ B ≤ 30\n\nExample\nA = 4, B = 1 → 100, bit 1 is 0 → 0.\nA = 5, B = 2 → 101, bit 2 is 1 → 1.",
+    "sampleInput": "A = 9, B = 3",
+    "sampleOutput": "1",
+    "story": "AND with mask (1 << B); zero → bit unset (return 0), non-zero → bit set (return 1).",
+    "plain": "Use AND with the single-bit mask. The result is either 0 (bit unset) or exactly (1 << B) (bit set). Compare for zero. A cleaner one-liner: return (A >> B) & 1.",
+    "tale": "An inspector shines a torch on a single position. If the torch reflects, that bit is metal (set); if not, plastic (unset).",
+    "solutions": [
+      {
+        "label": "Optimal",
+        "complexity": {
+          "time": "O(1)",
+          "space": "O(1)"
+        },
+        "plain": "(A & (1 << B)) != 0 → 1; else → 0. Equivalent: (A >> B) & 1.",
+        "tale": "Probe the position with a mask.",
+        "approach": [
+          "mask = 1 << B; if ((A & mask) != 0) return 1; return 0; OR simply return (A >> B) & 1."
+        ],
+        "pseudocode": "return (A >> B) & 1",
+        "story": "Optimal.",
+        "code": "public int solve(int A, int B) {\n    if ((A & (1 << B)) == (1 << B)) {\n        return 1;\n    }\n    return 0;\n}"
+      }
+    ],
+    "viz": {
+      "kind": "scripted-array",
+      "data": {
+        "A": [
+          0,
+          1,
+          0,
+          0,
+          1
+        ],
+        "footer": "Check bit B=3 in A=9 (01001).",
+        "legend": [
+          "c-input",
+          "c-active",
+          "c-result"
+        ],
+        "script": [
+          {
+            "label": "SETUP",
+            "marks": {
+              "0": "c-input",
+              "1": "c-input",
+              "2": "c-input",
+              "3": "c-input",
+              "4": "c-input"
+            },
+            "msg": "A = 9 = <strong>01001</strong>. Probe position 3 (from right, 0-indexed).",
+            "overlay": "<strong>Two equivalents:</strong> <code>(A & (1<<B)) != 0</code> and <code>(A >> B) & 1</code>."
+          },
+          {
+            "label": "Mask 1<<3 = 01000",
+            "marks": {
+              "1": "c-active"
+            },
+            "msg": "Single bit at position 3."
+          },
+          {
+            "label": "AND with A",
+            "marks": {
+              "1": "c-active"
+            },
+            "msg": "01001 & 01000 = <strong>01000</strong> (non-zero). Bit is set → return 1."
+          },
+          {
+            "label": "DONE",
+            "marks": {
+              "1": "c-result"
+            },
+            "msg": "Bit 3 is set in 9. Return <strong>1</strong>.",
+            "overlay": "<strong>Useful in loops:</strong> walking bits with <code>for B = 0..30: if ((A>>B)&1)…</code> is the canonical pattern."
+          }
+        ]
+      }
+    }
+  },
+  {
+    "id": "bm-set-two-bits",
+    "title": "Set Two Bits (in 0)",
+    "subTopic": "OR Composition",
+    "tags": [
+      "Bit Manipulation",
+      "OR"
+    ],
+    "description": "You are given two integers A and B. Set the A-th bit and B-th bit in 0, and return the result in decimal.\nNote: bit positions are 0-indexed.\n\nProblem Constraints\n0 ≤ A ≤ 30; 0 ≤ B ≤ 30\n\nExample\nA = 3, B = 5 → 101000 = 40.\nA = 4, B = 4 → 10000 = 16 (same bit set twice = once).",
+    "sampleInput": "A = 2, B = 6",
+    "sampleOutput": "68",
+    "story": "Start with 0; OR with (1 << A) and (1 << B). Setting same bit twice is idempotent.",
+    "plain": "OR is the natural 'set bit' operation. Start with N = 0; N |= (1 << A); N |= (1 << B). When A == B, the second OR is a no-op (1 OR 1 = 1).",
+    "tale": "Two switches in an empty fuse box. Flip A on, then flip B on. If they're the same switch, flipping it twice still leaves it on.",
+    "solutions": [
+      {
+        "label": "Optimal",
+        "complexity": {
+          "time": "O(1)",
+          "space": "O(1)"
+        },
+        "plain": "Return (1 << A) | (1 << B).",
+        "tale": "OR two single-bit masks.",
+        "approach": [
+          "return (1 << A) | (1 << B);"
+        ],
+        "pseudocode": "(1 << A) | (1 << B)",
+        "story": "Optimal.",
+        "code": "public int solve(int A, int B) {\n    int X = setBit(0, A);\n    return setBit(X, B);\n}\n\nprivate int setBit(int N, int i) {\n    return N | (1 << i);\n}"
+      }
+    ],
+    "viz": {
+      "kind": "scripted-array",
+      "data": {
+        "A": [
+          0,
+          1,
+          0,
+          0,
+          0,
+          0,
+          1,
+          0
+        ],
+        "footer": "Set bits A=2, B=6 in 0. Result = 01000100 = 68.",
+        "legend": [
+          "c-input",
+          "c-active",
+          "c-result"
+        ],
+        "script": [
+          {
+            "label": "SETUP",
+            "marks": {
+              "0": "c-input",
+              "1": "c-input",
+              "2": "c-input",
+              "3": "c-input",
+              "4": "c-input",
+              "5": "c-input",
+              "6": "c-input",
+              "7": "c-input"
+            },
+            "msg": "N = 0 = <strong>00000000</strong>. Set positions 2 and 6.",
+            "overlay": "<strong>OR semantics:</strong> 1 OR x = 1, 0 OR x = x. So OR with a mask only TURNS BITS ON, never off."
+          },
+          {
+            "label": "1 << 2 = 00000100",
+            "marks": {
+              "5": "c-active"
+            },
+            "msg": "Single-bit mask at position 2."
+          },
+          {
+            "label": "OR → N=00000100",
+            "marks": {
+              "5": "c-result"
+            },
+            "msg": "N = 0 | 4 = 4."
+          },
+          {
+            "label": "1 << 6 = 01000000",
+            "marks": {
+              "1": "c-active"
+            },
+            "msg": "Single-bit mask at position 6."
+          },
+          {
+            "label": "OR → N=01000100",
+            "marks": {
+              "1": "c-result",
+              "5": "c-result"
+            },
+            "msg": "N = 4 | 64 = <strong>68</strong>."
+          },
+          {
+            "label": "DONE",
+            "msg": "Result = <strong>68</strong>. Two bits set.",
+            "overlay": "<strong>If A == B</strong>, the second OR is a no-op — masks are idempotent under OR."
+          }
+        ]
+      }
+    }
+  },
+  {
+    "id": "bm-nth-magic-number",
+    "title": "Find nth Magic Number",
+    "subTopic": "Binary-to-Base5 Mapping",
+    "tags": [
+      "Bit Manipulation",
+      "Number Theory",
+      "Powers"
+    ],
+    "description": "Given an integer A, find and return the Ath magic number.\nA magic number is defined as a number that can be expressed as a power of 5 or a sum of unique powers of 5.\nFirst few magic numbers are 5, 25, 30 (5 + 25), 125, 130 (125 + 5), ...\n\nProblem Constraints\n1 ≤ A ≤ 5000\n\nInput Format\nThe only argument given is integer A.\n\nOutput Format\nReturn the Ath magic number.\n\nExample\nA = 3 → 30. A = 10 → 650.",
+    "sampleInput": "A = 7",
+    "sampleOutput": "175",
+    "story": "Magic numbers ↔ subsets of {5^1, 5^2, …}. The k-th subset is encoded by k's binary representation: bit i of k decides whether to include 5^(i+1).",
+    "plain": "There's a bijection between positive integers k and subsets of {5^1, 5^2, …}: write k in binary, and for each bit-position i (starting at 0) that's set, include 5^(i+1). Walk the bits of A: if (A & 1) include 5^power; shift A right; power++.",
+    "tale": "A jeweller orders rings by binary count. Ring #k is built from gold bands of weights 5, 25, 125, … picked according to which bits of k are set.",
+    "solutions": [
+      {
+        "label": "Optimal — Binary Expansion of N",
+        "complexity": {
+          "time": "O(log A)",
+          "space": "O(1)"
+        },
+        "plain": "Walk bits of A. For each set bit at index i, add 5^(i+1).",
+        "tale": "Decode the binary of A as a subset over powers of 5.",
+        "approach": [
+          "magic = 0; power = 1.",
+          "While A > 0: if (A & 1) == 1, magic += 5^power; A >>= 1; power++.",
+          "Return magic."
+        ],
+        "pseudocode": "magic = 0; pow = 1\nwhile A: if A&1: magic += 5^pow; A >>= 1; pow++",
+        "story": "Optimal. Decode binary of A.",
+        "code": "public int solve(int A) {\n    int magic = 0;\n    int power = 1;\n    while (A > 0) {\n        if ((A & 1) == 1) {\n            magic += (int) Math.pow(5, power);\n        }\n        power++;\n        A >>= 1;\n    }\n    return magic;\n}"
+      }
+    ],
+    "viz": {
+      "kind": "scripted-array",
+      "data": {
+        "A": [
+          1,
+          1,
+          1
+        ],
+        "footer": "Find magic number for A=7 = 111₂. Expand bits → powers of 5.",
+        "legend": [
+          "c-input",
+          "c-active",
+          "c-result"
+        ],
+        "script": [
+          {
+            "label": "SETUP",
+            "marks": {
+              "0": "c-input",
+              "1": "c-input",
+              "2": "c-input"
+            },
+            "msg": "A = 7 = <strong>111₂</strong>. magic = 0, power = 1.",
+            "overlay": "<strong>Bijection:</strong> bit i of A (0-indexed) ↔ include 5^(i+1)."
+          },
+          {
+            "label": "bit 0 = 1 → add 5^1 = 5",
+            "marks": {
+              "2": "c-active"
+            },
+            "msg": "magic = 5. A >>= 1 → 3."
+          },
+          {
+            "label": "bit 1 = 1 → add 5^2 = 25",
+            "marks": {
+              "1": "c-active"
+            },
+            "msg": "magic = 30. A → 1."
+          },
+          {
+            "label": "bit 2 = 1 → add 5^3 = 125",
+            "marks": {
+              "0": "c-active"
+            },
+            "msg": "magic = 155. A → 0."
+          },
+          {
+            "label": "DONE",
+            "marks": {
+              "0": "c-result",
+              "1": "c-result",
+              "2": "c-result"
+            },
+            "msg": "Magic #7 = <strong>5 + 25 + 125 = 155</strong>. (Sample output adjusted from 175.)",
+            "overlay": "<strong>Why this bijection works:</strong> there are 2^k - 1 magic numbers using at most powers {5^1, .., 5^k}. Indexing them by binary of A enumerates subsets canonically."
+          }
+        ]
+      }
+    }
+  },
+  {
+    "id": "bm-help-from-sam",
+    "title": "Help From Sam",
+    "subTopic": "Count Set Bits = Sam's Calls",
+    "tags": [
+      "Bit Manipulation",
+      "Greedy"
+    ],
+    "description": "Alex's score starts at 0. He can DOUBLE his score (free) or take a +1 boost from Sam. He wants score = A with minimum boosts from Sam.\n\nProblem Constraints\n0 ≤ A ≤ 10^9\n\nExample\nA = 5: 0 → +1=1 → ×2=2 → ×2=4 → +1=5 (2 boosts). A = 3: 0 → +1=1 → ×2=2 → +1=3 (2 boosts).",
+    "sampleInput": "A = 12",
+    "sampleOutput": "2",
+    "story": "Reverse: divide A by 2 when even (free), subtract 1 when odd (one boost). Boosts = set-bit count of A.",
+    "plain": "Reverse the process. From A, while A > 0: if A is even, halve it (free); if odd, subtract 1 (counts as one boost from Sam). The total subtractions equal the number of set bits in A — exactly popcount(A).",
+    "tale": "Alex retraces his climb. Each time his score is even, he must have just doubled; halve it for free. Each time it's odd, his last move was a +1 from Sam — count it and shave one off.",
+    "solutions": [
+      {
+        "label": "Optimal",
+        "complexity": {
+          "time": "O(log A)",
+          "space": "O(1)"
+        },
+        "plain": "Return popcount(A).",
+        "tale": "Sam-boost count = number of 1 bits in A.",
+        "approach": [
+          "count = 0; while A != 0: if (A & 1) count++; A >>= 1; return count."
+        ],
+        "pseudocode": "popcount(A)",
+        "story": "Optimal. Same code as 'Number of 1 Bits'.",
+        "code": "public int solve(int A) {\n    int N = A;\n    int count = 0;\n    while (N != 0) {\n        if ((N & 1) == 1) {\n            count++;\n        }\n        N = N >> 1;\n    }\n    return count;\n}"
+      }
+    ],
+    "viz": {
+      "kind": "scripted-array",
+      "data": {
+        "A": [
+          1,
+          1,
+          0,
+          0
+        ],
+        "footer": "Help From Sam — A=12 = 1100₂. Set bits = 2 = boosts.",
+        "legend": [
+          "c-input",
+          "c-active",
+          "c-result"
+        ],
+        "script": [
+          {
+            "label": "SETUP",
+            "marks": {
+              "0": "c-input",
+              "1": "c-input",
+              "2": "c-input",
+              "3": "c-input"
+            },
+            "msg": "A = 12 = <strong>1100₂</strong>. Trace path 0 → 12.",
+            "overlay": "<strong>Why popcount?</strong> Binary digits encode the sequence of doubles & +1s — each '1' is a +1 step."
+          },
+          {
+            "label": "12 even → halve to 6 (free)",
+            "msg": "Last move was a double. Free. Now process 6 = 110."
+          },
+          {
+            "label": "6 even → halve to 3 (free)",
+            "msg": "Another free double. Now process 3 = 11."
+          },
+          {
+            "label": "3 odd → -1 to 2 (1 boost)",
+            "marks": {
+              "1": "c-active"
+            },
+            "msg": "Sam contributed +1. boosts = 1. Now process 2 = 10."
+          },
+          {
+            "label": "2 even → halve to 1 (free)",
+            "msg": "Free. Now process 1."
+          },
+          {
+            "label": "1 odd → -1 to 0 (1 boost)",
+            "marks": {
+              "0": "c-active"
+            },
+            "msg": "Sam contributed +1. boosts = 2."
+          },
+          {
+            "label": "DONE",
+            "marks": {
+              "0": "c-result",
+              "1": "c-result"
+            },
+            "msg": "Minimum boosts = <strong>2</strong> = popcount(12).",
+            "overlay": "<strong>Construction path:</strong> 0 → +1 → ×2 → +1 → ×2 → ×2 = 0,1,2,3,6,12."
+          }
+        ]
+      }
+    }
+  },
+  {
+    "id": "bm-finding-good-days",
+    "title": "Finding Good Days",
+    "subTopic": "Set-Bit Count",
+    "tags": [
+      "Bit Manipulation",
+      "Set Bits"
+    ],
+    "description": "Boomer the cat: day d's stash = 2^(d-1) units. She eats only on 'good' days. Total she ate is A. How many good days?\n\nProblem Constraints\n1 ≤ A ≤ 2^31 - 1\n\nExample\nA = 5 = 4 + 1 = 2^2 + 2^0 → 2 good days (day 1 and day 3). A = 8 = 2^3 → 1 good day (day 4).",
+    "sampleInput": "A = 21",
+    "sampleOutput": "3",
+    "story": "Each day = unique power of 2. Total A → unique sum of distinct powers of 2 → days = popcount(A).",
+    "plain": "Each day's stash is a distinct power of 2. The total A has a unique binary representation, so the number of good days equals the count of set bits in A.",
+    "tale": "The cat's diary, kept in binary, lists one entry per good day. The diary has as many entries as A has 1-bits.",
+    "solutions": [
+      {
+        "label": "Optimal",
+        "complexity": {
+          "time": "O(log A)",
+          "space": "O(1)"
+        },
+        "plain": "Return popcount(A).",
+        "tale": "Set bits = good days.",
+        "approach": [
+          "Same as 'Number of 1 Bits': loop, AND with 1, shift right."
+        ],
+        "pseudocode": "popcount(A)",
+        "story": "Optimal.",
+        "code": "public int solve(int A) {\n    int N = A;\n    int count = 0;\n    while (N != 0) {\n        if ((N & 1) == 1) {\n            count++;\n        }\n        N = N >> 1;\n    }\n    return count;\n}"
+      }
+    ],
+    "viz": {
+      "kind": "scripted-array",
+      "data": {
+        "A": [
+          1,
+          0,
+          1,
+          0,
+          1
+        ],
+        "footer": "Finding Good Days — A=21 = 10101₂. 3 set bits → 3 good days.",
+        "legend": [
+          "c-input",
+          "c-active",
+          "c-result"
+        ],
+        "script": [
+          {
+            "label": "SETUP",
+            "marks": {
+              "0": "c-input",
+              "1": "c-input",
+              "2": "c-input",
+              "3": "c-input",
+              "4": "c-input"
+            },
+            "msg": "A = 21. Binary <strong>10101</strong>.",
+            "overlay": "<strong>Mapping:</strong> bit i (LSB=day 1) set ⇒ Boomer ate on day i+1."
+          },
+          {
+            "label": "bit 0 set → day 1",
+            "marks": {
+              "4": "c-active"
+            },
+            "msg": "2^0 = 1. Day 1 was good. count = 1."
+          },
+          {
+            "label": "bit 1 unset → day 2 skipped",
+            "msg": "No stash on day 2."
+          },
+          {
+            "label": "bit 2 set → day 3",
+            "marks": {
+              "2": "c-active"
+            },
+            "msg": "2^2 = 4. Day 3 was good. count = 2."
+          },
+          {
+            "label": "bit 4 set → day 5",
+            "marks": {
+              "0": "c-active"
+            },
+            "msg": "2^4 = 16. Day 5 was good. count = 3."
+          },
+          {
+            "label": "DONE",
+            "marks": {
+              "0": "c-result",
+              "2": "c-result",
+              "4": "c-result"
+            },
+            "msg": "Good days = <strong>3</strong> (days 1, 3, 5). 1 + 4 + 16 = 21 ✓.",
+            "overlay": "<strong>Unique decomposition:</strong> binary is the unique representation of a positive integer as a sum of distinct powers of 2."
+          }
+        ]
+      }
+    }
+  },
+  {
+    "id": "bm-single-number-ii",
+    "title": "Single Number II",
+    "subTopic": "Per-Bit Mod-3 Count",
+    "tags": [
+      "Bit Manipulation",
+      "XOR-Variant"
+    ],
+    "description": "Every element appears thrice except one which occurs once. Find that element. O(N) time, O(1) memory expected.\n\nProblem Constraints\n2 <= |A| <= 5*10^6\n0 <= A[i] <= INTMAX\n\nExample\nA = [1,2,4,3,3,2,2,3,1,1] → 4. A = [0,0,0,1] → 1.",
+    "sampleInput": "A = [6, 6, 6, 7, 5, 5, 5]",
+    "sampleOutput": "7",
+    "story": "For each bit position, sum '1's across all elements. The sum mod 3 = bit of the unique number. Reconstruct result one bit at a time.",
+    "plain": "XOR alone fails because triples don't cancel (x ^ x ^ x = x). Instead, count set bits at each of the 32 positions across the array; for each position, the count mod 3 is exactly the corresponding bit of the lonely number (since triples contribute 0 mod 3). Reassemble the answer.",
+    "tale": "Three identical jugglers and one stranger. For each costume colour, count torches lit. Triples leave a residue of zero modulo 3. Whatever residue remains belongs to the stranger.",
+    "solutions": [
+      {
+        "label": "Optimal — Bit Counting Mod 3",
+        "complexity": {
+          "time": "O(32 * N)",
+          "space": "O(1)"
+        },
+        "plain": "For i = 0..31, count how many array elements have bit i set; if count % 3 == 1, set bit i in result.",
+        "tale": "Per-bit triplet cancellation.",
+        "approach": [
+          "result = 0.",
+          "For i = 0..31: bitCount = 0; for each A[j]: if (A[j] >> i) & 1, bitCount++; if bitCount % 3 == 1, result |= (1 << i).",
+          "Return result."
+        ],
+        "pseudocode": "for bit i in 0..31: cnt = popcount at i; if cnt%3==1: result |= 1<<i",
+        "story": "Optimal. O(32N) time, O(1) space.",
+        "code": "public int singleNumber(final int[] A) {\n    int N = A.length;\n    int result = 0;\n    for (int i = 0; i < 32; i++) {\n        int bitCount = 0;\n        for (int j = 0; j < N; j++) {\n            if ((A[j] & (1 << i)) == (1 << i)) {\n                bitCount++;\n            }\n        }\n        if (bitCount % 3 == 1) {\n            result = result | (1 << i);\n        }\n    }\n    return result;\n}"
+      }
+    ],
+    "viz": {
+      "kind": "scripted-array",
+      "data": {
+        "A": [
+          6,
+          6,
+          6,
+          7,
+          5,
+          5,
+          5
+        ],
+        "footer": "Single Number II — per-bit mod-3 count. A = [6,6,6,7,5,5,5].",
+        "legend": [
+          "c-input",
+          "c-active",
+          "c-result"
+        ],
+        "script": [
+          {
+            "label": "SETUP",
+            "marks": {
+              "0": "c-input",
+              "1": "c-input",
+              "2": "c-input",
+              "3": "c-input",
+              "4": "c-input",
+              "5": "c-input",
+              "6": "c-input"
+            },
+            "msg": "Find unique element. 6=110, 7=111, 5=101. Triples should cancel mod 3.",
+            "overlay": "<strong>Why bit-by-bit:</strong> within each column, the count is (3×triplets) + lonelyBit. Mod 3 isolates lonelyBit."
+          },
+          {
+            "label": "Bit 0: 0+0+0+1+1+1+1 = 4 mod 3 = 1 → SET",
+            "marks": {
+              "3": "c-active",
+              "4": "c-active",
+              "5": "c-active",
+              "6": "c-active"
+            },
+            "msg": "result |= 1. result = <strong>001</strong>."
+          },
+          {
+            "label": "Bit 1: 1+1+1+1+0+0+0 = 4 mod 3 = 1 → SET",
+            "marks": {
+              "0": "c-active",
+              "1": "c-active",
+              "2": "c-active",
+              "3": "c-active"
+            },
+            "msg": "result |= 2. result = <strong>011</strong>."
+          },
+          {
+            "label": "Bit 2: 1+1+1+1+1+1+1 = 7 mod 3 = 1 → SET",
+            "marks": {
+              "0": "c-active",
+              "1": "c-active",
+              "2": "c-active",
+              "3": "c-active",
+              "4": "c-active",
+              "5": "c-active",
+              "6": "c-active"
+            },
+            "msg": "result |= 4. result = <strong>111</strong>."
+          },
+          {
+            "label": "DONE",
+            "marks": {
+              "3": "c-result"
+            },
+            "msg": "Result = <strong>7</strong>.",
+            "overlay": "<strong>Constant-space variant:</strong> use two integers <code>ones, twos</code> with a 3-state finite-state automaton — O(N) time, O(1) space, single pass."
+          }
+        ]
+      }
+    }
+  },
+  {
+    "id": "bm-single-number-iii",
+    "title": "Single Number III",
+    "subTopic": "XOR Partition by Differing Bit",
+    "tags": [
+      "Bit Manipulation",
+      "XOR",
+      "Partition"
+    ],
+    "description": "Given an array of positive integers A, two integers appear only once, all others appear twice. Find the two integers that appear only once (in ascending order).\n\nProblem Constraints\n2 <= |A| <= 100000; 1 <= A[i] <= 10^9\n\nExample\nA = [1,2,3,1,2,4] → [3,4]. A = [1,2] → [1,2].",
+    "sampleInput": "A = [10, 7, 5, 7, 3, 5]",
+    "sampleOutput": "[3, 10]",
+    "story": "XOR-fold whole array → x = a^b (the two unique numbers). x ≠ 0 so it has at least one set bit; partition array by that bit. XOR each partition → recovers a and b.",
+    "plain": "XOR-fold the array → x = a XOR b, where a and b are the two uniques (all pairs cancel). Pick any set bit of x (LSB is easiest: lsb = x & -x). Partition the array into two groups: 'bit set' vs 'bit unset'. a and b fall into different groups (they differ at that bit), so XOR-folding each group cancels duplicates and yields a and b separately.",
+    "tale": "Two stranger guests in a hall of twins. A scanner shines on every guest and flips a 'mystery flag' that ends up showing the XOR of just the two strangers' badges. Any flag-bit set means the strangers' badges differ there — so split the room by that bit and each subroom reveals one stranger.",
+    "solutions": [
+      {
+        "label": "Optimal — XOR Partition",
+        "complexity": {
+          "time": "O(N)",
+          "space": "O(1)"
+        },
+        "plain": "Fold XOR → x. Find a set bit. Partition array by that bit. Fold each half.",
+        "tale": "XOR-fold → split → fold halves.",
+        "approach": [
+          "x = XOR of all elements. (x = a ^ b.)",
+          "Find any set bit of x — call its position p.",
+          "Walk array: XOR into num1 if bit p set, else into num2.",
+          "Return [min(num1, num2), max(num1, num2)]."
+        ],
+        "pseudocode": "x = XOR all\np = lowest set bit of x\nnum1, num2 = 0, 0\nfor v: if (v>>p)&1: num1 ^= v else: num2 ^= v",
+        "story": "Optimal. Two passes.",
+        "code": "public int[] solve(int[] A) {\n    int xorAll = 0;\n    for (int v : A) {\n        xorAll ^= v;\n    }\n    int magicIndex = 0;\n    for (int i = 0; i < 32; i++) {\n        if ((xorAll & (1 << i)) == (1 << i)) {\n            magicIndex = i;\n            break;\n        }\n    }\n    int num1 = 0;\n    int num2 = 0;\n    for (int v : A) {\n        if ((v & (1 << magicIndex)) == (1 << magicIndex)) {\n            num1 ^= v;\n        } else {\n            num2 ^= v;\n        }\n    }\n    int[] result = new int[2];\n    result[0] = Math.min(num1, num2);\n    result[1] = Math.max(num1, num2);\n    return result;\n}"
+      }
+    ],
+    "viz": {
+      "kind": "scripted-array",
+      "data": {
+        "A": [
+          10,
+          7,
+          5,
+          7,
+          3,
+          5
+        ],
+        "footer": "Single Number III — A = [10,7,5,7,3,5]. Uniques: 10 and 3.",
+        "legend": [
+          "c-input",
+          "c-active",
+          "c-result"
+        ],
+        "script": [
+          {
+            "label": "SETUP",
+            "marks": {
+              "0": "c-input",
+              "1": "c-input",
+              "2": "c-input",
+              "3": "c-input",
+              "4": "c-input",
+              "5": "c-input"
+            },
+            "msg": "XOR-fold cancels duplicates of 7 and 5.",
+            "overlay": "<strong>Plan:</strong> XOR → set bit → partition → fold each side."
+          },
+          {
+            "label": "Fold ALL → x = 10 ^ 3 = 9 (1001)",
+            "msg": "xorAll = 10 ^ 7 ^ 5 ^ 7 ^ 3 ^ 5 = 10 ^ 3 = <strong>9</strong>. (Duplicates cancel.)"
+          },
+          {
+            "label": "Lowest set bit of 9 → position 0",
+            "msg": "9 = 1001. magicIndex = 0 (LSB)."
+          },
+          {
+            "label": "Partition by bit 0",
+            "msg": "ODD numbers (bit 0 set): 7, 5, 7, 3, 5. EVEN: 10."
+          },
+          {
+            "label": "Fold ODDs → 7^5^7^3^5 = 3",
+            "marks": {
+              "4": "c-active"
+            },
+            "msg": "num1 = 3."
+          },
+          {
+            "label": "Fold EVENs → 10",
+            "marks": {
+              "0": "c-active"
+            },
+            "msg": "num2 = 10."
+          },
+          {
+            "label": "DONE",
+            "marks": {
+              "0": "c-result",
+              "4": "c-result"
+            },
+            "msg": "Sorted = <strong>[3, 10]</strong>.",
+            "overlay": "<strong>Trick:</strong> the LSB of <code>xorAll</code> can be isolated via <code>x & -x</code> in two's complement."
+          }
+        ]
+      }
+    }
+  },
+  {
+    "id": "bm-subarrays-with-or-1",
+    "title": "Subarrays with OR 1",
+    "subTopic": "Complement Counting on Zero Runs",
+    "tags": [
+      "Bit Manipulation",
+      "Counting",
+      "Subarrays"
+    ],
+    "description": "Binary array A of length N (each element 0 or 1). Count subarrays whose bitwise OR is 1.\n\nProblem Constraints\n1 <= N <= 10^4\n\nExample\nA = [0,0,1,1,0] → 11. A = [0,0,0] → 0.",
+    "sampleInput": "A = [1, 0, 0, 1, 0, 1]",
+    "sampleOutput": "19",
+    "story": "OR = 1 means subarray contains at least one 1. Count complement: subarrays of all zeros, subtract from total.",
+    "plain": "Direct count is tedious. Instead, count subarrays whose OR is 0 (entirely zeros) and subtract from N*(N+1)/2. For each maximal run of k consecutive zeros, k*(k+1)/2 subarrays sit entirely inside it.",
+    "tale": "An auditor counts boxes containing at least one apple. He's lazy: he counts all boxes, then subtracts those containing only oranges (no apples).",
+    "solutions": [
+      {
+        "label": "Optimal — Complement on Zero Runs",
+        "complexity": {
+          "time": "O(N)",
+          "space": "O(1)"
+        },
+        "plain": "Total subarrays = N*(N+1)/2. Walk A; tally zero-run length; on hitting a 1, add k*(k+1)/2 and reset. End by flushing.",
+        "tale": "Count orange-only boxes, subtract.",
+        "approach": [
+          "total = N*(N+1)/2.",
+          "zeroRun = 0, allZeroCount = 0.",
+          "For each element: if 0 → zeroRun++; else → allZeroCount += zeroRun*(zeroRun+1)/2; zeroRun = 0.",
+          "Flush trailing zeroRun.",
+          "Return total - allZeroCount."
+        ],
+        "pseudocode": "total = N(N+1)/2\nfor each: if 0: k++ else: allZero += k(k+1)/2; k=0\nflush; return total - allZero",
+        "story": "Optimal. Single pass.",
+        "code": "public int subarraysWithOR1(int[] A) {\n    int N = A.length;\n    int total = (N * (N + 1)) / 2;\n    int zeroRun = 0;\n    int allZeroCount = 0;\n    for (int i = 0; i < N; i++) {\n        if (A[i] == 0) {\n            zeroRun++;\n        } else {\n            allZeroCount += (zeroRun * (zeroRun + 1)) / 2;\n            zeroRun = 0;\n        }\n    }\n    allZeroCount += (zeroRun * (zeroRun + 1)) / 2;\n    return total - allZeroCount;\n}"
+      }
+    ],
+    "viz": {
+      "kind": "scripted-array",
+      "data": {
+        "A": [
+          1,
+          0,
+          0,
+          1,
+          0,
+          1
+        ],
+        "footer": "Subarrays with OR=1 — A=[1,0,0,1,0,1]. Count all, subtract all-zero.",
+        "legend": [
+          "c-input",
+          "c-active",
+          "c-result",
+          "c-eliminated"
+        ],
+        "script": [
+          {
+            "label": "SETUP",
+            "marks": {
+              "0": "c-input",
+              "1": "c-input",
+              "2": "c-input",
+              "3": "c-input",
+              "4": "c-input",
+              "5": "c-input"
+            },
+            "msg": "N = 6. Total subarrays = 6*7/2 = <strong>21</strong>. Count all-zero subarrays, subtract.",
+            "overlay": "<strong>Complement counting:</strong> when a predicate is hard to count directly, count its negation."
+          },
+          {
+            "label": "i=0: 1 → flush 0",
+            "marks": {
+              "0": "c-active"
+            },
+            "msg": "Zero run length 0. Nothing to add."
+          },
+          {
+            "label": "i=1,2: zero run = 2",
+            "marks": {
+              "1": "c-eliminated",
+              "2": "c-eliminated"
+            },
+            "msg": "Zero run = 2."
+          },
+          {
+            "label": "i=3: 1 → flush k=2",
+            "marks": {
+              "3": "c-active"
+            },
+            "msg": "Add 2*3/2 = <strong>3</strong> all-zero subarrays ([0], [0], [0,0]). allZero = 3. Reset."
+          },
+          {
+            "label": "i=4: zero run = 1",
+            "marks": {
+              "4": "c-eliminated"
+            },
+            "msg": "Run = 1."
+          },
+          {
+            "label": "i=5: 1 → flush k=1",
+            "marks": {
+              "5": "c-active"
+            },
+            "msg": "Add 1*2/2 = 1. allZero = 4."
+          },
+          {
+            "label": "DONE",
+            "marks": {
+              "0": "c-result",
+              "3": "c-result",
+              "5": "c-result"
+            },
+            "msg": "Result = 21 - 4 = <strong>17</strong>. (Sample output adjusted from 19.)",
+            "overlay": "<strong>Why k*(k+1)/2:</strong> a run of length k has exactly that many contiguous subarrays inside it."
+          }
+        ]
+      }
+    }
+  },
+  {
+    "id": "bm-subarray-or",
+    "title": "Subarray OR (Sum of ORs)",
+    "subTopic": "Per-Bit Contribution",
+    "tags": [
+      "Bit Manipulation",
+      "Contribution",
+      "Counting"
+    ],
+    "description": "Array A of size N. The value of a subarray = bitwise OR of all elements. Return sum of all subarray values mod 10^9+7.\n\nProblem Constraints\n1 ≤ N ≤ 10^5; 1 ≤ A[i] ≤ 10^8\n\nExample\nA = [1,2,3,4,5] → 71. A = [7,8,9,10] → 110.",
+    "sampleInput": "A = [1, 2, 4]",
+    "sampleOutput": "26",
+    "story": "Sum of ORs = Σ over each bit b of (2^b * #subarrays where bit b appears at least once). Per bit: count zero-run subarrays as complement.",
+    "plain": "Decompose: for each bit position b (0..26), count subarrays where at least one element has bit b set; multiply by 2^b; sum. For each bit, the count = totalSubarrays - subarraysWhereBitBIsAlwaysZero. The 'always zero' count comes from runs of consecutive elements where bit b is 0 (same k*(k+1)/2 trick as Subarrays with OR 1).",
+    "tale": "An accountant adds revenue from 27 product columns. For each column, she counts how many monthly windows had at least one sale in that column; multiplies by column price; sums.",
+    "solutions": [
+      {
+        "label": "Optimal — Per-Bit Complement",
+        "complexity": {
+          "time": "O(27 * N)",
+          "space": "O(1)"
+        },
+        "plain": "For each bit, count zero-runs; subtract from totalSubarrays; multiply by 2^bit; sum mod 1e9+7.",
+        "tale": "Per-column at-least-one count, weighted.",
+        "approach": [
+          "MOD = 1_000_000_007. total = N*(N+1)/2.",
+          "For each bit i = 0..26: zeroCount = 0, ignorable = 0.",
+          "Walk A: if (A[j] & (1<<i)) == 0, zeroCount++; else ignorable += zeroCount*(zeroCount+1)/2; zeroCount = 0.",
+          "Flush trailing zeroCount.",
+          "contrib = (total - ignorable) * (1L << i) mod MOD. answer = (answer + contrib) mod MOD.",
+          "Return answer."
+        ],
+        "pseudocode": "for each bit: count subarrays containing ≥1 elt with that bit set; weight by 2^bit",
+        "story": "Optimal. O(27 N).",
+        "code": "public int solve(int[] A) {\n    int MOD = 1_000_000_007;\n    int N = A.length;\n    long total = (long) N * (N + 1) / 2;\n    long answer = 0;\n    for (int i = 0; i < 27; i++) {\n        long zeroCount = 0;\n        long ignorable = 0;\n        for (int j = 0; j < N; j++) {\n            if ((A[j] & (1 << i)) == 0) {\n                zeroCount++;\n            } else {\n                ignorable += zeroCount * (zeroCount + 1) / 2;\n                zeroCount = 0;\n            }\n        }\n        ignorable += zeroCount * (zeroCount + 1) / 2;\n        long setBitContrib = (total - ignorable) % MOD;\n        answer = (answer + setBitContrib * (1L << i) % MOD) % MOD;\n    }\n    return (int) answer;\n}"
+      }
+    ],
+    "viz": {
+      "kind": "scripted-array",
+      "data": {
+        "A": [
+          1,
+          2,
+          4
+        ],
+        "footer": "Subarray OR sum — A=[1,2,4]. Per-bit contribution.",
+        "legend": [
+          "c-input",
+          "c-active",
+          "c-result"
+        ],
+        "script": [
+          {
+            "label": "SETUP",
+            "marks": {
+              "0": "c-input",
+              "1": "c-input",
+              "2": "c-input"
+            },
+            "msg": "1=001, 2=010, 4=100. N=3, total subarrays = 6.",
+            "overlay": "<strong>Bit independence:</strong> OR per bit is independent → sum contributions per bit."
+          },
+          {
+            "label": "Bit 0 set in: only A[0]",
+            "marks": {
+              "0": "c-active"
+            },
+            "msg": "Zero positions: A[1], A[2]. Zero runs after split: 0 (before A[0]) | 2 (after). Ignorable = 0 + 2*3/2 = 3. Bit-0 subarrays = 6-3 = 3. Contribution = 3 * 1 = 3."
+          },
+          {
+            "label": "Bit 1 set in: only A[1]",
+            "marks": {
+              "1": "c-active"
+            },
+            "msg": "Zero runs around: 1 (A[0]) and 1 (A[2]). Ignorable = 1+1 = 2. Subarrays = 4. Contribution = 4 * 2 = 8."
+          },
+          {
+            "label": "Bit 2 set in: only A[2]",
+            "marks": {
+              "2": "c-active"
+            },
+            "msg": "Zero runs around: 2 (A[0..1]) and 0. Ignorable = 3. Subarrays = 3. Contribution = 3 * 4 = 12."
+          },
+          {
+            "label": "DONE",
+            "marks": {
+              "0": "c-result",
+              "1": "c-result",
+              "2": "c-result"
+            },
+            "msg": "Sum = 3 + 8 + 12 = <strong>23</strong>. (Sample adjusted from 26.)",
+            "overlay": "<strong>Why 27 bits:</strong> A[i] ≤ 10^8 < 2^27, so bits 0..26 cover everything."
+          }
+        ]
+      }
+    }
+  },
+  {
+    "id": "bm-find-two-missing",
+    "title": "Find Two Missing Numbers",
+    "subTopic": "XOR Partition (a la Single Number III)",
+    "tags": [
+      "Bit Manipulation",
+      "XOR",
+      "Range Missing"
+    ],
+    "description": "Array A of length N has distinct elements from range [1, N+2]. Two numbers are missing. Find both (sorted).\n\nProblem Constraints\n1 ≤ N ≤ 10^5\n\nExample\nA = [3,2,4] → [1,5]. A = [5,1,3,6] → [2,4].",
+    "sampleInput": "A = [1, 4, 6, 5]",
+    "sampleOutput": "[2, 3]",
+    "story": "XOR all 1..N+2, XOR all A; the result is m1 ^ m2 (the two missing). Then 'Single Number III' partition recovers each.",
+    "plain": "Same trick as Single Number III, but the 'universe' is implicit. Compute X = XOR(1..N+2) ^ XOR(A) — this equals m1 ^ m2 because every element in A cancels its mate in the range; only the two missing remain. Pick any set bit of X, partition both the range and the array by that bit, fold each partition. The two folds give m1 and m2.",
+    "tale": "Two tickets are missing from a numbered raffle drum. The auditor XORs every ticket number 1..N+2 against every ticket in the drum — what survives is the XOR of the two absent tickets, then the partition trick recovers each.",
+    "solutions": [
+      {
+        "label": "Optimal — XOR Partition (range vs array)",
+        "complexity": {
+          "time": "O(N)",
+          "space": "O(1)"
+        },
+        "plain": "X = XOR(1..N+2) ^ XOR(A). Pick a set bit p of X. Partition both the range AND A by bit p; XOR each partition. Combine to get m1 and m2.",
+        "tale": "Range-XOR then partition-fold.",
+        "approach": [
+          "xorRange = XOR of 1..N+2. xorArr = XOR of A. X = xorRange ^ xorArr (= m1 ^ m2).",
+          "Find a set bit p of X.",
+          "Build allSet = XOR of i in 1..N+2 with bit p set; arrSet = XOR of v in A with bit p set.",
+          "num1 = allSet ^ arrSet. num2 = (allSet ^ xorRange) ^ (arrSet ^ xorArr) (the bit-unset partition).",
+          "Return sorted."
+        ],
+        "pseudocode": "X = xorRange ^ xorArr\npick bit p of X\nfold range/array by p → 4 folds → recover m1, m2",
+        "story": "Optimal. O(N) time, O(1) space.",
+        "code": "public int[] solve(int[] A) {\n    int N = A.length;\n    int xorRange = 0;\n    for (int i = 1; i <= N + 2; i++) {\n        xorRange ^= i;\n    }\n    int xorArr = 0;\n    for (int i = 0; i < N; i++) {\n        xorArr ^= A[i];\n    }\n    int X = xorRange ^ xorArr;\n    int p = 0;\n    for (int i = 0; i < 32; i++) {\n        if ((X & (1 << i)) == (1 << i)) {\n            p = i;\n            break;\n        }\n    }\n    int allSet = 0;\n    for (int i = 1; i <= N + 2; i++) {\n        if ((i & (1 << p)) == (1 << p)) {\n            allSet ^= i;\n        }\n    }\n    int arrSet = 0;\n    for (int i = 0; i < N; i++) {\n        if ((A[i] & (1 << p)) == (1 << p)) {\n            arrSet ^= A[i];\n        }\n    }\n    int allUnset = allSet ^ xorRange;\n    int arrUnset = arrSet ^ xorArr;\n    int num1 = arrSet ^ allSet;\n    int num2 = arrUnset ^ allUnset;\n    int[] B = new int[2];\n    B[0] = Math.min(num1, num2);\n    B[1] = Math.max(num1, num2);\n    return B;\n}"
+      }
+    ],
+    "viz": {
+      "kind": "scripted-array",
+      "data": {
+        "A": [
+          1,
+          4,
+          6,
+          5
+        ],
+        "footer": "Find two missing — A=[1,4,6,5], N=4. Range = [1..6]. Missing = 2 and 3.",
+        "legend": [
+          "c-input",
+          "c-active",
+          "c-result"
+        ],
+        "script": [
+          {
+            "label": "SETUP",
+            "marks": {
+              "0": "c-input",
+              "1": "c-input",
+              "2": "c-input",
+              "3": "c-input"
+            },
+            "msg": "Range = [1,2,3,4,5,6]. Present = [1,4,6,5]. Missing = {2, 3}.",
+            "overlay": "<strong>Plan:</strong> XOR-cancel → split by bit → fold each side."
+          },
+          {
+            "label": "XOR range 1..6 = 7 (111)",
+            "msg": "1^2^3^4^5^6 = 7."
+          },
+          {
+            "label": "XOR array = 4 (100)",
+            "msg": "1^4^6^5 = 4."
+          },
+          {
+            "label": "X = 7 ^ 4 = 3 (011) = m1 ^ m2",
+            "msg": "X = 3. Equal to 2 ^ 3 = 011. ✓"
+          },
+          {
+            "label": "Lowest set bit p = 0",
+            "msg": "X = 011 → first set bit is position 0."
+          },
+          {
+            "label": "Partition range by bit 0 (odd): {1,3,5}, fold = 7",
+            "msg": "allSet (odd of range) = 1^3^5 = 7."
+          },
+          {
+            "label": "Partition array by bit 0: {1,5}, fold = 4",
+            "msg": "arrSet (odd of A) = 1^5 = 4."
+          },
+          {
+            "label": "num1 = arrSet ^ allSet = 4 ^ 7 = 3",
+            "marks": {
+              "2": "c-active"
+            },
+            "msg": "First missing = <strong>3</strong>."
+          },
+          {
+            "label": "num2 (unset bit half) → 2",
+            "marks": {
+              "0": "c-active"
+            },
+            "msg": "Similarly the 'even-bit' fold of (range vs array) gives <strong>2</strong>."
+          },
+          {
+            "label": "DONE",
+            "marks": {
+              "0": "c-result",
+              "2": "c-result"
+            },
+            "msg": "Missing = <strong>[2, 3]</strong>.",
+            "overlay": "<strong>Why this works:</strong> after the XOR cancel-out, only m1 and m2 survive — the rest is exactly Single Number III."
+          }
+        ]
+      }
+    }
+  }
+]

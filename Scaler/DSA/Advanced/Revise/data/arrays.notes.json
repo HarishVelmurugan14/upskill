@@ -1,0 +1,130 @@
+{
+  "topic": "Arrays",
+  "summary": "Arrays are the bedrock — and the techniques you learn here (prefix sums, carry-forward, sliding windows, contribution) come back in every harder topic. The job isn't 'iterate over an array'; it's 'pre-compute the right summary once so every query / scan becomes O(1)'. Master the index arithmetic of prefix sums and the symmetric thinking of carry-forward, and 70% of array problems collapse to two passes.",
+  "thoughtProcess": [
+    {
+      "title": "1. Can repeated range queries be turned into prefix-sum lookups?",
+      "body": "If you'll ask 'sum / count from L to R' more than once, build a prefix array first. Each query then becomes prefix[R] - prefix[L-1] in O(1). Watch the L=0 corner — return prefix[R] directly to avoid prefix[-1]."
+    },
+    {
+      "title": "2. Does each index need to know something about both sides?",
+      "body": "Carry-forward. Walk left-to-right keeping one running summary (max so far, count of 'A's, latest min position) and right-to-left keeping the symmetric one. At index i you now have both halves in O(1) — pair them in a single final pass."
+    },
+    {
+      "title": "3. Is the window length fixed (or constrained)?",
+      "body": "Sliding window. Compute the first window, then slide one step at a time: window += A[r] − A[l]. O(N) total, never recompute from scratch. Works for fixed-size sums, averages, and 'longest with property X' once you generalise to two pointers."
+    },
+    {
+      "title": "4. Are you summing the same quantity across MANY subarrays?",
+      "body": "Contribution technique. Don't enumerate subarrays — ask 'in how many subarrays does index i appear?' The answer is (i+1) * (N−i). Multiply each A[i] by that count and sum once: O(N) instead of O(N^3). Watch overflow — use long."
+    },
+    {
+      "title": "5. Is the input a matrix? Mind the index order.",
+      "body": "Matrices are arrays of arrays. Row-major traversal is i for rows, j for cols. Column sum / transpose / diagonal walks just swap the loop order or add/subtract i±j. For rotation, transpose then reverse each row (90° CW) — write it as two clean passes, not one tangled one."
+    },
+    {
+      "title": "6. Will sums overflow int?",
+      "body": "N up to 1e5 and A[i] up to 1e9 means a full sum is up to 1e14 — needs long. Promote the prefix array and the running sum to long. Cast one operand to long BEFORE the multiply, never after."
+    }
+  ],
+  "commonMistakes": [
+    {
+      "title": "prefix[start - 1] when start = 0",
+      "wrong": "long sum = prefix[end] - prefix[start - 1];",
+      "right": "long sum = (start == 0) ? prefix[end] : prefix[end] - prefix[start - 1];",
+      "why": "The L=0 case has no element on the left to subtract — return prefix[end] directly. Forgetting this throws ArrayIndexOutOfBoundsException or, worse, returns garbage if you wrap with modulo."
+    },
+    {
+      "title": "Storing prefix sums in int when they overflow",
+      "wrong": "int[] prefix = new int[N]; prefix[i] = prefix[i-1] + A[i];",
+      "right": "long[] prefix = new long[N]; prefix[i] = prefix[i-1] + A[i];",
+      "why": "1e5 elements at 1e9 each = 1e14, which is way past int range (~2.1e9). The bug looks like correct logic returning negative or random values."
+    },
+    {
+      "title": "Recomputing the window from scratch",
+      "wrong": "for (int i = 0; i + K <= N; i++) {\n    int s = 0;\n    for (int j = i; j < i + K; j++) {\n        s += A[j];\n    }\n}",
+      "right": "long s = 0;\nfor (int i = 0; i < K; i++) {\n    s += A[i];\n}\nfor (int r = K; r < N; r++) {\n    s += A[r] - A[r - K];\n}",
+      "why": "The brute is O(N*K). The slide is O(N). On N=1e5, K=1e3 that's 1e8 vs 1e5 — TLE vs instant."
+    },
+    {
+      "title": "Enumerating subarrays to sum a quantity",
+      "wrong": "for (int i = 0; i < N; i++) {\n    for (int j = i; j < N; j++) {\n        for (int k = i; k <= j; k++) {\n            total += A[k];\n        }\n    }\n}",
+      "right": "// contribution: A[i] appears in (i+1) * (N-i) subarrays\nlong total = 0;\nfor (int i = 0; i < N; i++) {\n    total += (long) A[i] * (i + 1) * (N - i);\n}",
+      "why": "O(N^3) → O(N). The cast to long must be on A[i] BEFORE the first multiply, otherwise (i+1)*(N-i) overflows int silently for N around 5e4."
+    },
+    {
+      "title": "Mutating A in place when the caller doesn't expect it",
+      "wrong": "// Equilibrium index — using A as prefix array\nfor (int i = 1; i < N; i++) A[i] += A[i-1];",
+      "right": "long[] prefix = new long[N];\nprefix[0] = A[0];\nfor (int i = 1; i < N; i++) prefix[i] = prefix[i-1] + A[i];",
+      "why": "Looks clever, but if the caller reuses A later (multi-test-case harness, follow-up query) the values are corrupted. Allocate a separate prefix array unless the problem literally asks for in-place."
+    },
+    {
+      "title": "Two-pointer leader scan written L→R",
+      "wrong": "for (int i = 0; i < N; i++) {\n    boolean leader = true;\n    for (int j = i+1; j < N; j++) {\n        if (A[j] >= A[i]) { leader = false; break; }\n    }\n}",
+      "right": "int maxRight = Integer.MIN_VALUE;\nfor (int i = N - 1; i >= 0; i--) {\n    if (A[i] > maxRight) leaders.add(A[i]);\n    maxRight = Math.max(maxRight, A[i]);\n}",
+      "why": "Right-to-left with a running max is O(N). The L→R nested scan is O(N^2). Most 'is i greater than everything on its right?' problems collapse the same way."
+    },
+    {
+      "title": "Matrix rotation done with extra space",
+      "wrong": "int[][] B = new int[M][M];\nfor (int i = 0; i < M; i++)\n    for (int j = 0; j < M; j++)\n        B[j][M-1-i] = A[i][j];",
+      "right": "// 90° CW = transpose then reverse each row\nfor (int i = 0; i < M; i++)\n    for (int j = i+1; j < M; j++) { int t = A[i][j]; A[i][j] = A[j][i]; A[j][i] = t; }\nfor (int i = 0; i < M; i++)\n    for (int l = 0, r = M-1; l < r; l++, r--) { int t = A[i][l]; A[i][l] = A[i][r]; A[i][r] = t; }",
+      "why": "In-place rotation is the interview expectation. Two clean passes (transpose, reverse rows) is easier to remember than one tangled index mapping."
+    },
+    {
+      "title": "'Closest min-max' tracked with only one running variable",
+      "wrong": "int last = -1;\nfor (int i = 0; i < N; i++) {\n    if (A[i] == min || A[i] == max) {\n        if (last != -1) best = Math.min(best, i - last + 1);\n        last = i;\n    }\n}",
+      "right": "// keep SEPARATE latest positions for min and max\nint lastMin = -1, lastMax = -1, best = N;\nfor (int i = 0; i < N; i++) {\n    if (A[i] == min) { lastMin = i; if (lastMax != -1) best = Math.min(best, lastMin - lastMax + 1); }\n    if (A[i] == max) { lastMax = i; if (lastMin != -1) best = Math.min(best, lastMax - lastMin + 1); }\n}",
+      "why": "A single 'last' loses track of whether you've seen the OTHER target yet. Track the two latest positions independently and pair them every time either updates."
+    }
+  ],
+  "keyPatterns": [
+    {
+      "name": "1-D Prefix Sum",
+      "when": "Repeated range-sum queries on a static array, equilibrium-index problems, in-place running totals.",
+      "template": "long[] prefix = new long[N];\nprefix[0] = A[0];\nfor (int i = 1; i < N; i++) {\n    prefix[i] = prefix[i-1] + A[i];\n}\n// query [L, R] in O(1):\nlong rangeSum = (L == 0) ? prefix[R] : prefix[R] - prefix[L-1];",
+      "examples": ["Range Sum Query", "Equilibrium Index", "Special Index (odd/even prefix sums)", "In-place Prefix Sum"]
+    },
+    {
+      "name": "Carry-Forward (left/right summary)",
+      "when": "Each index needs information from both sides — max-so-far on the right, count-so-far on the left, latest position of element X, etc.",
+      "template": "// Right-to-left running max example\nint maxRight = Integer.MIN_VALUE;\nfor (int i = N - 1; i >= 0; i--) {\n    if (A[i] > maxRight) {\n        // i is a leader\n    }\n    maxRight = Math.max(maxRight, A[i]);\n}",
+      "examples": ["Leaders in Array", "Best Time to Buy and Sell Stock I", "Closest MinMax", "Special Subsequences AG"]
+    },
+    {
+      "name": "Fixed-Size Sliding Window",
+      "when": "Sum / average / count over every window of length K. Compute once, then slide.",
+      "template": "long sum = 0;\nfor (int i = 0; i < K; i++) {\n    sum += A[i];\n}\nlong best = sum;\nfor (int r = K; r < N; r++) {\n    sum += A[r] - A[r - K];\n    best = Math.max(best, sum);\n}",
+      "examples": ["Maximum Sum Subarray of Size K", "Subarray with Least Average", "Subarray with Given Sum and Length"]
+    },
+    {
+      "name": "Contribution Technique",
+      "when": "Summing a quantity across every subarray. Flip the question: how many subarrays contain index i? Answer: (i+1) * (N-i).",
+      "template": "long total = 0;\nfor (int i = 0; i < N; i++) {\n    total += (long) A[i] * (i + 1) * (N - i);\n}\nreturn total;",
+      "examples": ["Sum of All Subarrays", "Sum of All Submatrices (2-D variant)"]
+    },
+    {
+      "name": "Pick-from-Both-Sides (rolling boundary)",
+      "when": "Choose B elements from either end of the array; maximise sum. Start with all from left, then swap one left for one right at a time.",
+      "template": "int sum = 0;\nfor (int i = 0; i < B; i++) sum += A[i];\nint best = sum;\nfor (int j = 0; j < B; j++) {\n    sum = sum - A[B - 1 - j] + A[N - 1 - j];\n    best = Math.max(best, sum);\n}",
+      "examples": ["Pick from Both Sides!", "Maximum Score from Card Picks (LeetCode parallel)"]
+    },
+    {
+      "name": "Matrix Row × Column Traversal",
+      "when": "Column sums, diagonal walks, transpose, rotation. Pick the right loop nesting so the inner index varies fastest along the axis you're accumulating on.",
+      "template": "// Column sums\nfor (int j = 0; j < cols; j++) {\n    long colSum = 0;\n    for (int i = 0; i < rows; i++) {\n        colSum += A[i][j];\n    }\n}\n// Main diagonal: A[i][i]\n// Anti-diagonal pass: index by (i + j) = constant",
+      "examples": ["Column Sum", "Main Diagonal Sum", "Anti Diagonals", "Matrix Transpose", "Rotate Matrix"]
+    }
+  ],
+  "edgeCases": [
+    "Single-element array — every prefix-sum index becomes a corner case (L = R = 0).",
+    "L = 0 in a range-sum query: don't read prefix[-1], return prefix[R] directly.",
+    "All elements equal — equilibrium / leaders / closest min-max all degenerate but must still return a valid answer.",
+    "Negative values present (Equilibrium / Pick-from-both-sides): the running min / running max can be negative, so don't initialise with 0.",
+    "Overflow when N is 1e5 and A[i] is 1e9 — prefix sums exceed int range; use long.",
+    "B > N in pick-from-both-sides → sum the entire array (handle in a guard or by clamping).",
+    "B = 0 → max sum is 0; the slide loop must not run.",
+    "Matrix with one row or one column — transpose / rotation must still work; diagonal loops must not over-index.",
+    "Empty string for AG counting — return 0 without crashing.",
+    "All maxes / all mins identical (Closest MinMax) — answer is 1 (the two values coincide on any index)."
+  ]
+}

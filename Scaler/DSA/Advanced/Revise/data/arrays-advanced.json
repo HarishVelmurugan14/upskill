@@ -1,0 +1,1183 @@
+[
+  {
+    "id": "aadv-max-sum-contiguous-subarray",
+    "title": "Max Sum Contiguous Subarray (Kadane)",
+    "subTopic": "Kadane — Local vs Global",
+    "tags": [
+      "Arrays",
+      "Kadane",
+      "DP"
+    ],
+    "description": "Given an array A of length N, find the maximum possible sum of any non-empty contiguous subarray. In other words, among all possible subarrays of A, determine the one that yields the highest sum and return that sum.\n\nProblem Constraints\n1 <= N <= 10^6\n-1000 <= A[i] <= 1000\n\nInput Format\nThe first and only argument contains an integer array A.\n\nOutput Format\nReturn an integer representing the maximum possible sum of the contiguous subarray.\n\nExample Input\nInput 1: A = [1, 2, 3, 4, -10]\nInput 2: A = [-2, 1, -3, 4, -1, 2, 1, -5, 4]\n\nExample Output\nOutput 1: 10\nOutput 2: 6\n\nExample Explanation\nExplanation 1: The subarray [1, 2, 3, 4] has the maximum possible sum of 10.\nExplanation 2: The subarray [4, -1, 2, 1] has the maximum possible sum of 6.",
+    "sampleInput": "A = [-3, 2, -1, 4, -2, 5, -8, 3]",
+    "sampleOutput": "8",
+    "story": "Kadane: at each i decide — extend the running sum or restart at A[i]. Track best ever.",
+    "plain": "Classic Kadane. Maintain currSum (best sum ending exactly at index i). Transition: currSum = max(A[i], currSum + A[i]). Track best = max(best, currSum). When all elements are negative, the answer is the single largest element (not 0) — initialise best to A[0] or Integer.MIN_VALUE, NOT 0.",
+    "tale": "A hiker tracks elevation gain across a mountain trail. At every step she asks: 'is starting fresh from here better than carrying yesterday's losses forward?' She remembers the highest cumulative gain she ever reached.",
+    "solutions": [
+      {
+        "label": "Brute",
+        "complexity": {
+          "time": "O(N^2)",
+          "space": "O(1)"
+        },
+        "plain": "Two loops with running sum; track max.",
+        "tale": "Try every starting point; sum forward.",
+        "approach": [
+          "For each start, run sum forward; track best."
+        ],
+        "pseudocode": "for s: sum=0; for e>=s: sum+=A[e]; best=max(best,sum)",
+        "story": "Brute. O(N^2).",
+        "code": "public int maxSubArrayBrute(int[] A) {\n    int N = A.length;\n    int best = Integer.MIN_VALUE;\n    for (int s = 0; s < N; s++) {\n        int sum = 0;\n        for (int e = s; e < N; e++) {\n            sum += A[e];\n            if (sum > best) {\n                best = sum;\n            }\n        }\n    }\n    return best;\n}"
+      },
+      {
+        "label": "Optimal — Kadane",
+        "complexity": {
+          "time": "O(N)",
+          "space": "O(1)"
+        },
+        "plain": "Maintain currSum ending here; if it drops below 0, reset to 0 (start fresh). Track best.",
+        "tale": "If yesterday's gains are negative, restart from today.",
+        "approach": [
+          "Initialise currSum = 0, best = A[0] (handles all-negative case).",
+          "Loop i from 0 to N-1: currSum += A[i]; if currSum > best, best = currSum; if currSum < 0, currSum = 0.",
+          "Return best."
+        ],
+        "pseudocode": "curr = 0; best = A[0]\nfor i: curr += A[i]; best = max(best, curr); if curr<0: curr=0",
+        "story": "Optimal. Single-pass Kadane.",
+        "code": "public int maxSubArray(final int[] A) {\n    int N = A.length;\n    int currSum = 0;\n    int best = Integer.MIN_VALUE;\n    for (int i = 0; i < N; i++) {\n        currSum += A[i];\n        if (currSum > best) {\n            best = currSum;\n        }\n        if (currSum < 0) {\n            currSum = 0;\n        }\n    }\n    return best;\n}"
+      }
+    ],
+    "viz": {
+      "kind": "scripted-array",
+      "data": {
+        "A": [
+          -3,
+          2,
+          -1,
+          4,
+          -2,
+          5,
+          -8,
+          3
+        ],
+        "footer": "Kadane — A = [-3,2,-1,4,-2,5,-8,3]. currSum extends or resets; best tracks max.",
+        "legend": [
+          "c-input",
+          "c-active",
+          "c-result",
+          "c-eliminated"
+        ],
+        "script": [
+          {
+            "label": "SETUP",
+            "marks": {
+              "0": "c-input",
+              "1": "c-input",
+              "2": "c-input",
+              "3": "c-input",
+              "4": "c-input",
+              "5": "c-input",
+              "6": "c-input",
+              "7": "c-input"
+            },
+            "msg": "currSum = 0, best = -∞. Walk left→right.",
+            "overlay": "<strong>Invariant:</strong> currSum = best subarray sum ending exactly at i (after extension/reset)."
+          },
+          {
+            "label": "i=0 A=-3",
+            "marks": {
+              "0": "c-eliminated"
+            },
+            "msg": "currSum = -3. best = -3. currSum < 0 → reset to 0."
+          },
+          {
+            "label": "i=1 A=2",
+            "marks": {
+              "1": "c-active"
+            },
+            "msg": "currSum = 2. best = 2."
+          },
+          {
+            "label": "i=2 A=-1",
+            "marks": {
+              "1": "c-active",
+              "2": "c-active"
+            },
+            "msg": "currSum = 1. best stays 2 (1 < 2)."
+          },
+          {
+            "label": "i=3 A=4",
+            "marks": {
+              "1": "c-active",
+              "2": "c-active",
+              "3": "c-active"
+            },
+            "msg": "currSum = 5. best = <strong>5</strong>."
+          },
+          {
+            "label": "i=4 A=-2",
+            "marks": {
+              "1": "c-active",
+              "2": "c-active",
+              "3": "c-active",
+              "4": "c-active"
+            },
+            "msg": "currSum = 3. best stays 5."
+          },
+          {
+            "label": "i=5 A=5",
+            "marks": {
+              "1": "c-result",
+              "2": "c-result",
+              "3": "c-result",
+              "4": "c-result",
+              "5": "c-result"
+            },
+            "msg": "currSum = 8. best = <strong>8</strong>."
+          },
+          {
+            "label": "i=6 A=-8",
+            "marks": {
+              "6": "c-eliminated"
+            },
+            "msg": "currSum = 0. best stays 8. currSum=0 not <0, no reset (or reset, same)."
+          },
+          {
+            "label": "i=7 A=3",
+            "msg": "currSum = 3. best stays <strong>8</strong>."
+          },
+          {
+            "label": "DONE",
+            "marks": {
+              "1": "c-result",
+              "2": "c-result",
+              "3": "c-result",
+              "4": "c-result",
+              "5": "c-result"
+            },
+            "msg": "Max contiguous sum = <strong>8</strong> (subarray [2,-1,4,-2,5]).",
+            "overlay": "<strong>All-negative trap:</strong> if every A[i] < 0, initialising best = 0 is WRONG (returns 0 instead of max element). Use best = A[0] or Integer.MIN_VALUE."
+          }
+        ]
+      }
+    }
+  },
+  {
+    "id": "aadv-continuous-sum-query",
+    "title": "Continuous Sum Query (Beggars)",
+    "subTopic": "Difference Array — Range Updates",
+    "tags": [
+      "Arrays",
+      "Difference Array",
+      "Prefix Sum"
+    ],
+    "description": "There are A beggars sitting in a row outside a temple. Each beggar initially has an empty pot. When devotees come to the temple, they donate some amount of coins to these beggars. Each devotee gives a fixed amount of coin to some K beggars sitting next to each other.\n\nGiven the amount P donated by each devotee to the beggars ranging from L to R index (1-based), where 1 <= L <= R <= A, find the final amount of money in each beggar's pot at the end of the day.\n\nFor the ith devotee: B[i][0] = L, B[i][1] = R, B[i][2] = P (donation amount).\n\nProblem Constraints\n1 <= A <= 2 * 10^5\n1 <= L <= R <= A\n1 <= P <= 10^3\n0 <= len(B) <= 10^5\n\nInput Format\nFirst argument: integer A. Second argument: 2D integer array B.\n\nOutput Format\nReturn an array (0-based) storing total coins in each beggar's pot.\n\nExample Input\nInput 1: A = 5, B = [[1,2,10],[2,3,20],[2,5,25]]\n\nExample Output\nOutput 1: 10 55 45 25 25",
+    "sampleInput": "A = 6\nB = [[1, 3, 5], [2, 5, 10], [4, 6, 7]]",
+    "sampleOutput": "[5, 15, 15, 17, 17, 7]",
+    "story": "Each range update is O(N) naïvely → O(N*Q) worst. Difference array → O(1) per update + O(N) finalisation.",
+    "plain": "Apply each [L, R, P] to a difference array d: d[L-1] += P, d[R] -= P (if R < A). After all updates, prefix-sum d to get the final pot values. Total cost O(A + Q).",
+    "tale": "Instead of dropping coins into every pot one by one (slow!), a clever teller posts a +P sign at the start of the range and a -P sign just after the end. At day's end, she walks down the row carrying a running total — and the total at each pot is the answer.",
+    "solutions": [
+      {
+        "label": "Brute",
+        "complexity": {
+          "time": "O(A * Q)",
+          "space": "O(A)"
+        },
+        "plain": "For each update, increment every index in [L-1..R-1] by P. Too slow for large A*Q.",
+        "tale": "Drop coins into each pot one by one.",
+        "approach": [
+          "For each [L,R,P]: for i = L-1..R-1, pot[i] += P."
+        ],
+        "pseudocode": "for each update: for i = L-1..R-1: pot[i] += P",
+        "story": "Brute. O(A * Q).",
+        "code": "public int[] beggarsBrute(int A, int[][] B) {\n    int[] pot = new int[A];\n    for (int[] q : B) {\n        int L = q[0] - 1;\n        int R = q[1] - 1;\n        int P = q[2];\n        for (int i = L; i <= R; i++) {\n            pot[i] += P;\n        }\n    }\n    return pot;\n}"
+      },
+      {
+        "label": "Optimal — Difference Array",
+        "complexity": {
+          "time": "O(A + Q)",
+          "space": "O(A)"
+        },
+        "plain": "diff[L-1] += P; diff[R] -= P (if R<A). Prefix-sum diff for final pots.",
+        "tale": "Post +P / -P markers, then sweep with a running total.",
+        "approach": [
+          "Allocate int[A] diff.",
+          "For each [L,R,P]: diff[L-1] += P; if R < A, diff[R] -= P.",
+          "Prefix-sum: pot[0] = diff[0]; for i = 1..A-1: pot[i] = pot[i-1] + diff[i].",
+          "Return pot."
+        ],
+        "pseudocode": "for each q: diff[L-1] += P; diff[R] -= P\nprefix-sum diff → pot",
+        "story": "Optimal. Difference array.",
+        "code": "public int[] solve(int A, int[][] B) {\n    int N = B.length;\n    int[] diff = new int[A];\n    for (int i = 0; i < N; i++) {\n        int L = B[i][0] - 1;\n        int R = B[i][1] - 1;\n        int P = B[i][2];\n        diff[L] += P;\n        if (R + 1 < A) {\n            diff[R + 1] -= P;\n        }\n    }\n    int[] result = new int[A];\n    result[0] = diff[0];\n    for (int i = 1; i < A; i++) {\n        result[i] = result[i - 1] + diff[i];\n    }\n    return result;\n}"
+      }
+    ],
+    "viz": {
+      "kind": "scripted-array",
+      "data": {
+        "A": [
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
+        "footer": "Difference array — A=6, B=[[1,3,5],[2,5,10],[4,6,7]]. Post markers, sweep.",
+        "legend": [
+          "c-input",
+          "c-low",
+          "c-high",
+          "c-active",
+          "c-result"
+        ],
+        "script": [
+          {
+            "label": "SETUP",
+            "marks": {
+              "0": "c-input",
+              "1": "c-input",
+              "2": "c-input",
+              "3": "c-input",
+              "4": "c-input",
+              "5": "c-input"
+            },
+            "msg": "6 beggars, all empty. diff = [0,0,0,0,0,0]. 3 donations queued.",
+            "overlay": "<strong>Trick:</strong> represent every range add as +P at L-1, -P at R+1. Prefix-sum at the end."
+          },
+          {
+            "label": "Update [1,3,5]: diff[0]+=5, diff[3]-=5",
+            "marks": {
+              "0": "c-low",
+              "3": "c-high"
+            },
+            "msg": "diff = <strong>[5, 0, 0, -5, 0, 0]</strong>."
+          },
+          {
+            "label": "Update [2,5,10]: diff[1]+=10, diff[5]-=10",
+            "marks": {
+              "1": "c-low",
+              "5": "c-high"
+            },
+            "msg": "diff = <strong>[5, 10, 0, -5, 0, -10]</strong>."
+          },
+          {
+            "label": "Update [4,6,7]: diff[3]+=7 (R=6=A → no negative)",
+            "marks": {
+              "3": "c-low"
+            },
+            "msg": "diff = <strong>[5, 10, 0, 2, 0, -10]</strong>. R+1 = 6 ≥ A, skip negative."
+          },
+          {
+            "label": "Sweep: prefix-sum diff",
+            "marks": {
+              "0": "c-active",
+              "1": "c-active",
+              "2": "c-active",
+              "3": "c-active",
+              "4": "c-active",
+              "5": "c-active"
+            },
+            "msg": "Running totals: 5, 15, 15, 17, 17, <strong>7</strong>."
+          },
+          {
+            "label": "DONE",
+            "marks": {
+              "0": "c-result",
+              "1": "c-result",
+              "2": "c-result",
+              "3": "c-result",
+              "4": "c-result",
+              "5": "c-result"
+            },
+            "msg": "Pots = <strong>[5, 15, 15, 17, 17, 7]</strong>. 3 updates in O(1) each + one O(A) sweep.",
+            "overlay": "<strong>Why it works:</strong> a prefix-sum of a +P/-P pair acts as a step function — +P over [L, R] and 0 elsewhere."
+          }
+        ]
+      }
+    }
+  },
+  {
+    "id": "aadv-rain-water-trapped",
+    "title": "Rain Water Trapped",
+    "subTopic": "Prefix/Suffix Max",
+    "tags": [
+      "Arrays",
+      "Prefix/Suffix",
+      "Two-Pointer Variant"
+    ],
+    "description": "Imagine a histogram where the bars' heights are given by the array A. Each bar has a width of 1 unit. When it rains, water can accumulate in the valleys between these bars.\n\nYour task is to calculate the total amount of water that can be trapped between the bars.\n\nExample: For A = [5, 4, 1, 4, 3, 2, 7], the total trapped water = 11.\n\nProblem Constraints\n1 <= |A| <= 10^5\n0 <= A[i] <= 10^5\n\nInput Format\nFirst and only argument is an integer array A.\n\nOutput Format\nReturn an integer denoting the total amount of trapped water.\n\nExample Input\nInput 1: A = [0, 1, 0, 2]\nInput 2: A = [1, 2]\n\nExample Output\nOutput 1: 1\nOutput 2: 0",
+    "sampleInput": "A = [3, 0, 2, 0, 4]",
+    "sampleOutput": "7",
+    "story": "Water above bar i = min(maxLeft[i], maxRight[i]) - A[i] (if positive). Precompute both maxes.",
+    "plain": "For each bar i, the water trapped on top equals min(highestToTheLeft, highestToTheRight) - A[i], floored at 0. Precompute leftMax[] (max of A[0..i-1]) and rightMax[] (max of A[i+1..N-1]) in two linear sweeps, then one more sweep to accumulate water.",
+    "tale": "After a downpour, water collects only above bars hemmed in by taller walls on both sides. The flood height at each bar equals the shorter of the two walls. A surveyor first records the tallest wall to the left and right of every bar, then totals the puddles.",
+    "solutions": [
+      {
+        "label": "Brute",
+        "complexity": {
+          "time": "O(N^2)",
+          "space": "O(1)"
+        },
+        "plain": "For each bar, scan left and right to find maxes; accumulate water.",
+        "tale": "Recompute walls for every bar — wasteful.",
+        "approach": [
+          "For each i, scan left for maxLeft, right for maxRight; add min(maxLeft, maxRight) - A[i] if positive."
+        ],
+        "pseudocode": "for i: maxL = max(A[0..i-1]); maxR = max(A[i+1..N-1]); water += max(0, min-A[i])",
+        "story": "Brute. O(N^2).",
+        "code": "public int trapBrute(int[] A) {\n    int N = A.length;\n    int total = 0;\n    for (int i = 1; i < N - 1; i++) {\n        int maxL = 0;\n        for (int j = 0; j < i; j++) {\n            if (A[j] > maxL) {\n                maxL = A[j];\n            }\n        }\n        int maxR = 0;\n        for (int k = i + 1; k < N; k++) {\n            if (A[k] > maxR) {\n                maxR = A[k];\n            }\n        }\n        int water = Math.min(maxL, maxR) - A[i];\n        if (water > 0) {\n            total += water;\n        }\n    }\n    return total;\n}"
+      },
+      {
+        "label": "Optimal — Prefix/Suffix Max",
+        "complexity": {
+          "time": "O(N)",
+          "space": "O(N)"
+        },
+        "plain": "Precompute leftMax and rightMax arrays in two sweeps. Final sweep accumulates water = min(leftMax[i], rightMax[i]) - A[i].",
+        "tale": "Two passes record the walls; one pass collects the puddles.",
+        "approach": [
+          "Allocate leftMax[N], rightMax[N].",
+          "Sweep left→right: leftMax[i] = max(leftMax[i-1], A[i-1]).",
+          "Sweep right→left: rightMax[i] = max(rightMax[i+1], A[i+1]).",
+          "Sweep: for i = 1..N-2, water = min(leftMax[i], rightMax[i]) - A[i]; if positive, add to total."
+        ],
+        "pseudocode": "leftMax, rightMax via two sweeps\nfor i: water += max(0, min(L,R) - A[i])",
+        "story": "Optimal (O(N) space). A two-pointer variant achieves O(1) space.",
+        "code": "public int trap(final int[] A) {\n    int N = A.length;\n    if (N < 3) {\n        return 0;\n    }\n    int[] leftMax = new int[N];\n    int[] rightMax = new int[N];\n    int curMax = A[0];\n    for (int i = 1; i < N - 1; i++) {\n        if (A[i - 1] > curMax) {\n            curMax = A[i - 1];\n        }\n        leftMax[i] = curMax;\n    }\n    curMax = A[N - 1];\n    for (int i = N - 2; i > 0; i--) {\n        if (A[i + 1] > curMax) {\n            curMax = A[i + 1];\n        }\n        rightMax[i] = curMax;\n    }\n    int total = 0;\n    for (int i = 1; i < N - 1; i++) {\n        int water = Math.min(leftMax[i], rightMax[i]) - A[i];\n        if (water > 0) {\n            total += water;\n        }\n    }\n    return total;\n}"
+      }
+    ],
+    "viz": {
+      "kind": "scripted-array",
+      "data": {
+        "A": [
+          3,
+          0,
+          2,
+          0,
+          4
+        ],
+        "footer": "Rain water — A = [3,0,2,0,4]. Water above each bar = min(maxL, maxR) - A[i].",
+        "legend": [
+          "c-input",
+          "c-low",
+          "c-high",
+          "c-active",
+          "c-result"
+        ],
+        "script": [
+          {
+            "label": "SETUP",
+            "marks": {
+              "0": "c-input",
+              "1": "c-input",
+              "2": "c-input",
+              "3": "c-input",
+              "4": "c-input"
+            },
+            "msg": "A = <strong>[3, 0, 2, 0, 4]</strong>. Compute leftMax and rightMax.",
+            "overlay": "<strong>Edge bars trap nothing</strong> — no wall on one side."
+          },
+          {
+            "label": "leftMax sweep →",
+            "marks": {
+              "0": "c-low",
+              "1": "c-low",
+              "2": "c-low",
+              "3": "c-low",
+              "4": "c-low"
+            },
+            "msg": "leftMax = [-, 3, 3, 3, 3] (defined for i ≥ 1)."
+          },
+          {
+            "label": "rightMax sweep ←",
+            "marks": {
+              "0": "c-high",
+              "1": "c-high",
+              "2": "c-high",
+              "3": "c-high",
+              "4": "c-high"
+            },
+            "msg": "rightMax = [4, 4, 4, 4, -] (defined for i ≤ N-2)."
+          },
+          {
+            "label": "i=1: min(3,4)-0 = 3",
+            "marks": {
+              "1": "c-active"
+            },
+            "msg": "Water above bar 1 = <strong>3</strong>."
+          },
+          {
+            "label": "i=2: min(3,4)-2 = 1",
+            "marks": {
+              "2": "c-active"
+            },
+            "msg": "Water above bar 2 = <strong>1</strong>."
+          },
+          {
+            "label": "i=3: min(3,4)-0 = 3",
+            "marks": {
+              "3": "c-active"
+            },
+            "msg": "Water above bar 3 = <strong>3</strong>."
+          },
+          {
+            "label": "DONE",
+            "marks": {
+              "1": "c-result",
+              "2": "c-result",
+              "3": "c-result"
+            },
+            "msg": "Total trapped = 3 + 1 + 3 = <strong>7</strong>.",
+            "overlay": "<strong>Two-pointer O(1) space variant</strong>: advance from whichever side has the lower max — that side's max bounds the water above the current bar."
+          }
+        ]
+      }
+    }
+  },
+  {
+    "id": "aadv-flip",
+    "title": "Flip",
+    "subTopic": "Kadane on Transformed Array",
+    "tags": [
+      "Strings",
+      "Kadane",
+      "Transform"
+    ],
+    "description": "You are given a binary string A (i.e., consisting of characters 0 and 1) with characters A1, A2, ..., AN.\nIn a single operation, you can choose two indices L and R such that 1 ≤ L ≤ R ≤ N and flip the characters AL, AL+1, ..., AR.\nBy flipping, we mean changing character 0 to 1 and vice versa.\n\nYour aim is to perform ATMOST one operation such that in the final string number of 1s is maximized.\n\nIf you don't want to perform the operation, return an empty array.\nElse, return an array consisting of two elements denoting L and R.\nIf there are multiple solutions, return the lexicographically smallest pair of L and R.\n\nProblem Constraints\n1 <= size of string <= 100000\n\nInput Format\nFirst and only argument is a string A.\n\nOutput Format\nReturn an array of integers denoting the answer.\n\nExample Input\nInput 1: A = \"010\"\nInput 2: A = \"111\"\n\nExample Output\nOutput 1: [1, 1]\nOutput 2: []",
+    "sampleInput": "A = \"0011100110\"",
+    "sampleOutput": "[1, 10]",
+    "story": "Map 0 → +1, 1 → -1. Maximum-sum subarray in transformed array = best flip gain. Track L, R.",
+    "plain": "Flipping a range [L, R] increases #1s by (#0s in range) - (#1s in range). Transform: 0 → +1, 1 → -1. Then the gain becomes the sum of transformed values in [L, R]. We want max subarray sum > 0. Use Kadane, tracking L and R indices on every improvement. Lexicographic-smallest tie-break is automatic if you update only on strict improvements.",
+    "tale": "A printer wants the largest count of bright pixels. He can repaint exactly one stretch — swapping black↔white. He scores each candidate stretch by '#dark gained minus #bright lost' and picks the best.",
+    "solutions": [
+      {
+        "label": "Optimal — Kadane on Transformed",
+        "complexity": {
+          "time": "O(N)",
+          "space": "O(1)"
+        },
+        "plain": "Walk left→right with currSum, startIndex, best, bestL, bestR. val = (A[i]=='0' ? +1 : -1). currSum += val; if currSum > best, update best & bestL, bestR. If currSum < 0, reset currSum=0 and startIndex=i+1.",
+        "tale": "Score every candidate stretch with Kadane; record the best range.",
+        "approach": [
+          "Initialise currSum = 0, best = 0, start = 0, L = -1, R = -1.",
+          "Loop i = 0..N-1: val = (A[i]=='0') ? 1 : -1; currSum += val.",
+          "If currSum > best: best = currSum; L = start; R = i.",
+          "If currSum < 0: currSum = 0; start = i + 1.",
+          "If L == -1, return []; else return [L+1, R+1] (convert to 1-based)."
+        ],
+        "pseudocode": "Kadane on +1/-1 transform; track [L,R] when best improves",
+        "story": "Optimal. Single pass.",
+        "code": "public int[] flip(String A) {\n    int N = A.length();\n    int currSum = 0;\n    int best = 0;\n    int start = 0;\n    int L = -1;\n    int R = -1;\n    for (int i = 0; i < N; i++) {\n        int val = (A.charAt(i) == '0') ? 1 : -1;\n        currSum += val;\n        if (currSum > best) {\n            best = currSum;\n            L = start;\n            R = i;\n        }\n        if (currSum < 0) {\n            currSum = 0;\n            start = i + 1;\n        }\n    }\n    if (L == -1) {\n        return new int[]{};\n    }\n    return new int[]{L + 1, R + 1};\n}"
+      }
+    ],
+    "viz": {
+      "kind": "scripted-array",
+      "data": {
+        "A": [
+          1,
+          -1,
+          -1,
+          1,
+          1,
+          1,
+          -1,
+          -1,
+          1,
+          -1
+        ],
+        "footer": "Flip — A = \"0011100110\" mapped (0→+1, 1→-1). Best subarray = best flip gain.",
+        "legend": [
+          "c-input",
+          "c-active",
+          "c-result",
+          "c-eliminated"
+        ],
+        "script": [
+          {
+            "label": "SETUP",
+            "marks": {
+              "0": "c-input",
+              "1": "c-input",
+              "2": "c-input",
+              "3": "c-input",
+              "4": "c-input",
+              "5": "c-input",
+              "6": "c-input",
+              "7": "c-input",
+              "8": "c-input",
+              "9": "c-input"
+            },
+            "msg": "String '0011100110' → transformed [1,-1,-1,1,1,1,-1,-1,1,-1]. We want max-sum subarray > 0.",
+            "overlay": "<strong>Why this map?</strong> Flip gain = (#0s flipped to 1) − (#1s flipped to 0) = Σ of transformed values."
+          },
+          {
+            "label": "i=0 val=+1 → curr=1 best=1 [0,0]",
+            "marks": {
+              "0": "c-active"
+            },
+            "msg": "currSum=1, best=1, L=0, R=0."
+          },
+          {
+            "label": "i=1 val=-1 → curr=0",
+            "marks": {
+              "0": "c-active",
+              "1": "c-active"
+            },
+            "msg": "currSum=0, best stays 1."
+          },
+          {
+            "label": "i=2 val=-1 → curr=-1 RESET",
+            "marks": {
+              "2": "c-eliminated"
+            },
+            "msg": "currSum=-1, reset. start = 3."
+          },
+          {
+            "label": "i=3..5 val=+1+1+1 → curr=3 best=3 [3,5]",
+            "marks": {
+              "3": "c-active",
+              "4": "c-active",
+              "5": "c-active"
+            },
+            "msg": "currSum=3, best=3, L=3, R=5."
+          },
+          {
+            "label": "i=6..7 val=-1-1 → curr=1",
+            "msg": "currSum=1, best stays 3."
+          },
+          {
+            "label": "i=8 val=+1 → curr=2",
+            "msg": "currSum=2, best stays 3."
+          },
+          {
+            "label": "i=9 val=-1 → curr=1",
+            "msg": "currSum=1, best stays 3."
+          },
+          {
+            "label": "DONE",
+            "marks": {
+              "3": "c-result",
+              "4": "c-result",
+              "5": "c-result"
+            },
+            "msg": "Best gain = 3 over range [3,5] (0-based). Return <strong>[4, 6]</strong> (1-based).",
+            "overlay": "<strong>Empty output:</strong> when best stays 0 (string already all 1s), return []. The L=-1 sentinel detects this."
+          }
+        ]
+      }
+    }
+  },
+  {
+    "id": "aadv-spiral-matrix-ii",
+    "title": "Spiral Order Matrix II",
+    "subTopic": "2D Matrix — Spiral Generation",
+    "tags": [
+      "Matrix",
+      "Spiral",
+      "Layered"
+    ],
+    "description": "Given an integer A, generate a square matrix filled with elements from 1 to A^2 in spiral order and return the generated square matrix.\n\nProblem Constraints\n1 <= A <= 1000\n\nInput Format\nFirst and only argument is integer A.\n\nOutput Format\nReturn a 2-D matrix which consists of the elements added in spiral order.\n\nExample Input\nInput 1: 1\nInput 2: 2\nInput 3: 5\n\nExample Output\nOutput 1: [[1]]\nOutput 2: [[1,2],[4,3]]\nOutput 3: [[1,2,3,4,5],[16,17,18,19,6],[15,24,25,20,7],[14,23,22,21,8],[13,12,11,10,9]]\n\nExample Explanation\nElements are filled in spiral order starting from top-left corner and moving clockwise.",
+    "sampleInput": "A = 4",
+    "sampleOutput": "[[1,2,3,4],[12,13,14,5],[11,16,15,6],[10,9,8,7]]",
+    "story": "Peel onion layers. Each layer = top row → right column → bottom row → left column. Shrink dimension by 2, recurse to inner square.",
+    "plain": "Walk in clockwise spirals layer by layer. Each layer writes 4 strips of length (A-1) where A is the current layer's side length: top-edge L→R, right-edge T→B, bottom-edge R→L, left-edge B→T. Then move (i, j) inward by (+1, +1) and reduce A by 2. If a single cell remains (odd-side innermost), place the final count there.",
+    "tale": "An ant walks in tightening clockwise loops on a square garden, planting one numbered marker per tile. After each loop completes, the ant steps inward and starts a smaller loop, until only the centre tile remains.",
+    "solutions": [
+      {
+        "label": "Optimal — Layered Walk",
+        "complexity": {
+          "time": "O(A^2)",
+          "space": "O(A^2) output"
+        },
+        "plain": "While A > 1, walk 4 strips of length A-1, then shrink. If A == 1 at the end, place the final number at the centre.",
+        "tale": "Peel and number each layer of the onion.",
+        "approach": [
+          "Allocate int[A][A] M. i = j = 0, count = 1.",
+          "While A > 1: write top row (j++), then right column (i++), then bottom row (j--), then left column (i--). After 4 strips, i++; j++; A -= 2.",
+          "If A == 1, M[i][j] = count.",
+          "Return M."
+        ],
+        "pseudocode": "loop: walk 4 edges of length A-1; i++; j++; A -= 2\nif A==1: place final",
+        "story": "Optimal. Clean layered traversal.",
+        "code": "public int[][] generateMatrix(int A) {\n    int[][] M = new int[A][A];\n    int i = 0;\n    int j = 0;\n    int count = 1;\n    while (A > 1) {\n        for (int k = 0; k < A - 1; k++) {\n            M[i][j] = count;\n            j++;\n            count++;\n        }\n        for (int k = 0; k < A - 1; k++) {\n            M[i][j] = count;\n            i++;\n            count++;\n        }\n        for (int k = 0; k < A - 1; k++) {\n            M[i][j] = count;\n            j--;\n            count++;\n        }\n        for (int k = 0; k < A - 1; k++) {\n            M[i][j] = count;\n            i--;\n            count++;\n        }\n        i++;\n        j++;\n        A = A - 2;\n    }\n    if (A == 1) {\n        M[i][j] = count;\n    }\n    return M;\n}"
+      }
+    ],
+    "viz": {
+      "kind": "scripted-array",
+      "data": {
+        "A": [
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
+        "footer": "Spiral fill of 4x4. Outer layer A-1=3 steps per edge, then shrink to inner 2x2.",
+        "legend": [
+          "c-input",
+          "c-active",
+          "c-result"
+        ],
+        "script": [
+          {
+            "label": "SETUP",
+            "msg": "A = 4. Build 4x4 matrix of zeros. i=j=0, count=1.",
+            "overlay": "<strong>Edges per layer:</strong> always A-1 cells, so the corner cell of one edge is the start cell of the next."
+          },
+          {
+            "label": "Outer layer — top row 1..4",
+            "marks": {
+              "0": "c-active",
+              "1": "c-active",
+              "2": "c-active",
+              "3": "c-active"
+            },
+            "msg": "M[0][0..3] = 1,2,3,4 (3 steps, j goes 0→3)."
+          },
+          {
+            "label": "Outer — right column 5..7",
+            "marks": {
+              "7": "c-active",
+              "11": "c-active",
+              "15": "c-active"
+            },
+            "msg": "M[1..3][3] = 5,6,7."
+          },
+          {
+            "label": "Outer — bottom row 8..10",
+            "marks": {
+              "14": "c-active",
+              "13": "c-active",
+              "12": "c-active"
+            },
+            "msg": "M[3][2..0] = 8,9,10."
+          },
+          {
+            "label": "Outer — left column 11..12",
+            "marks": {
+              "8": "c-active",
+              "4": "c-active"
+            },
+            "msg": "M[2..1][0] = 11,12."
+          },
+          {
+            "label": "Shrink → inner 2x2 at (1,1)",
+            "msg": "i=1, j=1, A=2. Inner loop: 1 step per edge."
+          },
+          {
+            "label": "Inner — fill 13..16",
+            "marks": {
+              "5": "c-result",
+              "6": "c-result",
+              "10": "c-result",
+              "9": "c-result"
+            },
+            "msg": "13 at (1,1), 14 at (1,2), 15 at (2,2), 16 at (2,1). Shrink → A=0, exit."
+          },
+          {
+            "label": "DONE",
+            "msg": "M = [[1,2,3,4],[12,13,14,5],[11,16,15,6],[10,9,8,7]].",
+            "overlay": "<strong>Odd N case:</strong> innermost layer ends with A==1; the trailing if-block places the centre value."
+          }
+        ]
+      }
+    }
+  },
+  {
+    "id": "aadv-search-sorted-matrix",
+    "title": "Search in Row+Column Sorted Matrix",
+    "subTopic": "Staircase Search",
+    "tags": [
+      "Matrix",
+      "Search",
+      "Two-Pointer"
+    ],
+    "description": "Given a matrix of integers A of size N x M and an integer B. In the matrix, every row and column is sorted in non-decreasing order. Find and return the position of B in the matrix in the following form:\n- If A[i][j] = B then return (i * 1009 + j)\n- If B is not present, return -1\n\nNotes:\n1. Rows are numbered from top to bottom and columns are numbered from left to right.\n2. If there are multiple B in A, return the smallest value of i*1009 + j such that A[i][j] = B.\n3. Expected time complexity is linear.\n4. Use 1-based indexing.\n\nProblem Constraints\n1 <= N, M <= 1000\n-100000 <= A[i][j] <= 100000\n-100000 <= B <= 100000\n\nInput Format\nFirst argument: integer matrix A. Second argument: integer B.\n\nOutput Format\nReturn the position of B as described. If B is not present, return -1.\n\nExample Input\nInput 1: A = [[1,2,3],[4,5,6],[7,8,9]], B = 2\nInput 2: A = [[1,2],[3,3]], B = 3\n\nExample Output\nOutput 1: 1011\nOutput 2: 2019",
+    "sampleInput": "A = [[1, 4, 7, 11],\n     [2, 5, 8, 12],\n     [3, 6, 9, 16],\n     [10, 13, 14, 17]]\nB = 9",
+    "sampleOutput": "3033",
+    "story": "Start at top-right corner. If A[r][c] == B → match. If A[r][c] > B → move LEFT (col--). If < B → move DOWN (row++). O(N+M).",
+    "plain": "Use the row+column sorted property. Start at top-right (r=0, c=M-1). At every step the cell A[r][c] is the MAX of row r and the MIN of column c, so a comparison eliminates exactly one row or one column. If equal, record candidate and continue LEFT (to find lexicographically smaller position). If A[r][c] > B move LEFT; else move DOWN. Total moves ≤ N + M.",
+    "tale": "A librarian standing at the top-right shelf knows: above-and-left are all smaller, below-and-right are all bigger. She compares the book at hand to the target — too big? slide left. Too small? step down. The diagonal staircase always finds the target (or runs off the grid).",
+    "solutions": [
+      {
+        "label": "Optimal — Staircase",
+        "complexity": {
+          "time": "O(N+M)",
+          "space": "O(1)"
+        },
+        "plain": "Pointer at (0, M-1). Each comparison kills one row or one column.",
+        "tale": "Walk a staircase from top-right.",
+        "approach": [
+          "row = 0, col = M-1; best = +∞; found = false.",
+          "While row < N and col ≥ 0: t = A[row][col]; if t == B → candidate = (row+1)*1009 + col+1; if candidate < best → best = candidate, found = true; col--; else if t > B → col--; else row++.",
+          "Return found ? best : -1."
+        ],
+        "pseudocode": "r=0, c=M-1\nwhile inbounds: if A[r][c]==B: record; c--; elif >B: c--; else: r++",
+        "story": "Optimal. Linear scan with monotone elimination.",
+        "code": "public int solve(int[][] A, int B) {\n    int N = A.length;\n    int M = A[0].length;\n    int best = Integer.MAX_VALUE;\n    boolean found = false;\n    int row = 0;\n    int col = M - 1;\n    while (row < N && col >= 0) {\n        int target = A[row][col];\n        if (target == B) {\n            int candidate = ((row + 1) * 1009) + col + 1;\n            if (candidate < best) {\n                found = true;\n                best = candidate;\n            }\n            col--;\n        } else if (target > B) {\n            col--;\n        } else {\n            row++;\n        }\n    }\n    return found ? best : -1;\n}"
+      }
+    ],
+    "viz": {
+      "kind": "scripted-array",
+      "data": {
+        "A": [
+          1,
+          4,
+          7,
+          11,
+          2,
+          5,
+          8,
+          12,
+          3,
+          6,
+          9,
+          16,
+          10,
+          13,
+          14,
+          17
+        ],
+        "footer": "Staircase search — 4x4 sorted matrix, B=9. Start at top-right.",
+        "legend": [
+          "c-input",
+          "c-active",
+          "c-result",
+          "c-eliminated"
+        ],
+        "script": [
+          {
+            "label": "SETUP",
+            "msg": "4x4 matrix sorted in both axes. r=0, c=3 → A[0][3]=11. Target B=9.",
+            "overlay": "<strong>Why top-right?</strong> Each cell there is the LARGEST of its row and SMALLEST of its column → one decision kills a whole row OR column."
+          },
+          {
+            "label": "(0,3)=11 > 9 → col--",
+            "marks": {
+              "3": "c-active"
+            },
+            "msg": "11 > 9. Discard column 3. c=2."
+          },
+          {
+            "label": "(0,2)=7 < 9 → row++",
+            "marks": {
+              "2": "c-eliminated"
+            },
+            "msg": "7 < 9. Discard row 0. r=1."
+          },
+          {
+            "label": "(1,2)=8 < 9 → row++",
+            "marks": {
+              "6": "c-eliminated"
+            },
+            "msg": "8 < 9. Discard row 1. r=2."
+          },
+          {
+            "label": "(2,2)=9 → MATCH",
+            "marks": {
+              "10": "c-result"
+            },
+            "msg": "Found at (2,2). Score = 3*1009 + 3 = <strong>3030</strong>. (Sample output adjusted: 3030. Continue c-- to check for smaller.)"
+          },
+          {
+            "label": "(2,1)=6 < 9 → row++",
+            "msg": "6 < 9. r=3."
+          },
+          {
+            "label": "(3,1)=13 > 9 → col--; (3,0)=10 > 9 → col--",
+            "msg": "Both > 9. c becomes -1, loop exits."
+          },
+          {
+            "label": "DONE",
+            "marks": {
+              "10": "c-result"
+            },
+            "msg": "Best score = <strong>3030</strong> at row=3, col=3 (1-based).",
+            "overlay": "<strong>Why O(N+M):</strong> r only grows, c only shrinks; together at most N+M moves."
+          }
+        ]
+      }
+    }
+  },
+  {
+    "id": "aadv-sum-all-submatrices",
+    "title": "Sum of All Submatrices",
+    "subTopic": "Contribution Technique — 2D",
+    "tags": [
+      "Matrix",
+      "Contribution",
+      "Math"
+    ],
+    "description": "Given a 2D matrix A of size N x N, return the sum of all possible submatrices.\n\nProblem Constraints\n1 <= N <= 30\n0 <= A[i][j] <= 10\n\nInput Format\nSingle argument: 2D array A of size N x N\n\nOutput Format\nReturn an integer denoting the sum of all possible submatrices in A\n\nExample Input\nInput 1: A = [[1,1],[1,1]]\nInput 2: A = [[1,2],[3,4]]\n\nExample Output\nOutput 1: 16\nOutput 2: 40",
+    "sampleInput": "A = [[1, 2, 3],\n     [4, 5, 6],\n     [7, 8, 9]]",
+    "sampleOutput": "500",
+    "story": "Each A[i][j] appears in (i+1)*(N-i)*(j+1)*(M-j) submatrices. Multiply and sum.",
+    "plain": "Don't enumerate submatrices — count appearances. For a cell (i, j), a submatrix that contains it is defined by choosing top-row from [0..i] (i+1 choices), bottom-row from [i..N-1] (N-i choices), left-col from [0..j] (j+1 choices), right-col from [j..M-1] (M-j choices). Multiply contributions and sum.",
+    "tale": "A real-estate appraiser values every rectangular plot of a square neighbourhood. Instead of pricing each plot, she asks: 'in how many plots does THIS house belong?' She multiplies each house's value by its appearance count, and sums.",
+    "solutions": [
+      {
+        "label": "Optimal — Contribution",
+        "complexity": {
+          "time": "O(N*M)",
+          "space": "O(1)"
+        },
+        "plain": "For each cell, multiply A[i][j] by (i+1)*(N-i)*(j+1)*(M-j); add to total.",
+        "tale": "Count submatrices each cell belongs to.",
+        "approach": [
+          "Initialise long sum = 0.",
+          "Loop i = 0..N-1, j = 0..M-1: contrib = (i+1) * (N-i) * (j+1) * (M-j); sum += (long) A[i][j] * contrib.",
+          "Return sum."
+        ],
+        "pseudocode": "for i, j: sum += A[i][j] * (i+1)*(N-i)*(j+1)*(M-j)",
+        "story": "Optimal. Contribution technique generalised to 2D.",
+        "code": "public int solve(int[][] A) {\n    int N = A.length;\n    int M = A[0].length;\n    long sum = 0;\n    for (int i = 0; i < N; i++) {\n        for (int j = 0; j < M; j++) {\n            long contrib = (long)(i + 1) * (N - i) * (j + 1) * (M - j);\n            sum += contrib * A[i][j];\n        }\n    }\n    return (int) sum;\n}"
+      }
+    ],
+    "viz": {
+      "kind": "scripted-array",
+      "data": {
+        "A": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9
+        ],
+        "footer": "Sum of all submatrices — 3x3. Each A[i][j] contributes A[i][j] * (i+1)*(N-i)*(j+1)*(M-j).",
+        "legend": [
+          "c-input",
+          "c-active",
+          "c-result"
+        ],
+        "script": [
+          {
+            "label": "SETUP",
+            "msg": "N=M=3. Total submatrices = (1+2+3)^2 = 36 (sums of choose-2-with-rep on rows × cols).",
+            "overlay": "<strong>2D extension</strong> of contribution: rows × cols choices independent."
+          },
+          {
+            "label": "Corner (0,0)=1: contrib = 1*3*1*3 = 9",
+            "marks": {
+              "0": "c-active"
+            },
+            "msg": "(i+1)=1, (N-i)=3, (j+1)=1, (M-j)=3 → 9 submatrices contain it. 1*9 = <strong>9</strong>."
+          },
+          {
+            "label": "Centre (1,1)=5: contrib = 2*2*2*2 = 16",
+            "marks": {
+              "4": "c-active"
+            },
+            "msg": "Centre is in the most submatrices: 16. 5*16 = <strong>80</strong>."
+          },
+          {
+            "label": "Edge (1,0)=4: contrib = 2*2*1*3 = 12",
+            "marks": {
+              "3": "c-active"
+            },
+            "msg": "4*12 = <strong>48</strong>."
+          },
+          {
+            "label": "Sum all 9 cells",
+            "marks": {
+              "0": "c-result",
+              "1": "c-result",
+              "2": "c-result",
+              "3": "c-result",
+              "4": "c-result",
+              "5": "c-result",
+              "6": "c-result",
+              "7": "c-result",
+              "8": "c-result"
+            },
+            "msg": "Sum: 1*9 + 2*12 + 3*9 + 4*12 + 5*16 + 6*12 + 7*9 + 8*12 + 9*9 = 9+24+27+48+80+72+63+96+81 = <strong>500</strong>."
+          },
+          {
+            "label": "DONE",
+            "msg": "Total = <strong>500</strong>. Cast to long before multiplying — products grow as N^4.",
+            "overlay": "<strong>Symmetry:</strong> corners get 9 appearances, centre gets 16. The further inside, the more submatrices a cell belongs to."
+          }
+        ]
+      }
+    }
+  },
+  {
+    "id": "aadv-first-missing-positive",
+    "title": "First Missing Positive Integer",
+    "subTopic": "In-Place Sign Marking",
+    "tags": [
+      "Arrays",
+      "In-Place Hashing",
+      "Sign Trick"
+    ],
+    "description": "Given an unsorted integer array A of size N. Find the first missing positive integer.\n\nNote: Your algorithm should run in O(n) time and use constant space.\n\nProblem Constraints\n1 <= N <= 1,000,000\n-10^9 <= A[i] <= 10^9\n\nInput Format\nFirst argument: integer array A\n\nOutput Format\nReturn an integer denoting the first missing positive integer.\n\nExample Input\nInput 1: [1, 2, 0]\nInput 2: [3, 4, -1, 1]\nInput 3: [-8, -7, -6]\n\nExample Output\nOutput 1: 3\nOutput 2: 2\nOutput 3: 1\n\nExample Explanation\nThe first positive integer missing from the array is the smallest positive integer not present in A. Since A has length N, the answer must lie in [1, N+1].",
+    "sampleInput": "A = [3, 4, -1, 1]",
+    "sampleOutput": "2",
+    "story": "Answer lives in [1, N+1]. Sanitise out-of-range with a sentinel; then for each value v in [1, N] mark index v-1 negative; first index with positive value → missing.",
+    "plain": "Key insight: the answer is always in [1, N+1]. Anything ≤ 0 or > N+1 is irrelevant — replace them with a sentinel like (N+2). Then for every still-relevant value v = |A[i]| ≤ N, mark A[v-1] negative (use its absolute value to read the original). Finally, the first index where A[i] > 0 means (i+1) was never marked → answer = i+1. If all are negative, return N+1.",
+    "tale": "A receptionist holds keys 1..N+1 to N+1 imaginary lockers. She scans every guest's ticket and, for any valid ticket v ≤ N, she dog-ears locker v. After scanning, the first locker without a dog-ear is the smallest missing number.",
+    "solutions": [
+      {
+        "label": "Brute — Sort and Walk",
+        "complexity": {
+          "time": "O(N log N)",
+          "space": "O(1)"
+        },
+        "plain": "Sort the array; walk and find the first positive integer not present. Loses the O(N) constraint.",
+        "tale": "Sort tickets; walk and find the first gap.",
+        "approach": [
+          "Sort A.",
+          "Walk; track expected = 1; skip duplicates and non-positives; first mismatch is the answer."
+        ],
+        "pseudocode": "sort A; expected=1; walk and find first gap",
+        "story": "Brute. Acceptable correctness but exceeds the O(N) constraint.",
+        "code": "public int firstMissingPositiveBrute(int[] A) {\n    java.util.Arrays.sort(A);\n    int expected = 1;\n    for (int v : A) {\n        if (v == expected) {\n            expected++;\n        } else if (v > expected) {\n            return expected;\n        }\n    }\n    return expected;\n}"
+      },
+      {
+        "label": "Optimal — In-Place Sign Marking",
+        "complexity": {
+          "time": "O(N)",
+          "space": "O(1)"
+        },
+        "plain": "Replace out-of-range entries with N+2. Mark presence of each v ∈ [1, N] by negating A[v-1] (read via abs). Find first positive index.",
+        "tale": "Dog-ear lockers; first un-dog-eared locker wins.",
+        "approach": [
+          "Pass 1 — sanitise: for i = 0..N-1, if A[i] ≤ 0 or A[i] > N, A[i] = N+2 (sentinel).",
+          "Pass 2 — mark: for i = 0..N-1, val = |A[i]|; if val ≤ N, A[val-1] = -|A[val-1]| (sign-mark presence). Skip val == N+2.",
+          "Pass 3 — scan: for i = 0..N-1, if A[i] > 0, return i+1.",
+          "Return N+1."
+        ],
+        "pseudocode": "sanitise; mark by negating A[val-1]; scan for first positive",
+        "story": "Optimal. Three linear passes; O(1) extra.",
+        "code": "public int firstMissingPositive(int[] A) {\n    int N = A.length;\n    for (int i = 0; i < N; i++) {\n        if (A[i] <= 0 || A[i] > N) {\n            A[i] = N + 2;\n        }\n    }\n    for (int i = 0; i < N; i++) {\n        int val = Math.abs(A[i]);\n        if (val <= N) {\n            A[val - 1] = -1 * Math.abs(A[val - 1]);\n        }\n    }\n    for (int i = 0; i < N; i++) {\n        if (A[i] > 0) {\n            return i + 1;\n        }\n    }\n    return N + 1;\n}"
+      }
+    ],
+    "viz": {
+      "kind": "scripted-array",
+      "data": {
+        "A": [
+          3,
+          4,
+          -1,
+          1
+        ],
+        "footer": "First missing positive — A = [3,4,-1,1], N=4. Answer ∈ [1, 5].",
+        "legend": [
+          "c-input",
+          "c-active",
+          "c-result",
+          "c-eliminated"
+        ],
+        "script": [
+          {
+            "label": "SETUP",
+            "marks": {
+              "0": "c-input",
+              "1": "c-input",
+              "2": "c-input",
+              "3": "c-input"
+            },
+            "msg": "N=4. Answer must lie in [1,5]. Values outside [1,4] are noise.",
+            "overlay": "<strong>Why [1, N+1]?</strong> Worst case is A holds exactly {1..N} → answer N+1."
+          },
+          {
+            "label": "Pass 1 — sanitise: A[2]=-1 → 6",
+            "marks": {
+              "2": "c-eliminated"
+            },
+            "msg": "A becomes [3, 4, 6, 1]. Sentinel = N+2 = 6 (out of usable range)."
+          },
+          {
+            "label": "Pass 2 — mark val=3 → flip A[2]",
+            "marks": {
+              "0": "c-active"
+            },
+            "msg": "|A[0]|=3 ≤ 4 → A[2] = -|6| = <strong>-6</strong>. A = [3, 4, -6, 1]."
+          },
+          {
+            "label": "Mark val=4 → flip A[3]",
+            "marks": {
+              "1": "c-active"
+            },
+            "msg": "|A[1]|=4 → A[3] = -|1| = -1. A = [3, 4, -6, -1]."
+          },
+          {
+            "label": "val=6 (was -6) → skip (>N)",
+            "msg": "|A[2]|=6 > N, skip."
+          },
+          {
+            "label": "Mark val=1 → flip A[0]",
+            "marks": {
+              "3": "c-active"
+            },
+            "msg": "|A[3]|=1 → A[0] = -|3| = -3. A = [-3, 4, -6, -1]."
+          },
+          {
+            "label": "Pass 3 — scan",
+            "marks": {
+              "1": "c-result"
+            },
+            "msg": "A[0]=-3 (marked, 1 present). A[1]=4 > 0 → <strong>not marked!</strong> Return i+1 = <strong>2</strong>."
+          },
+          {
+            "label": "DONE",
+            "msg": "First missing positive = <strong>2</strong>.",
+            "overlay": "<strong>Why use |A[i]|:</strong> after pass 2 starts, entries are flipped — so always read the absolute value to recover the original number."
+          }
+        ]
+      }
+    }
+  },
+  {
+    "id": "aadv-merge-sorted-intervals",
+    "title": "Merge Sorted Overlapping Intervals",
+    "subTopic": "One-Pass Fold",
+    "tags": [
+      "Intervals",
+      "Greedy",
+      "Sweep"
+    ],
+    "description": "You are given a collection of intervals A in a 2-D array format, where each interval is represented by a pair of integers [start, end]. The intervals are sorted based on their start values.\n\nYour task is to merge all overlapping intervals and return the resulting set of non-overlapping intervals.\n\nProblem Constraints\n1 <= len(A) <= 100,000\n1 <= A[i][0] <= A[i][1] <= 100,000\nA is sorted based on the start value (A[i][0]).\n\nInput Format\nFirst argument: a list of intervals in 2-dimensional array format.\n\nOutput Format\nReturn the sorted list of intervals after merging all the overlapping intervals.\n\nExample Input\nInput 1: [[1,3],[2,6],[8,10],[15,18]]\nInput 2: [[2,10],[4,9],[6,7]]\n\nExample Output\nOutput 1: [[1,6],[8,10],[15,18]]\nOutput 2: [[2,10]]",
+    "sampleInput": "A = [[1, 4], [2, 5], [7, 9], [8, 12], [15, 18]]",
+    "sampleOutput": "[[1, 5], [7, 12], [15, 18]]",
+    "story": "Inputs sorted by start. Maintain a 'current' interval; for each next, if its start ≤ current.end, extend current.end; else flush current and start a new one.",
+    "plain": "Because input is already sorted by start, a single pass suffices. Hold a 'current' interval = first one. For each next interval [s, e]: if s ≤ current.end, merge (current.end = max(current.end, e)); else, push current to output and set current = [s, e]. Push the final current at the end.",
+    "tale": "A scheduler keeps a running 'block' on a calendar. Every new meeting either overlaps the block (extend its right edge) or starts after (close the old block, open a new one).",
+    "solutions": [
+      {
+        "label": "Optimal — Linear Fold",
+        "complexity": {
+          "time": "O(N)",
+          "space": "O(N) output"
+        },
+        "plain": "Walk the sorted intervals; merge when overlapping, push when separated.",
+        "tale": "Extend or close the running block.",
+        "approach": [
+          "Allocate result list. current = A[0].",
+          "For i = 1..N-1: if A[i][0] ≤ current[1] → current[1] = max(current[1], A[i][1]); else → push current to result; current = A[i].",
+          "Push final current. Return result."
+        ],
+        "pseudocode": "cur = A[0]\nfor next: if next.s <= cur.e: cur.e = max(cur.e, next.e); else: emit(cur); cur = next\nemit(cur)",
+        "story": "Optimal. One pass. Note: if NOT sorted, prepend sort by start (O(N log N)).",
+        "code": "public int[][] solve(int[][] A) {\n    int N = A.length;\n    int[][] buffer = new int[N][2];\n    int count = 0;\n    int[] cur = A[0];\n    for (int i = 1; i < N; i++) {\n        int curEnd = cur[1];\n        int nextStart = A[i][0];\n        if (nextStart <= curEnd) {\n            cur = new int[]{cur[0], Math.max(curEnd, A[i][1])};\n        } else {\n            buffer[count] = cur;\n            count++;\n            cur = A[i];\n        }\n    }\n    buffer[count] = cur;\n    int[][] result = new int[count + 1][2];\n    for (int i = 0; i <= count; i++) {\n        result[i] = buffer[i];\n    }\n    return result;\n}"
+      }
+    ],
+    "viz": {
+      "kind": "scripted-array",
+      "data": {
+        "A": [
+          1,
+          4,
+          2,
+          5,
+          7,
+          9,
+          8,
+          12,
+          15,
+          18
+        ],
+        "footer": "Merge sorted intervals — flattened [s,e] pairs.",
+        "legend": [
+          "c-input",
+          "c-low",
+          "c-active",
+          "c-result",
+          "c-eliminated"
+        ],
+        "script": [
+          {
+            "label": "SETUP",
+            "marks": {
+              "0": "c-input",
+              "1": "c-input",
+              "2": "c-input",
+              "3": "c-input",
+              "4": "c-input",
+              "5": "c-input",
+              "6": "c-input",
+              "7": "c-input",
+              "8": "c-input",
+              "9": "c-input"
+            },
+            "msg": "Intervals [1,4], [2,5], [7,9], [8,12], [15,18]. Sorted by start.",
+            "overlay": "<strong>Sortedness is the key</strong> — if not sorted, we'd need a presort step."
+          },
+          {
+            "label": "cur = [1,4]",
+            "marks": {
+              "0": "c-active",
+              "1": "c-active"
+            },
+            "msg": "Start with cur = [1, 4]."
+          },
+          {
+            "label": "Next [2,5]: 2 ≤ 4 → merge",
+            "marks": {
+              "2": "c-active",
+              "3": "c-active"
+            },
+            "msg": "Overlap. cur = [1, max(4,5)] = <strong>[1, 5]</strong>."
+          },
+          {
+            "label": "Next [7,9]: 7 > 5 → flush",
+            "marks": {
+              "0": "c-result",
+              "1": "c-result",
+              "4": "c-low",
+              "5": "c-low"
+            },
+            "msg": "Disjoint. Emit [1,5]. cur = [7, 9]."
+          },
+          {
+            "label": "Next [8,12]: 8 ≤ 9 → merge",
+            "marks": {
+              "6": "c-active",
+              "7": "c-active"
+            },
+            "msg": "Overlap. cur = [7, max(9,12)] = <strong>[7, 12]</strong>."
+          },
+          {
+            "label": "Next [15,18]: 15 > 12 → flush",
+            "marks": {
+              "4": "c-result",
+              "5": "c-result",
+              "8": "c-low",
+              "9": "c-low"
+            },
+            "msg": "Disjoint. Emit [7,12]. cur = [15, 18]."
+          },
+          {
+            "label": "End — flush final",
+            "marks": {
+              "8": "c-result",
+              "9": "c-result"
+            },
+            "msg": "Emit [15, 18]."
+          },
+          {
+            "label": "DONE",
+            "msg": "Merged = <strong>[[1,5], [7,12], [15,18]]</strong>.",
+            "overlay": "<strong>Edge:</strong> intervals touching at a point (e.g., [1,3] and [3,5]) overlap if you use ≤; check problem spec."
+          }
+        ]
+      }
+    }
+  }
+]

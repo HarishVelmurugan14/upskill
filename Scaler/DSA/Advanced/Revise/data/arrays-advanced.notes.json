@@ -1,0 +1,126 @@
+{
+  "topic": "Arrays Advanced",
+  "summary": "Picks up where Section 0 Arrays leaves off — Kadane's algorithm for max subarray, point-update + range-query via difference arrays (Flip), the rain-water two-pointer trick, spiral matrix traversal, and search in row-and-column-sorted matrices. The pattern that keeps reappearing: pre-compute one auxiliary structure (max-so-far, suffix max, difference array) so a hard-looking nested loop collapses to O(N).",
+  "thoughtProcess": [
+    {
+      "title": "1. Kadane: 'reset or extend'.",
+      "body": "At every index ask: would adding A[i] to the running sum make things worse than starting fresh from A[i]? running = max(A[i], running + A[i]); best = max(best, running). One pass, O(N)."
+    },
+    {
+      "title": "2. Range updates + final read = difference array.",
+      "body": "If the problem flips bits / adds K over many intervals and asks the final state, mark +1 at L and -1 at R+1 in an aux array. One prefix-sum pass at the end reconstructs the result in O(N + Q)."
+    },
+    {
+      "title": "3. Rain water: water above i = min(maxLeft[i], maxRight[i]) - A[i].",
+      "body": "Precompute the two suffix/prefix maxes (or use the two-pointer trick to save space). Subtract A[i] and clamp to 0."
+    },
+    {
+      "title": "4. Sorted matrix: stair-step search.",
+      "body": "Start at top-right (or bottom-left). If current > target go left; if < target go down. O(R + C) — no binary search needed."
+    },
+    {
+      "title": "5. Spiral / submatrix sums: layer + 2D prefix.",
+      "body": "Spiral is just four bounded walks (top row, right col, bottom row, left col) in a shrinking rectangle. Submatrix sums use a 2D prefix table P[i][j] = sum of rect (0,0)→(i-1,j-1)."
+    }
+  ],
+  "commonMistakes": [
+    {
+      "title": "Kadane initialised to 0 with all-negative input",
+      "wrong": "int best = 0, run = 0;\nfor (int x : A) { run = Math.max(0, run + x); best = Math.max(best, run); }",
+      "right": "int best = A[0], run = A[0];\nfor (int i = 1; i < N; i++) { run = Math.max(A[i], run + A[i]); best = Math.max(best, run); }",
+      "why": "Resetting run to 0 when all numbers are negative returns 0 instead of the least-negative element."
+    },
+    {
+      "title": "Flip without difference array",
+      "wrong": "for each query (L, R): for (i = L; i <= R; i++) A[i] ^= 1;",
+      "right": "int[] diff = new int[N + 1];\nfor each (L, R) { diff[L]++; diff[R + 1]--; }\nint flips = 0;\nfor (int i = 0; i < N; i++) { flips += diff[i]; if (flips % 2 == 1) A[i] ^= 1; }",
+      "why": "Per-query O(R - L) becomes O(N * Q). Difference array makes total work O(N + Q)."
+    },
+    {
+      "title": "Search in sorted matrix: full binary search per row",
+      "wrong": "for each row: binarySearch(row, target);",
+      "right": "int i = 0, j = cols - 1;\nwhile (i < rows && j >= 0) {\n    if (M[i][j] == target) return true;\n    if (M[i][j] > target) j--; else i++;\n}",
+      "why": "Stair-step from top-right is O(R + C). Per-row BS is O(R log C). For square N×N the stair-step wins for any N > log N."
+    },
+    {
+      "title": "Rain water clamp forgotten",
+      "wrong": "water += Math.min(left[i], right[i]) - A[i];",
+      "right": "water += Math.max(0, Math.min(left[i], right[i]) - A[i]);",
+      "why": "At the global max, min(left, right) equals A[i], so the contribution is 0 — but if you bracket wrong you get negative water."
+    },
+    {
+      "title": "Spiral with one row / one column not handled",
+      "wrong": "while (top < bottom && left < right) { /* 4 walks */ }",
+      "right": "while (top <= bottom && left <= right) {\n    for (j = left; j <= right; j++) ...; top++;\n    for (i = top; i <= bottom; i++) ...; right--;\n    if (top <= bottom) for (j = right; j >= left; j--) ...; bottom--;\n    if (left <= right)  for (i = bottom; i >= top; i--) ...; left++;\n}",
+      "why": "Strict inequalities skip the last single-row / single-column band. Use <= and guard the bottom and left walks."
+    },
+    {
+      "title": "Submatrix sum using 4 nested loops",
+      "wrong": "for r1 for c1 for r2 for c2 for i for j sum += A[i][j];",
+      "right": "// 2-D prefix P[i+1][j+1]; submatrix sum = P[r2+1][c2+1] - P[r1][c2+1] - P[r2+1][c1] + P[r1][c1]",
+      "why": "Six nested loops is O(R^3 C^3). Prefix-table preprocessing is O(RC), each query O(1)."
+    }
+  ],
+  "keyPatterns": [
+    {
+      "name": "Kadane's Algorithm",
+      "when": "Maximum sum contiguous subarray.",
+      "template": "int best = A[0], run = A[0];\nfor (int i = 1; i < N; i++) {\n    run = Math.max(A[i], run + A[i]);\n    best = Math.max(best, run);\n}",
+      "examples": ["Max Sum Contiguous Subarray"]
+    },
+    {
+      "name": "Difference Array",
+      "when": "Many range-update queries followed by a final scan.",
+      "template": "int[] diff = new int[N + 1];\nfor (int[] q : queries) { diff[q[0]]++; diff[q[1] + 1]--; }\nint run = 0;\nfor (int i = 0; i < N; i++) { run += diff[i]; final[i] = run; }",
+      "examples": ["Flip", "Continuous Sum Query"]
+    },
+    {
+      "name": "Rain Water Trapped",
+      "when": "Trapping problems where each index's contribution depends on max of two sides.",
+      "template": "// O(N) time, O(N) space\nint[] L = new int[N], R = new int[N];\nL[0] = A[0]; for (int i = 1; i < N; i++) L[i] = Math.max(L[i-1], A[i]);\nR[N-1] = A[N-1]; for (int i = N-2; i >= 0; i--) R[i] = Math.max(R[i+1], A[i]);\nlong water = 0;\nfor (int i = 0; i < N; i++) water += Math.min(L[i], R[i]) - A[i];",
+      "examples": ["Rain Water Trapped"]
+    },
+    {
+      "name": "Stair-Step Search (sorted matrix)",
+      "when": "Matrix sorted both row-wise and column-wise.",
+      "template": "int i = 0, j = cols - 1;\nwhile (i < rows && j >= 0) {\n    if (M[i][j] == target) return found;\n    if (M[i][j] > target) j--; else i++;\n}",
+      "examples": ["Search in Row-wise and Column-wise Sorted Matrix"]
+    },
+    {
+      "name": "Spiral Order Generation",
+      "when": "Print or fill matrix in spiral order, using 4 directional walks in shrinking rectangle.",
+      "template": "int top = 0, bottom = R - 1, left = 0, right = C - 1, val = 1;\nwhile (top <= bottom && left <= right) {\n    for (int j = left; j <= right; j++) M[top][j] = val++; top++;\n    for (int i = top; i <= bottom; i++) M[i][right] = val++; right--;\n    if (top <= bottom) { for (int j = right; j >= left; j--) M[bottom][j] = val++; bottom--; }\n    if (left <= right) { for (int i = bottom; i >= top; i--) M[i][left] = val++; left++; }\n}",
+      "examples": ["Spiral Order Matrix II"]
+    },
+    {
+      "name": "2-D Prefix Sum for Submatrix Sums",
+      "when": "Compute the sum of every submatrix or many submatrix-sum queries.",
+      "template": "long[][] P = new long[R + 1][C + 1];\nfor (int i = 1; i <= R; i++)\n    for (int j = 1; j <= C; j++)\n        P[i][j] = A[i-1][j-1] + P[i-1][j] + P[i][j-1] - P[i-1][j-1];",
+      "examples": ["Sum of All Submatrices"]
+    },
+    {
+      "name": "First Missing Positive (in-place hashing)",
+      "when": "Find smallest missing positive integer in O(N) time, O(1) extra.",
+      "template": "for (int i = 0; i < N; i++) {\n    while (A[i] > 0 && A[i] <= N && A[A[i] - 1] != A[i]) {\n        int t = A[A[i] - 1]; A[A[i] - 1] = A[i]; A[i] = t;\n    }\n}\nfor (int i = 0; i < N; i++) if (A[i] != i + 1) return i + 1;\nreturn N + 1;",
+      "examples": ["First Missing Integer"]
+    },
+    {
+      "name": "Merge Overlapping Intervals",
+      "when": "Given a list of intervals, fold overlaps into one.",
+      "template": "Arrays.sort(intervals, (a, b) -> a[0] - b[0]);\nList<int[]> out = new ArrayList<>();\nfor (int[] cur : intervals) {\n    if (out.isEmpty() || out.get(out.size() - 1)[1] < cur[0]) out.add(cur);\n    else out.get(out.size() - 1)[1] = Math.max(out.get(out.size() - 1)[1], cur[1]);\n}",
+      "examples": ["Merge Sorted Overlapping Intervals - 2"]
+    }
+  ],
+  "edgeCases": [
+    "All-negative input for Kadane — return the largest (least-negative) single element.",
+    "Empty input or N=0 — early-return without dereferencing A[0].",
+    "Single-cell matrix — spiral / search / rain water must still work.",
+    "Range queries with L == R (single index).",
+    "Rain water at the global max — contribution is exactly 0, no crash.",
+    "Stair-step search target larger than every element — i walks past last row gracefully.",
+    "First missing positive when array is already 1..N — answer is N+1.",
+    "Merge intervals when input is empty or single interval — output is the same list.",
+    "Difference array index R+1 == N — allocate N+1, not N.",
+    "Spiral with R != C — bottom/left walks must be guarded by the if checks."
+  ]
+}

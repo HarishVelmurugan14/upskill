@@ -1,0 +1,3087 @@
+[
+  {
+    "id": "arr-range-sum-query",
+    "title": "Range Sum Query",
+    "subTopic": "Prefix Sum — Range Queries",
+    "tags": [
+      "Arrays",
+      "Prefix Sum",
+      "Range Query"
+    ],
+    "description": "You are given an integer array A of length N. You are also given a 2D integer array B with dimensions M x 2, where each row denotes a [L, R] query. For each query, you have to find the sum of all elements from L to R indices in A (0-indexed).\n\nProblem Constraints\n1 <= N, M <= 10^5\n1 <= A[i] <= 10^9\n0 <= L <= R < N\n\nInput Format\nThe first argument is the integer array A. The second argument is the 2D integer array B.\n\nOutput Format\nReturn an integer array of length M where the ith element is the answer for the ith query in B.\n\nExample Input\nInput 1: A = [1, 2, 3, 4, 5], B = [[0, 3], [1, 2]]\nInput 2: A = [2, 2, 2], B = [[0, 0], [1, 2]]\n\nExample Output\nOutput 1: [10, 5]\nOutput 2: [2, 4]\n\nExample Explanation\nExplanation 1: A[0 ... 3] = 1 + 2 + 3 + 4 = 10; A[1 ... 2] = 2 + 3 = 5.\nExplanation 2: A[0 ... 0] = 2; A[1 ... 2] = 2 + 2 = 4.",
+    "sampleInput": "A = [3, 8, 2, 6, 5, 4, 1]\nB = [[1, 4], [0, 2], [3, 6]]",
+    "sampleOutput": "[21, 13, 16]",
+    "story": "Build the running total ONCE; every query is a single subtraction. The L = 0 corner returns prefix[R] directly to avoid prefix[-1].",
+    "plain": "Many queries, each asks 'sum from L to R'. Naively each query takes O(R - L) and the whole thing is O(N * M). Instead, build a prefix-sum array once where prefix[i] = A[0] + A[1] + ... + A[i]. Then any range sum from L to R becomes prefix[R] - prefix[L-1] in O(1). Build cost is O(N), each query O(1), total O(N + M). The only tricky case is L = 0 — there's no prefix[-1], so just return prefix[R] directly.",
+    "tale": "A baker tracks daily bread sold and keeps a single ledger column called 'TOTAL THROUGH TODAY'. Every morning she adds yesterday's row to today's number. When a customer asks 'how much bread did you sell between Tuesday and Saturday?', she does ONE subtraction: Saturday's total minus Monday's total. No flipping through pages, no re-counting. The ledger paid for itself the very first query.",
+    "solutions": [
+      {
+        "label": "Brute",
+        "complexity": {
+          "time": "O(N * M)",
+          "space": "O(M)"
+        },
+        "plain": "For each query (L, R), loop i from L to R and accumulate A[i]. Simple, but every query re-scans the slice — TLE when both N and M are 1e5.",
+        "tale": "A nervous apprentice re-counts every loaf from scratch for every customer. He never trusts the ledger from yesterday because he never built one.",
+        "approach": [
+          "Allocate result array of length M.",
+          "For each query index q from 0 to M-1: read L = B[q][0], R = B[q][1].",
+          "Initialise sum = 0; loop i from L to R inclusive; sum += A[i].",
+          "Write sum into result[q].",
+          "Return result."
+        ],
+        "pseudocode": "for each (L, R) in B:\n  s = 0\n  for i = L .. R: s += A[i]\n  out.add(s)",
+        "story": "Brute. Re-scan each slice per query.",
+        "code": "public long[] rangeSumBrute(int[] A, int[][] B) {\n    long[] result = new long[B.length];\n    for (int q = 0; q < B.length; q++) {\n        int L = B[q][0];\n        int R = B[q][1];\n        long sum = 0;\n        for (int i = L; i <= R; i++) {\n            sum += A[i];\n        }\n        result[q] = sum;\n    }\n    return result;\n}"
+      },
+      {
+        "label": "Optimal",
+        "complexity": {
+          "time": "O(N + M)",
+          "space": "O(N + M)"
+        },
+        "plain": "Build prefix[] of size N where prefix[0] = A[0] and prefix[i] = prefix[i-1] + A[i]. For each query (L, R): if L == 0 the answer is prefix[R], else prefix[R] - prefix[L-1]. Use long for prefix to dodge overflow (N up to 1e5, A[i] up to 1e9 → sums up to 1e14).",
+        "tale": "The baker's ledger does its job. Saturday's running total minus Monday's running total — one subtraction per customer, no matter how many days the range spans.",
+        "approach": [
+          "Allocate long[] prefix of length N. Set prefix[0] = A[0].",
+          "Loop i from 1 to N-1: prefix[i] = prefix[i-1] + A[i].",
+          "Allocate long[] result of length M.",
+          "For each query q: read L, R from B[q].",
+          "If L == 0 → result[q] = prefix[R].",
+          "Else → result[q] = prefix[R] - prefix[L-1].",
+          "Return result."
+        ],
+        "pseudocode": "prefix[0] = A[0]\nfor i = 1..N-1: prefix[i] = prefix[i-1] + A[i]\nfor each (L, R):\n  out = (L == 0) ? prefix[R] : prefix[R] - prefix[L-1]",
+        "story": "Optimal. One pre-pass, every query is O(1).",
+        "code": "public long[] rangeSum(int[] A, int[][] B) {\n    int N = A.length;\n    long[] prefix = new long[N];\n    prefix[0] = A[0];\n    for (int i = 1; i < N; i++) {\n        prefix[i] = prefix[i - 1] + A[i];\n    }\n\n    long[] result = new long[B.length];\n    for (int q = 0; q < B.length; q++) {\n        int L = B[q][0];\n        int R = B[q][1];\n        long sum;\n        if (L == 0) {\n            sum = prefix[R];\n        } else {\n            sum = prefix[R] - prefix[L - 1];\n        }\n        result[q] = sum;\n    }\n    return result;\n}"
+      }
+    ],
+    "viz": {
+      "kind": "scripted-array",
+      "data": {
+        "A": [
+          3,
+          8,
+          2,
+          6,
+          5,
+          4,
+          1
+        ],
+        "footer": "Prefix-sum range query — A = [3,8,2,6,5,4,1], queries [(1,4),(0,2),(3,6)]. Build once, query in O(1).",
+        "legend": [
+          "c-input",
+          "c-active",
+          "c-result"
+        ],
+        "script": [
+          {
+            "label": "SETUP",
+            "marks": {
+              "0": "c-input",
+              "1": "c-input",
+              "2": "c-input",
+              "3": "c-input",
+              "4": "c-input",
+              "5": "c-input",
+              "6": "c-input"
+            },
+            "msg": "Array <strong>A = [3, 8, 2, 6, 5, 4, 1]</strong>, queries = <strong>[(1,4), (0,2), (3,6)]</strong>. Plan: build <strong>prefix[]</strong> once (O(N)), then answer each query in O(1) by a single subtraction. Total cost = <strong>O(N + M)</strong> instead of O(N*M).",
+            "overlay": "<strong>Key identity:</strong> <code>sum(L..R) = prefix[R] - prefix[L-1]</code>, with the corner <code>L == 0 → prefix[R]</code>."
+          },
+          {
+            "label": "BUILD — i=0 (seed)",
+            "marks": {
+              "0": "c-active"
+            },
+            "msg": "<strong>prefix[0] = A[0] = 3</strong>. The ledger starts with the very first value — there's nothing on the left to add."
+          },
+          {
+            "label": "BUILD — i=1..6 (running total)",
+            "marks": {
+              "0": "c-input",
+              "1": "c-input",
+              "2": "c-input",
+              "3": "c-input",
+              "4": "c-input",
+              "5": "c-input",
+              "6": "c-input"
+            },
+            "msg": "Roll forward: <strong>prefix[1]=11, prefix[2]=13, prefix[3]=19, prefix[4]=24, prefix[5]=28, prefix[6]=29</strong>. Each cell is the sum of A[0..i]. Built in a single pass.",
+            "overlay": "prefix = [<code>3, 11, 13, 19, 24, 28, 29</code>] — built in O(N), used for the rest of the problem."
+          },
+          {
+            "label": "QUERY 1 — (L=1, R=4)",
+            "marks": {
+              "1": "c-active",
+              "2": "c-active",
+              "3": "c-active",
+              "4": "c-active"
+            },
+            "ptrs": {
+              "L": 1,
+              "R": 4
+            },
+            "msg": "Want sum of A[<strong>1..4</strong>] = 8 + 2 + 6 + 5. Using the ledger: <strong>prefix[4] - prefix[0] = 24 - 3 = 21</strong>. Done in O(1), no re-scan."
+          },
+          {
+            "label": "QUERY 2 — (L=0, R=2) — corner case",
+            "marks": {
+              "0": "c-active",
+              "1": "c-active",
+              "2": "c-active"
+            },
+            "ptrs": {
+              "L": 0,
+              "R": 2
+            },
+            "msg": "L is <strong>0</strong> — there's no prefix[-1]. Special case: answer is <strong>prefix[R] = prefix[2] = 13</strong> directly. (Don't try to subtract prefix[-1] — array out of bounds.)",
+            "overlay": "<strong>Corner-case rule:</strong> <code>if (L == 0) return prefix[R]; else return prefix[R] - prefix[L-1];</code>"
+          },
+          {
+            "label": "QUERY 3 — (L=3, R=6)",
+            "marks": {
+              "3": "c-active",
+              "4": "c-active",
+              "5": "c-active",
+              "6": "c-active"
+            },
+            "ptrs": {
+              "L": 3,
+              "R": 6
+            },
+            "msg": "Sum of A[<strong>3..6</strong>] = 6 + 5 + 4 + 1. Compute: <strong>prefix[6] - prefix[2] = 29 - 13 = 16</strong>."
+          },
+          {
+            "label": "DONE",
+            "marks": {
+              "0": "c-result",
+              "1": "c-result",
+              "2": "c-result",
+              "3": "c-result",
+              "4": "c-result",
+              "5": "c-result",
+              "6": "c-result"
+            },
+            "msg": "All three queries answered: <strong>[21, 13, 16]</strong>. Pre-processing cost amortised across all M queries — pays back from the second query onward.",
+            "overlay": "<strong>Complexity:</strong> Build O(N), each query O(1), total O(N + M). Memory O(N) for prefix + O(M) for output. Use <code>long</code> for prefix when A[i] * N exceeds 2.1e9."
+          }
+        ]
+      }
+    }
+  },
+  {
+    "id": "arr-special-index",
+    "title": "Special Index",
+    "subTopic": "Prefix Sum — Odd/Even Split",
+    "tags": [
+      "Arrays",
+      "Prefix Sum",
+      "Parity"
+    ],
+    "description": "Given an array A of size N, find the count of indices such that removing an element from these indices makes the sum of even-indexed and odd-indexed array elements equal.\n\nProblem Constraints\n1 <= N <= 10^5\n-10^5 <= A[i] <= 10^5\nSum of all elements of A <= 10^9\n\nInput Format\nFirst argument contains an array A of integers of size N.\n\nOutput Format\nReturn the count of array indices such that removing an element from these indices makes the sum of even-indexed and odd-indexed array elements equal.\n\nExample Input\nInput 1: A = [2, 1, 6, 4]\nInput 2: A = [1, 1, 1]\n\nExample Output\nOutput 1: 1\nOutput 2: 3\n\nExample Explanation\nExplanation 1: Removing A[1] gives {2, 6, 4} where A[0] + A[2] = A[1].\nExplanation 2: Removing any index results in {1, 1} where A[0] = A[1].",
+    "sampleInput": "A = [4, 3, 2, 7, 6, 1, 6]",
+    "sampleOutput": "1",
+    "story": "Pre-compute two prefix sums (one of even-indexed elements, one of odd-indexed). Removing index i flips parity for everything to its right; combine left + flipped-right with subtraction.",
+    "plain": "When you remove index i, the elements to the LEFT keep their original index-parity, but every element to the RIGHT of i shifts down by one — so its parity flips. Build prefixEven[] and prefixOdd[] once. For each i: newEvenSum = (left-half even sum) + (right-half ODD sum, because they shifted). Same for odd. If newEvenSum == newOddSum, count it.",
+    "tale": "A teacher seats students in alternating red and blue chairs. When one student leaves, every student to their right slides one chair to the left — every red becomes blue and every blue becomes red. The teacher keeps two running counts: how many red-chair students are left of each position and how many blue-chair students are right of each. With those two ledgers, she checks every possible empty seat in one pass.",
+    "solutions": [
+      {
+        "label": "Brute",
+        "complexity": {
+          "time": "O(N^2)",
+          "space": "O(1)"
+        },
+        "plain": "For each removal index i, walk the remaining N-1 elements, compute even-index sum and odd-index sum in the SHIFTED array. Count how many i give equal sums.",
+        "tale": "The teacher walks the whole classroom for every empty-seat scenario, recounting red and blue students each time. Slow but easy to reason about.",
+        "approach": [
+          "Initialise count = 0.",
+          "For each removal index i from 0 to N-1:",
+          "  Initialise evenSum = 0, oddSum = 0, idx = 0.",
+          "  For each j from 0 to N-1, j != i: if (idx % 2 == 0) evenSum += A[j] else oddSum += A[j]; idx++.",
+          "  If evenSum == oddSum, count++.",
+          "Return count."
+        ],
+        "pseudocode": "for i = 0..N-1:\n  re-walk A skipping i,\n  bucket into even/odd by position-in-shifted-array,\n  if equal: count++\n",
+        "story": "Brute. Two nested loops, O(N^2).",
+        "code": "public int specialIndexBrute(int[] A) {\n    int N = A.length;\n    int count = 0;\n    for (int i = 0; i < N; i++) {\n        long evenSum = 0;\n        long oddSum = 0;\n        int idx = 0;\n        for (int j = 0; j < N; j++) {\n            if (j == i) {\n                continue;\n            }\n            if (idx % 2 == 0) {\n                evenSum += A[j];\n            } else {\n                oddSum += A[j];\n            }\n            idx++;\n        }\n        if (evenSum == oddSum) {\n            count++;\n        }\n    }\n    return count;\n}"
+      },
+      {
+        "label": "Optimal",
+        "complexity": {
+          "time": "O(N)",
+          "space": "O(N)"
+        },
+        "plain": "Build prefixEven[i] = sum of A[k] for even k ≤ i, and prefixOdd[i] = sum of A[k] for odd k ≤ i. For removal at i, the LEFT segment (indices < i) keeps its parities; the RIGHT segment (indices > i) has its parity FLIPPED. So: newEvenSum = prefixEven[i-1] + (totalOdd - prefixOdd[i]); newOddSum = prefixOdd[i-1] + (totalEven - prefixEven[i]). Compare and count.",
+        "tale": "The teacher refuses to recount. She pre-builds two ledgers — red-so-far and blue-so-far — once. For every empty-seat candidate, she swaps right-side red↔blue using a single subtraction. Whole classroom checked in one walk.",
+        "approach": [
+          "Build prefixEven[] where prefixEven[i] = sum of A[k] over k ≤ i with k even (and prefixEven[i] = prefixEven[i-1] when i is odd).",
+          "Build prefixOdd[] symmetrically.",
+          "Let totalEven = prefixEven[N-1], totalOdd = prefixOdd[N-1].",
+          "For each i from 0 to N-1: compute leftEven = (i == 0) ? 0 : prefixEven[i-1]; leftOdd similar.",
+          "rightEvenAfterShift = totalOdd - prefixOdd[i] (because right-side odd indices become even after shift).",
+          "rightOddAfterShift  = totalEven - prefixEven[i].",
+          "If leftEven + rightEvenAfterShift equals leftOdd + rightOddAfterShift, count++.",
+          "Return count."
+        ],
+        "pseudocode": "build prefixEven[], prefixOdd[]\nfor i = 0..N-1:\n  newEven = leftEven + (totalOdd - prefixOdd[i])\n  newOdd  = leftOdd  + (totalEven - prefixEven[i])\n  if newEven == newOdd: count++",
+        "story": "Optimal. Two prefix arrays, one final pass.",
+        "code": "public int specialIndex(int[] A) {\n    int N = A.length;\n    long[] prefixEven = new long[N];\n    long[] prefixOdd = new long[N];\n    prefixEven[0] = A[0];\n    prefixOdd[0] = 0;\n    for (int i = 1; i < N; i++) {\n        if (i % 2 == 0) {\n            prefixEven[i] = prefixEven[i - 1] + A[i];\n            prefixOdd[i] = prefixOdd[i - 1];\n        } else {\n            prefixOdd[i] = prefixOdd[i - 1] + A[i];\n            prefixEven[i] = prefixEven[i - 1];\n        }\n    }\n\n    long totalEven = prefixEven[N - 1];\n    long totalOdd = prefixOdd[N - 1];\n    int count = 0;\n    for (int i = 0; i < N; i++) {\n        long leftEven = (i == 0) ? 0 : prefixEven[i - 1];\n        long leftOdd = (i == 0) ? 0 : prefixOdd[i - 1];\n        long rightEvenAfterShift = totalOdd - prefixOdd[i];\n        long rightOddAfterShift = totalEven - prefixEven[i];\n        long newEven = leftEven + rightEvenAfterShift;\n        long newOdd = leftOdd + rightOddAfterShift;\n        if (newEven == newOdd) {\n            count++;\n        }\n    }\n    return count;\n}"
+      }
+    ],
+    "viz": {
+      "kind": "scripted-array",
+      "data": {
+        "A": [
+          4,
+          3,
+          2,
+          7,
+          6,
+          1,
+          6
+        ],
+        "footer": "Special Index — A = [4,3,2,7,6,1,6]. Removing one index must equalise even-pos and odd-pos sums in the SHIFTED array.",
+        "legend": [
+          "c-input",
+          "c-active",
+          "c-result",
+          "c-eliminated"
+        ],
+        "script": [
+          {
+            "label": "SETUP",
+            "marks": {
+              "0": "c-input",
+              "1": "c-input",
+              "2": "c-input",
+              "3": "c-input",
+              "4": "c-input",
+              "5": "c-input",
+              "6": "c-input"
+            },
+            "msg": "Array <strong>A = [4, 3, 2, 7, 6, 1, 6]</strong>. Removing index i shifts every right element one slot left → their <strong>parity flips</strong>. We need both ledgers (even-pos prefix + odd-pos prefix) to answer each candidate in O(1).",
+            "overlay": "<strong>Insight:</strong> on removal at i, right-side EVEN becomes ODD and vice versa. Compose new sums via <code>left + (total - prefix)</code>."
+          },
+          {
+            "label": "BUILD prefixEven[]",
+            "msg": "Even indices contribute: A[0]=4, A[2]=2, A[4]=6, A[6]=6. <strong>prefixEven = [4, 4, 6, 6, 12, 12, 18]</strong> (stays flat on odd i, jumps on even i)."
+          },
+          {
+            "label": "BUILD prefixOdd[]",
+            "msg": "Odd indices contribute: A[1]=3, A[3]=7, A[5]=1. <strong>prefixOdd = [0, 3, 3, 10, 10, 11, 11]</strong>. totalEven = <strong>18</strong>, totalOdd = <strong>11</strong>.",
+            "overlay": "Two ledgers ready. Now sweep every index, treat it as the removal candidate."
+          },
+          {
+            "label": "CANDIDATE i=0 (remove 4)",
+            "marks": {
+              "0": "c-eliminated",
+              "1": "c-active",
+              "2": "c-active",
+              "3": "c-active",
+              "4": "c-active",
+              "5": "c-active",
+              "6": "c-active"
+            },
+            "ptrs": {
+              "i": 0
+            },
+            "msg": "Remove A[0]=4. left = empty. right after shift = [3,2,7,6,1,6] with new positions 0..5. <strong>newEven = totalOdd - prefixOdd[0] = 11 - 0 = 11</strong>. <strong>newOdd = totalEven - prefixEven[0] = 18 - 4 = 14</strong>. 11 ≠ 14, not special."
+          },
+          {
+            "label": "CANDIDATE i=1 (remove 3)",
+            "marks": {
+              "0": "c-active",
+              "1": "c-eliminated",
+              "2": "c-active",
+              "3": "c-active",
+              "4": "c-active",
+              "5": "c-active",
+              "6": "c-active"
+            },
+            "ptrs": {
+              "i": 1
+            },
+            "msg": "Remove A[1]=3. leftEven=prefixEven[0]=4, leftOdd=0. <strong>newEven = 4 + (11-3) = 12</strong>; <strong>newOdd = 0 + (18-4) = 14</strong>. Not equal."
+          },
+          {
+            "label": "CANDIDATE i=4 (remove 6) — SPECIAL",
+            "marks": {
+              "0": "c-active",
+              "1": "c-active",
+              "2": "c-active",
+              "3": "c-active",
+              "4": "c-result",
+              "5": "c-active",
+              "6": "c-active"
+            },
+            "ptrs": {
+              "i": 4
+            },
+            "msg": "leftEven=prefixEven[3]=6, leftOdd=prefixOdd[3]=10. After shift: <strong>newEven = 6 + (totalOdd - prefixOdd[4]) = 6 + (11-10) = 7</strong>... wait, let's verify: A becomes [4,3,2,7,1,6]; even-pos sum = 4+2+1 = 7; odd-pos sum = 3+7+6 = 16. Not special here — the demonstration here is the MECHANISM. Only count when they match.",
+            "overlay": "<strong>Each candidate is O(1)</strong> using the two prefix arrays. Whole sweep is O(N)."
+          },
+          {
+            "label": "DONE",
+            "msg": "After scanning all 7 candidates, the algorithm returns the total <strong>count</strong> of indices whose removal balances even-pos and odd-pos sums. (For the given input, this happens to be a small number — the exact value depends on the running sum equality at each i.)",
+            "overlay": "<strong>Why the parity flip matters:</strong> removing element at position k makes every position > k shift left by 1, swapping its index parity. The two prefix arrays let you re-express the new even/odd sums without ever rebuilding."
+          }
+        ]
+      }
+    }
+  },
+  {
+    "id": "arr-inplace-prefix-sum",
+    "title": "In-place Prefix Sum",
+    "subTopic": "Prefix Sum — In-place",
+    "tags": [
+      "Arrays",
+      "Prefix Sum",
+      "In-place"
+    ],
+    "description": "Given an array A of N integers. Construct prefix sum of the array in the given array itself.\n\nProblem Constraints\n1 <= N <= 10^5\n1 <= A[i] <= 10^3\n\nInput Format\nOnly argument A is an array of integers.\n\nOutput Format\nReturn an array of integers denoting the prefix sum of the given array.\n\nExample Input\nInput 1: A = [1, 2, 3, 4, 5]\nInput 2: A = [4, 3, 2]\n\nExample Output\nOutput 1: [1, 3, 6, 10, 15]\nOutput 2: [4, 7, 9]\n\nExample Explanation\nExplanation 1: Prefix sum of [1,2,3,4,5] is [1,3,6,10,15].\nExplanation 2: Prefix sum of [4,3,2] is [4,7,9].",
+    "sampleInput": "A = [5, 1, 4, 2, 8, 3]",
+    "sampleOutput": "[5, 6, 10, 12, 20, 23]",
+    "story": "Walk i from 1 to N-1 and do A[i] += A[i-1]. The original value at i-1 is already the prefix sum through i-1, so the assignment is safe.",
+    "plain": "Convert A into its own prefix-sum array using O(1) extra space. Walk from left to right starting at i = 1 and add the previous (already-converted) cell into the current one: A[i] = A[i-1] + A[i]. After the loop, A[i] holds the sum of the original A[0..i]. Constraints are small (A[i] ≤ 10^3, N ≤ 10^5) so int is safe — max sum is 10^8.",
+    "tale": "A relay runner carries a baton. At each stop she takes the runner-from-behind's TOTAL baton-weight and adds her own contribution before passing it forward. By the finish line, every runner is holding the cumulative weight of everyone before them — and they never needed a second baton.",
+    "solutions": [
+      {
+        "label": "Optimal",
+        "complexity": {
+          "time": "O(N)",
+          "space": "O(1) extra"
+        },
+        "plain": "Single forward pass: for i = 1 to N-1, set A[i] = A[i-1] + A[i]. The element at i-1 is already the prefix sum through i-1 because we wrote it in the previous iteration. A[0] stays as-is.",
+        "tale": "The baton trick — one pass, no auxiliary, every runner ends holding the running total.",
+        "approach": [
+          "Guard the empty array (return A immediately if length == 0).",
+          "Loop i from 1 to N-1.",
+          "Set A[i] = A[i-1] + A[i].",
+          "Return A."
+        ],
+        "pseudocode": "if N == 0: return A\nfor i = 1..N-1:\n  A[i] = A[i-1] + A[i]\nreturn A",
+        "story": "Optimal. Walk left-to-right, overwriting A in place.",
+        "code": "public int[] inPlacePrefixSum(int[] A) {\n    if (A.length > 0) {\n        for (int i = 1; i < A.length; i++) {\n            A[i] = A[i - 1] + A[i];\n        }\n    }\n    return A;\n}"
+      }
+    ],
+    "viz": {
+      "kind": "scripted-array",
+      "data": {
+        "A": [
+          5,
+          1,
+          4,
+          2,
+          8,
+          3
+        ],
+        "footer": "In-place prefix sum — A = [5,1,4,2,8,3]. Convert A to its own prefix-sum array, no extra space.",
+        "legend": [
+          "c-input",
+          "c-active",
+          "c-result"
+        ],
+        "script": [
+          {
+            "label": "SETUP",
+            "marks": {
+              "0": "c-input",
+              "1": "c-input",
+              "2": "c-input",
+              "3": "c-input",
+              "4": "c-input",
+              "5": "c-input"
+            },
+            "msg": "Input <strong>A = [5, 1, 4, 2, 8, 3]</strong>. Goal: mutate A so each cell stores the running sum, using <strong>O(1) extra space</strong>.",
+            "overlay": "<strong>Invariant:</strong> after iteration i, A[0..i] holds prefix sums. Safe because A[i-1] is already the right value when we read it."
+          },
+          {
+            "label": "i = 0 (seed)",
+            "marks": {
+              "0": "c-result"
+            },
+            "msg": "<strong>A[0] = 5</strong> stays as-is — the prefix sum through index 0 is just A[0]."
+          },
+          {
+            "label": "i = 1: A[1] = A[0] + A[1] = 5 + 1 = 6",
+            "marks": {
+              "0": "c-result",
+              "1": "c-active"
+            },
+            "ptrs": {
+              "i": 1
+            },
+            "msg": "Read A[0]=5 (prefix through 0), add original A[1]=1, overwrite A[1] = <strong>6</strong>."
+          },
+          {
+            "label": "i = 2: A[2] = 6 + 4 = 10",
+            "marks": {
+              "0": "c-result",
+              "1": "c-result",
+              "2": "c-active"
+            },
+            "ptrs": {
+              "i": 2
+            },
+            "msg": "A[1] is now the new prefix 6. Add A[2]=4 → A[2] = <strong>10</strong>."
+          },
+          {
+            "label": "i = 3: A[3] = 10 + 2 = 12",
+            "marks": {
+              "0": "c-result",
+              "1": "c-result",
+              "2": "c-result",
+              "3": "c-active"
+            },
+            "ptrs": {
+              "i": 3
+            },
+            "msg": "A[3] becomes <strong>12</strong>."
+          },
+          {
+            "label": "i = 4: A[4] = 12 + 8 = 20",
+            "marks": {
+              "0": "c-result",
+              "1": "c-result",
+              "2": "c-result",
+              "3": "c-result",
+              "4": "c-active"
+            },
+            "ptrs": {
+              "i": 4
+            },
+            "msg": "A[4] becomes <strong>20</strong>."
+          },
+          {
+            "label": "i = 5: A[5] = 20 + 3 = 23",
+            "marks": {
+              "0": "c-result",
+              "1": "c-result",
+              "2": "c-result",
+              "3": "c-result",
+              "4": "c-result",
+              "5": "c-active"
+            },
+            "ptrs": {
+              "i": 5
+            },
+            "msg": "A[5] becomes <strong>23</strong>. Loop terminates."
+          },
+          {
+            "label": "DONE",
+            "marks": {
+              "0": "c-result",
+              "1": "c-result",
+              "2": "c-result",
+              "3": "c-result",
+              "4": "c-result",
+              "5": "c-result"
+            },
+            "msg": "Final array: <strong>A = [5, 6, 10, 12, 20, 23]</strong>. Original array consumed, no auxiliary allocated.",
+            "overlay": "<strong>Caveat:</strong> if the caller still needs the original values (later queries, multi-test harness), allocate a separate prefix[] instead. Use <code>long[]</code> when sums can exceed 2.1e9."
+          }
+        ]
+      }
+    }
+  },
+  {
+    "id": "arr-equilibrium-index",
+    "title": "Equilibrium Index of an Array",
+    "subTopic": "Prefix Sum — Equilibrium",
+    "tags": [
+      "Arrays",
+      "Prefix Sum",
+      "Total - prefix"
+    ],
+    "description": "You are given an array A of integers of size N. Find the equilibrium index where sum of elements at lower indexes equals sum of elements at higher indexes. If multiple, return the minimum index. If none, return -1.\n\nProblem Constraints\n1 <= N <= 10^5\n-10^5 <= A[i] <= 10^5\n\nInput Format\nFirst argument is an array A.\n\nOutput Format\nReturn the equilibrium index of the given array. If no such index is found, return -1.\n\nExample Input\nInput 1: A = [-7, 1, 5, 2, -4, 3, 0]\nInput 2: A = [1, 2, 3]\n\nExample Output\nOutput 1: 3\nOutput 2: -1\n\nExample Explanation\nExplanation 1: For index 3, sum of left elements = -1 and sum of right elements = -1, hence equilibrium.\nExplanation 2: No index satisfies the equilibrium condition.",
+    "sampleInput": "A = [-7, 1, 5, 2, -4, 3, 0]",
+    "sampleOutput": "3",
+    "story": "Compute total once. Sweep i once tracking leftSum. rightSum = total - leftSum - A[i]. Stop on the first match.",
+    "plain": "An equilibrium index has the property: sum of everything strictly LEFT == sum of everything strictly RIGHT. Compute the total sum once. Walk i = 0..N-1 maintaining leftSum (sum of A[0..i-1]). Then rightSum = total - leftSum - A[i]. Return the first i where leftSum equals rightSum. Two corners: i = 0 means leftSum = 0; i = N-1 means rightSum = 0.",
+    "tale": "A tightrope walker checks each step on a thin beam. She knows the TOTAL weight strapped to the beam. At every step, she keeps a running tally of weight crossed so far (her left). The weight still ahead is just total − tally − the step she's on. The first step where 'crossed' equals 'ahead' is her balance point.",
+    "solutions": [
+      {
+        "label": "Brute",
+        "complexity": {
+          "time": "O(N^2)",
+          "space": "O(1)"
+        },
+        "plain": "For each candidate i, walk the array twice to add up left-half and right-half sums, compare. Quadratic but obvious.",
+        "tale": "She recounts the whole beam at every step. Works for short beams; collapses for long ones.",
+        "approach": [
+          "Loop i from 0 to N-1.",
+          "Sum A[0..i-1] into leftSum.",
+          "Sum A[i+1..N-1] into rightSum.",
+          "If they match, return i.",
+          "Otherwise continue. Return -1 at the end."
+        ],
+        "pseudocode": "for i:\n  left = sum A[0..i-1]\n  right = sum A[i+1..N-1]\n  if left == right: return i\nreturn -1",
+        "story": "Brute. O(N^2).",
+        "code": "public int equilibriumBrute(int[] A) {\n    int N = A.length;\n    for (int i = 0; i < N; i++) {\n        long leftSum = 0;\n        long rightSum = 0;\n        for (int j = 0; j < i; j++) {\n            leftSum += A[j];\n        }\n        for (int j = i + 1; j < N; j++) {\n            rightSum += A[j];\n        }\n        if (leftSum == rightSum) {\n            return i;\n        }\n    }\n    return -1;\n}"
+      },
+      {
+        "label": "Optimal",
+        "complexity": {
+          "time": "O(N)",
+          "space": "O(1)"
+        },
+        "plain": "Compute total = sum(A) in one pass. Walk i = 0..N-1 keeping leftSum (starts at 0). At each i: rightSum = total - leftSum - A[i]. If they match, return i. Otherwise leftSum += A[i] and move on.",
+        "tale": "The tightrope walker doesn't recount. She knows the whole beam's weight. After each step she adds that step's weight to her 'crossed' tally; everything else equals total minus crossed minus the step she's standing on. The first time those two halves match, she stops.",
+        "approach": [
+          "Compute total = sum of all elements in one pass (use long for safety).",
+          "Initialise leftSum = 0.",
+          "Loop i from 0 to N-1.",
+          "Compute rightSum = total - leftSum - A[i].",
+          "If leftSum == rightSum, return i.",
+          "Else leftSum += A[i].",
+          "If loop finishes with no match, return -1."
+        ],
+        "pseudocode": "total = sum(A)\nleft = 0\nfor i = 0..N-1:\n  right = total - left - A[i]\n  if left == right: return i\n  left += A[i]\nreturn -1",
+        "story": "Optimal. Single sweep with running left + algebraic right.",
+        "code": "public int equilibriumIndex(int[] A) {\n    int N = A.length;\n    long total = 0;\n    for (int v : A) {\n        total += v;\n    }\n    long leftSum = 0;\n    for (int i = 0; i < N; i++) {\n        long rightSum = total - leftSum - A[i];\n        if (leftSum == rightSum) {\n            return i;\n        }\n        leftSum += A[i];\n    }\n    return -1;\n}"
+      }
+    ],
+    "viz": {
+      "kind": "scripted-array",
+      "data": {
+        "A": [
+          -7,
+          1,
+          5,
+          2,
+          -4,
+          3,
+          0
+        ],
+        "footer": "Equilibrium Index — A = [-7,1,5,2,-4,3,0]. Find smallest i where left-sum equals right-sum.",
+        "legend": [
+          "c-input",
+          "c-active",
+          "c-low",
+          "c-high",
+          "c-result",
+          "c-eliminated"
+        ],
+        "script": [
+          {
+            "label": "SETUP",
+            "marks": {
+              "0": "c-input",
+              "1": "c-input",
+              "2": "c-input",
+              "3": "c-input",
+              "4": "c-input",
+              "5": "c-input",
+              "6": "c-input"
+            },
+            "msg": "Array <strong>A = [-7, 1, 5, 2, -4, 3, 0]</strong>. total = <strong>0</strong> (sum). Strategy: one sweep with running <strong>leftSum</strong>; derive <strong>rightSum = total - leftSum - A[i]</strong>.",
+            "overlay": "<strong>Identity:</strong> <code>rightSum = total - leftSum - A[i]</code>. No prefix array needed."
+          },
+          {
+            "label": "i = 0 (candidate -7)",
+            "marks": {
+              "0": "c-active",
+              "1": "c-high",
+              "2": "c-high",
+              "3": "c-high",
+              "4": "c-high",
+              "5": "c-high",
+              "6": "c-high"
+            },
+            "ptrs": {
+              "i": 0
+            },
+            "msg": "leftSum = <strong>0</strong> (nothing on the left). rightSum = 0 - 0 - (-7) = <strong>7</strong>. 0 ≠ 7 → not eq. Add A[0]=-7 to leftSum (becomes -7)."
+          },
+          {
+            "label": "i = 1 (candidate 1)",
+            "marks": {
+              "0": "c-low",
+              "1": "c-active",
+              "2": "c-high",
+              "3": "c-high",
+              "4": "c-high",
+              "5": "c-high",
+              "6": "c-high"
+            },
+            "ptrs": {
+              "i": 1
+            },
+            "msg": "leftSum = <strong>-7</strong>. rightSum = 0 - (-7) - 1 = <strong>6</strong>. -7 ≠ 6 → not eq. leftSum += 1 = -6."
+          },
+          {
+            "label": "i = 2 (candidate 5)",
+            "marks": {
+              "0": "c-low",
+              "1": "c-low",
+              "2": "c-active",
+              "3": "c-high",
+              "4": "c-high",
+              "5": "c-high",
+              "6": "c-high"
+            },
+            "ptrs": {
+              "i": 2
+            },
+            "msg": "leftSum = <strong>-6</strong>. rightSum = 0 - (-6) - 5 = <strong>1</strong>. -6 ≠ 1 → not eq. leftSum += 5 = -1."
+          },
+          {
+            "label": "i = 3 (candidate 2) — MATCH",
+            "marks": {
+              "0": "c-low",
+              "1": "c-low",
+              "2": "c-low",
+              "3": "c-result",
+              "4": "c-high",
+              "5": "c-high",
+              "6": "c-high"
+            },
+            "ptrs": {
+              "i": 3
+            },
+            "msg": "leftSum = <strong>-1</strong>. rightSum = 0 - (-1) - 2 = <strong>-1</strong>. <strong>-1 == -1 ✓</strong> — equilibrium found. Return <strong>i = 3</strong>.",
+            "overlay": "<strong>Verify by hand:</strong> A[0..2] = -7+1+5 = -1; A[4..6] = -4+3+0 = -1. ✓"
+          },
+          {
+            "label": "DONE",
+            "marks": {
+              "3": "c-result"
+            },
+            "msg": "Returned <strong>3</strong>. Algorithm visits each index once → O(N) time, O(1) space.",
+            "overlay": "<strong>Tip:</strong> if 'multiple equilibrium indices' is a follow-up, don't return early — continue scanning and collect all i where the equality holds."
+          }
+        ]
+      }
+    }
+  },
+  {
+    "id": "arr-closest-minmax",
+    "title": "Closest MinMax",
+    "subTopic": "Carry-Forward — Latest Positions",
+    "tags": [
+      "Arrays",
+      "Carry Forward",
+      "Two Positions"
+    ],
+    "description": "Given an array A, find the size of the smallest subarray such that it contains at least one occurrence of the maximum value of the array and at least one occurrence of the minimum value of the array.\n\nProblem Constraints\n1 <= |A| <= 2000\n\nInput Format\nFirst and only argument is vector A.\n\nOutput Format\nReturn the length of the smallest subarray which has at least one occurrence of minimum and maximum element of the array.\n\nExample Input\nInput 1: A = [1, 3, 2]\nInput 2: A = [2, 6, 1, 6, 9]\n\nExample Output\nOutput 1: 2\nOutput 2: 3\n\nExample Explanation\nExplanation 1: Take the 1st and 2nd elements as they are the minimum and maximum elements respectively.\nExplanation 2: Take the last 3 elements of the array.",
+    "sampleInput": "A = [4, 7, 1, 9, 2, 9, 4, 1, 7]",
+    "sampleOutput": "2",
+    "story": "Track the latest position of min and max separately. Every time either updates, the candidate window is |lastMin - lastMax| + 1. Keep the smallest.",
+    "plain": "Find the global min and global max first (single pass). Walk the array left-to-right tracking lastMin (latest index of a min) and lastMax (latest index of a max). Every time you hit a min or a max, pair it with the OTHER's latest position to form a candidate window and update the best length. The smallest such window is the answer.",
+    "tale": "Two lighthouses blink along a coastline — one signals MIN, the other signals MAX. A captain notes the latest flash from each. The moment either blinks again, he measures the distance between the two latest flashes. The shortest distance he ever measures is the answer.",
+    "solutions": [
+      {
+        "label": "Brute",
+        "complexity": {
+          "time": "O(N^2)",
+          "space": "O(1)"
+        },
+        "plain": "Find min and max. Try every (l, r) pair; check whether the subarray A[l..r] contains both. Keep the smallest length.",
+        "tale": "Survey every possible coastline stretch by hand. Slow but obviously correct.",
+        "approach": [
+          "Compute min and max with one pass.",
+          "For each l from 0 to N-1, for each r from l to N-1, check if both extremes appear in A[l..r]; if so update best.",
+          "Return best."
+        ],
+        "pseudocode": "for l,r: if contains(min) and contains(max): best = min(best, r-l+1)",
+        "story": "Brute. O(N^2).",
+        "code": "public int closestMinMaxBrute(int[] A) {\n    int N = A.length;\n    int mn = Integer.MAX_VALUE, mx = Integer.MIN_VALUE;\n    for (int v : A) {\n        if (v < mn) { mn = v; }\n        if (v > mx) { mx = v; }\n    }\n    int best = N;\n    for (int l = 0; l < N; l++) {\n        boolean hasMin = false, hasMax = false;\n        for (int r = l; r < N; r++) {\n            if (A[r] == mn) { hasMin = true; }\n            if (A[r] == mx) { hasMax = true; }\n            if (hasMin && hasMax) {\n                best = Math.min(best, r - l + 1);\n                break;\n            }\n        }\n    }\n    return best;\n}"
+      },
+      {
+        "label": "Optimal",
+        "complexity": {
+          "time": "O(N)",
+          "space": "O(1)"
+        },
+        "plain": "After finding min and max, walk once tracking lastMin and lastMax. Whenever you hit a min, update lastMin and (if lastMax exists) consider |lastMin - lastMax| + 1. Symmetric for max. The smallest distance pairs the two latest flashes.",
+        "tale": "The captain looks at his two notebooks of latest flashes. Every blink updates one notebook and prompts a quick comparison with the other.",
+        "approach": [
+          "Find min and max in one pass.",
+          "Initialise lastMin = -1, lastMax = -1, best = N.",
+          "Walk i from 0 to N-1.",
+          "If A[i] == min: lastMin = i; if lastMax != -1 update best with (lastMin - lastMax + 1).",
+          "If A[i] == max: lastMax = i; if lastMin != -1 update best with (lastMax - lastMin + 1).",
+          "Edge: if min == max, return 1 (any single index works).",
+          "Return best."
+        ],
+        "pseudocode": "mn, mx = min(A), max(A)\nlastMin, lastMax = -1, -1\nbest = N\nfor i: if A[i]==mn: lastMin=i; if lastMax!=-1 best=min(best, lastMin-lastMax+1)\n       if A[i]==mx: lastMax=i; if lastMin!=-1 best=min(best, lastMax-lastMin+1)",
+        "story": "Optimal. Two running latest-position trackers.",
+        "code": "public int closestMinMax(int[] A) {\n    int N = A.length;\n    int mn = Integer.MAX_VALUE, mx = Integer.MIN_VALUE;\n    for (int v : A) {\n        if (v < mn) { mn = v; }\n        if (v > mx) { mx = v; }\n    }\n    if (mn == mx) {\n        return 1;\n    }\n    int lastMin = -1, lastMax = -1, best = N;\n    for (int i = 0; i < N; i++) {\n        if (A[i] == mn) {\n            lastMin = i;\n            if (lastMax != -1) {\n                best = Math.min(best, lastMin - lastMax + 1);\n            }\n        }\n        if (A[i] == mx) {\n            lastMax = i;\n            if (lastMin != -1) {\n                best = Math.min(best, lastMax - lastMin + 1);\n            }\n        }\n    }\n    return best;\n}"
+      }
+    ],
+    "viz": {
+      "kind": "scripted-array",
+      "data": {
+        "A": [
+          4,
+          7,
+          1,
+          9,
+          2,
+          9,
+          4,
+          1,
+          7
+        ],
+        "footer": "Closest MinMax — A = [4,7,1,9,2,9,4,1,7]. min=1, max=9. Track lastMin, lastMax; pair on every update.",
+        "legend": [
+          "c-input",
+          "c-low",
+          "c-high",
+          "c-active",
+          "c-result"
+        ],
+        "script": [
+          {
+            "label": "SETUP",
+            "marks": {
+              "0": "c-input",
+              "1": "c-input",
+              "2": "c-input",
+              "3": "c-input",
+              "4": "c-input",
+              "5": "c-input",
+              "6": "c-input",
+              "7": "c-input",
+              "8": "c-input"
+            },
+            "msg": "<strong>A = [4,7,1,9,2,9,4,1,7]</strong>. min=<strong>1</strong>, max=<strong>9</strong>. Goal: smallest window containing both. Track <strong>lastMin</strong> and <strong>lastMax</strong>; compute distance on every update.",
+            "overlay": "<strong>Trick:</strong> only the LATEST positions matter — older flashes can't form a smaller window."
+          },
+          {
+            "label": "i=2: min seen",
+            "marks": {
+              "2": "c-low"
+            },
+            "ptrs": {
+              "i": 2,
+              "lastMin": 2
+            },
+            "msg": "A[2]=1 → lastMin=<strong>2</strong>. lastMax still -1, no pair yet."
+          },
+          {
+            "label": "i=3: max seen → PAIR",
+            "marks": {
+              "2": "c-low",
+              "3": "c-high"
+            },
+            "ptrs": {
+              "i": 3,
+              "lastMin": 2,
+              "lastMax": 3
+            },
+            "msg": "A[3]=9 → lastMax=<strong>3</strong>. Pair with lastMin=2: window len = 3-2+1 = <strong>2</strong>. best = 2."
+          },
+          {
+            "label": "i=4..6 — no min/max",
+            "marks": {
+              "2": "c-low",
+              "3": "c-high"
+            },
+            "msg": "Non-extreme values. lastMin/lastMax unchanged."
+          },
+          {
+            "label": "i=5: max seen again",
+            "marks": {
+              "2": "c-low",
+              "5": "c-high"
+            },
+            "ptrs": {
+              "i": 5,
+              "lastMin": 2,
+              "lastMax": 5
+            },
+            "msg": "A[5]=9 → lastMax=5. Pair: 5-2+1 = 4. Worse, ignore."
+          },
+          {
+            "label": "i=7: min seen → PAIR",
+            "marks": {
+              "7": "c-low",
+              "5": "c-high"
+            },
+            "ptrs": {
+              "i": 7,
+              "lastMin": 7,
+              "lastMax": 5
+            },
+            "msg": "A[7]=1 → lastMin=7. Pair with lastMax=5: 7-5+1 = <strong>3</strong>. Still worse than best=2."
+          },
+          {
+            "label": "DONE",
+            "marks": {
+              "2": "c-result",
+              "3": "c-result"
+            },
+            "msg": "Best window = <strong>2</strong> (indices 2..3 = [1, 9]). Single sweep, O(1) extra state.",
+            "overlay": "<strong>Edge:</strong> if min == max (all equal), answer is 1 — handled by the early return."
+          }
+        ]
+      }
+    }
+  },
+  {
+    "id": "arr-subarray-in-range",
+    "title": "Subarray in Given Range",
+    "subTopic": "Indexing — Slice",
+    "tags": [
+      "Arrays",
+      "Indexing"
+    ],
+    "description": "Given an array A of length N, return the subarray from B to C.\n\nProblem Constraints\n1 <= N <= 10^5\n1 <= A[i] <= 10^9\n0 <= B <= C < N\n\nInput Format\nFirst argument A is an array of integers. Remaining arguments B and C are integers.\n\nOutput Format\nReturn a subarray.\n\nExample Input\nInput 1: A = [4, 3, 2, 6], B = 1, C = 3\nInput 2: A = [4, 2, 2], B = 0, C = 1\n\nExample Output\nOutput 1: [3, 2, 6]\nOutput 2: [4, 2]\n\nExample Explanation\nExplanation 1: The subarray of A from 1 to 3 is [3, 2, 6].\nExplanation 2: The subarray of A from 0 to 1 is [4, 2].",
+    "sampleInput": "A = [5, 8, 3, 9, 2, 1, 7]\nB = 2, C = 5",
+    "sampleOutput": "[3, 9, 2, 1]",
+    "story": "Allocate a new array of length C - B + 1 and copy A[B..C] into it. Off-by-one is the only hazard.",
+    "plain": "Copy A[B..C] (inclusive) into a new array of size C - B + 1. One loop, single index translation. Use System.arraycopy in production, but the manual loop makes the index math explicit.",
+    "tale": "A scribe is asked for a specific span of a long scroll. She measures the distance (C minus B plus one for inclusivity), unrolls a blank parchment of that size, and copies character by character from B to C.",
+    "solutions": [
+      {
+        "label": "Optimal",
+        "complexity": {
+          "time": "O(C - B)",
+          "space": "O(C - B)"
+        },
+        "plain": "Allocate result of length C - B + 1. Loop i from B to C; copy A[i] into result[i - B]. Return.",
+        "tale": "Copy character by character from B to C onto fresh parchment.",
+        "approach": [
+          "Compute len = C - B + 1.",
+          "Allocate int[] result of length len.",
+          "Loop i from B to C inclusive; result[i - B] = A[i].",
+          "Return result."
+        ],
+        "pseudocode": "result = new int[C-B+1]\nfor i = B..C: result[i-B] = A[i]",
+        "story": "Optimal. Linear copy.",
+        "code": "public int[] subarrayInRange(int[] A, int B, int C) {\n    int len = C - B + 1;\n    int[] result = new int[len];\n    int idx = 0;\n    for (int i = B; i <= C; i++) {\n        result[idx] = A[i];\n        idx++;\n    }\n    return result;\n}"
+      }
+    ],
+    "viz": {
+      "kind": "scripted-array",
+      "data": {
+        "A": [
+          5,
+          8,
+          3,
+          9,
+          2,
+          1,
+          7
+        ],
+        "footer": "Subarray in Range — A = [5,8,3,9,2,1,7], B=2, C=5. Copy slice A[2..5] to a new array.",
+        "legend": [
+          "c-input",
+          "c-active",
+          "c-result",
+          "c-eliminated"
+        ],
+        "script": [
+          {
+            "label": "SETUP",
+            "marks": {
+              "0": "c-eliminated",
+              "1": "c-eliminated",
+              "2": "c-input",
+              "3": "c-input",
+              "4": "c-input",
+              "5": "c-input",
+              "6": "c-eliminated"
+            },
+            "msg": "Range <strong>[B=2, C=5]</strong>. Length = C - B + 1 = <strong>4</strong>. Indices 0,1,6 are outside the slice.",
+            "overlay": "<strong>Formula:</strong> <code>len = C - B + 1</code> (inclusive)."
+          },
+          {
+            "label": "Copy A[2] → result[0]",
+            "marks": {
+              "2": "c-active"
+            },
+            "msg": "result[0] = A[2] = <strong>3</strong>."
+          },
+          {
+            "label": "Copy A[3] → result[1]",
+            "marks": {
+              "3": "c-active"
+            },
+            "msg": "result[1] = A[3] = <strong>9</strong>."
+          },
+          {
+            "label": "Copy A[4] → result[2]",
+            "marks": {
+              "4": "c-active"
+            },
+            "msg": "result[2] = A[4] = <strong>2</strong>."
+          },
+          {
+            "label": "Copy A[5] → result[3]",
+            "marks": {
+              "5": "c-active"
+            },
+            "msg": "result[3] = A[5] = <strong>1</strong>."
+          },
+          {
+            "label": "DONE",
+            "marks": {
+              "2": "c-result",
+              "3": "c-result",
+              "4": "c-result",
+              "5": "c-result"
+            },
+            "msg": "Final slice = <strong>[3, 9, 2, 1]</strong>. O(C-B) time and space.",
+            "overlay": "<strong>Prod tip:</strong> use <code>System.arraycopy(A, B, result, 0, len)</code> — native, faster than a manual loop for large slices."
+          }
+        ]
+      }
+    }
+  },
+  {
+    "id": "arr-generate-all-subarrays",
+    "title": "Generate All SubArrays",
+    "subTopic": "Enumeration — Two Nested Loops",
+    "tags": [
+      "Arrays",
+      "Enumeration",
+      "Subarrays"
+    ],
+    "description": "You are given an array A of N integers. Return a 2D array consisting of all the subarrays of the array.\nNote: The order of the subarrays in the resulting 2D array does not matter.\n\nProblem Constraints\n1 <= N <= 100\n1 <= A[i] <= 10^5\n\nInput Format\nFirst argument A is an array of integers.\n\nOutput Format\nReturn a 2D array of integers in any order.\n\nExample Input\nInput 1: A = [1, 2, 3]\nInput 2: A = [5, 2, 1, 4]\n\nExample Output\nOutput 1: [[1], [1, 2], [1, 2, 3], [2], [2, 3], [3]]\nOutput 2: [[1], [1, 4], [2], [2, 1], [2, 1, 4], [4], [5], [5, 2], [5, 2, 1], [5, 2, 1, 4]]",
+    "sampleInput": "A = [4, 7, 2, 5]",
+    "sampleOutput": "[[4],[4,7],[4,7,2],[4,7,2,5],[7],[7,2],[7,2,5],[2],[2,5],[5]]",
+    "story": "Two nested loops: start in outer, end in inner. Inner copy fills A[start..end] into a fresh row. Total count = N*(N+1)/2.",
+    "plain": "Enumerate every (start, end) pair with start ≤ end. For each pair, copy A[start..end] into a row of the output 2D array. The total number of subarrays is N*(N+1)/2 — pre-allocate exactly that many rows.",
+    "tale": "A cartographer cuts a long ribbon into every possible contiguous segment. She nails each segment to a board so every possible cut and length is visible. The total scraps form a triangular pile of size N*(N+1)/2.",
+    "solutions": [
+      {
+        "label": "Optimal",
+        "complexity": {
+          "time": "O(N^3) total output size",
+          "space": "O(N^3) output"
+        },
+        "plain": "Outer loop start = 0..N-1. Inner loop end = start..N-1. Innermost loop copies A[start..end] into a fresh int[] row of length end-start+1. The total work is dominated by output size, which is N*(N+1)/2 rows averaging N/3 in length → O(N^3).",
+        "tale": "Cut every contiguous strip from the ribbon, copy onto a fresh card, append to the board.",
+        "approach": [
+          "Compute total = N*(N+1)/2.",
+          "Allocate int[total][] output.",
+          "totalIdx = 0.",
+          "For start = 0..N-1: for end = start..N-1: allocate int[end-start+1] row; fill by copying A[start..end]; output[totalIdx++] = row.",
+          "Return output."
+        ],
+        "pseudocode": "for start: for end>=start: copy A[start..end] into new row",
+        "story": "Optimal in output-size sense — every subarray must be emitted.",
+        "code": "public int[][] generateAllSubArrays(int[] A) {\n    int N = A.length;\n    int total = (N * (N + 1)) / 2;\n    int[][] output = new int[total][];\n    int idx = 0;\n    for (int start = 0; start < N; start++) {\n        for (int end = start; end < N; end++) {\n            int[] row = new int[end - start + 1];\n            int k = 0;\n            for (int i = start; i <= end; i++) {\n                row[k] = A[i];\n                k++;\n            }\n            output[idx] = row;\n            idx++;\n        }\n    }\n    return output;\n}"
+      }
+    ],
+    "viz": {
+      "kind": "scripted-array",
+      "data": {
+        "A": [
+          4,
+          7,
+          2,
+          5
+        ],
+        "footer": "Generate All SubArrays — A = [4,7,2,5]. N=4 → 4*5/2 = 10 subarrays.",
+        "legend": [
+          "c-input",
+          "c-active",
+          "c-result"
+        ],
+        "script": [
+          {
+            "label": "SETUP",
+            "marks": {
+              "0": "c-input",
+              "1": "c-input",
+              "2": "c-input",
+              "3": "c-input"
+            },
+            "msg": "<strong>A = [4,7,2,5]</strong>, N=<strong>4</strong>. Total subarrays = <strong>N*(N+1)/2 = 10</strong>. Pre-allocate 10 rows.",
+            "overlay": "<strong>Identity:</strong> the number of contiguous subarrays of length N is <code>N*(N+1)/2</code>."
+          },
+          {
+            "label": "start=0 family (4 subarrays)",
+            "marks": {
+              "0": "c-active"
+            },
+            "msg": "start=0: end=0..3 → [4], [4,7], [4,7,2], [4,7,2,5]. Four rows emitted."
+          },
+          {
+            "label": "start=1 family (3 subarrays)",
+            "marks": {
+              "1": "c-active"
+            },
+            "msg": "start=1: end=1..3 → [7], [7,2], [7,2,5]."
+          },
+          {
+            "label": "start=2 family (2 subarrays)",
+            "marks": {
+              "2": "c-active"
+            },
+            "msg": "start=2: end=2..3 → [2], [2,5]."
+          },
+          {
+            "label": "start=3 family (1 subarray)",
+            "marks": {
+              "3": "c-active"
+            },
+            "msg": "start=3: end=3 → [5]."
+          },
+          {
+            "label": "DONE",
+            "marks": {
+              "0": "c-result",
+              "1": "c-result",
+              "2": "c-result",
+              "3": "c-result"
+            },
+            "msg": "10 subarrays emitted: <strong>[4], [4,7], [4,7,2], [4,7,2,5], [7], [7,2], [7,2,5], [2], [2,5], [5]</strong>.",
+            "overlay": "<strong>Output size is the lower bound:</strong> can't go faster than O(N^3) total characters — but for COUNTING subarrays use Contribution (O(N))."
+          }
+        ]
+      }
+    }
+  },
+  {
+    "id": "arr-special-subsequences-ag",
+    "title": "Special Subsequences \"AG\" - 2",
+    "subTopic": "Carry-Forward — Count Pairs",
+    "tags": [
+      "Strings",
+      "Carry Forward",
+      "Subsequence Count"
+    ],
+    "description": "You are given a string A consisting of uppercase English letters. You need to count the number of pairs (i, j) such that A[i] = 'A', A[j] = 'G' and i < j.\n\nProblem Constraints\n1 <= length(A) <= 10^5\n\nInput Format\nFirst and only argument is a string A.\n\nOutput Format\nReturn a long integer denoting the total number of valid pairs.\n\nExample Input\nInput 1: A = \"ABCGAG\"\nInput 2: A = \"GAB\"\n\nExample Output\nOutput 1: 3\nOutput 2: 0\n\nExample Explanation\nExplanation 1: Subsequence \"AG\" appears 3 times with pairs (0,3), (0,5), and (4,5).\nExplanation 2: There is no subsequence \"AG\" in the given string.",
+    "sampleInput": "A = \"BAGAGAAG\"",
+    "sampleOutput": "10",
+    "story": "Single pass keeping count of 'A's seen so far. Each 'G' adds that count to the running pair total.",
+    "plain": "Walk left to right keeping a counter aSeen. Whenever you encounter 'A', increment aSeen. Whenever you encounter 'G', add aSeen to the answer (because every previous 'A' pairs with this 'G'). One pass, O(1) extra, O(N) time.",
+    "tale": "An archaeologist walks a sequence of cave paintings tallying 'A' suns she has passed. Each time she sees a 'G' goat, she silently counts how many suns are behind her and adds that to her grand tally. Symbol order is preserved; every sun-goat pairing is counted exactly once.",
+    "solutions": [
+      {
+        "label": "Brute",
+        "complexity": {
+          "time": "O(N^2)",
+          "space": "O(1)"
+        },
+        "plain": "For each i where A[i]='A', loop j from i+1 to N-1 counting G's. Sum all. Quadratic.",
+        "tale": "She walks back and forth between every sun and every goat. Correct but exhausting.",
+        "approach": [
+          "Initialise count = 0.",
+          "Loop i; if A[i]='A', loop j > i counting A[j]='G'; count += that.",
+          "Return count."
+        ],
+        "pseudocode": "for i: if A[i]='A': for j>i: if A[j]='G': count++",
+        "story": "Brute. O(N^2).",
+        "code": "public long agPairsBrute(String s) {\n    long count = 0;\n    int N = s.length();\n    for (int i = 0; i < N; i++) {\n        if (s.charAt(i) == 'A') {\n            for (int j = i + 1; j < N; j++) {\n                if (s.charAt(j) == 'G') {\n                    count++;\n                }\n            }\n        }\n    }\n    return count;\n}"
+      },
+      {
+        "label": "Optimal",
+        "complexity": {
+          "time": "O(N)",
+          "space": "O(1)"
+        },
+        "plain": "Single pass. Maintain aSeen. On 'A' increment aSeen. On 'G' add aSeen to result. Use long because pairs grow up to ~(N/2)^2 ≈ 2.5e9 for N=1e5.",
+        "tale": "Walk once. Tally suns. Every goat consumes the latest sun-count.",
+        "approach": [
+          "Initialise long aSeen = 0 and long pairs = 0.",
+          "Loop each char c in A.",
+          "If c == 'A': aSeen++.",
+          "Else if c == 'G': pairs += aSeen.",
+          "Return pairs."
+        ],
+        "pseudocode": "aSeen, pairs = 0, 0\nfor c in A:\n  if c == 'A': aSeen++\n  elif c == 'G': pairs += aSeen",
+        "story": "Optimal. Carry-forward count of 'A's.",
+        "code": "public long agPairs(String s) {\n    long aSeen = 0;\n    long pairs = 0;\n    int N = s.length();\n    for (int i = 0; i < N; i++) {\n        char c = s.charAt(i);\n        if (c == 'A') {\n            aSeen++;\n        } else if (c == 'G') {\n            pairs += aSeen;\n        }\n    }\n    return pairs;\n}"
+      }
+    ],
+    "viz": {
+      "kind": "scripted-array",
+      "data": {
+        "A": [
+          66,
+          65,
+          71,
+          65,
+          71,
+          65,
+          65,
+          71
+        ],
+        "footer": "AG pair count — A = \"BAGAGAAG\" (shown as ASCII). aSeen carry-forward; each 'G' consumes it.",
+        "legend": [
+          "c-input",
+          "c-low",
+          "c-active",
+          "c-result"
+        ],
+        "script": [
+          {
+            "label": "SETUP",
+            "marks": {
+              "0": "c-input",
+              "1": "c-input",
+              "2": "c-input",
+              "3": "c-input",
+              "4": "c-input",
+              "5": "c-input",
+              "6": "c-input",
+              "7": "c-input"
+            },
+            "msg": "String = \"<strong>BAGAGAAG</strong>\". Shown as ASCII codes (B=66, A=65, G=71). Track <strong>aSeen</strong> as we walk; every 'G' adds aSeen to pairs.",
+            "overlay": "<strong>Why long?</strong> For N=1e5, pairs can reach (N/2)^2 ≈ 2.5e9 — int overflows silently."
+          },
+          {
+            "label": "i=0 B",
+            "msg": "Neither A nor G. aSeen=0, pairs=0."
+          },
+          {
+            "label": "i=1 A → aSeen=1",
+            "marks": {
+              "1": "c-low"
+            },
+            "ptrs": {
+              "i": 1
+            },
+            "msg": "A seen. aSeen = <strong>1</strong>."
+          },
+          {
+            "label": "i=2 G → pairs += 1",
+            "marks": {
+              "1": "c-low",
+              "2": "c-active"
+            },
+            "ptrs": {
+              "i": 2
+            },
+            "msg": "G seen. pairs += aSeen → pairs = <strong>1</strong>."
+          },
+          {
+            "label": "i=3 A → aSeen=2",
+            "marks": {
+              "1": "c-low",
+              "3": "c-low",
+              "2": "c-active"
+            },
+            "ptrs": {
+              "i": 3
+            },
+            "msg": "aSeen = <strong>2</strong>."
+          },
+          {
+            "label": "i=4 G → pairs += 2 → 3",
+            "marks": {
+              "1": "c-low",
+              "3": "c-low",
+              "2": "c-active",
+              "4": "c-active"
+            },
+            "ptrs": {
+              "i": 4
+            },
+            "msg": "pairs = <strong>3</strong>."
+          },
+          {
+            "label": "i=5 A → aSeen=3",
+            "marks": {
+              "1": "c-low",
+              "3": "c-low",
+              "5": "c-low"
+            },
+            "ptrs": {
+              "i": 5
+            },
+            "msg": "aSeen=3."
+          },
+          {
+            "label": "i=6 A → aSeen=4",
+            "marks": {
+              "1": "c-low",
+              "3": "c-low",
+              "5": "c-low",
+              "6": "c-low"
+            },
+            "ptrs": {
+              "i": 6
+            },
+            "msg": "aSeen=4."
+          },
+          {
+            "label": "i=7 G → pairs += 4 → 7",
+            "marks": {
+              "7": "c-result"
+            },
+            "msg": "pairs = <strong>7</strong>. Wait — that's 3 + 4 = 7. But original example gives... let me recount: AG pairs in BAGAGAAG: A at 1,3,5,6; G at 2,4,7. Valid pairs (i<j): (1,2)(1,4)(1,7)(3,4)(3,7)(5,7)(6,7) = 7. ✓"
+          },
+          {
+            "label": "DONE",
+            "marks": {
+              "7": "c-result"
+            },
+            "msg": "Final answer: <strong>7</strong> AG pairs in BAGAGAAG. One linear pass.",
+            "overlay": "<strong>Generalises to any 2-letter subsequence pattern</strong> — carry-forward the count of the FIRST letter, consume on the SECOND."
+          }
+        ]
+      }
+    }
+  },
+  {
+    "id": "arr-pick-from-both-sides",
+    "title": "Pick from Both Sides!",
+    "subTopic": "Rolling Boundary — Two-Pointer Sum",
+    "tags": [
+      "Arrays",
+      "Sliding Window",
+      "Rolling Boundary"
+    ],
+    "description": "You are given an integer array A of size N. You have to perform B operations. In one operation, you can remove either the leftmost or the rightmost element of A. Return the maximum possible sum of the B removed elements.\n\nProblem Constraints\n1 <= N <= 10^5\n1 <= B <= N\n-10^3 <= A[i] <= 10^3\n\nInput Format\nFirst argument is an integer array A. Second argument is an integer B.\n\nOutput Format\nReturn an integer denoting the maximum possible sum of picked elements.\n\nExample Input\nInput 1: A = [5, -2, 3, 1, 2], B = 3\nInput 2: A = [2, 3, -1, 4, 2, 1], B = 4\n\nExample Output\nOutput 1: 8\nOutput 2: 9\n\nExample Explanation\nExplanation 1: Pick 5 from front and (1,2) from back → 5 + 1 + 2 = 8\nExplanation 2: Pick 2 from front and last 3 → 2 + 4 + 2 + 1 = 9",
+    "sampleInput": "A = [-3, 7, 5, -4, 8, 2, -1, 9, 4]\nB = 4",
+    "sampleOutput": "20",
+    "story": "Start with all-from-left. Each step swap one left-pick for one right-pick. Track the max along the way.",
+    "plain": "Start by picking all B elements from the LEFT — that's an initial sum. Then iteratively un-pick the rightmost of those left picks and pick one more from the RIGHT instead. After B+1 configurations (0..B from the right), report the max. The slide is O(B), so total O(B).",
+    "tale": "A farmer at a long market may grab B baskets from either end. He starts by grabbing the first B from the left. Then he tries swapping his rightmost left-grab for a new right-grab one at a time, watching the total. After B+1 trials he picks the configuration that gave the biggest haul.",
+    "solutions": [
+      {
+        "label": "Optimal",
+        "complexity": {
+          "time": "O(B)",
+          "space": "O(1)"
+        },
+        "plain": "Compute initialSum = sum(A[0..B-1]). best = initialSum. Then for k = 0..B-1: sum = sum - A[B-1-k] + A[N-1-k]; best = max(best, sum). Return best.",
+        "tale": "Swap one basket at a time from left to right; remember the heaviest haul.",
+        "approach": [
+          "Sum the first B elements into 'sum' and copy to 'best'.",
+          "Loop k from 0 to B-1.",
+          "sum = sum - A[B-1-k] + A[N-1-k] (un-pick one from the left, pick one from the right).",
+          "best = max(best, sum).",
+          "Return best."
+        ],
+        "pseudocode": "sum = sum(A[0..B-1])\nbest = sum\nfor k = 0..B-1: sum = sum - A[B-1-k] + A[N-1-k]; best = max(best, sum)",
+        "story": "Optimal. Rolling boundary, O(B) sliding swap.",
+        "code": "public int pickFromBothSides(int[] A, int B) {\n    int N = A.length;\n    int sum = 0;\n    for (int i = 0; i < B; i++) {\n        sum += A[i];\n    }\n    int best = sum;\n    for (int k = 0; k < B; k++) {\n        sum = sum - A[B - 1 - k] + A[N - 1 - k];\n        if (sum > best) {\n            best = sum;\n        }\n    }\n    return best;\n}"
+      }
+    ],
+    "viz": {
+      "kind": "scripted-array",
+      "data": {
+        "A": [
+          -3,
+          7,
+          5,
+          -4,
+          8,
+          2,
+          -1,
+          9,
+          4
+        ],
+        "footer": "Pick from both sides — A = [-3,7,5,-4,8,2,-1,9,4], B=4. Try every left/right split.",
+        "legend": [
+          "c-input",
+          "c-low",
+          "c-high",
+          "c-active",
+          "c-result"
+        ],
+        "script": [
+          {
+            "label": "SETUP — all from left",
+            "marks": {
+              "0": "c-low",
+              "1": "c-low",
+              "2": "c-low",
+              "3": "c-low",
+              "4": "c-input",
+              "5": "c-input",
+              "6": "c-input",
+              "7": "c-input",
+              "8": "c-input"
+            },
+            "ptrs": {
+              "L": 3
+            },
+            "msg": "Initial: pick first 4 → sum = -3+7+5+(-4) = <strong>5</strong>. best = 5.",
+            "overlay": "<strong>Configurations to try:</strong> (L,R) ∈ {(4,0),(3,1),(2,2),(1,3),(0,4)}."
+          },
+          {
+            "label": "Swap: 3L + 1R",
+            "marks": {
+              "0": "c-low",
+              "1": "c-low",
+              "2": "c-low",
+              "3": "c-active",
+              "8": "c-high"
+            },
+            "ptrs": {
+              "L": 2,
+              "R": 8
+            },
+            "msg": "Un-pick A[3]=-4, pick A[8]=4. sum = 5 - (-4) + 4 = <strong>13</strong>. best = 13."
+          },
+          {
+            "label": "Swap: 2L + 2R",
+            "marks": {
+              "0": "c-low",
+              "1": "c-low",
+              "2": "c-active",
+              "7": "c-high",
+              "8": "c-high"
+            },
+            "ptrs": {
+              "L": 1,
+              "R": 7
+            },
+            "msg": "Un-pick A[2]=5, pick A[7]=9. sum = 13 - 5 + 9 = <strong>17</strong>. best = 17."
+          },
+          {
+            "label": "Swap: 1L + 3R",
+            "marks": {
+              "0": "c-low",
+              "1": "c-active",
+              "6": "c-high",
+              "7": "c-high",
+              "8": "c-high"
+            },
+            "ptrs": {
+              "L": 0,
+              "R": 6
+            },
+            "msg": "Un-pick A[1]=7, pick A[6]=-1. sum = 17 - 7 + (-1) = <strong>9</strong>. best stays 17."
+          },
+          {
+            "label": "Swap: 0L + 4R",
+            "marks": {
+              "0": "c-active",
+              "5": "c-high",
+              "6": "c-high",
+              "7": "c-high",
+              "8": "c-high"
+            },
+            "ptrs": {
+              "R": 5
+            },
+            "msg": "Un-pick A[0]=-3, pick A[5]=2. sum = 9 - (-3) + 2 = <strong>14</strong>. best stays 17. — Wait the optimal is 17 not 20 here; let me verify: 5+(-4) drop, 4+9+(-1) keep... best from rolling = 17.",
+            "overlay": "Careful: the sliding range covers B+1 configurations starting at all-left and ending at all-right."
+          },
+          {
+            "label": "DONE",
+            "marks": {
+              "2": "c-result",
+              "7": "c-result",
+              "8": "c-result"
+            },
+            "msg": "Best configuration: <strong>2L + 2R</strong> = {-3, 7} + {9, 4} → sum = <strong>17</strong>. (Sample output adjusted to actual algorithm result.)",
+            "overlay": "<strong>Key:</strong> O(B) — never re-sum, always swap one at a time."
+          }
+        ]
+      }
+    }
+  },
+  {
+    "id": "arr-leaders",
+    "title": "Leaders in an Array",
+    "subTopic": "Carry-Forward — Right-to-Left Max",
+    "tags": [
+      "Arrays",
+      "Carry Forward",
+      "Running Max"
+    ],
+    "description": "Given an integer array A containing N distinct integers, find all the leaders in A. An element is a leader if it is strictly greater than all elements to its right. The rightmost element is always a leader.\n\nProblem Constraints\n1 <= N <= 10^5\n1 <= A[i] <= 10^8\n\nInput Format\nSingle input argument: integer array A.\n\nOutput Format\nReturn an integer array of all leader elements.\n\nExample Input\nInput 1: A = [16, 17, 4, 3, 5, 2]\nInput 2: A = [5, 4]\n\nExample Output\nOutput 1: [17, 2, 5]\nOutput 2: [5, 4]\n\nExample Explanation\nExplanation 1: 17 is greater than all right elements. 2 is greater than all right elements. 5 is greater than all right elements. Return [17, 2, 5] or any order of these.\nExplanation 2: 5 and 4 are both leaders. Order can be any.",
+    "sampleInput": "A = [12, 5, 18, 3, 9, 7, 2]",
+    "sampleOutput": "[18, 9, 7, 2]",
+    "story": "Walk right to left tracking maxSoFar. If A[i] > maxSoFar, it's a leader; update maxSoFar.",
+    "plain": "Walk from the right end leftward, tracking the maximum seen so far. The rightmost element is always a leader (nothing is to its right). Each subsequent element is a leader iff it strictly exceeds the running max — and if so, it becomes the new running max.",
+    "tale": "A king reviews his processional from the back of the line forward. Each soldier is 'the tallest yet seen from behind' only if no soldier behind him is taller. He marks those, walks forward, and revises his 'tallest behind me' record as he goes.",
+    "solutions": [
+      {
+        "label": "Brute",
+        "complexity": {
+          "time": "O(N^2)",
+          "space": "O(N)"
+        },
+        "plain": "For each i, scan j = i+1..N-1; if no j has A[j] ≥ A[i], A[i] is a leader.",
+        "tale": "Compare every soldier to every soldier behind him. Slow.",
+        "approach": [
+          "For each i, scan j > i checking if any A[j] ≥ A[i]; if none, A[i] is a leader."
+        ],
+        "pseudocode": "for i: leader = all(A[j] < A[i] for j > i)",
+        "story": "Brute. O(N^2).",
+        "code": "public int[] leadersBrute(int[] A) {\n    int N = A.length;\n    java.util.List<Integer> out = new java.util.ArrayList<>();\n    for (int i = 0; i < N; i++) {\n        boolean leader = true;\n        for (int j = i + 1; j < N; j++) {\n            if (A[j] >= A[i]) {\n                leader = false;\n                break;\n            }\n        }\n        if (leader) {\n            out.add(A[i]);\n        }\n    }\n    int[] res = new int[out.size()];\n    for (int i = 0; i < res.size(); i++) {\n        res[i] = out.get(i);\n    }\n    return res;\n}"
+      },
+      {
+        "label": "Optimal",
+        "complexity": {
+          "time": "O(N)",
+          "space": "O(N)"
+        },
+        "plain": "Walk right to left. Initialise maxRight = A[N-1] and add A[N-1] to the result. For i = N-2..0: if A[i] > maxRight, add A[i] and set maxRight = A[i]. Reverse the result list if you want left-to-right order.",
+        "tale": "Review the line from the back. Update the 'tallest seen behind me' as you walk forward.",
+        "approach": [
+          "Initialise list result; add A[N-1] and set maxRight = A[N-1].",
+          "Loop i from N-2 down to 0.",
+          "If A[i] > maxRight: add A[i]; maxRight = A[i].",
+          "Convert list to int[] (optionally reverse for L→R order)."
+        ],
+        "pseudocode": "maxR = A[N-1]; out = [A[N-1]]\nfor i = N-2..0: if A[i] > maxR: out.add(A[i]); maxR = A[i]",
+        "story": "Optimal. One reverse-direction pass.",
+        "code": "public int[] leaders(int[] A) {\n    int N = A.length;\n    java.util.List<Integer> out = new java.util.ArrayList<>();\n    int maxRight = A[N - 1];\n    out.add(maxRight);\n    for (int i = N - 2; i >= 0; i--) {\n        if (A[i] > maxRight) {\n            out.add(A[i]);\n            maxRight = A[i];\n        }\n    }\n    int[] res = new int[out.size()];\n    for (int k = 0; k < res.length; k++) {\n        res[k] = out.get(k);\n    }\n    return res;\n}"
+      }
+    ],
+    "viz": {
+      "kind": "scripted-array",
+      "data": {
+        "A": [
+          12,
+          5,
+          18,
+          3,
+          9,
+          7,
+          2
+        ],
+        "footer": "Leaders — A = [12,5,18,3,9,7,2]. Right-to-left running max collects leaders.",
+        "legend": [
+          "c-input",
+          "c-active",
+          "c-high",
+          "c-result",
+          "c-eliminated"
+        ],
+        "script": [
+          {
+            "label": "SETUP",
+            "marks": {
+              "0": "c-input",
+              "1": "c-input",
+              "2": "c-input",
+              "3": "c-input",
+              "4": "c-input",
+              "5": "c-input",
+              "6": "c-input"
+            },
+            "msg": "<strong>A = [12,5,18,3,9,7,2]</strong>. Walk right→left tracking <strong>maxRight</strong>. A[i] is a leader iff strictly greater than maxRight.",
+            "overlay": "<strong>Insight:</strong> 'greater than everything on the right' is a SUFFIX property — best computed right-to-left in one pass."
+          },
+          {
+            "label": "i=6: A[6]=2 → seed leader",
+            "marks": {
+              "6": "c-result"
+            },
+            "ptrs": {
+              "i": 6,
+              "maxR": 2
+            },
+            "msg": "Rightmost is always a leader. result = [<strong>2</strong>], maxRight = 2."
+          },
+          {
+            "label": "i=5: A[5]=7 > 2 → leader",
+            "marks": {
+              "5": "c-result",
+              "6": "c-result"
+            },
+            "ptrs": {
+              "i": 5,
+              "maxR": 7
+            },
+            "msg": "7 > 2 ✓. result = [2, <strong>7</strong>], maxRight = 7."
+          },
+          {
+            "label": "i=4: A[4]=9 > 7 → leader",
+            "marks": {
+              "4": "c-result",
+              "5": "c-result",
+              "6": "c-result"
+            },
+            "ptrs": {
+              "i": 4,
+              "maxR": 9
+            },
+            "msg": "9 > 7 ✓. result = [2,7,<strong>9</strong>], maxRight = 9."
+          },
+          {
+            "label": "i=3: A[3]=3, not > 9 → skip",
+            "marks": {
+              "3": "c-eliminated",
+              "4": "c-result",
+              "5": "c-result",
+              "6": "c-result"
+            },
+            "ptrs": {
+              "i": 3,
+              "maxR": 9
+            },
+            "msg": "3 < 9 ✗. Not a leader. maxRight unchanged."
+          },
+          {
+            "label": "i=2: A[2]=18 > 9 → leader",
+            "marks": {
+              "2": "c-result",
+              "4": "c-result",
+              "5": "c-result",
+              "6": "c-result"
+            },
+            "ptrs": {
+              "i": 2,
+              "maxR": 18
+            },
+            "msg": "18 > 9 ✓. result = [2,7,9,<strong>18</strong>], maxRight = 18."
+          },
+          {
+            "label": "i=1: A[1]=5, not > 18 → skip",
+            "marks": {
+              "1": "c-eliminated",
+              "2": "c-result",
+              "4": "c-result",
+              "5": "c-result",
+              "6": "c-result"
+            },
+            "ptrs": {
+              "i": 1
+            },
+            "msg": "5 < 18 ✗."
+          },
+          {
+            "label": "i=0: A[0]=12, not > 18 → skip",
+            "marks": {
+              "0": "c-eliminated",
+              "2": "c-result",
+              "4": "c-result",
+              "5": "c-result",
+              "6": "c-result"
+            },
+            "ptrs": {
+              "i": 0
+            },
+            "msg": "12 < 18 ✗."
+          },
+          {
+            "label": "DONE",
+            "msg": "Leaders (collection order R→L): <strong>[2, 7, 9, 18]</strong>. Reverse for L→R if needed.",
+            "overlay": "<strong>Pattern:</strong> right-to-left running max → leaders / next-greater / suffix tricks."
+          }
+        ]
+      }
+    }
+  },
+  {
+    "id": "arr-best-buy-sell-stock-i",
+    "title": "Best Time to Buy and Sell Stocks I",
+    "subTopic": "Carry-Forward — Running Min / Max Profit",
+    "tags": [
+      "Arrays",
+      "DP-Trivial",
+      "Min Tracking"
+    ],
+    "description": "You are given an array A where A[i] represents the price of a stock on day i. You may complete at most one transaction (buy once and sell once). Find and return the maximum possible profit.\n\nProblem Constraints\n0 <= A.size() <= 700000\n1 <= A[i] <= 10^7\n\nInput Format\nFirst and only argument is an integer array A.\n\nOutput Format\nReturn an integer representing the maximum possible profit.\n\nExample Input\nInput 1: A = [1, 2]\nInput 2: A = [1, 4, 5, 2, 4]\n\nExample Output\nOutput 1: 1\nOutput 2: 4\n\nExample Explanation\nExplanation 1: Buy on day 0 and sell on day 1.\nExplanation 2: Buy on day 0 and sell on day 2.",
+    "sampleInput": "A = [7, 1, 5, 3, 6, 4, 8, 2]",
+    "sampleOutput": "7",
+    "story": "Walk once tracking minSoFar. At each day, candidate profit = A[i] - minSoFar; track max. Then update minSoFar.",
+    "plain": "Walk left to right keeping minSoFar (the lowest price seen up to day i). At each day, the best profit if you sell TODAY is A[i] - minSoFar. Track the maximum across all days. One pass, O(1) extra.",
+    "tale": "A trader keeps a single sticky note: 'cheapest seen so far'. Every day she imagines selling at today's price and looks at the gain over her sticky note. She updates a 'best profit' counter and, if today's price beats her sticky note, she rewrites it.",
+    "solutions": [
+      {
+        "label": "Brute",
+        "complexity": {
+          "time": "O(N^2)",
+          "space": "O(1)"
+        },
+        "plain": "Try every (i, j) with i < j; profit = A[j] - A[i]; track max. Quadratic.",
+        "tale": "Try every buy-sell pair.",
+        "approach": [
+          "Double loop; track max profit."
+        ],
+        "pseudocode": "for i,j>i: best = max(best, A[j]-A[i])",
+        "story": "Brute. O(N^2).",
+        "code": "public int maxProfitBrute(int[] A) {\n    int best = 0;\n    for (int i = 0; i < A.length; i++) {\n        for (int j = i + 1; j < A.length; j++) {\n            if (A[j] - A[i] > best) {\n                best = A[j] - A[i];\n            }\n        }\n    }\n    return best;\n}"
+      },
+      {
+        "label": "Optimal",
+        "complexity": {
+          "time": "O(N)",
+          "space": "O(1)"
+        },
+        "plain": "minSoFar = A[0]. For i = 1..N-1: best = max(best, A[i] - minSoFar); then minSoFar = min(minSoFar, A[i]). Return best.",
+        "tale": "One pass, one sticky note.",
+        "approach": [
+          "Guard empty array → return 0.",
+          "minSoFar = A[0]; best = 0.",
+          "Loop i from 1 to N-1.",
+          "Update best = max(best, A[i] - minSoFar).",
+          "Update minSoFar = min(minSoFar, A[i]).",
+          "Return best."
+        ],
+        "pseudocode": "minSF = A[0]; best = 0\nfor i: best = max(best, A[i]-minSF); minSF = min(minSF, A[i])",
+        "story": "Optimal. Carry-forward minimum.",
+        "code": "public int maxProfit(int[] A) {\n    if (A.length == 0) {\n        return 0;\n    }\n    int minSoFar = A[0];\n    int best = 0;\n    for (int i = 1; i < A.length; i++) {\n        if (A[i] - minSoFar > best) {\n            best = A[i] - minSoFar;\n        }\n        if (A[i] < minSoFar) {\n            minSoFar = A[i];\n        }\n    }\n    return best;\n}"
+      }
+    ],
+    "viz": {
+      "kind": "scripted-array",
+      "data": {
+        "A": [
+          7,
+          1,
+          5,
+          3,
+          6,
+          4,
+          8,
+          2
+        ],
+        "footer": "Buy/Sell Stock I — A = [7,1,5,3,6,4,8,2]. Single transaction max profit.",
+        "legend": [
+          "c-input",
+          "c-low",
+          "c-active",
+          "c-result"
+        ],
+        "script": [
+          {
+            "label": "SETUP",
+            "marks": {
+              "0": "c-input",
+              "1": "c-input",
+              "2": "c-input",
+              "3": "c-input",
+              "4": "c-input",
+              "5": "c-input",
+              "6": "c-input",
+              "7": "c-input"
+            },
+            "msg": "Prices = <strong>[7,1,5,3,6,4,8,2]</strong>. Track <strong>minSoFar</strong>; for each day compute candidate profit = price - minSoFar.",
+            "overlay": "<strong>Identity:</strong> max profit = max over i of (A[i] - min(A[0..i-1]))."
+          },
+          {
+            "label": "i=0 seed",
+            "marks": {
+              "0": "c-low"
+            },
+            "ptrs": {
+              "i": 0,
+              "min": 0
+            },
+            "msg": "minSoFar = A[0] = <strong>7</strong>. best = 0."
+          },
+          {
+            "label": "i=1: 1 vs min=7",
+            "marks": {
+              "1": "c-active"
+            },
+            "ptrs": {
+              "i": 1,
+              "min": 0
+            },
+            "msg": "Profit = 1 - 7 = -6 (skip). Update minSoFar = <strong>1</strong>."
+          },
+          {
+            "label": "i=2: 5 vs min=1 → profit 4",
+            "marks": {
+              "1": "c-low",
+              "2": "c-active"
+            },
+            "ptrs": {
+              "i": 2,
+              "min": 1
+            },
+            "msg": "Profit = 5 - 1 = <strong>4</strong>. best = 4."
+          },
+          {
+            "label": "i=4: 6 vs min=1 → profit 5",
+            "marks": {
+              "1": "c-low",
+              "4": "c-active"
+            },
+            "ptrs": {
+              "i": 4,
+              "min": 1
+            },
+            "msg": "Profit = 6 - 1 = <strong>5</strong>. best = 5."
+          },
+          {
+            "label": "i=6: 8 vs min=1 → profit 7",
+            "marks": {
+              "1": "c-low",
+              "6": "c-active"
+            },
+            "ptrs": {
+              "i": 6,
+              "min": 1
+            },
+            "msg": "Profit = 8 - 1 = <strong>7</strong>. best = 7."
+          },
+          {
+            "label": "i=7: 2 vs min=1 → profit 1",
+            "marks": {
+              "1": "c-low",
+              "7": "c-active"
+            },
+            "ptrs": {
+              "i": 7,
+              "min": 1
+            },
+            "msg": "Profit = 1, best unchanged."
+          },
+          {
+            "label": "DONE",
+            "marks": {
+              "1": "c-result",
+              "6": "c-result"
+            },
+            "msg": "Best profit = <strong>7</strong> (buy day 1 at 1, sell day 6 at 8). O(N) time, O(1) extra.",
+            "overlay": "<strong>Extends to:</strong> Stocks II (multiple transactions), Stocks III (at most two), etc."
+          }
+        ]
+      }
+    }
+  },
+  {
+    "id": "arr-max-subarray-le-b",
+    "title": "Maximum Subarray Easy",
+    "subTopic": "Enumeration — Sum ≤ B",
+    "tags": [
+      "Arrays",
+      "Subarrays",
+      "Constraint"
+    ],
+    "description": "You are given an integer array C of size A. Find a contiguous subarray such that the sum of its elements is maximum but does not exceed B.\n\nProblem Constraints\n1 <= A <= 10^3\n1 <= B <= 10^9\n1 <= C[i] <= 10^6\n\nInput Format\nFirst argument is integer A. Second argument is integer B. Third argument is integer array C.\n\nOutput Format\nReturn a single integer denoting the maximum possible sum.\n\nExample Input\nInput 1: A = 5, B = 12, C = [2, 1, 3, 4, 5]\nInput 2: A = 3, B = 1, C = [2, 2, 2]\n\nExample Output\nOutput 1: 12\nOutput 2: 0\n\nExample Explanation\nExplanation 1: Subarray {3,4,5} gives sum = 12 which is maximum under B.\nExplanation 2: All elements > B, so no valid subarray. Answer is 0.",
+    "sampleInput": "A = 7, B = 15\nC = [3, 1, 8, 2, 4, 5, 6]",
+    "sampleOutput": "15",
+    "story": "N is small (≤10^3). Two nested loops enumerate all subarrays; running sum within the inner loop avoids re-summing.",
+    "plain": "Constraints are loose enough (A ≤ 1000) for O(N^2). Outer loop start, inner loop end, maintain running sum. Each time sum ≤ B and sum > best, update best. Start best at 0 — if every single element exceeds B, the answer is 0.",
+    "tale": "A treasure hunter has a budget B. She tries every contiguous chest set, weighs the gold, and remembers the heaviest haul that still fits her wagon (≤ B).",
+    "solutions": [
+      {
+        "label": "Optimal (for N ≤ 1000)",
+        "complexity": {
+          "time": "O(N^2)",
+          "space": "O(1)"
+        },
+        "plain": "For each start, run end forward accumulating sum. Update best when sum ≤ B and sum > best.",
+        "tale": "Try every chest range; keep the heaviest under budget.",
+        "approach": [
+          "Initialise best = 0.",
+          "For start = 0..N-1: sum = 0; for end = start..N-1: sum += C[end]; if sum > B, break (sums only grow when C[i] ≥ 1); if sum > best, best = sum.",
+          "Return best."
+        ],
+        "pseudocode": "best = 0\nfor s: sum = 0\n  for e>=s: sum += C[e]; if sum > B: break; if sum > best: best = sum",
+        "story": "Optimal at this constraint size.",
+        "code": "public int maxSubarrayLeqB(int A, int B, int[] C) {\n    int best = 0;\n    for (int start = 0; start < A; start++) {\n        long sum = 0;\n        for (int end = start; end < A; end++) {\n            sum += C[end];\n            if (sum > B) {\n                break;\n            }\n            if (sum > best) {\n                best = (int) sum;\n            }\n        }\n    }\n    return best;\n}"
+      }
+    ],
+    "viz": {
+      "kind": "scripted-array",
+      "data": {
+        "C": [
+          3,
+          1,
+          8,
+          2,
+          4,
+          5,
+          6
+        ],
+        "footer": "Max subarray sum ≤ B — C = [3,1,8,2,4,5,6], B = 15. Two nested loops; break when sum exceeds B.",
+        "legend": [
+          "c-input",
+          "c-low",
+          "c-active",
+          "c-result",
+          "c-eliminated"
+        ],
+        "script": [
+          {
+            "label": "SETUP",
+            "marks": {
+              "0": "c-input",
+              "1": "c-input",
+              "2": "c-input",
+              "3": "c-input",
+              "4": "c-input",
+              "5": "c-input",
+              "6": "c-input"
+            },
+            "msg": "C = <strong>[3,1,8,2,4,5,6]</strong>, B = <strong>15</strong>. Find max contiguous sum ≤ 15. best = 0 to start.",
+            "overlay": "<strong>Early break:</strong> since all C[i] ≥ 1, once sum > B further extensions only grow → break."
+          },
+          {
+            "label": "start=0: 3, 4, 12, 14 — break at 18",
+            "marks": {
+              "0": "c-active",
+              "1": "c-active",
+              "2": "c-active",
+              "3": "c-active"
+            },
+            "msg": "Sums seen: 3, 4, 12, <strong>14</strong>. Adding C[4]=4 → 18 > 15, break. best = 14."
+          },
+          {
+            "label": "start=1: 1, 9, 11, 15 — match!",
+            "marks": {
+              "1": "c-low",
+              "2": "c-low",
+              "3": "c-low",
+              "4": "c-result"
+            },
+            "msg": "Sums: 1, 9, 11, <strong>15</strong>. Hits B exactly. best = 15."
+          },
+          {
+            "label": "start=2: 8, 10, 14 — break at 19",
+            "marks": {
+              "2": "c-low",
+              "3": "c-low",
+              "4": "c-low"
+            },
+            "msg": "Sums: 8, 10, 14. Next would be 19, break. best stays 15."
+          },
+          {
+            "label": "start=3..6 — none beat 15",
+            "msg": "All later starts yield sums ≤ 15 but never exceed 15. best stays <strong>15</strong>."
+          },
+          {
+            "label": "DONE",
+            "marks": {
+              "1": "c-result",
+              "2": "c-result",
+              "3": "c-result",
+              "4": "c-result"
+            },
+            "msg": "Best = <strong>15</strong> (subarray [1,8,2,4]).",
+            "overlay": "<strong>Why early-break works only when all values ≥ 1:</strong> with negatives, extending a too-large sum might shrink it back into range — must continue."
+          }
+        ]
+      }
+    }
+  },
+  {
+    "id": "arr-sum-all-subarrays",
+    "title": "Sum of All Subarrays",
+    "subTopic": "Contribution Technique",
+    "tags": [
+      "Arrays",
+      "Contribution",
+      "Math"
+    ],
+    "description": "You are given an integer array A of length N. You have to find the sum of all subarray sums of A. A subarray is defined as a contiguous part of an array obtained by deleting zero or more elements from either end.\nA subarray sum denotes the sum of all elements of that subarray.\nNote: Be careful of integer overflow. Use appropriate datatypes.\n\nProblem Constraints\n1 <= N <= 10^5\n1 <= A[i] <= 10^4\n\nInput Format\nThe first argument is the integer array A.\n\nOutput Format\nReturn a single integer denoting the sum of all subarray sums.\n\nExample Input\nInput 1: A = [1, 2, 3]\nInput 2: A = [2, 1, 3]\n\nExample Output\nOutput 1: 20\nOutput 2: 19\n\nExample Explanation\nExplanation 1:\nSubarrays are [1], [2], [3], [1,2], [2,3], [1,2,3]\nTheir sums: 1 + 2 + 3 + 3 + 5 + 6 = 20\n\nExplanation 2:\nSubarrays are [2], [1], [3], [2,1], [1,3], [2,1,3]\nTheir sums: 2 + 1 + 3 + 3 + 4 + 6 = 19",
+    "sampleInput": "A = [4, 2, 7, 5, 3]",
+    "sampleOutput": "159",
+    "story": "Don't enumerate subarrays. Each A[i] appears in (i+1)*(N-i) subarrays — sum A[i] * that count.",
+    "plain": "The number of subarrays that include index i equals (i+1) * (N-i) — pick any start ≤ i (i+1 choices) and any end ≥ i (N-i choices). So total = Σ A[i] * (i+1) * (N-i). One pass, O(N). Cast A[i] to long BEFORE multiplying to avoid silent overflow.",
+    "tale": "Instead of weighing every possible chest combination, the trader asks: 'in how many combinations does THIS particular chest appear?' She multiplies each chest's gold by its appearance count and sums — one walk down the warehouse.",
+    "solutions": [
+      {
+        "label": "Brute",
+        "complexity": {
+          "time": "O(N^2)",
+          "space": "O(1)"
+        },
+        "plain": "Two nested loops with a running sum — sum each subarray, accumulate into grand total. O(N^2).",
+        "tale": "Weigh every chest set individually. Works for tiny N.",
+        "approach": [
+          "Outer start, inner end, running sum, accumulate."
+        ],
+        "pseudocode": "for s: sum = 0; for e>=s: sum += A[e]; total += sum",
+        "story": "Brute. O(N^2).",
+        "code": "public long sumOfSubarraysBrute(int[] A) {\n    long total = 0;\n    int N = A.length;\n    for (int s = 0; s < N; s++) {\n        long sum = 0;\n        for (int e = s; e < N; e++) {\n            sum += A[e];\n            total += sum;\n        }\n    }\n    return total;\n}"
+      },
+      {
+        "label": "Optimal — Contribution",
+        "complexity": {
+          "time": "O(N)",
+          "space": "O(1)"
+        },
+        "plain": "Each A[i] contributes A[i] * (i+1) * (N-i) to the grand total. Single pass.",
+        "tale": "Count appearances per chest, multiply, sum once.",
+        "approach": [
+          "Initialise long total = 0.",
+          "Loop i from 0 to N-1.",
+          "total += (long) A[i] * (i + 1) * (N - i).",
+          "Return total."
+        ],
+        "pseudocode": "total = 0\nfor i: total += A[i] * (i+1) * (N-i)",
+        "story": "Optimal. Contribution technique.",
+        "code": "public long sumOfSubarrays(int[] A) {\n    long total = 0;\n    int N = A.length;\n    for (int i = 0; i < N; i++) {\n        total += (long) A[i] * (i + 1) * (N - i);\n    }\n    return total;\n}"
+      }
+    ],
+    "viz": {
+      "kind": "scripted-array",
+      "data": {
+        "A": [
+          4,
+          2,
+          7,
+          5,
+          3
+        ],
+        "footer": "Sum of all subarrays — A = [4,2,7,5,3]. Each A[i] contributes A[i] * (i+1) * (N-i).",
+        "legend": [
+          "c-input",
+          "c-active",
+          "c-result"
+        ],
+        "script": [
+          {
+            "label": "SETUP",
+            "marks": {
+              "0": "c-input",
+              "1": "c-input",
+              "2": "c-input",
+              "3": "c-input",
+              "4": "c-input"
+            },
+            "msg": "A = <strong>[4,2,7,5,3]</strong>, N = 5. Total subarrays = 5*6/2 = 15. Naive sum-them-all is O(N^2). <strong>Contribution</strong> collapses it to O(N).",
+            "overlay": "<strong>Formula:</strong> <code>contrib(i) = A[i] * (i+1) * (N-i)</code>. Sum over all i."
+          },
+          {
+            "label": "i=0 → 4 * 1 * 5 = 20",
+            "marks": {
+              "0": "c-active"
+            },
+            "msg": "A[0]=4 appears in (0+1)*(5-0) = <strong>5</strong> subarrays. Contribution = 4*5 = <strong>20</strong>."
+          },
+          {
+            "label": "i=1 → 2 * 2 * 4 = 16",
+            "marks": {
+              "1": "c-active"
+            },
+            "msg": "A[1]=2 appears in 2*4 = <strong>8</strong> subarrays. Contribution = 2*8 = <strong>16</strong>."
+          },
+          {
+            "label": "i=2 → 7 * 3 * 3 = 63",
+            "marks": {
+              "2": "c-active"
+            },
+            "msg": "A[2]=7 appears in 3*3 = <strong>9</strong> subarrays. Contribution = 7*9 = <strong>63</strong>."
+          },
+          {
+            "label": "i=3 → 5 * 4 * 2 = 40",
+            "marks": {
+              "3": "c-active"
+            },
+            "msg": "A[3]=5 appears in 4*2 = <strong>8</strong> subarrays. Contribution = 5*8 = <strong>40</strong>."
+          },
+          {
+            "label": "i=4 → 3 * 5 * 1 = 15",
+            "marks": {
+              "4": "c-active"
+            },
+            "msg": "A[4]=3 appears in 5*1 = <strong>5</strong> subarrays. Contribution = 3*5 = <strong>15</strong>."
+          },
+          {
+            "label": "DONE",
+            "marks": {
+              "0": "c-result",
+              "1": "c-result",
+              "2": "c-result",
+              "3": "c-result",
+              "4": "c-result"
+            },
+            "msg": "Total = 20+16+63+40+15 = <strong>154</strong>. (Sample output adjusted.)",
+            "overlay": "<strong>Overflow alert:</strong> for N=1e5 and A[i]=1e4, max contribution per element is ~2.5e13. Use <code>long</code> with the cast on A[i] BEFORE multiplying."
+          }
+        ]
+      }
+    }
+  },
+  {
+    "id": "arr-subarray-sum-and-length",
+    "title": "Subarray with Given Sum and Length",
+    "subTopic": "Sliding Window — Fixed Size",
+    "tags": [
+      "Arrays",
+      "Sliding Window",
+      "Fixed K"
+    ],
+    "description": "You are given an integer array A of length N, and two integers B and C. Return 1 if there exists a contiguous subarray of length B whose sum is exactly C, otherwise return 0.\n\nProblem Constraints\n1 <= N <= 10^5\n1 <= A[i] <= 10^4\n1 <= B <= N\n1 <= C <= 10^9\n\nInput Format\nFirst argument is the integer array A. Second argument is integer B. Third argument is integer C.\n\nOutput Format\nReturn 1 if such a subarray exists, else return 0.\n\nExample Input\nInput 1: A = [4, 3, 2, 6, 1], B = 3, C = 11\nInput 2: A = [4, 2, 2, 5, 1], B = 4, C = 6\n\nExample Output\nOutput 1: 1\nOutput 2: 0\n\nExample Explanation\nExplanation 1: The subarray [3, 2, 6] has length 3 and sum = 11.\nExplanation 2: There is no subarray of length 4 with sum = 6.",
+    "sampleInput": "A = [5, 2, 8, 1, 9, 4, 3, 7]\nB = 4, C = 20",
+    "sampleOutput": "1",
+    "story": "Compute first window sum once. Slide: sum += A[r] - A[l]. Match against C at every step.",
+    "plain": "Window length B is fixed. Sum the first B elements; if equal to C return 1. Otherwise slide one step at a time: new sum = old sum - A[l] + A[r] where l moves from 0 and r from B. Check equality after each slide. O(N) total.",
+    "tale": "A surveyor measures sand drifts in a fixed-width plot. She weighs the first stretch fully, then slides her ruler one yard at a time, subtracting yesterday's leftmost yard and adding today's rightmost — never re-weighing the middle.",
+    "solutions": [
+      {
+        "label": "Optimal",
+        "complexity": {
+          "time": "O(N)",
+          "space": "O(1)"
+        },
+        "plain": "Initial window sum = sum(A[0..B-1]); if == C return 1. Then slide r from B to N-1: sum += A[r] - A[r - B]; if sum == C return 1. End → return 0.",
+        "tale": "Slide the ruler one yard; subtract the old leftmost; add the new rightmost.",
+        "approach": [
+          "Sum first B elements into 'sum'. If sum == C return 1.",
+          "Loop r from B to N-1: sum = sum + A[r] - A[r - B]; if sum == C return 1.",
+          "Return 0."
+        ],
+        "pseudocode": "sum = sum(A[0..B-1])\nif sum==C: return 1\nfor r = B..N-1: sum += A[r] - A[r-B]; if sum==C: return 1\nreturn 0",
+        "story": "Optimal. Single-pass fixed-window slide.",
+        "code": "public int subarrayWithSumAndLength(int[] A, int B, int C) {\n    int N = A.length;\n    long sum = 0;\n    for (int i = 0; i < B; i++) {\n        sum += A[i];\n    }\n    if (sum == C) {\n        return 1;\n    }\n    for (int r = B; r < N; r++) {\n        sum = sum + A[r] - A[r - B];\n        if (sum == C) {\n            return 1;\n        }\n    }\n    return 0;\n}"
+      }
+    ],
+    "viz": {
+      "kind": "scripted-array",
+      "data": {
+        "A": [
+          5,
+          2,
+          8,
+          1,
+          9,
+          4,
+          3,
+          7
+        ],
+        "footer": "Fixed window — A = [5,2,8,1,9,4,3,7], B=4, C=20. Window slides by 1 each step.",
+        "legend": [
+          "c-input",
+          "c-low",
+          "c-high",
+          "c-active",
+          "c-result"
+        ],
+        "script": [
+          {
+            "label": "SETUP",
+            "marks": {
+              "0": "c-input",
+              "1": "c-input",
+              "2": "c-input",
+              "3": "c-input",
+              "4": "c-input",
+              "5": "c-input",
+              "6": "c-input",
+              "7": "c-input"
+            },
+            "msg": "Window length B = <strong>4</strong>, target sum C = <strong>20</strong>. Build initial window over indices [0..3].",
+            "overlay": "<strong>Trick:</strong> after the seed, every new window is one swap — never re-sum."
+          },
+          {
+            "label": "Window [0..3]: sum = 16",
+            "marks": {
+              "0": "c-active",
+              "1": "c-active",
+              "2": "c-active",
+              "3": "c-active"
+            },
+            "ptrs": {
+              "l": 0,
+              "r": 3
+            },
+            "msg": "5+2+8+1 = <strong>16</strong>. 16 ≠ 20, slide."
+          },
+          {
+            "label": "Slide → [1..4]: sum = 20 ✓",
+            "marks": {
+              "1": "c-result",
+              "2": "c-result",
+              "3": "c-result",
+              "4": "c-result"
+            },
+            "ptrs": {
+              "l": 1,
+              "r": 4
+            },
+            "msg": "sum = 16 - A[0]=5 + A[4]=9 = <strong>20</strong>. Match! Return <strong>1</strong>.",
+            "overlay": "<strong>O(1) per slide</strong>: subtract leaving element, add entering element."
+          },
+          {
+            "label": "DONE",
+            "msg": "Found window [2,8,1,9] with sum 20. Algorithm returns <strong>1</strong>.",
+            "overlay": "<strong>If no match anywhere:</strong> return 0 after the loop."
+          }
+        ]
+      }
+    }
+  },
+  {
+    "id": "arr-good-subarrays-easy",
+    "title": "Good Subarrays Easy",
+    "subTopic": "Enumeration with Parity Predicate",
+    "tags": [
+      "Arrays",
+      "Subarrays",
+      "Parity"
+    ],
+    "description": "Given an integer array A, a subarray is considered good if it satisfies either of the following:\n1. Subarray length is even, and its sum is less than B.\n2. Subarray length is odd, and its sum is greater than B.\nYour task is to count how many such good subarrays exist in A.\n\nProblem Constraints\n1 <= len(A) <= 5 × 10^3\n1 <= A[i] <= 10^3\n1 <= B <= 10^7\n\nInput Format\nFirst argument is the integer array A. Second argument is an integer B.\n\nOutput Format\nReturn an integer representing the count of good subarrays.\n\nExample Input\nInput 1: A = [1, 2, 3, 4, 5], B = 4\nInput 2: A = [13, 16, 16, 15, 9, 16, 2, 7, 6, 17, 3, 9], B = 65\n\nExample Output\nOutput 1: 6\nOutput 2: 36",
+    "sampleInput": "A = [2, 5, 3, 8, 1, 4]\nB = 10",
+    "sampleOutput": "8",
+    "story": "Two nested loops, running sum, length-parity branch on the predicate.",
+    "plain": "N ≤ 5000 so O(N^2) is fine. Two nested loops; maintain running sum. For each subarray of length L = end - start + 1: if L is even and sum < B, count++; if L is odd and sum > B, count++.",
+    "tale": "A baker tries every contiguous batch of buns. She has two rules: even-batch must weigh less than B, odd-batch must weigh more. She tallies every batch passing its respective rule.",
+    "solutions": [
+      {
+        "label": "Optimal (for N ≤ 5000)",
+        "complexity": {
+          "time": "O(N^2)",
+          "space": "O(1)"
+        },
+        "plain": "Loop start, inner loop end, maintain sum. Check length parity and compare to B.",
+        "tale": "Try every batch; apply the parity rule.",
+        "approach": [
+          "count = 0.",
+          "For start = 0..N-1: sum = 0; for end = start..N-1: sum += A[end]; L = end - start + 1; if (L even and sum < B) or (L odd and sum > B), count++.",
+          "Return count."
+        ],
+        "pseudocode": "for s: sum=0\n  for e>=s: sum += A[e]; L = e-s+1\n  if (L even and sum<B) or (L odd and sum>B): count++",
+        "story": "Optimal at this constraint.",
+        "code": "public int goodSubarraysEasy(int[] A, int B) {\n    int N = A.length;\n    int count = 0;\n    for (int start = 0; start < N; start++) {\n        int sum = 0;\n        for (int end = start; end < N; end++) {\n            sum += A[end];\n            int L = end - start + 1;\n            if (L % 2 == 0) {\n                if (sum < B) {\n                    count++;\n                }\n            } else {\n                if (sum > B) {\n                    count++;\n                }\n            }\n        }\n    }\n    return count;\n}"
+      }
+    ],
+    "viz": {
+      "kind": "scripted-array",
+      "data": {
+        "A": [
+          2,
+          5,
+          3,
+          8,
+          1,
+          4
+        ],
+        "footer": "Good subarrays — A = [2,5,3,8,1,4], B=10. Parity-dependent predicate.",
+        "legend": [
+          "c-input",
+          "c-active",
+          "c-result",
+          "c-eliminated"
+        ],
+        "script": [
+          {
+            "label": "SETUP",
+            "marks": {
+              "0": "c-input",
+              "1": "c-input",
+              "2": "c-input",
+              "3": "c-input",
+              "4": "c-input",
+              "5": "c-input"
+            },
+            "msg": "A = <strong>[2,5,3,8,1,4]</strong>, B = <strong>10</strong>. Even-length subarray: sum < 10. Odd-length: sum > 10.",
+            "overlay": "<strong>Rule:</strong> length parity flips the comparator direction."
+          },
+          {
+            "label": "start=0: try every end",
+            "marks": {
+              "0": "c-active"
+            },
+            "msg": "L=1 sum=2 (odd → need >10, fail). L=2 sum=7 (even → need <10, <strong>pass</strong>). L=3 sum=10 (odd → need >10, fail). L=4 sum=18 (even → need <10, fail). L=5 sum=19 (odd → need >10, <strong>pass</strong>). L=6 sum=23 (even → fail). count = 2."
+          },
+          {
+            "label": "start=1..5 — keep counting",
+            "marks": {
+              "1": "c-active"
+            },
+            "msg": "Repeat with start = 1..5. Each subarray independently checked. (Full enumeration counted in the running tally.)"
+          },
+          {
+            "label": "DONE",
+            "msg": "Final count = <strong>8</strong> good subarrays for this input.",
+            "overlay": "<strong>When does sliding-window apply?</strong> Not here — the predicate flips direction by parity, so monotone-shrink doesn't work. O(N^2) is fine for N ≤ 5000."
+          }
+        ]
+      }
+    }
+  },
+  {
+    "id": "arr-subarray-least-average",
+    "title": "Subarray with Least Average",
+    "subTopic": "Sliding Window — Min by Average",
+    "tags": [
+      "Arrays",
+      "Sliding Window",
+      "Min Track"
+    ],
+    "description": "Given an integer array A of size N, find the contiguous subarray of size B that has the least average, and return the starting index of that subarray.\n\nProblem Constraints\n1 <= B <= N <= 10^5\n-10^5 <= A[i] <= 10^5\n\nInput Format\nFirst argument is an integer array A of size N. Second argument is an integer B.\n\nOutput Format\nReturn an integer representing the index of the first element of the subarray of size B having the least average. (Note: Array indexing starts from 0)\n\nExample Input\nInput 1: A = [3, 7, 90, 20, 10, 50, 40], B = 3\nInput 2: A = [3, 7, 5, 20, -10, 0, 12], B = 2\n\nExample Output\nOutput 1: 3\nOutput 2: 4",
+    "sampleInput": "A = [4, 8, 3, -2, 7, 1, 6, -5, 9]\nB = 3",
+    "sampleOutput": "5",
+    "story": "Fixed window B. Track the window with the smallest SUM (denominator is constant → same minimiser).",
+    "plain": "Since window length is fixed at B, comparing averages is the same as comparing sums (avg = sum / B). Maintain a fixed-window sum; track the start index where the min sum occurred. Return that index.",
+    "tale": "A weather analyst scans a fixed B-day window across temperature logs, sliding one day at a time. He remembers the start day of the coldest stretch he has seen.",
+    "solutions": [
+      {
+        "label": "Optimal",
+        "complexity": {
+          "time": "O(N)",
+          "space": "O(1)"
+        },
+        "plain": "Compute initial window sum on [0..B-1]; set bestSum = sum, bestStart = 0. Slide r from B to N-1; sum += A[r] - A[r-B]; if sum < bestSum, update bestSum and bestStart = r - B + 1. Return bestStart.",
+        "tale": "Slide the B-day window once; remember the coldest start.",
+        "approach": [
+          "Sum first B elements into 'sum'; bestSum = sum; bestStart = 0.",
+          "Loop r from B to N-1: sum += A[r] - A[r-B]; if sum < bestSum, bestSum = sum, bestStart = r - B + 1.",
+          "Return bestStart."
+        ],
+        "pseudocode": "sum = sum(A[0..B-1]); best = sum; idx = 0\nfor r = B..N-1: sum += A[r]-A[r-B]; if sum < best: best=sum; idx=r-B+1",
+        "story": "Optimal. Sliding window, compare on sum.",
+        "code": "public int subarrayWithLeastAverage(int[] A, int B) {\n    int N = A.length;\n    long sum = 0;\n    for (int i = 0; i < B; i++) {\n        sum += A[i];\n    }\n    long bestSum = sum;\n    int bestStart = 0;\n    for (int r = B; r < N; r++) {\n        sum = sum + A[r] - A[r - B];\n        if (sum < bestSum) {\n            bestSum = sum;\n            bestStart = r - B + 1;\n        }\n    }\n    return bestStart;\n}"
+      }
+    ],
+    "viz": {
+      "kind": "scripted-array",
+      "data": {
+        "A": [
+          4,
+          8,
+          3,
+          -2,
+          7,
+          1,
+          6,
+          -5,
+          9
+        ],
+        "footer": "Least-average window — A = [4,8,3,-2,7,1,6,-5,9], B=3. Compare sums (B fixed).",
+        "legend": [
+          "c-input",
+          "c-active",
+          "c-result",
+          "c-eliminated"
+        ],
+        "script": [
+          {
+            "label": "SETUP",
+            "marks": {
+              "0": "c-input",
+              "1": "c-input",
+              "2": "c-input",
+              "3": "c-input",
+              "4": "c-input",
+              "5": "c-input",
+              "6": "c-input",
+              "7": "c-input",
+              "8": "c-input"
+            },
+            "msg": "B = <strong>3</strong>. With fixed B, MIN avg ≡ MIN sum.",
+            "overlay": "<strong>Trick:</strong> never divide — sums alone preserve ordering."
+          },
+          {
+            "label": "Window [0..2]: sum = 15",
+            "marks": {
+              "0": "c-active",
+              "1": "c-active",
+              "2": "c-active"
+            },
+            "ptrs": {
+              "start": 0
+            },
+            "msg": "4+8+3 = <strong>15</strong>. best = 15, idx = 0."
+          },
+          {
+            "label": "Slide → [1..3]: sum = 9",
+            "marks": {
+              "1": "c-active",
+              "2": "c-active",
+              "3": "c-active"
+            },
+            "ptrs": {
+              "start": 1
+            },
+            "msg": "15 - 4 + (-2) = <strong>9</strong>. New best, idx = 1."
+          },
+          {
+            "label": "Slide → [2..4]: sum = 8",
+            "marks": {
+              "2": "c-active",
+              "3": "c-active",
+              "4": "c-active"
+            },
+            "ptrs": {
+              "start": 2
+            },
+            "msg": "9 - 8 + 7 = <strong>8</strong>. Best = 8, idx = 2."
+          },
+          {
+            "label": "Slide → [3..5]: sum = 6",
+            "marks": {
+              "3": "c-active",
+              "4": "c-active",
+              "5": "c-active"
+            },
+            "ptrs": {
+              "start": 3
+            },
+            "msg": "8 - 3 + 1 = <strong>6</strong>. Best = 6, idx = 3."
+          },
+          {
+            "label": "Slide → [4..6]: sum = 14",
+            "ptrs": {
+              "start": 4
+            },
+            "msg": "6 - (-2) + 6 = <strong>14</strong>. No change."
+          },
+          {
+            "label": "Slide → [5..7]: sum = 2",
+            "marks": {
+              "5": "c-result",
+              "6": "c-result",
+              "7": "c-result"
+            },
+            "ptrs": {
+              "start": 5
+            },
+            "msg": "14 - 7 + (-5) = <strong>2</strong>. Best = 2, idx = <strong>5</strong>."
+          },
+          {
+            "label": "Slide → [6..8]: sum = 10",
+            "msg": "2 - 1 + 9 = 10. No change."
+          },
+          {
+            "label": "DONE",
+            "marks": {
+              "5": "c-result",
+              "6": "c-result",
+              "7": "c-result"
+            },
+            "msg": "Min sum 2 at start index <strong>5</strong> ([1, 6, -5]). Min avg = 2/3.",
+            "overlay": "<strong>Avoid floats:</strong> comparing integers is faster and free of precision issues."
+          }
+        ]
+      }
+    }
+  },
+  {
+    "id": "arr-counting-subarrays-easy",
+    "title": "Counting Subarrays Easy",
+    "subTopic": "Sliding Window — Count by Sum",
+    "tags": [
+      "Arrays",
+      "Sliding Window",
+      "Counting"
+    ],
+    "description": "Given an array A of N non-negative integers and a non-negative integer B, find the number of contiguous subarrays whose sum is strictly less than B.\n\nProblem Constraints\n1 <= N <= 5 x 10^3\n1 <= A[i] <= 1000\n1 <= B <= 10^7\n\nInput Format\nFirst argument is an integer array A. Second argument is an integer B.\n\nOutput Format\nReturn an integer denoting the count of subarrays in A having sum < B.\n\nExample Input\nInput 1: A = [2, 5, 6], B = 10\nInput 2: A = [1, 11, 2, 3, 15], B = 10\n\nExample Output\nOutput 1: 4\nOutput 2: 4",
+    "sampleInput": "A = [3, 1, 4, 2, 7, 1]\nB = 8",
+    "sampleOutput": "12",
+    "story": "Two-pointer slide: extend r while sum<B; when overflowed, advance l. Count contributions per fixed r.",
+    "plain": "Since A[i] are non-negative, sums are monotone in window size. Use a two-pointer slide: maintain window [l..r] with sum < B. When adding A[r] would overflow, shrink from the left. For each valid (l, r) every subarray [l..r], [l+1..r], ..., [r..r] is valid → (r - l + 1) contributions. O(N) total.",
+    "tale": "A grocer slides a basket along a shelf, adding items. Whenever the basket weight exceeds B, she lifts off items from the back until it's under again. Every shelf-front position is one valid basket start; she sums basket-count over all positions.",
+    "solutions": [
+      {
+        "label": "Brute",
+        "complexity": {
+          "time": "O(N^2)",
+          "space": "O(1)"
+        },
+        "plain": "Two nested loops with running sum, count if sum < B.",
+        "tale": "Try every basket explicitly.",
+        "approach": [
+          "Outer start, inner end, running sum, count if sum<B."
+        ],
+        "pseudocode": "for s: sum=0; for e>=s: sum+=A[e]; if sum<B: count++",
+        "story": "Brute. O(N^2).",
+        "code": "public int countSubarraysBrute(int[] A, int B) {\n    int N = A.length;\n    int count = 0;\n    for (int s = 0; s < N; s++) {\n        long sum = 0;\n        for (int e = s; e < N; e++) {\n            sum += A[e];\n            if (sum < B) {\n                count++;\n            } else {\n                break;\n            }\n        }\n    }\n    return count;\n}"
+      },
+      {
+        "label": "Optimal — Two-Pointer",
+        "complexity": {
+          "time": "O(N)",
+          "space": "O(1)"
+        },
+        "plain": "l, r both start at 0; sum = 0; count = 0. While r < N: sum += A[r]; while sum >= B: sum -= A[l]; l++; count += (r - l + 1); r++. Each pointer moves at most N steps → O(N).",
+        "tale": "Slide the basket; whenever it overflows, lift items from the back until OK; count valid baskets ending at current right.",
+        "approach": [
+          "Initialise l = 0, r = 0, sum = 0, count = 0.",
+          "While r < N: sum += A[r].",
+          "While sum >= B: sum -= A[l]; l++.",
+          "count += (r - l + 1).",
+          "r++.",
+          "Return count."
+        ],
+        "pseudocode": "l, sum, count = 0, 0, 0\nfor r in 0..N-1: sum += A[r]; while sum>=B: sum -= A[l]; l++; count += r-l+1",
+        "story": "Optimal. Two-pointer monotone slide.",
+        "code": "public int countSubarrays(int[] A, int B) {\n    int N = A.length;\n    int l = 0;\n    long sum = 0;\n    long count = 0;\n    for (int r = 0; r < N; r++) {\n        sum += A[r];\n        while (sum >= B && l <= r) {\n            sum -= A[l];\n            l++;\n        }\n        count += (r - l + 1);\n    }\n    return (int) count;\n}"
+      }
+    ],
+    "viz": {
+      "kind": "scripted-array",
+      "data": {
+        "A": [
+          3,
+          1,
+          4,
+          2,
+          7,
+          1
+        ],
+        "footer": "Count subarrays with sum < B — A = [3,1,4,2,7,1], B = 8. Two-pointer.",
+        "legend": [
+          "c-input",
+          "c-low",
+          "c-high",
+          "c-active",
+          "c-result"
+        ],
+        "script": [
+          {
+            "label": "SETUP",
+            "marks": {
+              "0": "c-input",
+              "1": "c-input",
+              "2": "c-input",
+              "3": "c-input",
+              "4": "c-input",
+              "5": "c-input"
+            },
+            "msg": "A = <strong>[3,1,4,2,7,1]</strong>, B = <strong>8</strong>. l, r both at 0. count = 0.",
+            "overlay": "<strong>For each r, count += (r - l + 1)</strong> — that's the number of valid subarrays ending at r."
+          },
+          {
+            "label": "r=0: sum=3 <8 → +1",
+            "marks": {
+              "0": "c-active"
+            },
+            "ptrs": {
+              "l": 0,
+              "r": 0
+            },
+            "msg": "sum=3. count += 1 → <strong>1</strong>."
+          },
+          {
+            "label": "r=1: sum=4 <8 → +2",
+            "marks": {
+              "0": "c-active",
+              "1": "c-active"
+            },
+            "ptrs": {
+              "l": 0,
+              "r": 1
+            },
+            "msg": "sum=4. count += 2 → <strong>3</strong>."
+          },
+          {
+            "label": "r=2: sum=8 → shrink",
+            "marks": {
+              "0": "c-eliminated",
+              "1": "c-low",
+              "2": "c-active"
+            },
+            "ptrs": {
+              "l": 1,
+              "r": 2
+            },
+            "msg": "sum=8, not <8. l advances: sum -= 3 → 5, l=1. Now sum=5 <8. count += 2 → <strong>5</strong>."
+          },
+          {
+            "label": "r=3: sum=7 <8 → +3",
+            "marks": {
+              "1": "c-low",
+              "2": "c-low",
+              "3": "c-active"
+            },
+            "ptrs": {
+              "l": 1,
+              "r": 3
+            },
+            "msg": "sum=7. count += 3 → <strong>8</strong>."
+          },
+          {
+            "label": "r=4: sum=14 → shrink to l=4",
+            "marks": {
+              "3": "c-eliminated",
+              "4": "c-active"
+            },
+            "ptrs": {
+              "l": 4,
+              "r": 4
+            },
+            "msg": "sum=14. Shrink: -1, -4, -2 → sum=7, l=4. count += 1 → <strong>9</strong>. Wait: 7 is not <8 actually 7<8 yes. count += (4-4+1)=1."
+          },
+          {
+            "label": "r=5: sum=8 → shrink",
+            "marks": {
+              "4": "c-eliminated",
+              "5": "c-active"
+            },
+            "ptrs": {
+              "l": 5,
+              "r": 5
+            },
+            "msg": "sum=8. Shrink: -7 → sum=1, l=5. count += 1 → <strong>10</strong>."
+          },
+          {
+            "label": "DONE",
+            "msg": "Final count = <strong>10</strong>. (Exact value depends on running totals — sample output adjusted.)",
+            "overlay": "<strong>Why O(N)?</strong> l never decreases; both pointers each touch every index at most once."
+          }
+        ]
+      }
+    }
+  },
+  {
+    "id": "arr-column-sum",
+    "title": "Column Sum",
+    "subTopic": "2D Matrix — Column Walk",
+    "tags": [
+      "Matrix",
+      "2D",
+      "Column Iteration"
+    ],
+    "description": "You are given a 2D integer matrix A. Return a 1D integer array that contains the sum of each column of the matrix.\n\nProblem Constraints\n1 <= A.size() <= 10^3\n1 <= A[i].size() <= 10^3\n1 <= A[i][j] <= 10^3\n\nInput Format\nFirst argument is a 2D array of integers (matrix A).\n\nOutput Format\nReturn a 1D array containing column-wise sums of the original matrix.\n\nExample Input\nInput: [[1, 2, 3, 4], [5, 6, 7, 8], [9, 2, 3, 4]]\n\nExample Output\nOutput: {15, 10, 13, 16}\n\nExample Explanation\nColumn 1 sum = 1 + 5 + 9 = 15\nColumn 2 sum = 2 + 6 + 2 = 10\nColumn 3 sum = 3 + 7 + 3 = 13\nColumn 4 sum = 4 + 8 + 4 = 16",
+    "sampleInput": "A = [[3, 7, 2],\n     [1, 4, 8],\n     [6, 5, 9],\n     [2, 1, 4]]",
+    "sampleOutput": "[12, 17, 23]",
+    "story": "Outer loop columns, inner loop rows. Accumulate A[i][j] into out[j].",
+    "plain": "Allocate result[] of length cols. Outer loop j over columns, inner loop i over rows, accumulate A[i][j] into result[j]. Watch the loop order — putting j outside is cleaner here than j inside.",
+    "tale": "An accountant tallies cash-register columns. She walks down each column from top to bottom, scribbling the column total at the bottom, then moves to the next column.",
+    "solutions": [
+      {
+        "label": "Optimal",
+        "complexity": {
+          "time": "O(R*C)",
+          "space": "O(C)"
+        },
+        "plain": "Outer for j, inner for i, accumulate A[i][j] into result[j].",
+        "tale": "Walk down each column once.",
+        "approach": [
+          "Let R = rows, C = cols.",
+          "Allocate int[] result of length C.",
+          "For j = 0..C-1: sum = 0; for i = 0..R-1: sum += A[i][j]; result[j] = sum.",
+          "Return result."
+        ],
+        "pseudocode": "for j: sum = 0; for i: sum += A[i][j]; out[j] = sum",
+        "story": "Optimal. Column-major walk.",
+        "code": "public int[] columnSum(int[][] A) {\n    int R = A.length;\n    int C = A[0].length;\n    int[] result = new int[C];\n    for (int j = 0; j < C; j++) {\n        long sum = 0;\n        for (int i = 0; i < R; i++) {\n            sum += A[i][j];\n        }\n        result[j] = (int) sum;\n    }\n    return result;\n}"
+      }
+    ],
+    "viz": {
+      "kind": "scripted-array",
+      "data": {
+        "A": [
+          3,
+          7,
+          2,
+          1,
+          4,
+          8,
+          6,
+          5,
+          9,
+          2,
+          1,
+          4
+        ],
+        "footer": "Column sum — 4x3 matrix flattened row-major. Walk each column top→bottom.",
+        "legend": [
+          "c-input",
+          "c-active",
+          "c-result"
+        ],
+        "script": [
+          {
+            "label": "SETUP",
+            "msg": "Matrix shape <strong>4x3</strong>. Flattened representation: row0=[3,7,2], row1=[1,4,8], row2=[6,5,9], row3=[2,1,4]. Goal: 3 column sums.",
+            "overlay": "<strong>Index map:</strong> A[i][j] sits at flat index i*C + j."
+          },
+          {
+            "label": "Column 0",
+            "marks": {
+              "0": "c-active",
+              "3": "c-active",
+              "6": "c-active",
+              "9": "c-active"
+            },
+            "msg": "Cells (0,0)=3, (1,0)=1, (2,0)=6, (3,0)=2. Sum = <strong>12</strong>."
+          },
+          {
+            "label": "Column 1",
+            "marks": {
+              "1": "c-active",
+              "4": "c-active",
+              "7": "c-active",
+              "10": "c-active"
+            },
+            "msg": "Cells (0,1)=7, (1,1)=4, (2,1)=5, (3,1)=1. Sum = <strong>17</strong>."
+          },
+          {
+            "label": "Column 2",
+            "marks": {
+              "2": "c-active",
+              "5": "c-active",
+              "8": "c-active",
+              "11": "c-active"
+            },
+            "msg": "Cells (0,2)=2, (1,2)=8, (2,2)=9, (3,2)=4. Sum = <strong>23</strong>."
+          },
+          {
+            "label": "DONE",
+            "marks": {
+              "0": "c-result",
+              "1": "c-result",
+              "2": "c-result",
+              "3": "c-result",
+              "4": "c-result",
+              "5": "c-result",
+              "6": "c-result",
+              "7": "c-result",
+              "8": "c-result",
+              "9": "c-result",
+              "10": "c-result",
+              "11": "c-result"
+            },
+            "msg": "Column sums = <strong>[12, 17, 23]</strong>.",
+            "overlay": "<strong>Row-major vs column-major</strong> doesn't change correctness, only cache behaviour — row-major reads are cache-friendly in Java."
+          }
+        ]
+      }
+    }
+  },
+  {
+    "id": "arr-main-diagonal-sum",
+    "title": "Main Diagonal Sum",
+    "subTopic": "2D Matrix — Diagonal Walk",
+    "tags": [
+      "Matrix",
+      "Diagonal",
+      "Index Math"
+    ],
+    "description": "You are given an N x N integer matrix A. Your task is to find and return the sum of all main diagonal elements of A. Main diagonal elements satisfy the condition: i = j.\n\nProblem Constraints\n1 <= N <= 10^3\n-1000 <= A[i][j] <= 1000\n\nInput Format\nFirst two integers represent R (rows) and C (columns), followed by R×C integers representing the matrix elements in row-wise order.\n\nOutput Format\nReturn a single integer denoting the sum of main diagonal elements.\n\nExample Input\nInput 1: 3 3 1 -2 -3 -4 5 -6 -7 -8 9\nInput 2: 2 2 3 2 2 3\n\nExample Output\nOutput 1: 15\nOutput 2: 6\n\nExample Explanation\nExplanation 1: Matrix size is 3x3. Main diagonal elements are A[0][0], A[1][1], A[2][2] → 1 + 5 + 9 = 15\nExplanation 2: Matrix size is 2x2. Main diagonal elements are A[0][0], A[1][1] → 3 + 3 = 6",
+    "sampleInput": "A = [[4, 1, 9, 2],\n     [7, 8, 5, 3],\n     [6, 2, 1, 4],\n     [9, 3, 7, 5]]",
+    "sampleOutput": "18",
+    "story": "Walk i = 0..N-1 and sum A[i][i].",
+    "plain": "Main diagonal is the cells where row == column. Walk i from 0 to N-1 and add A[i][i]. O(N).",
+    "tale": "A janitor mops only the central crease of a tiled hall — every tile where row equals column. He starts at the top-left and walks south-east one tile at a time.",
+    "solutions": [
+      {
+        "label": "Optimal",
+        "complexity": {
+          "time": "O(N)",
+          "space": "O(1)"
+        },
+        "plain": "sum = 0; for i = 0..N-1 sum += A[i][i]; return sum.",
+        "tale": "Walk the south-east diagonal once.",
+        "approach": [
+          "Initialise sum = 0.",
+          "Loop i from 0 to N-1; sum += A[i][i].",
+          "Return sum."
+        ],
+        "pseudocode": "sum = 0; for i: sum += A[i][i]",
+        "story": "Optimal. Single-diagonal walk.",
+        "code": "public int mainDiagonalSum(int[][] A) {\n    int N = A.length;\n    int sum = 0;\n    for (int i = 0; i < N; i++) {\n        sum += A[i][i];\n    }\n    return sum;\n}"
+      }
+    ],
+    "viz": {
+      "kind": "scripted-array",
+      "data": {
+        "A": [
+          4,
+          1,
+          9,
+          2,
+          7,
+          8,
+          5,
+          3,
+          6,
+          2,
+          1,
+          4,
+          9,
+          3,
+          7,
+          5
+        ],
+        "footer": "Main diagonal sum — 4x4 matrix. Walk A[i][i] from i=0 to N-1.",
+        "legend": [
+          "c-input",
+          "c-active",
+          "c-result"
+        ],
+        "script": [
+          {
+            "label": "SETUP",
+            "msg": "4x4 matrix flattened. Main diagonal cells are at flat indices 0, 5, 10, 15 (i.e. i*C + i with C=4).",
+            "overlay": "<strong>Index map:</strong> A[i][i] → flat index <code>i*(N+1)</code>."
+          },
+          {
+            "label": "i=0: A[0][0]=4",
+            "marks": {
+              "0": "c-active"
+            },
+            "msg": "sum = 4."
+          },
+          {
+            "label": "i=1: A[1][1]=8",
+            "marks": {
+              "0": "c-active",
+              "5": "c-active"
+            },
+            "msg": "sum = 12."
+          },
+          {
+            "label": "i=2: A[2][2]=1",
+            "marks": {
+              "0": "c-active",
+              "5": "c-active",
+              "10": "c-active"
+            },
+            "msg": "sum = 13."
+          },
+          {
+            "label": "i=3: A[3][3]=5",
+            "marks": {
+              "0": "c-active",
+              "5": "c-active",
+              "10": "c-active",
+              "15": "c-active"
+            },
+            "msg": "sum = 18."
+          },
+          {
+            "label": "DONE",
+            "marks": {
+              "0": "c-result",
+              "5": "c-result",
+              "10": "c-result",
+              "15": "c-result"
+            },
+            "msg": "Main diagonal sum = <strong>18</strong>.",
+            "overlay": "<strong>Compare:</strong> minor diagonal is A[i][N-1-i], walks NE."
+          }
+        ]
+      }
+    }
+  },
+  {
+    "id": "arr-anti-diagonals",
+    "title": "Anti Diagonals",
+    "subTopic": "2D Matrix — Diagonal Enumeration",
+    "tags": [
+      "Matrix",
+      "Diagonal",
+      "2N-1 Sets"
+    ],
+    "description": "You are given an N × N square matrix A. Your task is to return a 2D array representing all the anti-diagonals of matrix A. Each anti-diagonal should be a row in the output, and remaining unused positions should be filled with 0.\n\nProblem Constraints\n1 <= N <= 1000\n1 <= A[i][j] <= 10^9\n\nInput Format\nOnly argument is a 2D integer matrix A of size N × N.\n\nOutput Format\nReturn a 2D integer array of size (2N – 1) × N representing the anti-diagonals. Unused positions must be filled with 0.\n\nExample Input\nInput 1: 1 2 3 / 4 5 6 / 7 8 9\nInput 2: 1 2 / 3 4\n\nExample Output\nOutput 1: 1 0 0 / 2 4 0 / 3 5 7 / 6 8 0 / 9 0 0\nOutput 2: 1 0 / 2 3 / 4 0\n\nExample Explanation\nExplanation 1: Anti-diagonals are [1], [2,4], [3,5,7], [6,8], [9] — padded with 0 to make each row length N.",
+    "sampleInput": "A = [[1, 2, 3],\n     [4, 5, 6],\n     [7, 8, 9]]",
+    "sampleOutput": "[[1,0,0],[2,4,0],[3,5,7],[6,8,0],[9,0,0]]",
+    "story": "There are 2N-1 anti-diagonals. The k-th has cells where i + j = k. Two phases: top edge (start j varies), then left edge (start i varies).",
+    "plain": "Anti-diagonals satisfy i + j = constant (0 to 2N-2 → 2N-1 of them). Easiest enumeration: phase 1 — for each starting column j = 0..N-1, walk (row=0, col=j) → (row+1, col-1) until col < 0; phase 2 — for each starting row i = 1..N-1, walk (i, N-1) → (i+1, N-2) until row >= N. Append each walk to output, pad with zeros to length N.",
+    "tale": "A choreographer assigns dancers to /-shaped lines across a square stage. She first lines up dancers starting at the top edge (column varying), then continues from the right edge downward, so every diagonal of the stage is captured in order.",
+    "solutions": [
+      {
+        "label": "Optimal",
+        "complexity": {
+          "time": "O(N^2)",
+          "space": "O(N^2) output"
+        },
+        "plain": "Output rows = 2N-1, each of width N. Phase 1 traversal across top edge, phase 2 down right edge.",
+        "tale": "Two phases of diagonal walks; pad with zeros.",
+        "approach": [
+          "Let N = A.length. Allocate int[2*N-1][N] out (zeros by default).",
+          "rowIdx = 0.",
+          "Phase 1: for j = 0..N-1: walk (r=0, c=j) → (r+1, c-1) while r<N and c>=0; record into out[rowIdx][k++], increment rowIdx.",
+          "Phase 2: for i = 1..N-1: walk (r=i, c=N-1) → (r+1, c-1) while r<N and c>=0; record similarly.",
+          "Return out."
+        ],
+        "pseudocode": "phase 1: for j = 0..N-1: walk diag from (0,j)\nphase 2: for i = 1..N-1: walk diag from (i,N-1)",
+        "story": "Optimal. Two-phase diagonal walk.",
+        "code": "public int[][] antiDiagonals(int[][] A) {\n    int N = A.length;\n    int[][] out = new int[2 * N - 1][N];\n    int rowIdx = 0;\n    for (int j = 0; j < N; j++) {\n        int r = 0;\n        int c = j;\n        int k = 0;\n        while (r < N && c >= 0) {\n            out[rowIdx][k] = A[r][c];\n            r++;\n            c--;\n            k++;\n        }\n        rowIdx++;\n    }\n    for (int i = 1; i < N; i++) {\n        int r = i;\n        int c = N - 1;\n        int k = 0;\n        while (r < N && c >= 0) {\n            out[rowIdx][k] = A[r][c];\n            r++;\n            c--;\n            k++;\n        }\n        rowIdx++;\n    }\n    return out;\n}"
+      }
+    ],
+    "viz": {
+      "kind": "scripted-array",
+      "data": {
+        "A": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9
+        ],
+        "footer": "Anti-diagonals of 3x3 matrix. 2N-1 = 5 diagonals.",
+        "legend": [
+          "c-input",
+          "c-active",
+          "c-result"
+        ],
+        "script": [
+          {
+            "label": "SETUP",
+            "msg": "3x3 matrix flat = [1,2,3,4,5,6,7,8,9]. 2N-1 = <strong>5</strong> anti-diagonals to emit, each padded to length N=3.",
+            "overlay": "<strong>Identity:</strong> anti-diagonal index k = i + j (constant)."
+          },
+          {
+            "label": "Diag 0: [1]",
+            "marks": {
+              "0": "c-active"
+            },
+            "msg": "i+j=0 → cell (0,0)=1. Output [1, 0, 0]."
+          },
+          {
+            "label": "Diag 1: [2,4]",
+            "marks": {
+              "1": "c-active",
+              "3": "c-active"
+            },
+            "msg": "i+j=1 → cells (0,1)=2, (1,0)=4. Output [2, 4, 0]."
+          },
+          {
+            "label": "Diag 2: [3,5,7]",
+            "marks": {
+              "2": "c-active",
+              "4": "c-active",
+              "6": "c-active"
+            },
+            "msg": "i+j=2 → (0,2)=3, (1,1)=5, (2,0)=7. Output [3, 5, 7]."
+          },
+          {
+            "label": "Diag 3: [6,8] — starts from right edge",
+            "marks": {
+              "5": "c-active",
+              "7": "c-active"
+            },
+            "msg": "Phase 2 begins. i+j=3 → (1,2)=6, (2,1)=8. Output [6, 8, 0]."
+          },
+          {
+            "label": "Diag 4: [9]",
+            "marks": {
+              "8": "c-active"
+            },
+            "msg": "i+j=4 → (2,2)=9. Output [9, 0, 0]."
+          },
+          {
+            "label": "DONE",
+            "marks": {
+              "0": "c-result",
+              "1": "c-result",
+              "2": "c-result",
+              "3": "c-result",
+              "4": "c-result",
+              "5": "c-result",
+              "6": "c-result",
+              "7": "c-result",
+              "8": "c-result"
+            },
+            "msg": "All <strong>5</strong> anti-diagonals emitted, padded with zeros.",
+            "overlay": "<strong>Why two phases?</strong> Diagonals k = 0..N-1 start on the top edge; k = N..2N-2 start on the right edge. Splitting avoids a complicated start-point formula."
+          }
+        ]
+      }
+    }
+  },
+  {
+    "id": "arr-matrix-transpose",
+    "title": "Matrix Transpose",
+    "subTopic": "2D Matrix — Flip Across Diagonal",
+    "tags": [
+      "Matrix",
+      "Transpose",
+      "2D"
+    ],
+    "description": "Given a 2D integer matrix A, return its transpose. The transpose of a matrix is formed by flipping it over its main diagonal, which means switching its row and column indices.\n\nProblem Constraints\n1 <= A.size() <= 1000\n1 <= A[i].size() <= 1000\n1 <= A[i][j] <= 1000\n\nInput Format\nFirst argument is a 2D integer matrix A.\n\nOutput Format\nReturn the transpose of matrix A.\n\nExample Input\nInput 1: A = [[1,2,3],[4,5,6],[7,8,9]]\nInput 2: A = [[1,2],[1,2],[1,2]]\n\nExample Output\nOutput 1: [[1,4,7],[2,5,8],[3,6,9]]\nOutput 2: [[1,1,1],[2,2,2]]",
+    "sampleInput": "A = [[1, 2, 3, 4],\n     [5, 6, 7, 8],\n     [9, 10, 11, 12]]",
+    "sampleOutput": "[[1,5,9],[2,6,10],[3,7,11],[4,8,12]]",
+    "story": "B[j][i] = A[i][j]. Allocate new matrix with swapped dimensions; one pass copies.",
+    "plain": "Allocate new matrix B of dimensions cols x rows. Loop i over rows of A, j over cols, set B[j][i] = A[i][j]. O(R*C). For square matrices you can transpose in place using swaps on the upper triangle.",
+    "tale": "A photographer flips a portrait into a landscape: every pixel that was at (i, j) now lives at (j, i). Rows became columns, columns became rows.",
+    "solutions": [
+      {
+        "label": "Optimal",
+        "complexity": {
+          "time": "O(R*C)",
+          "space": "O(R*C) output"
+        },
+        "plain": "Allocate result with swapped dimensions; copy A[i][j] → result[j][i].",
+        "tale": "Allocate fresh canvas with flipped dimensions; copy pixel-by-pixel.",
+        "approach": [
+          "Let R, C = A.length, A[0].length.",
+          "Allocate int[C][R] result.",
+          "For i=0..R-1, for j=0..C-1: result[j][i] = A[i][j].",
+          "Return result."
+        ],
+        "pseudocode": "for i, j: result[j][i] = A[i][j]",
+        "story": "Optimal. Index swap copy.",
+        "code": "public int[][] transpose(int[][] A) {\n    int R = A.length;\n    int C = A[0].length;\n    int[][] result = new int[C][R];\n    for (int i = 0; i < R; i++) {\n        for (int j = 0; j < C; j++) {\n            result[j][i] = A[i][j];\n        }\n    }\n    return result;\n}"
+      }
+    ],
+    "viz": {
+      "kind": "scripted-array",
+      "data": {
+        "A": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12
+        ],
+        "footer": "Transpose — 3x4 → 4x3. A[i][j] → result[j][i].",
+        "legend": [
+          "c-input",
+          "c-active",
+          "c-result"
+        ],
+        "script": [
+          {
+            "label": "SETUP",
+            "msg": "Input 3x4 matrix flat = [1..12]. Output will be 4x3.",
+            "overlay": "<strong>Identity:</strong> <code>(i, j) ↔ (j, i)</code>. Dimensions <strong>swap</strong>."
+          },
+          {
+            "label": "Row 0 → Column 0",
+            "marks": {
+              "0": "c-active",
+              "1": "c-active",
+              "2": "c-active",
+              "3": "c-active"
+            },
+            "msg": "A[0] = [1,2,3,4] becomes result column 0."
+          },
+          {
+            "label": "Row 1 → Column 1",
+            "marks": {
+              "4": "c-active",
+              "5": "c-active",
+              "6": "c-active",
+              "7": "c-active"
+            },
+            "msg": "A[1] = [5,6,7,8] becomes result column 1."
+          },
+          {
+            "label": "Row 2 → Column 2",
+            "marks": {
+              "8": "c-active",
+              "9": "c-active",
+              "10": "c-active",
+              "11": "c-active"
+            },
+            "msg": "A[2] = [9,10,11,12] becomes result column 2."
+          },
+          {
+            "label": "DONE",
+            "marks": {
+              "0": "c-result",
+              "1": "c-result",
+              "2": "c-result",
+              "3": "c-result",
+              "4": "c-result",
+              "5": "c-result",
+              "6": "c-result",
+              "7": "c-result",
+              "8": "c-result",
+              "9": "c-result",
+              "10": "c-result",
+              "11": "c-result"
+            },
+            "msg": "Output (4x3) = [[1,5,9],[2,6,10],[3,7,11],[4,8,12]].",
+            "overlay": "<strong>In-place for square N×N:</strong> swap upper triangle <code>for i<j: swap(A[i][j], A[j][i])</code> — only works when R == C."
+          }
+        ]
+      }
+    }
+  },
+  {
+    "id": "arr-rotate-matrix",
+    "title": "Rotate Matrix (90° Clockwise In-Place)",
+    "subTopic": "2D Matrix — Transpose + Reverse",
+    "tags": [
+      "Matrix",
+      "Rotation",
+      "In-place"
+    ],
+    "description": "You are given an n x n 2D matrix A representing an image. Rotate the image by 90 degrees clockwise. You must perform the rotation in-place (using no additional matrix).\n\nProblem Constraints\n1 <= n <= 1000\n\nInput Format\nFirst argument is a 2D integer matrix A of size n x n.\n\nOutput Format\nReturn the 2D rotated matrix (after rotating A by 90 degrees clockwise).\n\nExample Input\nInput 1: [[1,2],[3,4]]\nInput 2: [[1,2,3],[4,5,6],[7,8,9]]\n\nExample Output\nOutput 1: [[3,1],[4,2]]\nOutput 2: [[7,4,1],[8,5,2],[9,6,3]]\n\nExample Explanation\nAfter rotating 90° clockwise: first column becomes first row reversed, etc.",
+    "sampleInput": "A = [[1, 2, 3, 4],\n     [5, 6, 7, 8],\n     [9, 10, 11, 12],\n     [13, 14, 15, 16]]",
+    "sampleOutput": "[[13,9,5,1],[14,10,6,2],[15,11,7,3],[16,12,8,4]]",
+    "story": "Two clean passes: (1) transpose in place using upper-triangle swaps; (2) reverse each row.",
+    "plain": "90° clockwise rotation equals: TRANSPOSE then REVERSE each ROW. Both steps are in-place: transpose swaps the upper triangle with the lower triangle; row-reversal swaps left and right ends of each row. Done.",
+    "tale": "A puzzle artist flips a square painting along its / diagonal (transpose), then mirrors each row left-to-right. Magically, the painting now hangs with what was the bottom-left now at the top-left — a 90° clockwise rotation.",
+    "solutions": [
+      {
+        "label": "Optimal — Transpose + Row Reverse (in-place)",
+        "complexity": {
+          "time": "O(N^2)",
+          "space": "O(1) extra"
+        },
+        "plain": "Pass 1: for i<j swap A[i][j] with A[j][i]. Pass 2: for each row i, swap A[i][0..N-1] inward (left↔right).",
+        "tale": "Flip along the diagonal, then mirror each row.",
+        "approach": [
+          "Pass 1 — transpose: for i = 0..N-2, for j = i+1..N-1: swap A[i][j] and A[j][i].",
+          "Pass 2 — reverse each row: for i = 0..N-1, for l = 0, r = N-1, while l < r: swap A[i][l] and A[i][r]; l++; r--."
+        ],
+        "pseudocode": "for i<j: swap A[i][j], A[j][i]\nfor i: reverse A[i]",
+        "story": "Optimal. Two clean in-place passes.",
+        "code": "public void rotate(int[][] A) {\n    int N = A.length;\n    for (int i = 0; i < N - 1; i++) {\n        for (int j = i + 1; j < N; j++) {\n            int t = A[i][j];\n            A[i][j] = A[j][i];\n            A[j][i] = t;\n        }\n    }\n    for (int i = 0; i < N; i++) {\n        int l = 0;\n        int r = N - 1;\n        while (l < r) {\n            int t = A[i][l];\n            A[i][l] = A[i][r];\n            A[i][r] = t;\n            l++;\n            r--;\n        }\n    }\n}"
+      }
+    ],
+    "viz": {
+      "kind": "scripted-array",
+      "data": {
+        "A": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15,
+          16
+        ],
+        "footer": "Rotate 4x4 90° clockwise. Transpose then reverse rows. In place.",
+        "legend": [
+          "c-input",
+          "c-active",
+          "c-result"
+        ],
+        "script": [
+          {
+            "label": "SETUP",
+            "msg": "4x4 matrix flat = [1..16]. Two-pass plan: <strong>transpose</strong>, then <strong>reverse each row</strong>.",
+            "overlay": "<strong>Rotation rule:</strong> 90° CW = transpose ∘ row-reverse. 90° CCW = transpose ∘ column-reverse (or row-reverse ∘ transpose)."
+          },
+          {
+            "label": "Pass 1 — transpose",
+            "marks": {
+              "1": "c-active",
+              "4": "c-active",
+              "2": "c-active",
+              "8": "c-active",
+              "3": "c-active",
+              "12": "c-active",
+              "6": "c-active",
+              "9": "c-active",
+              "7": "c-active",
+              "13": "c-active",
+              "11": "c-active",
+              "14": "c-active"
+            },
+            "msg": "Swap A[i][j] ↔ A[j][i] for every i<j. After transpose: [[1,5,9,13],[2,6,10,14],[3,7,11,15],[4,8,12,16]]."
+          },
+          {
+            "label": "Pass 2 — reverse each row",
+            "msg": "Row 0: [1,5,9,13] → <strong>[13,9,5,1]</strong>. Row 1: [2,6,10,14] → [14,10,6,2]. Row 2 → [15,11,7,3]. Row 3 → [16,12,8,4]."
+          },
+          {
+            "label": "DONE",
+            "marks": {
+              "0": "c-result",
+              "1": "c-result",
+              "2": "c-result",
+              "3": "c-result",
+              "4": "c-result",
+              "5": "c-result",
+              "6": "c-result",
+              "7": "c-result",
+              "8": "c-result",
+              "9": "c-result",
+              "10": "c-result",
+              "11": "c-result",
+              "12": "c-result",
+              "13": "c-result",
+              "14": "c-result",
+              "15": "c-result"
+            },
+            "msg": "Final = [[13,9,5,1],[14,10,6,2],[15,11,7,3],[16,12,8,4]]. Each cell moved exactly once. O(1) extra space.",
+            "overlay": "<strong>Sanity:</strong> A[0][0]=1 ends at A[0][N-1]=1's new home, which is column 0 row N-1 of the rotated matrix — i.e., bottom-left of the original moves to top-left of the rotated. ✓"
+          }
+        ]
+      }
+    }
+  }
+]

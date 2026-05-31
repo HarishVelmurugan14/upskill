@@ -1,6 +1,30 @@
 {
   "topics": [
     {
+      "name": "Arrays",
+      "section": "Section 0",
+      "file": "arrays.json",
+      "notesFile": "arrays.notes.json"
+    },
+    {
+      "name": "Arrays Advanced",
+      "section": "Section 1",
+      "file": "arrays-advanced.json",
+      "notesFile": "arrays-advanced.notes.json"
+    },
+    {
+      "name": "Bit Manipulation",
+      "section": "Section 1",
+      "file": "bit-manipulation.json",
+      "notesFile": "bit-manipulation.notes.json"
+    },
+    {
+      "name": "Recursion",
+      "section": "Section 1",
+      "file": "recursion.json",
+      "notesFile": "recursion.notes.json"
+    },
+    {
       "name": "Binary Search",
       "section": "Section 2",
       "file": "binary-search.json",

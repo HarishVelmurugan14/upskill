@@ -1,0 +1,130 @@
+{
+  "topic": "Bit Manipulation",
+  "summary": "Bits are tiny, fast, and tricky. The whole topic boils down to four operations (AND for masking, OR for setting, XOR for toggling/comparing, shift for positioning) and one identity that powers half the problems: a ^ a = 0. Once you internalise XOR's pairing magic and the bit-by-bit accumulation pattern (loop i = 0..30, ask 'how many numbers have bit i set?'), 80% of bit problems reduce to one or two passes.",
+  "thoughtProcess": [
+    {
+      "title": "1. Need to ISOLATE bit i? AND with a mask.",
+      "body": "(x >> i) & 1 tells you bit i. (x & (1 << i)) != 0 is the equivalent boolean form. Always parenthesise the shift — operator precedence will bite you."
+    },
+    {
+      "title": "2. Need to SET / CLEAR / TOGGLE bit i?",
+      "body": "Set: x | (1 << i). Clear: x & ~(1 << i). Toggle: x ^ (1 << i). Memorise the trio — every bit problem uses at least one."
+    },
+    {
+      "title": "3. Looking for the lonely element? Think XOR.",
+      "body": "Because a ^ a = 0 and a ^ 0 = a, XOR-folding an array cancels everything that appears in pairs. The leftover IS the answer. Generalises with bit-counts when elements appear 3 times instead of 2."
+    },
+    {
+      "title": "4. Counting something across an array of integers?",
+      "body": "Loop bit position i from 0 to 30. For each i, count how many numbers have bit i set (call it c). Use c, (N - c), or c * (N - c) depending on whether you want OR-of-subarray, AND-of-subarray, or sum-of-XOR-pairs. This 'per-bit pass' trick converts O(N^2) over numbers into O(31 * N)."
+    },
+    {
+      "title": "5. Want a power of 2? n & (n - 1) == 0.",
+      "body": "Powers of two have exactly one bit set; n - 1 flips that bit and everything below. ANDing them gives 0. Also: lowest set bit = n & -n. Count set bits with the Brian-Kernighan trick: n &= (n - 1) drops one bit per step."
+    },
+    {
+      "title": "6. Overflow with shifts.",
+      "body": "1 << 31 is negative in int. Use 1L << i when i can reach 31. Magic-number-style problems with base-5 or base-7 also overflow int around N = 12 — use long upfront."
+    }
+  ],
+  "commonMistakes": [
+    {
+      "title": "Missing parentheses around shift",
+      "wrong": "if (x & 1 << i != 0) ...",
+      "right": "if ((x & (1 << i)) != 0) ...",
+      "why": "!= binds tighter than &. The wrong version evaluates 1 << i != 0 first (which is true) then ANDs with x. Always parenthesise the whole mask-test."
+    },
+    {
+      "title": "Using int for 1 << 31",
+      "wrong": "int mask = 1 << 31;  // becomes Integer.MIN_VALUE, surprising in arithmetic",
+      "right": "long mask = 1L << 31;",
+      "why": "1 << 31 is the sign bit in int and prints as -2147483648. Comparisons and modular arithmetic break silently."
+    },
+    {
+      "title": "XOR-find-lonely written with HashSet",
+      "wrong": "Set<Integer> s = new HashSet<>(); for (int x : A) if (!s.add(x)) s.remove(x);",
+      "right": "int x = 0; for (int v : A) x ^= v; return x;",
+      "why": "The HashSet version is O(N) time but O(N) space. XOR is O(N) time, O(1) space — and elegant."
+    },
+    {
+      "title": "Single Number II (every other appears 3x) with XOR alone",
+      "wrong": "int x = 0; for (int v : A) x ^= v;",
+      "right": "// per-bit count mod 3\nint res = 0;\nfor (int i = 0; i < 32; i++) {\n    int c = 0;\n    for (int v : A) c += (v >> i) & 1;\n    if (c % 3 != 0) res |= (1 << i);\n}",
+      "why": "XOR only cancels pairs (mod 2). When duplicates appear 3 times, you need a per-bit mod-3 sum."
+    },
+    {
+      "title": "Magic number / base-N expansion in int",
+      "wrong": "int answer = 0, pow = 1;\nwhile (N > 0) { if ((N & 1) == 1) answer += pow; pow *= 5; N >>= 1; }",
+      "right": "long answer = 0, pow = 1;\nwhile (N > 0) { if ((N & 1) == 1) answer += pow; pow *= 5; N >>= 1; }",
+      "why": "5^14 overflows int. Promote both answer and pow to long."
+    },
+    {
+      "title": "Subarray-OR counted by brute O(N^2)",
+      "wrong": "for (int i = 0; i < N; i++) for (int j = i; j < N; j++) if (OR(i..j) == 1) ++count;",
+      "right": "// Count subarrays whose OR is 0: those entirely inside runs of 0s.\n// Total subarrays = N*(N+1)/2; answer = total - sum over runs of len L of L*(L+1)/2.",
+      "why": "Direct enumeration is O(N^2). Complement counting using runs of zeros is O(N)."
+    }
+  ],
+  "keyPatterns": [
+    {
+      "name": "Single-Bit Get / Set / Clear / Toggle",
+      "when": "Any problem that needs to manipulate one bit at a known position.",
+      "template": "int getBit   = (x >> i) & 1;\nint setBit   = x |  (1 << i);\nint clearBit = x & ~(1 << i);\nint toggle   = x ^  (1 << i);",
+      "examples": ["Set Bit", "Unset i-th bit", "Toggle i-th bit", "Check bit"]
+    },
+    {
+      "name": "Population Count (Brian Kernighan)",
+      "when": "Count set bits in an integer.",
+      "template": "int count = 0;\nwhile (n != 0) {\n    n &= (n - 1);  // drops the lowest set bit\n    count++;\n}",
+      "examples": ["Number of 1 Bits"]
+    },
+    {
+      "name": "XOR-Fold Lonely Element",
+      "when": "All elements appear in pairs except one.",
+      "template": "int x = 0;\nfor (int v : A) x ^= v;\nreturn x;",
+      "examples": ["Single Number"]
+    },
+    {
+      "name": "Per-Bit Accumulation (mod 3)",
+      "when": "Every element appears 3 times except one. Same skeleton for many 'find unique via bits' variants.",
+      "template": "int res = 0;\nfor (int i = 0; i < 32; i++) {\n    int c = 0;\n    for (int v : A) c += (v >> i) & 1;\n    if (c % 3 != 0) res |= (1 << i);\n}",
+      "examples": ["Single Number II"]
+    },
+    {
+      "name": "XOR Partition (two unique elements)",
+      "when": "Two elements appear once, the rest in pairs. Use the XOR of all to isolate a differing bit, then partition.",
+      "template": "int xor = 0; for (int v : A) xor ^= v;\nint diffBit = xor & -xor;\nint a = 0, b = 0;\nfor (int v : A) {\n    if ((v & diffBit) == 0) a ^= v; else b ^= v;\n}",
+      "examples": ["Single Number III"]
+    },
+    {
+      "name": "Base-N Magic Number",
+      "when": "Encode N as a sum of distinct powers of base-K (typically K = 5 for magic numbers).",
+      "template": "long ans = 0, pow = 1;\nwhile (N > 0) {\n    if ((N & 1) == 1) ans += pow;\n    pow *= 5;\n    N >>= 1;\n}",
+      "examples": ["Find nth Magic Number"]
+    },
+    {
+      "name": "Complement Counting on Runs",
+      "when": "Count subarrays whose OR is at least 1 — count zero-OR ones (runs of zeros) and subtract.",
+      "template": "long total = (long) N * (N + 1) / 2;\nlong zeros = 0, run = 0;\nfor (int v : A) {\n    if (v == 0) { run++; zeros += run; }\n    else run = 0;\n}\nreturn total - zeros;",
+      "examples": ["Subarrays with OR 1"]
+    },
+    {
+      "name": "Bit-Sum Trick for Subarray OR",
+      "when": "Sum over all subarrays of (OR of subarray). For each bit i, count subarrays where bit i appears at least once: contribute (1 << i) * thatCount.",
+      "template": "long ans = 0;\nfor (int i = 0; i < 32; i++) {\n    long lastZero = -1, contribution = 0;\n    for (int j = 0; j < N; j++) {\n        if (((A[j] >> i) & 1) == 0) lastZero = j;\n        // subarrays ending at j containing bit i set:\n        contribution += (j - lastZero);\n    }\n    ans += (1L << i) * contribution;\n}",
+      "examples": ["Subarray OR"]
+    }
+  ],
+  "edgeCases": [
+    "i = 31 — the shift amount equals the sign bit position. Use 1L << i if you need a positive mask.",
+    "Empty array for XOR-fold returns 0 — make sure 0 is a valid answer or guard length.",
+    "Negative numbers in 'Single Number III' — XOR-of-differing-bit still works because two's complement preserves XOR identity.",
+    "n = 0 in popcount — loop never enters, returns 0.",
+    "N = 1 in nth magic number — return 5.",
+    "All zeros for Subarrays-with-OR-1 — answer is 0, the run-length sum equals N*(N+1)/2.",
+    "Subarray-OR with very long arrays — running contribution can exceed int even when bits don't; use long.",
+    "Find-two-missing problems with sum overflow — use the XOR formulation (or use long for the sum formulation).",
+    "Help-from-Sam style staircase problems — power-of-2 transitions, use 1L when N exceeds 30.",
+    "Brian-Kernighan in a tight loop — guard against n < 0 (sign bit will keep popping forever in arithmetic shift contexts)."
+  ]
+}

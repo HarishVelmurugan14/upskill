@@ -1,0 +1,1367 @@
+[
+  {
+    "id": "rec-factorial",
+    "title": "Find Factorial!",
+    "subTopic": "Linear Recursion",
+    "tags": [
+      "Recursion",
+      "Base Case"
+    ],
+    "description": "Write a program to find the factorial of A using recursion. Factorial(N) = product of 1..N.\n\nProblem Constraints\n0 ≤ A ≤ 12\n\nExample\nA = 4 → 24. A = 1 → 1.",
+    "sampleInput": "A = 6",
+    "sampleOutput": "720",
+    "story": "Base: 0! = 1. Recursive: N! = N × (N-1)!. Linear stack depth.",
+    "plain": "Two parts: BASE CASE — if A == 0, return 1 (0! is 1 by convention). RECURSIVE CASE — return A * solve(A-1). Each frame multiplies its own A by the result of the smaller subproblem. Stack depth = A+1.",
+    "tale": "A stack of boxes, each labelled with a number, gets unpacked from N down to 0. The bottom box contains '1'. As you re-pack, each box multiplies its own label into the running product.",
+    "solutions": [
+      {
+        "label": "Optimal — Linear Recursion",
+        "complexity": {
+          "time": "O(N)",
+          "space": "O(N) stack"
+        },
+        "plain": "Base case 0 → 1. Otherwise return A * solve(A-1).",
+        "tale": "Unpack to zero, then re-multiply on the way back.",
+        "approach": [
+          "If A == 0 → return 1.",
+          "Else → return A * solve(A - 1)."
+        ],
+        "pseudocode": "f(A) = 1 if A==0 else A * f(A-1)",
+        "story": "Optimal for recursive form. Iterative loop saves stack.",
+        "code": "public int solve(int A) {\n    if (A == 0) {\n        return 1;\n    }\n    return solve(A - 1) * A;\n}"
+      }
+    ],
+    "viz": {
+      "kind": "scripted-array",
+      "data": {
+        "A": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6
+        ],
+        "footer": "Factorial recursion for A=6 — unpack & repack the call stack.",
+        "legend": [
+          "c-input",
+          "c-active",
+          "c-result"
+        ],
+        "script": [
+          {
+            "label": "SETUP",
+            "marks": {
+              "0": "c-input",
+              "1": "c-input",
+              "2": "c-input",
+              "3": "c-input",
+              "4": "c-input",
+              "5": "c-input"
+            },
+            "msg": "solve(6) called. Stack will grow to depth 7 (6, 5, 4, 3, 2, 1, 0).",
+            "overlay": "<strong>Base case</strong> halts unbounded growth — without it, infinite recursion."
+          },
+          {
+            "label": "Unwind: 6→5→4→3→2→1→0",
+            "marks": {
+              "5": "c-active",
+              "4": "c-active",
+              "3": "c-active",
+              "2": "c-active",
+              "1": "c-active",
+              "0": "c-active"
+            },
+            "msg": "Each frame waits on solve(A-1)."
+          },
+          {
+            "label": "Base solve(0) = 1",
+            "msg": "Bottom of stack returns 1."
+          },
+          {
+            "label": "Repack: 1 → 1×1=1 → 2×1=2 → 3×2=6 → 4×6=24 → 5×24=120 → 6×120=720",
+            "marks": {
+              "0": "c-result",
+              "1": "c-result",
+              "2": "c-result",
+              "3": "c-result",
+              "4": "c-result",
+              "5": "c-result"
+            },
+            "msg": "Each return multiplies the local A."
+          },
+          {
+            "label": "DONE",
+            "msg": "6! = <strong>720</strong>.",
+            "overlay": "<strong>Overflow:</strong> for A ≥ 13, the result overflows int32. Constraint A ≤ 12 keeps us safe."
+          }
+        ]
+      }
+    }
+  },
+  {
+    "id": "rec-fibonacci-ii",
+    "title": "Find Fibonacci - II",
+    "subTopic": "Tree Recursion (Exponential)",
+    "tags": [
+      "Recursion",
+      "Tree Recursion",
+      "DP-foreshadow"
+    ],
+    "description": "Fibonacci sequence: 0, 1, 1, 2, 3, 5, 8, … Fn = Fn-1 + Fn-2. Given A, return A-th Fibonacci using recursion. F0 = 0, F1 = 1.\n\nProblem Constraints\n0 ≤ A ≤ 20\n\nExample\nA = 2 → 1. A = 9 → 34.",
+    "sampleInput": "A = 10",
+    "sampleOutput": "55",
+    "story": "Two base cases (0 → 0, 1 → 1). Recursive: f(A) = f(A-1) + f(A-2). Branching factor 2 → O(φ^N) calls.",
+    "plain": "TWO base cases: A == 0 → 0, A == 1 → 1. Otherwise f(A) = f(A-1) + f(A-2). Naively exponential (~φ^N nodes in the call tree) because subtrees overlap massively — solve(A-2) is computed inside both branches. Memoisation reduces it to O(N).",
+    "tale": "A genealogist asks each person 'who are your two predecessors?' until reaching the original ancestors (0 and 1). Each ancestor lookup is repeated many times — a wasteful family tree.",
+    "solutions": [
+      {
+        "label": "Brute — Tree Recursion",
+        "complexity": {
+          "time": "O(φ^N)",
+          "space": "O(N) stack"
+        },
+        "plain": "Direct recursion. Exponential calls.",
+        "tale": "Walk the whole genealogy every time.",
+        "approach": [
+          "If A == 0 → 0; if A == 1 → 1.",
+          "Return f(A-1) + f(A-2)."
+        ],
+        "pseudocode": "f(A) = 0 if A==0; 1 if A==1; else f(A-1)+f(A-2)",
+        "story": "Brute. Acceptable only for small A (constraint ≤ 20).",
+        "code": "public int findAthFibonacci(int A) {\n    if (A == 0) {\n        return 0;\n    }\n    if (A == 1) {\n        return 1;\n    }\n    return findAthFibonacci(A - 1) + findAthFibonacci(A - 2);\n}"
+      },
+      {
+        "label": "Optimal — Iterative Roll-Up",
+        "complexity": {
+          "time": "O(N)",
+          "space": "O(1)"
+        },
+        "plain": "Roll two variables forward — no recursion needed.",
+        "tale": "Walk forward keeping just the last two terms.",
+        "approach": [
+          "a = 0, b = 1. Loop i = 2..A: c = a + b; a = b; b = c. Return (A == 0 ? 0 : b)."
+        ],
+        "pseudocode": "a=0, b=1; loop i=2..A: c=a+b; a=b; b=c",
+        "story": "Optimal. Linear time, constant memory.",
+        "code": "public int fibIter(int A) {\n    if (A == 0) {\n        return 0;\n    }\n    int a = 0;\n    int b = 1;\n    for (int i = 2; i <= A; i++) {\n        int c = a + b;\n        a = b;\n        b = c;\n    }\n    return b;\n}"
+      }
+    ],
+    "viz": {
+      "kind": "scripted-array",
+      "data": {
+        "A": [
+          0,
+          1,
+          1,
+          2,
+          3,
+          5,
+          8,
+          13,
+          21,
+          34,
+          55
+        ],
+        "footer": "Fibonacci sequence to index 10. Iterative roll.",
+        "legend": [
+          "c-input",
+          "c-active",
+          "c-result"
+        ],
+        "script": [
+          {
+            "label": "SETUP",
+            "marks": {
+              "0": "c-input",
+              "1": "c-input"
+            },
+            "msg": "F0=0, F1=1.",
+            "overlay": "<strong>Recursive call tree</strong> for A=10 has ~177 nodes; iterative has 9 additions."
+          },
+          {
+            "label": "F2=1",
+            "marks": {
+              "2": "c-active"
+            },
+            "msg": "0+1 = 1."
+          },
+          {
+            "label": "F3=2",
+            "marks": {
+              "3": "c-active"
+            },
+            "msg": "1+1 = 2."
+          },
+          {
+            "label": "F4=3",
+            "marks": {
+              "4": "c-active"
+            },
+            "msg": "1+2 = 3."
+          },
+          {
+            "label": "F5=5",
+            "marks": {
+              "5": "c-active"
+            },
+            "msg": "2+3 = 5."
+          },
+          {
+            "label": "F6=8 .. F10=55",
+            "marks": {
+              "6": "c-active",
+              "7": "c-active",
+              "8": "c-active",
+              "9": "c-active",
+              "10": "c-active"
+            },
+            "msg": "F6..F10 = 8, 13, 21, 34, 55."
+          },
+          {
+            "label": "DONE",
+            "marks": {
+              "10": "c-result"
+            },
+            "msg": "F10 = <strong>55</strong>.",
+            "overlay": "<strong>Lesson:</strong> recursion with overlapping subproblems → use memoisation (top-down DP) or iterate bottom-up."
+          }
+        ]
+      }
+    }
+  },
+  {
+    "id": "rec-print-1-to-a",
+    "title": "Print 1 to A",
+    "subTopic": "Recursion — Print After Recurse (Ascending)",
+    "tags": [
+      "Recursion",
+      "Printing"
+    ],
+    "description": "Given integer A, print numbers from 1 to A using recursion. Add a newline after.\n\nProblem Constraints\n1 ≤ A ≤ 10^4\n\nExample\nA = 5 → '1 2 3 4 5'.",
+    "sampleInput": "A = 5",
+    "sampleOutput": "1 2 3 4 5",
+    "story": "Recurse FIRST with N-1, THEN print N. Stack unwinding prints in ascending order.",
+    "plain": "Trick is the ORDER: recurse first, print after. The function dives all the way to base (N==0), then unwinds — and on each unwind frame, prints its N. So you get 1, 2, 3, …, A. If you printed BEFORE recursing, you'd get A down to 1.",
+    "tale": "A diver descends N rungs of a ladder; on each climb back up, he calls out the current rung number — so he calls out 1, 2, …, N as he ascends.",
+    "solutions": [
+      {
+        "label": "Optimal",
+        "complexity": {
+          "time": "O(N)",
+          "space": "O(N) stack"
+        },
+        "plain": "Recurse on N-1 first, then print N. Print newline at the end.",
+        "tale": "Print on the way back up.",
+        "approach": [
+          "If N == 0 return.",
+          "Recurse on N-1.",
+          "Print N (with trailing space)."
+        ],
+        "pseudocode": "f(N): if N==0 return; f(N-1); print N",
+        "story": "Optimal. Stack depth N.",
+        "code": "public void solve(int A) {\n    printAscending(A);\n    System.out.println();\n}\n\nprivate void printAscending(int N) {\n    if (N == 0) {\n        return;\n    }\n    printAscending(N - 1);\n    System.out.print(N + \" \");\n}"
+      }
+    ],
+    "viz": {
+      "kind": "scripted-array",
+      "data": {
+        "A": [
+          1,
+          2,
+          3,
+          4,
+          5
+        ],
+        "footer": "Print 1..A via recursion. Recurse first, print after.",
+        "legend": [
+          "c-input",
+          "c-active",
+          "c-result"
+        ],
+        "script": [
+          {
+            "label": "SETUP",
+            "marks": {
+              "0": "c-input",
+              "1": "c-input",
+              "2": "c-input",
+              "3": "c-input",
+              "4": "c-input"
+            },
+            "msg": "Call f(5). Frames build up: 5→4→3→2→1→0.",
+            "overlay": "<strong>Where you do work matters:</strong> before vs after recursive call inverts the order."
+          },
+          {
+            "label": "Stack at base — return",
+            "msg": "f(0) returns immediately."
+          },
+          {
+            "label": "Unwind f(1) prints 1",
+            "marks": {
+              "0": "c-active"
+            },
+            "msg": "Print '1'."
+          },
+          {
+            "label": "Unwind f(2) prints 2",
+            "marks": {
+              "1": "c-active"
+            },
+            "msg": "Print '2'."
+          },
+          {
+            "label": "Unwind f(3) prints 3",
+            "marks": {
+              "2": "c-active"
+            },
+            "msg": "Print '3'."
+          },
+          {
+            "label": "Unwind f(4) prints 4",
+            "marks": {
+              "3": "c-active"
+            },
+            "msg": "Print '4'."
+          },
+          {
+            "label": "Unwind f(5) prints 5",
+            "marks": {
+              "4": "c-active"
+            },
+            "msg": "Print '5'. Then newline."
+          },
+          {
+            "label": "DONE",
+            "marks": {
+              "0": "c-result",
+              "1": "c-result",
+              "2": "c-result",
+              "3": "c-result",
+              "4": "c-result"
+            },
+            "msg": "Output: <strong>'1 2 3 4 5'</strong>.",
+            "overlay": "<strong>Print-before vs print-after:</strong> swap the two statements and you get '5 4 3 2 1'."
+          }
+        ]
+      }
+    }
+  },
+  {
+    "id": "rec-print-a-to-1",
+    "title": "Print A to 1",
+    "subTopic": "Recursion — Print Before Recurse (Descending)",
+    "tags": [
+      "Recursion",
+      "Printing"
+    ],
+    "description": "Given integer A, print numbers from A to 1 using recursion. Add a newline after.\n\nProblem Constraints\n1 ≤ A ≤ 10^4\n\nExample\nA = 5 → '5 4 3 2 1'.",
+    "sampleInput": "A = 5",
+    "sampleOutput": "5 4 3 2 1",
+    "story": "Print FIRST, THEN recurse with N-1. Top of the stack prints first — descending.",
+    "plain": "Swap the order from Print 1-to-A: print N FIRST, then recurse on N-1. Each frame prints before diving deeper, so the highest values print first.",
+    "tale": "A diver standing at rung N shouts 'N!' before descending one rung. He shouts N, N-1, …, 1 on the way down.",
+    "solutions": [
+      {
+        "label": "Optimal",
+        "complexity": {
+          "time": "O(N)",
+          "space": "O(N) stack"
+        },
+        "plain": "Print N, then recurse on N-1.",
+        "tale": "Print on the way down.",
+        "approach": [
+          "If N == 0 return.",
+          "Print N (with trailing space).",
+          "Recurse on N-1."
+        ],
+        "pseudocode": "f(N): if N==0 return; print N; f(N-1)",
+        "story": "Optimal. Mirror of Print 1-to-A.",
+        "code": "public void solve(int A) {\n    printDescending(A);\n    System.out.println();\n}\n\nprivate void printDescending(int N) {\n    if (N == 0) {\n        return;\n    }\n    System.out.print(N + \" \");\n    printDescending(N - 1);\n}"
+      }
+    ],
+    "viz": {
+      "kind": "scripted-array",
+      "data": {
+        "A": [
+          5,
+          4,
+          3,
+          2,
+          1
+        ],
+        "footer": "Print A..1 — print before recurse.",
+        "legend": [
+          "c-input",
+          "c-active",
+          "c-result"
+        ],
+        "script": [
+          {
+            "label": "SETUP",
+            "marks": {
+              "0": "c-input",
+              "1": "c-input",
+              "2": "c-input",
+              "3": "c-input",
+              "4": "c-input"
+            },
+            "msg": "f(5). Print THEN recurse.",
+            "overlay": "<strong>Tail recursion friendly:</strong> work happens before the recursive call, so a compiler could optimise to a loop."
+          },
+          {
+            "label": "f(5) prints 5 → call f(4)",
+            "marks": {
+              "0": "c-active"
+            },
+            "msg": "Print '5'."
+          },
+          {
+            "label": "f(4) prints 4 → call f(3)",
+            "marks": {
+              "1": "c-active"
+            },
+            "msg": "Print '4'."
+          },
+          {
+            "label": "f(3) prints 3 → call f(2)",
+            "marks": {
+              "2": "c-active"
+            },
+            "msg": "Print '3'."
+          },
+          {
+            "label": "f(2) prints 2 → call f(1)",
+            "marks": {
+              "3": "c-active"
+            },
+            "msg": "Print '2'."
+          },
+          {
+            "label": "f(1) prints 1 → call f(0)",
+            "marks": {
+              "4": "c-active"
+            },
+            "msg": "Print '1'. f(0) returns immediately."
+          },
+          {
+            "label": "DONE",
+            "marks": {
+              "0": "c-result",
+              "1": "c-result",
+              "2": "c-result",
+              "3": "c-result",
+              "4": "c-result"
+            },
+            "msg": "Output: <strong>'5 4 3 2 1'</strong>.",
+            "overlay": "<strong>Compare with previous problem:</strong> same recursion, opposite work order → opposite print order."
+          }
+        ]
+      }
+    }
+  },
+  {
+    "id": "rec-decreasing-increasing",
+    "title": "Decreasing-Increasing in One Function",
+    "subTopic": "Work Before AND After Recurse",
+    "tags": [
+      "Recursion",
+      "Symmetric Stack"
+    ],
+    "description": "Given positive N, print N, N-1, …, 1, 1, 2, …, N using a SINGLE recursive function. No loops.\n\nProblem Constraints\n1 ≤ N ≤ 100\n\nExample\nN = 4 → '4 3 2 1 1 2 3 4'. N = 1 → '1 1'.",
+    "sampleInput": "N = 5",
+    "sampleOutput": "5 4 3 2 1 1 2 3 4 5",
+    "story": "Each frame: print N → recurse(N-1) → print N. Stack mirror produces the palindrome-like output.",
+    "plain": "Each frame prints N TWICE — once before recursing (descending sweep) and once after returning (ascending sweep). The recursion descends to the base, leaving the descending half printed; then unwinds, the second print happens on the way up.",
+    "tale": "A bell-ringer walks down N stairs ringing once on each step. At the bottom he turns around and rings each step again on the way up. The result echoes from N → 1 → 1 → N.",
+    "solutions": [
+      {
+        "label": "Optimal",
+        "complexity": {
+          "time": "O(N)",
+          "space": "O(N) stack"
+        },
+        "plain": "Print N, recurse N-1, print N. Two prints per frame.",
+        "tale": "Ring on the way down and the way up.",
+        "approach": [
+          "If N == 0 return.",
+          "Print N.",
+          "Recurse on N-1.",
+          "Print N again."
+        ],
+        "pseudocode": "f(N): if N==0 return; print N; f(N-1); print N",
+        "story": "Optimal. Stack height N.",
+        "code": "public void DecThenInc(int A) {\n    printSymmetric(A);\n    System.out.println();\n}\n\nprivate void printSymmetric(int N) {\n    if (N == 0) {\n        return;\n    }\n    System.out.print(N + \" \");\n    printSymmetric(N - 1);\n    System.out.print(N + \" \");\n}"
+      }
+    ],
+    "viz": {
+      "kind": "scripted-array",
+      "data": {
+        "A": [
+          5,
+          4,
+          3,
+          2,
+          1,
+          1,
+          2,
+          3,
+          4,
+          5
+        ],
+        "footer": "Decreasing-Increasing — N=5. Single function prints both halves.",
+        "legend": [
+          "c-input",
+          "c-active",
+          "c-result"
+        ],
+        "script": [
+          {
+            "label": "SETUP",
+            "marks": {
+              "0": "c-input",
+              "1": "c-input",
+              "2": "c-input",
+              "3": "c-input",
+              "4": "c-input",
+              "5": "c-input",
+              "6": "c-input",
+              "7": "c-input",
+              "8": "c-input",
+              "9": "c-input"
+            },
+            "msg": "Expected output for N=5: 5 4 3 2 1 1 2 3 4 5.",
+            "overlay": "<strong>Two prints per frame</strong> — descending leg before recurse, ascending leg after."
+          },
+          {
+            "label": "Descend: 5,4,3,2,1",
+            "marks": {
+              "0": "c-active",
+              "1": "c-active",
+              "2": "c-active",
+              "3": "c-active",
+              "4": "c-active"
+            },
+            "msg": "Each frame prints N then recurses → descending half emitted."
+          },
+          {
+            "label": "Base f(0) returns",
+            "msg": "Bottom of recursion."
+          },
+          {
+            "label": "Ascend: 1,2,3,4,5",
+            "marks": {
+              "5": "c-active",
+              "6": "c-active",
+              "7": "c-active",
+              "8": "c-active",
+              "9": "c-active"
+            },
+            "msg": "Each frame returns from recurse, prints N → ascending half emitted."
+          },
+          {
+            "label": "DONE",
+            "marks": {
+              "0": "c-result",
+              "1": "c-result",
+              "2": "c-result",
+              "3": "c-result",
+              "4": "c-result",
+              "5": "c-result",
+              "6": "c-result",
+              "7": "c-result",
+              "8": "c-result",
+              "9": "c-result"
+            },
+            "msg": "Full output: <strong>'5 4 3 2 1 1 2 3 4 5'</strong>.",
+            "overlay": "<strong>Pattern:</strong> any palindromic output can be produced by putting symmetric work on both sides of the recursive call."
+          }
+        ]
+      }
+    }
+  },
+  {
+    "id": "rec-palindrome",
+    "title": "Check Palindrome",
+    "subTopic": "Two-Pointer Recursion",
+    "tags": [
+      "Recursion",
+      "Strings",
+      "Palindrome"
+    ],
+    "description": "Recursive function that returns 1 if A is a palindrome, else 0. Lowercase letters only.\n\nProblem Constraints\n1 ≤ |A| ≤ 50000\n\nExample\n'naman' → 1. 'strings' → 0.",
+    "sampleInput": "A = \"racecar\"",
+    "sampleOutput": "1",
+    "story": "Two indices start, end. Base: start >= end → true. Else: A[start] == A[end] AND recurse(start+1, end-1).",
+    "plain": "Use a helper f(start, end). Base: if start >= end (crossed or met), return true. Otherwise check A[start] == A[end] AND f(start+1, end-1). Stack depth N/2.",
+    "tale": "Two readers stand at opposite ends of a scroll, reading inward. If their letters match at every step and they meet in the middle, the scroll is a palindrome.",
+    "solutions": [
+      {
+        "label": "Optimal",
+        "complexity": {
+          "time": "O(N)",
+          "space": "O(N) stack"
+        },
+        "plain": "Recursive two-pointer match.",
+        "tale": "Two readers walk inward.",
+        "approach": [
+          "Convert string to char array.",
+          "Helper f(arr, start, end): if start >= end → return true; if arr[start] != arr[end] → return false; return f(arr, start+1, end-1).",
+          "Return f(arr, 0, N-1) ? 1 : 0."
+        ],
+        "pseudocode": "f(s,e): if s>=e: true; if A[s]!=A[e]: false; return f(s+1,e-1)",
+        "story": "Optimal. Iterative loop also works; constraint allows recursion.",
+        "code": "public int solve(String A) {\n    char[] arr = A.toCharArray();\n    return isPali(arr, 0, arr.length - 1) ? 1 : 0;\n}\n\nprivate boolean isPali(char[] arr, int start, int end) {\n    if (start >= end) {\n        return true;\n    }\n    if (arr[start] != arr[end]) {\n        return false;\n    }\n    return isPali(arr, start + 1, end - 1);\n}"
+      }
+    ],
+    "viz": {
+      "kind": "scripted-array",
+      "data": {
+        "A": [
+          "r",
+          "a",
+          "c",
+          "e",
+          "c",
+          "a",
+          "r"
+        ],
+        "footer": "Palindrome check — 'racecar'. Two-pointer recursion.",
+        "legend": [
+          "c-input",
+          "c-low",
+          "c-high",
+          "c-active",
+          "c-result"
+        ],
+        "script": [
+          {
+            "label": "SETUP",
+            "marks": {
+              "0": "c-input",
+              "1": "c-input",
+              "2": "c-input",
+              "3": "c-input",
+              "4": "c-input",
+              "5": "c-input",
+              "6": "c-input"
+            },
+            "msg": "A = 'racecar'. start=0, end=6.",
+            "overlay": "<strong>Early exit:</strong> the first mismatch short-circuits — no need to walk the rest."
+          },
+          {
+            "label": "f(0,6): 'r'='r' ✓ recurse",
+            "marks": {
+              "0": "c-active",
+              "6": "c-active"
+            },
+            "msg": "Match. Recurse to (1,5)."
+          },
+          {
+            "label": "f(1,5): 'a'='a' ✓ recurse",
+            "marks": {
+              "1": "c-active",
+              "5": "c-active"
+            },
+            "msg": "Match. Recurse to (2,4)."
+          },
+          {
+            "label": "f(2,4): 'c'='c' ✓ recurse",
+            "marks": {
+              "2": "c-active",
+              "4": "c-active"
+            },
+            "msg": "Match. Recurse to (3,3)."
+          },
+          {
+            "label": "f(3,3): start>=end → true",
+            "marks": {
+              "3": "c-active"
+            },
+            "msg": "Crossed. Base case returns true."
+          },
+          {
+            "label": "DONE",
+            "marks": {
+              "0": "c-result",
+              "1": "c-result",
+              "2": "c-result",
+              "3": "c-result",
+              "4": "c-result",
+              "5": "c-result",
+              "6": "c-result"
+            },
+            "msg": "Palindrome → <strong>1</strong>.",
+            "overlay": "<strong>Iterative variant:</strong> a while loop with two pointers — same logic without the stack."
+          }
+        ]
+      }
+    }
+  },
+  {
+    "id": "rec-tower-of-hanoi",
+    "title": "Tower of Hanoi",
+    "subTopic": "Classic Recursive Reduction",
+    "tags": [
+      "Recursion",
+      "Divide & Conquer",
+      "Classic"
+    ],
+    "description": "Move A disks from tower 1 to tower 3 using tower 2 as helper. One disk at a time, never place a larger disk on a smaller one. Return the move sequence as a 2D array, each row [disk, from, to].\n\nProblem Constraints\n1 ≤ A ≤ 18\n\nExample\nA = 2 → [[1,1,2],[2,1,3],[1,2,3]]. A = 3 → 7 moves.",
+    "sampleInput": "A = 3",
+    "sampleOutput": "[[1,1,3],[2,1,2],[1,3,2],[3,1,3],[1,2,1],[2,2,3],[1,1,3]]",
+    "story": "Solve N: move N-1 from source→helper (using destination), move disk N from source→destination, move N-1 from helper→destination (using source). 2^N - 1 moves.",
+    "plain": "Recursive reduction: to move N disks source→dest with helper, first move the top N-1 source→helper (using dest as temporary), then move disk N source→dest (1 move), then move N-1 helper→dest (using source as temporary). Minimum number of moves = 2^N - 1.",
+    "tale": "An ancient monastery has three pegs and a tower of golden discs. The high priest delegates: 'apprentice, shift the top N-1 off the way; I'll move the big disc; then apprentice, finish.' The apprentices recursively delegate to smaller apprentices until they hold a single disc each.",
+    "solutions": [
+      {
+        "label": "Optimal",
+        "complexity": {
+          "time": "O(2^N)",
+          "space": "O(N) stack"
+        },
+        "plain": "f(N, src, hlp, dst): if N==0 return; f(N-1, src, dst, hlp); record [N, src, dst]; f(N-1, hlp, src, dst).",
+        "tale": "Delegate, move, delegate.",
+        "approach": [
+          "Helper hanoi(n, source, helper, destination, result).",
+          "If n == 0 return.",
+          "Recurse hanoi(n-1, source, destination, helper, result) — shift smaller stack onto helper.",
+          "Append [n, source, destination] to result.",
+          "Recurse hanoi(n-1, helper, source, destination, result) — shift smaller stack onto destination."
+        ],
+        "pseudocode": "hanoi(n, s, h, d): if n==0 return; hanoi(n-1, s, d, h); emit [n,s,d]; hanoi(n-1, h, s, d)",
+        "story": "Optimal. Exponential output is unavoidable — that's the number of moves.",
+        "code": "public java.util.ArrayList<java.util.ArrayList<Integer>> towerOfHanoi(int A) {\n    java.util.ArrayList<java.util.ArrayList<Integer>> result = new java.util.ArrayList<>();\n    hanoi(A, 1, 2, 3, result);\n    return result;\n}\n\nprivate void hanoi(int n, int source, int helper, int destination,\n                   java.util.ArrayList<java.util.ArrayList<Integer>> result) {\n    if (n == 0) {\n        return;\n    }\n    hanoi(n - 1, source, destination, helper, result);\n    java.util.ArrayList<Integer> move = new java.util.ArrayList<>();\n    move.add(n);\n    move.add(source);\n    move.add(destination);\n    result.add(move);\n    hanoi(n - 1, helper, source, destination, result);\n}"
+      }
+    ],
+    "viz": {
+      "kind": "scripted-array",
+      "data": {
+        "A": [
+          3,
+          2,
+          1
+        ],
+        "footer": "Tower of Hanoi, A=3. Total moves = 2^3 − 1 = 7.",
+        "legend": [
+          "c-input",
+          "c-active",
+          "c-result"
+        ],
+        "script": [
+          {
+            "label": "SETUP",
+            "marks": {
+              "0": "c-input",
+              "1": "c-input",
+              "2": "c-input"
+            },
+            "msg": "Tower 1 holds discs [3, 2, 1] (bottom→top). Goal: move to Tower 3.",
+            "overlay": "<strong>Recurrence:</strong> T(N) = 2*T(N-1) + 1, T(1) = 1 → T(N) = 2^N − 1."
+          },
+          {
+            "label": "Move 1: disc 1, T1→T3",
+            "marks": {
+              "2": "c-active"
+            },
+            "msg": "Top disc moves to T3."
+          },
+          {
+            "label": "Move 2: disc 2, T1→T2",
+            "marks": {
+              "1": "c-active"
+            },
+            "msg": "Disc 2 moves to T2."
+          },
+          {
+            "label": "Move 3: disc 1, T3→T2",
+            "marks": {
+              "2": "c-active"
+            },
+            "msg": "Disc 1 onto disc 2."
+          },
+          {
+            "label": "Move 4: disc 3, T1→T3",
+            "marks": {
+              "0": "c-active"
+            },
+            "msg": "Big disc moves home."
+          },
+          {
+            "label": "Move 5,6,7: disc 1 T2→T1, disc 2 T2→T3, disc 1 T1→T3",
+            "marks": {
+              "0": "c-result",
+              "1": "c-result",
+              "2": "c-result"
+            },
+            "msg": "Restack on T3 in 3 more moves."
+          },
+          {
+            "label": "DONE",
+            "msg": "All 3 discs on Tower 3 in <strong>7 moves</strong>. Move list captured.",
+            "overlay": "<strong>Sequence of disc movements:</strong> the smallest disc moves every other turn — never the same disc twice in a row."
+          }
+        ]
+      }
+    }
+  },
+  {
+    "id": "rec-all-indices",
+    "title": "All Indices Of Array",
+    "subTopic": "Recursion Building List",
+    "tags": [
+      "Recursion",
+      "Arrays"
+    ],
+    "description": "Given array A and target B, return sorted list of all indices where B occurs.\n\nProblem Constraints\n1 ≤ N ≤ 10^3; B guaranteed to occur.\n\nExample\nA=[8,9,5,6,5,5], B=5 → [2,4,5].",
+    "sampleInput": "A = [3, 5, 1, 5, 9, 5, 2]\nB = 5",
+    "sampleOutput": "[1, 3, 5]",
+    "story": "Helper f(A, N, B): base N==0 → empty list. Else, build list for first N-1; if A[N-1]==B append N-1; return.",
+    "plain": "Recursion that builds the answer list. f(A, N, B) returns indices in A[0..N-1]. Base N==0: empty list. Recursive: get the list for N-1; if A[N-1] == B, append N-1 to it; return. Because we process N-1 first and append after, the list naturally comes out in ascending order.",
+    "tale": "A scribe scans a scroll from left to right; every time he sees the target glyph, he stamps its index at the end of his tally — so the tally is naturally sorted.",
+    "solutions": [
+      {
+        "label": "Optimal",
+        "complexity": {
+          "time": "O(N)",
+          "space": "O(N) stack + O(K) output"
+        },
+        "plain": "Recurse to build list for prefix, then append current if match.",
+        "tale": "Tally as you scan.",
+        "approach": [
+          "Helper f(A, N, B) → ArrayList: if N==0 return empty list.",
+          "list = f(A, N-1, B).",
+          "If A[N-1] == B, list.add(N-1).",
+          "Return list.",
+          "Wrapper: call f(A, A.length, B), copy ArrayList → int[] in order."
+        ],
+        "pseudocode": "f(N): if N==0: []; L = f(N-1); if A[N-1]==B: L.add(N-1); return L",
+        "story": "Optimal. Single pass via recursion.",
+        "code": "public int[] allIndices(int[] A, int B) {\n    java.util.ArrayList<Integer> ar = collect(A, A.length, B);\n    int[] result = new int[ar.size()];\n    for (int i = 0; i < ar.size(); i++) {\n        result[i] = ar.get(i);\n    }\n    return result;\n}\n\nprivate java.util.ArrayList<Integer> collect(int[] A, int N, int B) {\n    if (N == 0) {\n        return new java.util.ArrayList<>();\n    }\n    java.util.ArrayList<Integer> list = collect(A, N - 1, B);\n    if (A[N - 1] == B) {\n        list.add(N - 1);\n    }\n    return list;\n}"
+      }
+    ],
+    "viz": {
+      "kind": "scripted-array",
+      "data": {
+        "A": [
+          3,
+          5,
+          1,
+          5,
+          9,
+          5,
+          2
+        ],
+        "footer": "All indices where B=5 occurs in A. Recursion appends on unwind.",
+        "legend": [
+          "c-input",
+          "c-active",
+          "c-result"
+        ],
+        "script": [
+          {
+            "label": "SETUP",
+            "marks": {
+              "0": "c-input",
+              "1": "c-input",
+              "2": "c-input",
+              "3": "c-input",
+              "4": "c-input",
+              "5": "c-input",
+              "6": "c-input"
+            },
+            "msg": "Recurse N=7 → 6 → ... → 0.",
+            "overlay": "<strong>Order emerges naturally:</strong> appending on unwind = ascending index order."
+          },
+          {
+            "label": "Unwind: check each index",
+            "msg": "Frame returns; check A[N-1]; append if match."
+          },
+          {
+            "label": "i=1 A[1]=5 → append",
+            "marks": {
+              "1": "c-active"
+            },
+            "msg": "List = [1]."
+          },
+          {
+            "label": "i=3 A[3]=5 → append",
+            "marks": {
+              "3": "c-active"
+            },
+            "msg": "List = [1, 3]."
+          },
+          {
+            "label": "i=5 A[5]=5 → append",
+            "marks": {
+              "5": "c-active"
+            },
+            "msg": "List = [1, 3, 5]."
+          },
+          {
+            "label": "DONE",
+            "marks": {
+              "1": "c-result",
+              "3": "c-result",
+              "5": "c-result"
+            },
+            "msg": "Result = <strong>[1, 3, 5]</strong>.",
+            "overlay": "<strong>If you tail-recurse</strong> with the list passed in as a parameter, no need to allocate at every frame."
+          }
+        ]
+      }
+    }
+  },
+  {
+    "id": "rec-print-array",
+    "title": "Print Array using Recursion",
+    "subTopic": "Recurse First, Print After",
+    "tags": [
+      "Recursion",
+      "Arrays",
+      "Printing"
+    ],
+    "description": "Given an array A, print elements left-to-right using recursion (no loops).\n\nProblem Constraints\n1 ≤ |A| ≤ 100\n\nExample\nA = [6,-2,5,3] → '6 -2 5 3'.",
+    "sampleInput": "A = [4, 8, -1, 7, 2]",
+    "sampleOutput": "4 8 -1 7 2",
+    "story": "Helper f(A, N): base N==0 return; recurse N-1; print A[N-1].",
+    "plain": "Same recursive pattern as 'Print 1 to A': recurse on N-1 FIRST, then print A[N-1]. Stack unwinding emits elements in original (left-to-right) order.",
+    "tale": "A reader photocopies a stack of pages from top to bottom — but he can only see the bottom page. He recursively defers the upper pages to a helper, then once the helper is done, prints his bottom page last. Each helper does the same: defer up, print his page. The result is a clean top-to-bottom printout.",
+    "solutions": [
+      {
+        "label": "Optimal",
+        "complexity": {
+          "time": "O(N)",
+          "space": "O(N) stack"
+        },
+        "plain": "f(A, N): if N==0 return; f(A, N-1); print A[N-1].",
+        "tale": "Defer, print on the way back.",
+        "approach": [
+          "Wrapper calls f(A, A.length) then newline.",
+          "f(A, N): if N==0 return; f(A, N-1); print A[N-1] with trailing space."
+        ],
+        "pseudocode": "f(N): if N==0 return; f(N-1); print A[N-1]",
+        "story": "Optimal.",
+        "code": "public void PrintArray(int[] A) {\n    printRec(A, A.length);\n    System.out.println();\n}\n\nprivate void printRec(int[] A, int N) {\n    if (N == 0) {\n        return;\n    }\n    printRec(A, N - 1);\n    System.out.print(A[N - 1] + \" \");\n}"
+      }
+    ],
+    "viz": {
+      "kind": "scripted-array",
+      "data": {
+        "A": [
+          4,
+          8,
+          -1,
+          7,
+          2
+        ],
+        "footer": "Print array recursively — A=[4,8,-1,7,2]. Recurse first, print after.",
+        "legend": [
+          "c-input",
+          "c-active",
+          "c-result"
+        ],
+        "script": [
+          {
+            "label": "SETUP",
+            "marks": {
+              "0": "c-input",
+              "1": "c-input",
+              "2": "c-input",
+              "3": "c-input",
+              "4": "c-input"
+            },
+            "msg": "Stack grows N→0 with no output.",
+            "overlay": "<strong>Compare to printing on the way down:</strong> that yields reversed order."
+          },
+          {
+            "label": "Unwind f(1) prints A[0]=4",
+            "marks": {
+              "0": "c-active"
+            },
+            "msg": "Print 4."
+          },
+          {
+            "label": "Unwind f(2) prints A[1]=8",
+            "marks": {
+              "1": "c-active"
+            },
+            "msg": "Print 8."
+          },
+          {
+            "label": "Unwind f(3) prints A[2]=-1",
+            "marks": {
+              "2": "c-active"
+            },
+            "msg": "Print -1."
+          },
+          {
+            "label": "Unwind f(4) prints A[3]=7",
+            "marks": {
+              "3": "c-active"
+            },
+            "msg": "Print 7."
+          },
+          {
+            "label": "Unwind f(5) prints A[4]=2",
+            "marks": {
+              "4": "c-active"
+            },
+            "msg": "Print 2. Newline."
+          },
+          {
+            "label": "DONE",
+            "marks": {
+              "0": "c-result",
+              "1": "c-result",
+              "2": "c-result",
+              "3": "c-result",
+              "4": "c-result"
+            },
+            "msg": "Output: <strong>'4 8 -1 7 2'</strong>.",
+            "overlay": "<strong>Alternative recurrence:</strong> pass an index from 0 upward, print FIRST then recurse — equivalent forward direction."
+          }
+        ]
+      }
+    }
+  },
+  {
+    "id": "rec-fast-power",
+    "title": "Fast Power (A^B)",
+    "subTopic": "Binary Exponentiation",
+    "tags": [
+      "Recursion",
+      "Divide & Conquer",
+      "Exponentiation"
+    ],
+    "description": "Compute A^B in O(log B) using fast exponentiation. Result fits in 64-bit long.\n\nProblem Constraints\nA^B fits 64-bit.\n\nExample\nA=2, B=10 → 1024. A=1, B=10^8 → 1.",
+    "sampleInput": "A = 3, B = 13",
+    "sampleOutput": "1594323",
+    "story": "Divide exponent in half. half = power(A, B/2). If B even: half*half. If B odd: half*half*A. O(log B).",
+    "plain": "Halve the exponent at each step. half = power(A, B/2). If B is even: A^B = half * half. If odd: A^B = half * half * A. Base: B==1 → A. Reduces from O(B) multiplications to O(log B).",
+    "tale": "Instead of multiplying A by itself B times, you square once and double the exponent. Like folding a paper — each fold doubles thickness, so log2(B) folds reach 2^B layers.",
+    "solutions": [
+      {
+        "label": "Brute — Linear Multiplication",
+        "complexity": {
+          "time": "O(B)",
+          "space": "O(1)"
+        },
+        "plain": "Multiply A by itself B times.",
+        "tale": "Plain multiplication.",
+        "approach": [
+          "result = 1.",
+          "Loop B times: result *= A.",
+          "Return result."
+        ],
+        "pseudocode": "r=1; for i=1..B: r*=A; return r",
+        "story": "Brute. TLE when B is large.",
+        "code": "public long powerBrute(int A, int B) {\n    long result = 1;\n    for (int i = 0; i < B; i++) {\n        result *= A;\n    }\n    return result;\n}"
+      },
+      {
+        "label": "Optimal — Fast Power (Recursive Halving)",
+        "complexity": {
+          "time": "O(log B)",
+          "space": "O(log B) stack"
+        },
+        "plain": "Recurse on B/2. Square the half; multiply by A if B odd.",
+        "tale": "Fold the exponent in half.",
+        "approach": [
+          "If B == 1, return A.",
+          "halfPower = power(A, B / 2).",
+          "If B is even, return halfPower * halfPower.",
+          "Else return halfPower * halfPower * A."
+        ],
+        "pseudocode": "p(B) = A if B==1; h = p(B/2); return B even ? h*h : h*h*A",
+        "story": "Optimal. log2(B) recursive calls.",
+        "code": "public long power(int A, int B) {\n    if (B == 1) {\n        return A;\n    }\n    long halfPower = power(A, B / 2);\n    if (B % 2 == 0) {\n        return halfPower * halfPower;\n    } else {\n        return halfPower * halfPower * A;\n    }\n}"
+      }
+    ],
+    "viz": {
+      "kind": "scripted-array",
+      "data": {
+        "A": [
+          "A=3, B=13",
+          "B/2=6",
+          "B/2=3",
+          "B/2=1 → base",
+          "3^1=3",
+          "3^3=27",
+          "3^6=729",
+          "3^13=1594323"
+        ],
+        "footer": "Fast power 3^13. Recursive halving, 4 frames.",
+        "legend": [
+          "c-input",
+          "c-active",
+          "c-result"
+        ],
+        "script": [
+          {
+            "label": "SETUP",
+            "marks": {
+              "0": "c-input"
+            },
+            "msg": "Compute 3^13. Naive needs 13 multiplies; fast needs 4.",
+            "overlay": "<strong>Recursion depth:</strong> log2(B) — for B=10^8 that's just ~27 calls."
+          },
+          {
+            "label": "B=13 (odd) → recurse B/2=6",
+            "marks": {
+              "1": "c-active"
+            },
+            "msg": "Halve."
+          },
+          {
+            "label": "B=6 (even) → recurse B/2=3",
+            "marks": {
+              "2": "c-active"
+            },
+            "msg": "Halve."
+          },
+          {
+            "label": "B=3 (odd) → recurse B/2=1",
+            "marks": {
+              "3": "c-active"
+            },
+            "msg": "Halve. Base reached."
+          },
+          {
+            "label": "B=1 base → return 3",
+            "marks": {
+              "4": "c-result"
+            },
+            "msg": "Bottom of stack."
+          },
+          {
+            "label": "Unwind B=3: 3*3*3 = 27",
+            "marks": {
+              "5": "c-result"
+            },
+            "msg": "halfPower * halfPower * A."
+          },
+          {
+            "label": "Unwind B=6: 27*27 = 729",
+            "marks": {
+              "6": "c-result"
+            },
+            "msg": "halfPower * halfPower."
+          },
+          {
+            "label": "Unwind B=13: 729*729*3 = 1594323",
+            "marks": {
+              "7": "c-result"
+            },
+            "msg": "Final answer <strong>1594323</strong>.",
+            "overlay": "<strong>Modular variant:</strong> wrap each multiply in '% MOD' to handle very large bases without overflow."
+          }
+        ]
+      }
+    }
+  },
+  {
+    "id": "rec-first-index",
+    "title": "First Index using Recursion",
+    "subTopic": "Forward Recursion with Early Return",
+    "tags": [
+      "Recursion",
+      "Arrays",
+      "Linear Search"
+    ],
+    "description": "Return first index where B occurs in A, or -1 if absent.\n\nProblem Constraints\n1 ≤ N ≤ 100\n\nExample\nA=[-3,5,6,2], B=6 → 2. A=[0,1,0,2], B=3 → -1.",
+    "sampleInput": "A = [4, 2, 7, 2, 9, 2]\nB = 2",
+    "sampleOutput": "1",
+    "story": "Walk index forward from 0. If A[i]==B return i. Else recurse with i+1. End of array → -1.",
+    "plain": "Recurse from index 0 upward. Check current first; if match return index. Otherwise recurse on index+1. The first match wins because we check BEFORE recursing.",
+    "tale": "A reader scans pages 0, 1, 2, … and immediately stops at the first match — never reads further.",
+    "solutions": [
+      {
+        "label": "Optimal",
+        "complexity": {
+          "time": "O(N)",
+          "space": "O(N) stack"
+        },
+        "plain": "Helper f(A, B, idx): if idx == N return -1; if A[idx]==B return idx; else f(A, B, idx+1).",
+        "tale": "Check then dive deeper.",
+        "approach": [
+          "Helper f(A, B, idx) with idx starting at 0.",
+          "If idx == A.length, return -1.",
+          "If A[idx] == B, return idx.",
+          "Else return f(A, B, idx + 1)."
+        ],
+        "pseudocode": "f(i): if i==N: -1; if A[i]==B: i; return f(i+1)",
+        "story": "Optimal. Tail-recursive form.",
+        "code": "public int FirstIndex(int[] A, int B) {\n    return firstIdx(A, B, 0);\n}\n\nprivate int firstIdx(int[] A, int B, int idx) {\n    if (idx == A.length) {\n        return -1;\n    }\n    if (A[idx] == B) {\n        return idx;\n    }\n    return firstIdx(A, B, idx + 1);\n}"
+      }
+    ],
+    "viz": {
+      "kind": "scripted-array",
+      "data": {
+        "A": [
+          4,
+          2,
+          7,
+          2,
+          9,
+          2
+        ],
+        "footer": "First index of B=2 in A. Check-before-recurse.",
+        "legend": [
+          "c-input",
+          "c-active",
+          "c-eliminated",
+          "c-result"
+        ],
+        "script": [
+          {
+            "label": "SETUP",
+            "marks": {
+              "0": "c-input",
+              "1": "c-input",
+              "2": "c-input",
+              "3": "c-input",
+              "4": "c-input",
+              "5": "c-input"
+            },
+            "msg": "Start at idx=0. Looking for first 2.",
+            "overlay": "<strong>Short-circuit:</strong> first match returns through the stack without examining the rest."
+          },
+          {
+            "label": "idx=0 A[0]=4 ≠ 2",
+            "marks": {
+              "0": "c-eliminated"
+            },
+            "msg": "Recurse idx=1."
+          },
+          {
+            "label": "idx=1 A[1]=2 ✓",
+            "marks": {
+              "1": "c-result"
+            },
+            "msg": "Match! Return 1 up the stack."
+          },
+          {
+            "label": "DONE",
+            "marks": {
+              "1": "c-result",
+              "2": "c-input",
+              "3": "c-input",
+              "4": "c-input",
+              "5": "c-input"
+            },
+            "msg": "Result = <strong>1</strong>. Indices 2..5 never examined.",
+            "overlay": "<strong>Iterative alternative:</strong> a forward for-loop with early break — identical complexity, no stack."
+          }
+        ]
+      }
+    }
+  },
+  {
+    "id": "rec-last-index",
+    "title": "Last Index using Recursion",
+    "subTopic": "Recurse First, Check After",
+    "tags": [
+      "Recursion",
+      "Arrays",
+      "Linear Search"
+    ],
+    "description": "Return last index where B occurs in A, or -1.\n\nProblem Constraints\n1 ≤ N ≤ 100\n\nExample\nA=[6,5,6,2], B=6 → 2. A=[0,1,0,2], B=3 → -1.",
+    "sampleInput": "A = [4, 2, 7, 2, 9, 2]\nB = 2",
+    "sampleOutput": "5",
+    "story": "Recurse forward FIRST. If deeper call found a later index, return it. Else check current.",
+    "plain": "Reverse the order from First Index: recurse FIRST, then check current. f(A, B, idx) returns -1 at end; otherwise gets the answer from idx+1 first. If that returned a valid index, return it (we've found something later). Else check if A[idx]==B and return idx or -1.",
+    "tale": "A scanner walks all the way to the end, then back-tracks — at each step on the return, it checks whether anything later was found; if so, it propagates that index; otherwise it checks itself.",
+    "solutions": [
+      {
+        "label": "Optimal",
+        "complexity": {
+          "time": "O(N)",
+          "space": "O(N) stack"
+        },
+        "plain": "Recurse first, check after. Later matches win.",
+        "tale": "Walk to the end, then walk back checking.",
+        "approach": [
+          "Helper f(A, B, idx) starting idx=0.",
+          "If idx == N return -1.",
+          "rest = f(A, B, idx+1).",
+          "If rest != -1 return rest.",
+          "Else if A[idx] == B return idx; else return -1."
+        ],
+        "pseudocode": "f(i): if i==N: -1; r=f(i+1); if r!=-1: r; else A[i]==B ? i : -1",
+        "story": "Optimal. Inverts the First Index order: do work AFTER recurse.",
+        "code": "public int LastIndex(int[] A, int B) {\n    return lastIdx(A, B, 0);\n}\n\nprivate int lastIdx(int[] A, int B, int idx) {\n    if (idx == A.length) {\n        return -1;\n    }\n    int rest = lastIdx(A, B, idx + 1);\n    if (rest != -1) {\n        return rest;\n    }\n    if (A[idx] == B) {\n        return idx;\n    }\n    return -1;\n}"
+      }
+    ],
+    "viz": {
+      "kind": "scripted-array",
+      "data": {
+        "A": [
+          4,
+          2,
+          7,
+          2,
+          9,
+          2
+        ],
+        "footer": "Last index of B=2 in A. Recurse first, then check on unwind.",
+        "legend": [
+          "c-input",
+          "c-active",
+          "c-eliminated",
+          "c-result"
+        ],
+        "script": [
+          {
+            "label": "SETUP",
+            "marks": {
+              "0": "c-input",
+              "1": "c-input",
+              "2": "c-input",
+              "3": "c-input",
+              "4": "c-input",
+              "5": "c-input"
+            },
+            "msg": "Looking for LAST 2. Recurse 0→1→...→6.",
+            "overlay": "<strong>Order matters:</strong> recurse-then-check (this problem) finds the last match; check-then-recurse finds the first."
+          },
+          {
+            "label": "Base idx=6: return -1",
+            "msg": "Bottom of stack."
+          },
+          {
+            "label": "Unwind idx=5 A[5]=2 ✓",
+            "marks": {
+              "5": "c-result"
+            },
+            "msg": "rest = -1 so check current. Match! Return 5."
+          },
+          {
+            "label": "Unwind idx=4: rest=5 ≠ -1 → propagate 5",
+            "marks": {
+              "4": "c-eliminated"
+            },
+            "msg": "Pass 5 up."
+          },
+          {
+            "label": "Unwind idx=3..0: each propagates 5",
+            "marks": {
+              "0": "c-eliminated",
+              "1": "c-eliminated",
+              "2": "c-eliminated",
+              "3": "c-eliminated"
+            },
+            "msg": "All earlier frames see rest=5 and just return it."
+          },
+          {
+            "label": "DONE",
+            "marks": {
+              "5": "c-result"
+            },
+            "msg": "Result = <strong>5</strong>.",
+            "overlay": "<strong>Iterative alternative:</strong> reverse for-loop from N-1 to 0 with early return — same answer, no stack."
+          }
+        ]
+      }
+    }
+  }
+]
