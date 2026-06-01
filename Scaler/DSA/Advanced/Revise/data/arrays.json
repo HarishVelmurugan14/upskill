@@ -1858,9 +1858,9 @@
     "description": "You are given an integer array A of length N. You have to find the sum of all subarray sums of A. A subarray is defined as a contiguous part of an array obtained by deleting zero or more elements from either end.\nA subarray sum denotes the sum of all elements of that subarray.\nNote: Be careful of integer overflow. Use appropriate datatypes.\n\nProblem Constraints\n1 <= N <= 10^5\n1 <= A[i] <= 10^4\n\nInput Format\nThe first argument is the integer array A.\n\nOutput Format\nReturn a single integer denoting the sum of all subarray sums.\n\nExample Input\nInput 1: A = [1, 2, 3]\nInput 2: A = [2, 1, 3]\n\nExample Output\nOutput 1: 20\nOutput 2: 19\n\nExample Explanation\nExplanation 1:\nSubarrays are [1], [2], [3], [1,2], [2,3], [1,2,3]\nTheir sums: 1 + 2 + 3 + 3 + 5 + 6 = 20\n\nExplanation 2:\nSubarrays are [2], [1], [3], [2,1], [1,3], [2,1,3]\nTheir sums: 2 + 1 + 3 + 3 + 4 + 6 = 19",
     "sampleInput": "A = [4, 2, 7, 5, 3]",
     "sampleOutput": "159",
-    "story": "Don't enumerate subarrays. Each A[i] appears in (i+1)*(N-i) subarrays — sum A[i] * that count.",
-    "plain": "The number of subarrays that include index i equals (i+1) * (N-i) — pick any start ≤ i (i+1 choices) and any end ≥ i (N-i choices). So total = Σ A[i] * (i+1) * (N-i). One pass, O(N). Cast A[i] to long BEFORE multiplying to avoid silent overflow.",
-    "tale": "Instead of weighing every possible chest combination, the trader asks: 'in how many combinations does THIS particular chest appear?' She multiplies each chest's gold by its appearance count and sums — one walk down the warehouse.",
+    "story": "<strong>Mnemonic — Left Fence × Right Fence.</strong> For A[i] to sit inside a subarray you need a left wall and a right wall. Left wall can be ANY position 0..i → that's <code>i+1</code> choices. Right wall can be ANY position i..N-1 → that's <code>N-i</code> choices. Multiply: A[i] lives in <code>(i+1) * (N-i)</code> subarrays. So <code>total = Σ A[i] * (i+1) * (N-i)</code>. One pass, O(N).",
+    "plain": "The number of subarrays that include index i equals (i+1) * (N-i) — pick any start ≤ i (i+1 choices, namely 0,1,...,i) and any end ≥ i (N-i choices, namely i,i+1,...,N-1). Each (start, end) pair defines a unique subarray containing i. So total = Σ A[i] * (i+1) * (N-i). One pass, O(N). Cast A[i] to long BEFORE multiplying to avoid silent overflow.",
+    "tale": "<strong>Two fences enclose every garden gnome.</strong> Gnome i needs a fence on its LEFT (planted anywhere from the start of the row up to and including i → i+1 spots) and a fence on its RIGHT (anywhere from i to the end of the row → N-i spots). Every (left, right) fence pair creates one subarray that contains the gnome. Count fences, not subarrays.",
     "solutions": [
       {
         "label": "Brute",
@@ -1923,7 +1923,7 @@
               "4": "c-input"
             },
             "msg": "A = <strong>[4,2,7,5,3]</strong>, N = 5. Total subarrays = 5*6/2 = 15. Naive sum-them-all is O(N^2). <strong>Contribution</strong> collapses it to O(N).",
-            "overlay": "<strong>Formula:</strong> <code>contrib(i) = A[i] * (i+1) * (N-i)</code>. Sum over all i."
+            "overlay": "<strong>Mnemonic — Left Fence × Right Fence.</strong> Pick a left wall from {0..i} (<code>i+1</code> options) × a right wall from {i..N-1} (<code>N-i</code> options). Every (left, right) fence pair encloses a unique subarray containing index i. → <code>contrib(i) = A[i] * (i+1) * (N-i)</code>."
           },
           {
             "label": "i=0 → 4 * 1 * 5 = 20",
