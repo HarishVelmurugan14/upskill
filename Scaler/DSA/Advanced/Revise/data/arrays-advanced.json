@@ -1179,5 +1179,167 @@
         ]
       }
     }
+  },
+  {
+    "id": "aadv-max-subarray-easy",
+    "title": "Maximum Subarray Easy",
+    "subTopic": "Sliding Window — Sum Ceiling",
+    "tags": [
+      "Arrays",
+      "Sliding Window",
+      "Two Pointers"
+    ],
+    "description": "Given an array C of A POSITIVE integers and an integer B, find the MAXIMUM possible sum of a contiguous sub-array whose sum is ≤ B. If no sub-array qualifies (e.g. every single element exceeds B), return 0.\n\nProblem Constraints\n1 ≤ A ≤ 10^5\n1 ≤ B ≤ 10^9\n1 ≤ C[i] ≤ 10^6\n\nInput Format\nA — length of C; B — upper bound; C — array of positives.\n\nOutput Format\nMax sum ≤ B; 0 if none.\n\nExample\nC = [2, 1, 3, 4, 5], B = 7 → 7 ([3, 4]).\nC = [10, 20], B = 5 → 0 (no element fits).",
+    "sampleInput": "C = [2, 1, 3, 4, 5], B = 7",
+    "sampleOutput": "7",
+    "story": "Two pointers on a positive array: expand right adding to currSum; while currSum > B, shrink from left. After each step, update maxSum with currSum (which is ≤ B by then).",
+    "plain": "Because C[i] > 0, expanding the right pointer monotonically increases currSum and shrinking from the left monotonically decreases it. So a single forward pass with a sliding window finds, for every right end, the LARGEST window ending there with sum ≤ B. Take the max of those window sums. Brute is O(N²) over all subarrays — fine for small N but pointless when O(N) is one extra pointer.",
+    "tale": "Inflate a balloon by walking right; whenever it overshoots the cap, deflate from the back end until it fits, and read off the maximum legal size you ever saw.",
+    "solutions": [
+      {
+        "label": "Brute — All Subarrays",
+        "complexity": {
+          "time": "O(N²)",
+          "space": "O(1)"
+        },
+        "plain": "Try every start; sum forward; bail when sum > B.",
+        "tale": "Brute window sweep.",
+        "approach": [
+          "best = 0.",
+          "For l = 0..N-1: s = 0; for r = l..N-1: s += C[r]; if s > B → break; best = max(best, s).",
+          "Return best."
+        ],
+        "pseudocode": "for l; s=0; for r>=l: s+=C[r]; if s>B: break; best=max(best,s)",
+        "story": "Educational. O(N²) → TLE at N = 1e5.",
+        "code": "public int solveBrute(int A, int B, int[] C) {\n    int best = 0;\n    for (int l = 0; l < A; l++) {\n        long s = 0;\n        for (int r = l; r < A; r++) {\n            s += C[r];\n            if (s > B) {\n                break;\n            }\n            if (s > best) {\n                best = (int) s;\n            }\n        }\n    }\n    return best;\n}"
+      },
+      {
+        "label": "Optimal — Sliding Window (Two Pointers)",
+        "complexity": {
+          "time": "O(N)",
+          "space": "O(1)"
+        },
+        "plain": "Expand right; shrink left whenever sum exceeds B; track max.",
+        "tale": "Balloon expand/deflate.",
+        "approach": [
+          "maxSum = 0; currSum = 0; left = 0.",
+          "For right = 0..A-1: currSum += C[right].",
+          "While currSum > B and left ≤ right → currSum -= C[left]; left++.",
+          "If currSum ≤ B → maxSum = max(maxSum, currSum).",
+          "Return maxSum."
+        ],
+        "pseudocode": "l=0,curr=0,best=0; for r: curr+=C[r]; while curr>B: curr-=C[l++]; best=max(best,curr)",
+        "story": "Optimal. Each index enters and leaves the window once → amortised O(N).",
+        "code": "public int solve(int A, int B, int[] C) {\n    int maxSum = 0;\n    int currentSum = 0;\n    int left = 0;\n    for (int right = 0; right < A; right++) {\n        currentSum += C[right];\n        while (currentSum > B && left <= right) {\n            currentSum -= C[left];\n            left++;\n        }\n        if (currentSum <= B) {\n            maxSum = Math.max(maxSum, currentSum);\n        }\n    }\n    return maxSum;\n}"
+      }
+    ],
+    "viz": {
+      "kind": "scripted-array",
+      "data": {
+        "A": [
+          2,
+          1,
+          3,
+          4,
+          5
+        ],
+        "footer": "Sliding window — max sum ≤ B=7 on C=[2,1,3,4,5].",
+        "legend": [
+          "c-input",
+          "c-active",
+          "c-result",
+          "c-eliminated"
+        ],
+        "script": [
+          {
+            "label": "SETUP",
+            "marks": {
+              "0": "c-input",
+              "1": "c-input",
+              "2": "c-input",
+              "3": "c-input",
+              "4": "c-input"
+            },
+            "msg": "l=0, currSum=0, maxSum=0, B=7.",
+            "overlay": "<strong>Why two pointers OK?</strong> All C[i] > 0 → adding moves currSum up only; removing moves it down only. Both monotonic ⇒ single sweep suffices."
+          },
+          {
+            "label": "r=0: +2 → currSum=2",
+            "marks": {
+              "0": "c-active"
+            },
+            "msg": "Window [2]. 2 ≤ 7 → maxSum = 2."
+          },
+          {
+            "label": "r=1: +1 → currSum=3",
+            "marks": {
+              "0": "c-active",
+              "1": "c-active"
+            },
+            "msg": "Window [2,1]. maxSum = 3."
+          },
+          {
+            "label": "r=2: +3 → currSum=6",
+            "marks": {
+              "0": "c-active",
+              "1": "c-active",
+              "2": "c-active"
+            },
+            "msg": "Window [2,1,3]. maxSum = 6."
+          },
+          {
+            "label": "r=3: +4 → currSum=10 > 7 → shrink",
+            "marks": {
+              "0": "c-eliminated",
+              "1": "c-active",
+              "2": "c-active",
+              "3": "c-active"
+            },
+            "msg": "Drop C[0]=2 → currSum=8 still > 7."
+          },
+          {
+            "label": "Shrink again: drop C[1]=1",
+            "marks": {
+              "0": "c-eliminated",
+              "1": "c-eliminated",
+              "2": "c-active",
+              "3": "c-active"
+            },
+            "msg": "currSum=7 ≤ 7 → maxSum = <strong>7</strong>."
+          },
+          {
+            "label": "r=4: +5 → currSum=12 > 7 → shrink",
+            "marks": {
+              "0": "c-eliminated",
+              "1": "c-eliminated",
+              "2": "c-eliminated",
+              "3": "c-active",
+              "4": "c-active"
+            },
+            "msg": "Drop C[2]=3 → currSum=9 still > 7."
+          },
+          {
+            "label": "Shrink again: drop C[3]=4",
+            "marks": {
+              "0": "c-eliminated",
+              "1": "c-eliminated",
+              "2": "c-eliminated",
+              "3": "c-eliminated",
+              "4": "c-active"
+            },
+            "msg": "currSum=5 ≤ 7 → maxSum stays 7."
+          },
+          {
+            "label": "DONE",
+            "marks": {
+              "2": "c-result",
+              "3": "c-result"
+            },
+            "msg": "Best window = [3,4] with sum <strong>7</strong>.",
+            "overlay": "<strong>Edge case:</strong> if every C[i] > B, no window ever satisfies the cap → return the initial maxSum = 0."
+          }
+        ]
+      }
+    }
   }
 ]
