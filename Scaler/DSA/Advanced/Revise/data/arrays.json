@@ -2086,6 +2086,209 @@
     }
   },
   {
+    "id": "arr-subarray-master-cheatsheet",
+    "title": "Subarray Patterns — Master Cheatsheet",
+    "subTopic": "Decision Tree — Sum / Count / Length / Distinct",
+    "tags": [
+      "Arrays",
+      "Sliding Window",
+      "Two Pointers",
+      "Prefix Sum",
+      "HashMap",
+      "Kadane",
+      "Reference"
+    ],
+    "description": "META PROBLEM. Not a single Scaler task — a decision tree to pick the right algorithm for ANY subarray problem.\n\nWhen the input array contains:\n• ALL POSITIVES (or all non-negatives) — sums are MONOTONE in window size → SLIDING WINDOW.\n• MIXED SIGNS (negatives allowed) — sums are NOT monotone → SLIDING WINDOW BREAKS. Use HashMap (for sum == k) or Merge-sort on prefix sums (for sum ≤ k / ≥ k).\n• 'Exactly k distinct' problems → atMost(k) − atMost(k − 1) trick.\n\nMaster three algorithms and you cover ~95% of subarray problems:\n  1) HashMap on prefix sums — handles negatives, equality (= k).\n  2) Sliding Window (two pointers) — positives only, ≤ / ≥ / fixed.\n  3) Merge-sort on prefix sums — handles negatives, ≤ / ≥.\n\nKadane is sliding-window-for-maximum-sum specialised to allow negatives via 'reset when current < 0'.\n\nProblem Constraints\nN/A — reference card.\n\nExample\nWhich algorithm for: 'count subarrays with sum = K, K can be negative'?\n→ HashMap prefix-sum, O(N).",
+    "sampleInput": "Q: 'longest subarray with sum ≤ K, all A[i] > 0'",
+    "sampleOutput": "Sliding Window, O(N)",
+    "story": "<strong>Three algorithms cover almost every subarray problem.</strong> Pick by asking two questions: (1) Are negatives allowed? (2) Is the constraint equality, ≤/≥, or fixed window? The decision tree picks the algorithm; the rest is template typing.",
+    "plain": "Every subarray problem reduces to a (constraint, signs) pair:\n• (= K, any signs) → HashMap of prefix sums; for each running sum S add count of (S − K) seen, then bump count of S.\n• (= K, positives) → HashMap also works; sliding-window-with-atMost trick also works.\n• (≤ K or ≥ K, positives) → Sliding window: expand right, shrink left when constraint breaks.\n• (≤ K or ≥ K, mixed signs) → Merge-sort on prefix sums (counting inversions / sum-bounded pairs).\n• (Fixed window of size K) → Sliding window of fixed size; add new, drop old.\n• (Exactly K distinct) → atMost(K) − atMost(K − 1).\n• (Max sum subarray, mixed signs) → Kadane (reset currSum when it dips below 0).",
+    "tale": "<strong>The toolbox-and-toggle.</strong> The toggle is sign-of-elements; the toolbox has three bays. Positive-only? → Sliding window. Equality? → HashMap. Inequality with negatives? → Merge-sort prefix. Pull the right tool — never mix.",
+    "solutions": [
+      {
+        "label": "Tool 1 — HashMap of Prefix Sums (handles negatives, sum == K)",
+        "complexity": {
+          "time": "O(N) avg",
+          "space": "O(N)"
+        },
+        "plain": "Maintain a running prefix sum and a count map of how many times each prefix has been seen. For 'count subarrays with sum K': for each step, ans += map[currSum − K]; then map[currSum]++.",
+        "tale": "Checkpoint pairing: every time you reach a tally that is exactly K above some past tally, that past-to-current stretch sums to K.",
+        "approach": [
+          "Initialise Map<Long, Integer> seen = {0L: 1} — sentinel so a prefix of K starting at index 0 counts.",
+          "long sum = 0; long count = 0; int longest = 0; Map<Long, Integer> first = new HashMap<>(); first.put(0L, -1);",
+          "For i = 0..N−1: sum += A[i].",
+          "  COUNT (= K): count += seen.getOrDefault(sum − K, 0); seen.merge(sum, 1, Integer::sum).",
+          "  LONGEST (= K): if first.containsKey(sum − K) → longest = max(longest, i − first.get(sum − K)); first.putIfAbsent(sum, i)."
+        ],
+        "pseudocode": "// COUNT == K (with negatives)\nseen = {0:1}; sum=0; for x: sum+=x; ans += seen[sum-K]; seen[sum]++\n\n// LONGEST == K (with negatives) — keep EARLIEST index only\nfirst = {0:-1}; sum=0; for i: sum+=A[i]; if (sum-K) in first: best = max(best, i - first[sum-K]); first.putIfAbsent(sum, i)",
+        "story": "Use whenever the constraint is sum == K. Negatives allowed (HashMap doesn't care). Counting needs a count-map; longest needs an earliest-index map.",
+        "code": "// Pattern A — Count subarrays with sum == K (handles negatives)\npublic int countSumEqualsK(int[] A, int K) {\n    Map<Long, Integer> seen = new HashMap<>();\n    seen.put(0L, 1);\n    long sum = 0;\n    int count = 0;\n    for (int x : A) {\n        sum += x;\n        count += seen.getOrDefault(sum - K, 0);\n        seen.merge(sum, 1, Integer::sum);\n    }\n    return count;\n}\n\n// Pattern B — Longest subarray with sum == K (handles negatives)\npublic int longestSumEqualsK(int[] A, int K) {\n    Map<Long, Integer> first = new HashMap<>();\n    first.put(0L, -1);\n    long sum = 0;\n    int best = 0;\n    for (int i = 0; i < A.length; i++) {\n        sum += A[i];\n        if (first.containsKey(sum - K)) {\n            best = Math.max(best, i - first.get(sum - K));\n        }\n        first.putIfAbsent(sum, i);\n    }\n    return best;\n}"
+      },
+      {
+        "label": "Tool 2 — Sliding Window / Two Pointers (positives only)",
+        "complexity": {
+          "time": "O(N)",
+          "space": "O(1)"
+        },
+        "plain": "All A[i] > 0 ⇒ window sum is MONOTONE in window size. Expand right; while constraint broken, shrink left. Variants: count, longest, fixed-size, at-most-K-distinct.",
+        "tale": "Inflate a balloon (advance right); deflate from the back (advance left) when it bursts the cap. Read off the best legal size.",
+        "approach": [
+          "COUNT sum ≤ K (positives): expand r, shrink l while sum > K. For each r, count += (r − l + 1) — number of valid subarrays ending at r.",
+          "LONGEST sum ≤ K (positives): same pattern, track best window size after the shrink step.",
+          "COUNT sum == K (positives): atMost(K) − atMost(K − 1). Reuse the COUNT-≤-K template twice.",
+          "FIXED window size W: build first window in one pass; slide by adding A[i] and removing A[i − W]; emit per slide.",
+          "AT-MOST K distinct: maintain HashMap<value, count>; expand r adding A[r]; while map.size() > K, shrink l. count += (r − l + 1).",
+          "EXACTLY K distinct = atMost(K) − atMost(K − 1)."
+        ],
+        "pseudocode": "// COUNT subarrays with sum ≤ K (positives only)\nl=0; sum=0; ans=0; for r: sum+=A[r]; while sum>K: sum-=A[l++]; ans += (r-l+1)\n\n// LONGEST sum ≤ K (positives only)\nl=0; sum=0; best=0; for r: sum+=A[r]; while sum>K: sum-=A[l++]; best=max(best, r-l+1)\n\n// AT-MOST K distinct (positives or any non-negatives)\nl=0; freq={}; ans=0; for r: freq[A[r]]++; while freq.size()>K: dec/remove A[l]; l++; ans += (r-l+1)",
+        "story": "Use when array is all positive (or non-negative) AND the constraint is ≤ / ≥ / fixed / distinct. NEVER use sliding window when signs are mixed for sum problems — monotonicity breaks.",
+        "code": "// Pattern C — Count subarrays with sum <= K (positives only)\npublic int countSumAtMostK(int[] A, int K) {\n    int left = 0;\n    long sum = 0;\n    int count = 0;\n    for (int right = 0; right < A.length; right++) {\n        sum += A[right];\n        while (sum > K && left <= right) {\n            sum -= A[left];\n            left++;\n        }\n        count += (right - left + 1);\n    }\n    return count;\n}\n\n// Pattern D — Longest subarray with sum <= K (positives only)\npublic int longestSumAtMostK(int[] A, int K) {\n    int left = 0;\n    long sum = 0;\n    int best = 0;\n    for (int right = 0; right < A.length; right++) {\n        sum += A[right];\n        while (sum > K && left <= right) {\n            sum -= A[left];\n            left++;\n        }\n        best = Math.max(best, right - left + 1);\n    }\n    return best;\n}\n\n// Pattern E — Count subarrays with sum == K (positives only) via atMost(K) - atMost(K-1)\npublic int countSumEqualsKPositive(int[] A, int K) {\n    return countSumAtMostK(A, K) - countSumAtMostK(A, K - 1);\n}\n\n// Pattern F — Longest subarray with at-most K distinct elements\npublic int longestAtMostKDistinct(int[] A, int K) {\n    Map<Integer, Integer> freq = new HashMap<>();\n    int left = 0;\n    int best = 0;\n    for (int right = 0; right < A.length; right++) {\n        freq.merge(A[right], 1, Integer::sum);\n        while (freq.size() > K) {\n            int c = freq.get(A[left]) - 1;\n            if (c == 0) {\n                freq.remove(A[left]);\n            } else {\n                freq.put(A[left], c);\n            }\n            left++;\n        }\n        best = Math.max(best, right - left + 1);\n    }\n    return best;\n}\n\n// Pattern G — Count subarrays with EXACTLY K distinct = atMost(K) - atMost(K-1)\npublic int countExactlyKDistinct(int[] A, int K) {\n    return countAtMostKDistinct(A, K) - countAtMostKDistinct(A, K - 1);\n}\nprivate int countAtMostKDistinct(int[] A, int K) {\n    if (K < 0) {\n        return 0;\n    }\n    Map<Integer, Integer> freq = new HashMap<>();\n    int left = 0;\n    int count = 0;\n    for (int right = 0; right < A.length; right++) {\n        freq.merge(A[right], 1, Integer::sum);\n        while (freq.size() > K) {\n            int c = freq.get(A[left]) - 1;\n            if (c == 0) {\n                freq.remove(A[left]);\n            } else {\n                freq.put(A[left], c);\n            }\n            left++;\n        }\n        count += (right - left + 1);\n    }\n    return count;\n}\n\n// Pattern H — Fixed window size W, max sum\npublic int maxSumFixedWindow(int[] A, int W) {\n    long windowSum = 0;\n    for (int i = 0; i < W; i++) {\n        windowSum += A[i];\n    }\n    long best = windowSum;\n    for (int i = W; i < A.length; i++) {\n        windowSum += A[i] - A[i - W];\n        if (windowSum > best) {\n            best = windowSum;\n        }\n    }\n    return (int) best;\n}"
+      },
+      {
+        "label": "Tool 3 — Merge-Sort on Prefix Sums (≤ K / ≥ K with negatives)",
+        "complexity": {
+          "time": "O(N log N)",
+          "space": "O(N)"
+        },
+        "plain": "Build prefix sums P[0..N]. 'Count subarrays with sum ≤ K' = count pairs (i, j) with i < j and P[j] − P[i] ≤ K, i.e. P[i] ≥ P[j] − K. This is an inversion-style count over prefix sums — solved by a modified merge sort in O(N log N).",
+        "tale": "When sliding window doesn't apply (negatives), prefix sums turn the question into a range-pair-counting problem and merge sort counts those pairs while sorting.",
+        "approach": [
+          "Build prefix sum array P of length N+1: P[0] = 0; P[i+1] = P[i] + A[i].",
+          "For sum ≤ K: count pairs (i, j) with i < j AND P[j] − P[i] ≤ K, i.e. P[i] ≥ P[j] − K.",
+          "Run merge sort on P; during the merge step, for each P[j] in the right half, count P[i] in the left half satisfying the bound (two-pointer scan since both halves are sorted).",
+          "For sum ≥ K: symmetric — count P[i] ≤ P[j] − K.",
+          "For sum = K with negatives: prefer HashMap (Tool 1) — it's O(N) and simpler."
+        ],
+        "pseudocode": "P[0]=0; P[i+1]=P[i]+A[i]\n// count pairs i<j with P[j]-P[i] <= K\nmergeSort(P, 0, N) and inside the merge, for each j in right, advance i in left while P[i] >= P[j]-K\n// add (left.size - i) to count, then sort.",
+        "story": "Use ONLY when negatives prevent sliding window AND the constraint is ≤ / ≥. For = K with negatives, use HashMap (Tool 1).",
+        "code": "// Pattern I — Count subarrays with sum <= K (handles negatives)\npublic long countSumAtMostKAnySign(int[] A, long K) {\n    int N = A.length;\n    long[] P = new long[N + 1];\n    for (int i = 0; i < N; i++) {\n        P[i + 1] = P[i] + A[i];\n    }\n    return mergeCount(P, 0, N, K, new long[N + 1]);\n}\nprivate long mergeCount(long[] P, int lo, int hi, long K, long[] buf) {\n    if (hi - lo <= 1) {\n        return 0;\n    }\n    int mid = lo + (hi - lo) / 2;\n    long count = mergeCount(P, lo, mid, K, buf) + mergeCount(P, mid, hi, K, buf);\n    // count pairs (i, j) with lo <= i < mid <= j < hi and P[j] - P[i] <= K\n    int j = mid;\n    int valid = mid;\n    for (int i = lo; i < mid; i++) {\n        while (valid < hi && P[valid] - P[i] <= K) {\n            valid++;\n        }\n        count += (valid - mid);\n    }\n    // standard merge into buf and copy back\n    int p = lo;\n    int q = mid;\n    int k = lo;\n    while (p < mid && q < hi) {\n        if (P[p] <= P[q]) {\n            buf[k++] = P[p++];\n        } else {\n            buf[k++] = P[q++];\n        }\n    }\n    while (p < mid) {\n        buf[k++] = P[p++];\n    }\n    while (q < hi) {\n        buf[k++] = P[q++];\n    }\n    for (int t = lo; t < hi; t++) {\n        P[t] = buf[t];\n    }\n    return count;\n}\n\n// Pattern J — Kadane (max subarray sum, mixed signs) — sliding-window's specialisation\npublic int kadane(int[] A) {\n    int currSum = 0;\n    int best = Integer.MIN_VALUE;\n    for (int x : A) {\n        currSum += x;\n        if (currSum > best) {\n            best = currSum;\n        }\n        if (currSum < 0) {\n            currSum = 0;\n        }\n    }\n    return best;\n}"
+      }
+    ],
+    "viz": {
+      "kind": "scripted-array",
+      "data": {
+        "A": [
+          3,
+          1,
+          -2,
+          4,
+          -1,
+          5
+        ],
+        "footer": "Subarray decision tree — pick by (signs, constraint).",
+        "legend": [
+          "c-input",
+          "c-active",
+          "c-result",
+          "c-eliminated"
+        ],
+        "script": [
+          {
+            "label": "DECISION TREE",
+            "marks": {
+              "0": "c-input",
+              "1": "c-input",
+              "2": "c-input",
+              "3": "c-input",
+              "4": "c-input",
+              "5": "c-input"
+            },
+            "msg": "Sample A=[3,1,-2,4,-1,5] has negatives — sliding window for sum problems is OUT.",
+            "overlay": "<strong>Step 1 — Are there negatives?</strong><br>YES → HashMap (= K) or Merge-sort (≤ K / ≥ K). NO → Sliding window covers everything."
+          },
+          {
+            "label": "= K, signs ANY",
+            "marks": {
+              "0": "c-active",
+              "1": "c-active",
+              "2": "c-active",
+              "3": "c-active"
+            },
+            "msg": "Use <strong>HashMap of prefix sums</strong>. For each sum, ans += map[sum − K]; then map[sum]++.",
+            "overlay": "<strong>Why?</strong> Equality doesn't need monotonicity. HashMap counts repeats of (currSum − K) in O(1)."
+          },
+          {
+            "label": "≤ K or ≥ K, POSITIVES",
+            "marks": {
+              "0": "c-active",
+              "1": "c-active",
+              "3": "c-active",
+              "5": "c-active"
+            },
+            "msg": "Use <strong>Sliding Window</strong> (two pointers). Expand r; shrink l while constraint broken.",
+            "overlay": "<strong>Why it works:</strong> all A[i] > 0 ⇒ window sum is monotone in window size. Both pointers only advance — amortised O(N)."
+          },
+          {
+            "label": "≤ K or ≥ K, NEGATIVES",
+            "marks": {
+              "0": "c-active",
+              "2": "c-eliminated",
+              "4": "c-eliminated"
+            },
+            "msg": "Sliding window FAILS (window sum not monotone). Use <strong>Merge-sort on prefix sums</strong>: count pairs (i, j) with P[j] − P[i] ≤ K.",
+            "overlay": "<strong>Cost:</strong> O(N log N), but it's the only general fix when signs mix and you need ≤ / ≥."
+          },
+          {
+            "label": "MAX SUM, signs ANY",
+            "marks": {
+              "0": "c-active",
+              "1": "c-active",
+              "3": "c-active",
+              "4": "c-active",
+              "5": "c-active"
+            },
+            "msg": "Use <strong>Kadane</strong>: currSum += A[i]; reset to 0 when it dips below 0; track best.",
+            "overlay": "<strong>Kadane = sliding-window-for-max-sum.</strong> The 'reset when negative' is exactly the left-pointer jump in disguise."
+          },
+          {
+            "label": "FIXED window size W, max stat",
+            "marks": {
+              "1": "c-active",
+              "2": "c-active",
+              "3": "c-active"
+            },
+            "msg": "Add A[i], drop A[i − W]. Update best.",
+            "overlay": "<strong>Pattern:</strong> ring-buffer style; one add + one remove per slide → O(N)."
+          },
+          {
+            "label": "AT-MOST K distinct",
+            "marks": {
+              "0": "c-active",
+              "1": "c-active",
+              "2": "c-active",
+              "3": "c-active"
+            },
+            "msg": "HashMap<value, count> in window; while map.size() > K, shrink left and drop zero-count keys.",
+            "overlay": "<strong>Critical:</strong> remove the key entirely when its count hits 0 — otherwise map.size() over-counts."
+          },
+          {
+            "label": "EXACTLY K distinct",
+            "marks": {
+              "0": "c-active",
+              "1": "c-active",
+              "2": "c-active"
+            },
+            "msg": "= atMost(K) − atMost(K − 1).",
+            "overlay": "<strong>Trick:</strong> 'exactly' is hard; 'at most' is easy. Subtract two 'at most' counts."
+          },
+          {
+            "label": "SUMMARY",
+            "marks": {
+              "0": "c-result",
+              "1": "c-result",
+              "2": "c-result",
+              "3": "c-result",
+              "4": "c-result",
+              "5": "c-result"
+            },
+            "msg": "Three tools cover the table:<br>1) HashMap prefix sum — = K, any signs, O(N).<br>2) Sliding window — ≤ K / ≥ K / fixed / distinct, positives only, O(N).<br>3) Merge-sort prefix — ≤ K / ≥ K, any signs, O(N log N).<br>Kadane = sliding-window max-sum.",
+            "overlay": "<strong>Memorise this table.</strong> It is the entire taxonomy of subarray problems in three rows."
+          }
+        ]
+      }
+    }
+  },
+  {
     "id": "arr-good-subarrays-easy",
     "title": "Good Subarrays Easy",
     "subTopic": "Enumeration with Parity Predicate",
