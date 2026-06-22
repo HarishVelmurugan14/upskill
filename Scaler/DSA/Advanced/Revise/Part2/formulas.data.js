@@ -1,0 +1,528 @@
+// Auto-generated from ../data/formulas.json — single source for the Formulas page.
+// Loaded as a sibling <script> so it resolves regardless of server root (and works under file://).
+window.FORMULAS_DATA = {
+  "taxonomy": [
+    {
+      "section": "Section 1",
+      "topic": "Arrays Advanced"
+    },
+    {
+      "section": "Section 1",
+      "topic": "Maths"
+    },
+    {
+      "section": "Section 2",
+      "topic": "Binary Search"
+    },
+    {
+      "section": "Section 2",
+      "topic": "Stacks"
+    },
+    {
+      "section": "Section 2",
+      "topic": "Queues"
+    },
+    {
+      "section": "Section 2",
+      "topic": "Trees"
+    }
+  ],
+  "formulas": [
+    {
+      "id": "kadane-s-algorithm-max-sum-subarray",
+      "name": "Kadane's Algorithm — Max Sum Subarray",
+      "section": "Section 1",
+      "topic": "Arrays Advanced",
+      "day": "d08",
+      "formula": "curr = max(<span class=\"var\">A[i]</span>, curr <span class=\"op\">+</span> <span class=\"var\">A[i]</span>) <span class=\"com\">// best sum ENDING at i</span><br>\n            best = max(best, curr) <span class=\"com\">// best seen anywhere</span><br>\n            <span class=\"com\">// init: curr = best = A[0]</span>",
+      "example": "<strong>Ex:</strong> A=[-2,1,-3,4,-1,2,1,-5,4] → best = <strong>6</strong> (subarray [4,-1,2,1])",
+      "whenToUse": [
+        "Maximum sum of a contiguous subarray",
+        "Any \"running accumulation that may restart from scratch\"",
+        "All-negative input → answer is the largest element, <em>not</em> 0"
+      ],
+      "usedIn": [
+        "aadv-max-sum-contiguous-subarray",
+        "aadv-max-subarray-easy"
+      ],
+      "note": "Never seed <code>best = 0</code> — that silently returns 0 for all-negative arrays. Initialise both <code>curr</code> and <code>best</code> to <code>A[0]</code> (or <code>Integer.MIN_VALUE</code>)."
+    },
+    {
+      "id": "2d-contribution-sum-of-all-submatrices",
+      "name": "2D Contribution — Sum of All Submatrices",
+      "section": "Section 1",
+      "topic": "Arrays Advanced",
+      "day": "d09",
+      "formula": "answer = Σ<sub>i</sub> Σ<sub>j</sub> <span class=\"var\">A[i][j]</span> <span class=\"op\">*</span> (<span class=\"var\">i</span><span class=\"op\">+</span><span class=\"num\">1</span>)(<span class=\"var\">N</span><span class=\"op\">−</span><span class=\"var\">i</span>) <span class=\"op\">*</span> (<span class=\"var\">j</span><span class=\"op\">+</span><span class=\"num\">1</span>)(<span class=\"var\">M</span><span class=\"op\">−</span><span class=\"var\">j</span>)<br>\n            <span class=\"com\">// (i+1)(N−i) = # row-ranges covering row i</span><br>\n            <span class=\"com\">// (j+1)(M−j) = # col-ranges covering col j</span>",
+      "example": "<strong>Ex:</strong> 2×2 grid of 1s → each cell counted (i+1)(N−i)(j+1)(M−j)=<strong>4</strong> times → total <strong>16</strong>",
+      "whenToUse": [
+        "\"Sum of f over <em>all</em> submatrices\" of a grid",
+        "2D extension of the subarray contribution trick",
+        "Replaces O(N²M²) enumeration with O(N·M)"
+      ],
+      "usedIn": [
+        "aadv-sum-all-submatrices"
+      ],
+      "note": "The 1D analogue is <code>contribution(A[i]) = A[i]·(i+1)·(N−i)</code>; the 2D form just multiplies the independent row-count and column-count of ranges."
+    },
+    {
+      "id": "gcd-euclidean-algorithm",
+      "name": "GCD (Euclidean algorithm)",
+      "section": "Section 1",
+      "topic": "Maths",
+      "day": "d21",
+      "formula": "gcd(<span class=\"var\">a</span>, <span class=\"var\">b</span>) = gcd(<span class=\"var\">b</span>, <span class=\"var\">a</span> <span class=\"op\">%</span> <span class=\"var\">b</span>) <span class=\"com\">// until b == 0</span><br>\n            gcd(<span class=\"var\">a</span>, <span class=\"num\">0</span>) = <span class=\"var\">a</span>",
+      "example": "<strong>Ex:</strong> gcd(48, 18) → gcd(18, 12) → gcd(12, 6) → gcd(6, 0) = <strong>6</strong>",
+      "whenToUse": [
+        "Reducing fractions / simplifying ratios",
+        "\"Largest equal-size group\" problems",
+        "LCM derivation (needs gcd)",
+        "Stride / cycle problems on arrays"
+      ],
+      "usedIn": [
+        "Maths Formulas",
+        "LCM"
+      ],
+      "note": "Recursive form is O(log(min(a, b))). Iterative <code>while (b != 0) { t = b; b = a % b; a = t; }</code> avoids stack frames."
+    },
+    {
+      "id": "lcm-via-gcd",
+      "name": "LCM (via GCD)",
+      "section": "Section 1",
+      "topic": "Maths",
+      "day": "d21",
+      "formula": "lcm(<span class=\"var\">a</span>, <span class=\"var\">b</span>) = (<span class=\"var\">a</span> <span class=\"op\">/</span> gcd(<span class=\"var\">a</span>, <span class=\"var\">b</span>)) <span class=\"op\">*</span> <span class=\"var\">b</span>",
+      "example": "<strong>Ex:</strong> lcm(4, 6) = (4 / gcd(4,6)) * 6 = (4 / 2) * 6 = <strong>12</strong>",
+      "whenToUse": [
+        "Aligning two cyclic events",
+        "\"Smallest number divisible by both\"",
+        "Period of repeating patterns"
+      ],
+      "usedIn": [
+        "Maths Formulas"
+      ],
+      "note": "Always divide first, then multiply — <code>a * b / gcd</code> can overflow even when the result fits."
+    },
+    {
+      "id": "sum-of-first-n-natural-numbers",
+      "name": "Sum of First N Natural Numbers",
+      "section": "Section 1",
+      "topic": "Maths",
+      "day": "d21",
+      "formula": "<span class=\"num\">1</span> <span class=\"op\">+</span> <span class=\"num\">2</span> <span class=\"op\">+</span> … <span class=\"op\">+</span> <span class=\"var\">N</span> = <span class=\"var\">N</span> <span class=\"op\">*</span> (<span class=\"var\">N</span> <span class=\"op\">+</span> <span class=\"num\">1</span>) <span class=\"op\">/</span> <span class=\"num\">2</span>",
+      "example": "<strong>Ex:</strong> N = 10 → 10 * 11 / 2 = <strong>55</strong>",
+      "whenToUse": [
+        "\"Find the missing number in 1..N\"",
+        "Counting total subarrays of an array (N*(N+1)/2)",
+        "Triangular number / staircase totals",
+        "Brute upper bound for staircase / sqrt problems"
+      ],
+      "usedIn": [
+        "bs-staircase",
+        "bs-special-integer",
+        "missing number variants"
+      ],
+      "note": "Always use <code>long</code> — N=10⁵ already gives ~5·10⁹, overflows int."
+    },
+    {
+      "id": "sum-of-squares-1-n",
+      "name": "Sum of Squares 1..N",
+      "section": "Section 1",
+      "topic": "Maths",
+      "day": "d21",
+      "formula": "<span class=\"num\">1²</span> <span class=\"op\">+</span> <span class=\"num\">2²</span> <span class=\"op\">+</span> … <span class=\"op\">+</span> <span class=\"var\">N²</span> = <span class=\"var\">N</span> <span class=\"op\">*</span> (<span class=\"var\">N</span> <span class=\"op\">+</span> <span class=\"num\">1</span>) <span class=\"op\">*</span> (<span class=\"num\">2</span><span class=\"var\">N</span> <span class=\"op\">+</span> <span class=\"num\">1</span>) <span class=\"op\">/</span> <span class=\"num\">6</span>",
+      "example": "<strong>Ex:</strong> N=4 → 4·5·9/6 = <strong>30</strong> (1+4+9+16)",
+      "whenToUse": [
+        "Closed-form for nested sums",
+        "Estimating brute-force work over partial sums"
+      ],
+      "usedIn": []
+    },
+    {
+      "id": "total-subarrays-of-an-array",
+      "name": "Total Subarrays of an Array",
+      "section": "Section 1",
+      "topic": "Maths",
+      "day": "d27, d28",
+      "formula": "#subarrays(<span class=\"var\">N</span>) = <span class=\"var\">N</span> <span class=\"op\">*</span> (<span class=\"var\">N</span> <span class=\"op\">+</span> <span class=\"num\">1</span>) <span class=\"op\">/</span> <span class=\"num\">2</span>",
+      "example": "<strong>Ex:</strong> N=4 → 4·5/2 = <strong>10</strong> subarrays",
+      "whenToUse": [
+        "Sanity-checking that \"sum of contributions\" equals total work",
+        "Choosing whether O(N²) enumeration even fits"
+      ],
+      "usedIn": [],
+      "note": "Identical to \"sum of 1..N\" — every left endpoint <code>l</code> pairs with <code>N - l</code> right endpoints."
+    },
+    {
+      "id": "inclusion-exclusion-divisible-by-a-or-b",
+      "name": "Inclusion–Exclusion (divisible by A or B)",
+      "section": "Section 1",
+      "topic": "Maths",
+      "day": "d23",
+      "formula": "#(<span class=\"num\">1</span>..<span class=\"var\">N</span> divisible by <span class=\"var\">A</span> or <span class=\"var\">B</span>)<br>\n            &nbsp;&nbsp;= ⌊<span class=\"var\">N</span> <span class=\"op\">/</span> <span class=\"var\">A</span>⌋ <span class=\"op\">+</span> ⌊<span class=\"var\">N</span> <span class=\"op\">/</span> <span class=\"var\">B</span>⌋ <span class=\"op\">−</span> ⌊<span class=\"var\">N</span> <span class=\"op\">/</span> lcm(<span class=\"var\">A</span>, <span class=\"var\">B</span>)⌋",
+      "example": "<strong>Ex:</strong> N=12, A=2, B=3 → 6 + 4 − 2 = <strong>8</strong> (numbers: 2,3,4,6,8,9,10,12).",
+      "whenToUse": [
+        "\"K-th magical number divisible by A or B\"",
+        "BS on answer where the predicate is \"count ≤ mid ≥ K\"",
+        "Any two-set \"OR\" count over [1..N]"
+      ],
+      "usedIn": [
+        "bs-magical-number"
+      ],
+      "note": "Subtraction prevents double-counting multiples of <code>lcm(A,B)</code>. Generalizes to 3+ sets with alternating signs."
+    },
+    {
+      "id": "safe-modulo-of-subtraction-avoid-negatives",
+      "name": "Safe Modulo of Subtraction (avoid negatives)",
+      "section": "Section 1",
+      "topic": "Maths",
+      "day": "d27, d28",
+      "formula": "result = ((<span class=\"var\">a</span> <span class=\"op\">−</span> <span class=\"var\">b</span>) <span class=\"op\">%</span> MOD <span class=\"op\">+</span> MOD) <span class=\"op\">%</span> MOD",
+      "example": "<strong>Ex:</strong> a=3, b=10, MOD=7 → (-7 % 7 + 7) % 7 = <strong>0</strong>. Without the +MOD, Java would return −0 or a negative depending on language.",
+      "whenToUse": [
+        "Any modular running sum that involves subtraction",
+        "\"Max − min\" contribution sums with mod"
+      ],
+      "usedIn": [
+        "stacks-max-and-min",
+        "queues-sum-of-min-max"
+      ],
+      "note": "In Java, <code>%</code> on negatives returns negative — always wrap with <code>+ MOD) % MOD</code> after any subtraction."
+    },
+    {
+      "id": "modular-product-long-cast",
+      "name": "Modular Product (long cast)",
+      "section": "Section 1",
+      "topic": "Maths",
+      "day": "d27",
+      "formula": "(<span class=\"var\">a</span> <span class=\"op\">*</span> <span class=\"var\">b</span>) <span class=\"op\">%</span> MOD = ((<span class=\"op\">long</span>)<span class=\"var\">a</span> <span class=\"op\">*</span> <span class=\"var\">b</span>) <span class=\"op\">%</span> MOD",
+      "example": "<strong>Ex:</strong> a=b=10⁵, int * int overflows; (long)a * b = 10¹⁰ fits in long.",
+      "whenToUse": [
+        "Any product where both operands can reach √MAX_LONG",
+        "Contribution sums multiplying counts × values"
+      ],
+      "usedIn": [
+        "bs-add-or-not",
+        "bs-painters",
+        "bs-staircase",
+        "bs-magical-number",
+        "trees-valid-bst"
+      ]
+    },
+    {
+      "id": "safe-mid-no-overflow",
+      "name": "Safe Mid (no overflow)",
+      "section": "Section 2",
+      "topic": "Binary Search",
+      "day": "d21–d23",
+      "formula": "<span class=\"var\">mid</span> = <span class=\"var\">low</span> <span class=\"op\">+</span> (<span class=\"var\">high</span> <span class=\"op\">-</span> <span class=\"var\">low</span>) <span class=\"op\">/</span> <span class=\"num\">2</span>",
+      "example": "<strong>Ex:</strong> low=2·10⁹, high=2·10⁹+8 → naive (low+high)/2 overflows int; safe form stays valid.",
+      "whenToUse": [
+        "Every binary search — no exception",
+        "Especially: BS on answer space where bounds can be 10⁹"
+      ],
+      "usedIn": [
+        "all bs-* problems"
+      ],
+      "note": "Mathematically equivalent to <code>(low+high)/2</code> — but immune to int overflow when low, high are near MAX_INT."
+    },
+    {
+      "id": "matrix-median-position",
+      "name": "Matrix Median Position",
+      "section": "Section 2",
+      "topic": "Binary Search",
+      "day": "d23",
+      "formula": "target rank = (<span class=\"var\">N</span> <span class=\"op\">*</span> <span class=\"var\">M</span> <span class=\"op\">+</span> <span class=\"num\">1</span>) <span class=\"op\">/</span> <span class=\"num\">2</span> <span class=\"com\">// 1-indexed median in odd-size matrix</span>",
+      "example": "<strong>Ex:</strong> 3×5 matrix → (15+1)/2 = <strong>8th</strong> smallest is the median.",
+      "whenToUse": [
+        "Median of a row-wise sorted matrix",
+        "BS on value range + per-row lower_bound"
+      ],
+      "usedIn": [
+        "bs-matrix-median"
+      ]
+    },
+    {
+      "id": "lower-bound-count-x-in-sorted-row",
+      "name": "Lower Bound (count ≤ x in sorted row)",
+      "section": "Section 2",
+      "topic": "Binary Search",
+      "day": "d23",
+      "formula": "count(≤ x) = upper_bound(row, x) <span class=\"op\">−</span> <span class=\"num\">0</span><br>\n            count(&lt; x) = lower_bound(row, x)",
+      "example": "<strong>Ex:</strong> row = [3,8,14,22], x=10 → upper=2 (3,8 ≤ 10), lower=2 (same since 10 missing).",
+      "whenToUse": [
+        "Count \"how many ≤ candidate\" across N sorted rows in O(N log M)",
+        "BS-on-value-range driver function"
+      ],
+      "usedIn": [
+        "bs-matrix-median"
+      ]
+    },
+    {
+      "id": "integer-square-root-via-bs",
+      "name": "Integer Square Root via BS",
+      "section": "Section 2",
+      "topic": "Binary Search",
+      "day": "d21, d23",
+      "formula": "⌊√<span class=\"var\">N</span>⌋ = largest <span class=\"var\">mid</span> with <span class=\"var\">mid</span> <span class=\"op\">*</span> <span class=\"var\">mid</span> <span class=\"op\">≤</span> <span class=\"var\">N</span><br>\n            <span class=\"com\">// search space: low=0, high=N (or 46341 cap if N fits in int)</span><br>\n            <span class=\"com\">// use (long) cast on mid*mid to avoid overflow</span>",
+      "example": "<strong>Ex:</strong> N=11 → mid=3 (9 ≤ 11 ✓), mid=4 (16 &gt; 11 ✗) → <strong>3</strong>.",
+      "whenToUse": [
+        "\"⌊√N⌋ without Math.sqrt\"",
+        "Staircase: smallest k with k(k+1)/2 ≥ N",
+        "Any \"largest x with monotone predicate\""
+      ],
+      "usedIn": [
+        "bs-sqrt",
+        "bs-staircase"
+      ],
+      "note": "Cast: <code>long sq = (long) mid * mid;</code> — int*int overflows when N ≥ 2³¹."
+    },
+    {
+      "id": "bs-on-answer-bounds",
+      "name": "BS-on-Answer Bounds",
+      "section": "Section 2",
+      "topic": "Binary Search",
+      "day": "d23",
+      "formula": "<span class=\"com\">// minimize-max (painters, books, paint cost):</span><br>\n            low = max(items)  <span class=\"com\">// can't go below largest single item</span><br>\n            high = sum(items) <span class=\"com\">// 1 worker takes everything</span><br><br>\n            <span class=\"com\">// maximize-min (aggressive cows):</span><br>\n            low = <span class=\"num\">1</span>                          <span class=\"com\">// smallest gap</span><br>\n            high = max(items) <span class=\"op\">−</span> min(items) <span class=\"com\">// widest possible gap</span>",
+      "example": "<strong>Painters [10, 20, 30, 40]:</strong> low=40, high=100. Feasible(70)? → yes → try 60.",
+      "whenToUse": [
+        "BS on answer space — picking the right bounds is half the work",
+        "Wrong bounds (low=0 or low=1 for minimize-max) → infinite-loop or wrong answer"
+      ],
+      "usedIn": [
+        "bs-painters",
+        "bs-allocate-books",
+        "bs-aggressive-cows"
+      ]
+    },
+    {
+      "id": "pivot-detection-in-rotated-sorted-array",
+      "name": "Pivot Detection in Rotated Sorted Array",
+      "section": "Section 2",
+      "topic": "Binary Search",
+      "day": "d22",
+      "formula": "<span class=\"com\">// At each step exactly one half is sorted:</span><br>\n            if (<span class=\"var\">A</span>[low] <span class=\"op\">≤</span> <span class=\"var\">A</span>[mid])  → <span class=\"op\">left</span> half is sorted<br>\n            else                       → <span class=\"op\">right</span> half is sorted<br><br>\n            <span class=\"com\">// Then check if target lies inside the sorted half:</span><br>\n            if (target in [<span class=\"var\">A</span>[low], <span class=\"var\">A</span>[mid])) → go left, else → go right",
+      "example": "<strong>Ex:</strong> A=[4,5,6,7,0,1,2], target=0. mid=3 (A[mid]=7). A[low]=4 ≤ 7 → left sorted, target 0 ∉ [4,7), go right.",
+      "whenToUse": [
+        "Search in a rotated sorted array (no duplicates)",
+        "Find min in rotated sorted array (same half-test)"
+      ],
+      "usedIn": [
+        "bs-rotated-search"
+      ],
+      "note": "Use <code>&lt;=</code> not <code>&lt;</code> on the left-sorted check — handles the case where low == mid."
+    },
+    {
+      "id": "median-by-partition-two-sorted-arrays",
+      "name": "Median by Partition (Two Sorted Arrays)",
+      "section": "Section 2",
+      "topic": "Binary Search",
+      "day": "d23",
+      "formula": "<span class=\"com\">// Let N ≤ M; BS over partitionA in [0..N]:</span><br>\n            partitionA = (low <span class=\"op\">+</span> high) <span class=\"op\">/</span> <span class=\"num\">2</span><br>\n            partitionB = (<span class=\"var\">N</span> <span class=\"op\">+</span> <span class=\"var\">M</span> <span class=\"op\">+</span> <span class=\"num\">1</span>) <span class=\"op\">/</span> <span class=\"num\">2</span> <span class=\"op\">−</span> partitionA<br><br>\n            <span class=\"com\">// Valid when:</span><br>\n            maxLeftA <span class=\"op\">≤</span> minRightB <span class=\"op\">&&</span> maxLeftB <span class=\"op\">≤</span> minRightA<br><br>\n            <span class=\"com\">// Median:</span><br>\n            odd  → max(maxLeftA, maxLeftB)<br>\n            even → (max(maxLeftA, maxLeftB) <span class=\"op\">+</span> min(minRightA, minRightB)) <span class=\"op\">/</span> <span class=\"num\">2.0</span>",
+      "example": "<strong>Ex:</strong> A=[1,3], B=[2]. N=1, M=2. Trying partitionA=1, partitionB=1 → maxLeftA=1, minRightB=∞, maxLeftB=2, minRightA=3 → valid → median = max(1,2) = <strong>2</strong>.",
+      "whenToUse": [
+        "Median of two sorted arrays in O(log(min(N, M)))",
+        "K-th element of two sorted arrays (similar partition trick)"
+      ],
+      "usedIn": [
+        "bs-median-two-sorted"
+      ],
+      "note": "Use <code>Integer.MIN_VALUE</code> / <code>MAX_VALUE</code> as sentinels when a partition lands at the array edge."
+    },
+    {
+      "id": "min-stack-encode-decode-o-1-extra-space",
+      "name": "Min-Stack Encode/Decode (O(1) extra space)",
+      "section": "Section 2",
+      "topic": "Stacks",
+      "day": "d26",
+      "formula": "<span class=\"com\">// push x:</span><br>\n            if (stack empty) → push x, min = x<br>\n            else if (x <span class=\"op\">&gt;=</span> min) → push x<br>\n            else → push (<span class=\"num\">2</span><span class=\"op\">*</span>x <span class=\"op\">−</span> min), min = x<br><br>\n            <span class=\"com\">// top:</span><br>\n            if (top <span class=\"op\">&lt;</span> min) → return min  <span class=\"com\">// encoded marker</span><br>\n            else → return top<br><br>\n            <span class=\"com\">// pop:</span><br>\n            if (top <span class=\"op\">&lt;</span> min) → min = <span class=\"num\">2</span><span class=\"op\">*</span>min <span class=\"op\">−</span> top  <span class=\"com\">// recover old min</span><br>\n            then pop",
+      "example": "<strong>Why it works:</strong> when new x &lt; min, store the \"deviation\" 2x−min. Since 2x−min &lt; x &lt; min, it acts as a sentinel; on pop we reverse to get the previous min.",
+      "whenToUse": [
+        "Min/Max stack with O(1) per op and O(1) extra space",
+        "Interview classic when \"no auxiliary stack\" is required"
+      ],
+      "usedIn": [
+        "stacks-min-stack"
+      ],
+      "note": "Use <code>long</code> if values can be near MAX_INT — <code>2*x − min</code> can underflow int."
+    },
+    {
+      "id": "contribution-technique-subarray-sum",
+      "name": "Contribution Technique — Subarray Sum",
+      "section": "Section 2",
+      "topic": "Stacks",
+      "day": "d27",
+      "formula": "contribution(<span class=\"var\">A[i]</span>) = <span class=\"var\">A[i]</span> <span class=\"op\">*</span> (<span class=\"var\">i</span> <span class=\"op\">−</span> <span class=\"var\">L</span>) <span class=\"op\">*</span> (<span class=\"var\">R</span> <span class=\"op\">−</span> <span class=\"var\">i</span>)<br>\n            <span class=\"com\">// L = prev boundary index, R = next boundary index</span><br>\n            <span class=\"com\">// (i − L) = # subarrays where i is the chosen left side</span><br>\n            <span class=\"com\">// (R − i) = # subarrays where i is the chosen right side</span>",
+      "example": "<strong>Why it works:</strong> every subarray (l, r) containing i has exactly one \"i\" — sum across all subarrays = Σ A[i] × (ways i is included).",
+      "whenToUse": [
+        "\"Sum of f(subarray) over <em>all</em> subarrays\"",
+        "f is min, max, sum, or count of a single element",
+        "Naive O(N²) or O(N³) is too slow"
+      ],
+      "usedIn": [
+        "stacks-max-and-min",
+        "stacks-sum-of-subarray-mins",
+        "queues-sum-of-min-max"
+      ],
+      "note": "L and R come from <strong>prevSmaller / nextSmaller</strong> (for min contribution) or <strong>prevGreater / nextGreater</strong> (for max contribution) — built once with a monotonic stack in O(N)."
+    },
+    {
+      "id": "contribution-to-min-amp-max-stack-sum",
+      "name": "Contribution to Min & Max Stack Sum",
+      "section": "Section 2",
+      "topic": "Stacks",
+      "day": "d27",
+      "formula": "answer = Σ <span class=\"var\">A[i]</span> <span class=\"op\">*</span> (<span class=\"var\">i</span> <span class=\"op\">−</span> PG[i]) <span class=\"op\">*</span> (NG[i] <span class=\"op\">−</span> <span class=\"var\">i</span>)<br>\n            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class=\"op\">−</span> Σ <span class=\"var\">A[i]</span> <span class=\"op\">*</span> (<span class=\"var\">i</span> <span class=\"op\">−</span> PS[i]) <span class=\"op\">*</span> (NS[i] <span class=\"op\">−</span> <span class=\"var\">i</span>)<br>\n            <span class=\"com\">// PG/NG = prev/next Greater  ·  PS/NS = prev/next Smaller</span>",
+      "example": "<strong>Reads as:</strong> \"every element contributes A[i] × (# subarrays where it's the max) MINUS A[i] × (# where it's the min)\".",
+      "whenToUse": [
+        "Σ (max(sub) − min(sub)) over all subarrays",
+        "Distinct-element handling: use <code>&gt;</code> on one side, <code>&gt;=</code> on the other to avoid double-count"
+      ],
+      "usedIn": [
+        "stacks-max-and-min"
+      ],
+      "note": "Tie-breaking matters: for \"next greater\" use strict <code>&gt;</code>, for \"prev greater\" use <code>&gt;=</code> (or vice versa) so each subarray is counted exactly once."
+    },
+    {
+      "id": "largest-rectangle-in-histogram",
+      "name": "Largest Rectangle in Histogram",
+      "section": "Section 2",
+      "topic": "Stacks",
+      "day": "d27",
+      "formula": "area(<span class=\"var\">i</span>) = <span class=\"var\">H[i]</span> <span class=\"op\">*</span> (NS[i] <span class=\"op\">−</span> PS[i] <span class=\"op\">−</span> <span class=\"num\">1</span>)<br>\n            answer = max over all <span class=\"var\">i</span> of area(<span class=\"var\">i</span>)",
+      "example": "<strong>Ex:</strong> H=[2,1,5,6,2,3] → at i=3 (H=6): PS=2, NS=4, area = 6 * (4−2−1) = <strong>6</strong>; at i=2 (H=5): PS=1, NS=4, area = 5*2 = <strong>10</strong> ← max.",
+      "whenToUse": [
+        "Maximum rectangle inside a bar chart",
+        "Building block for \"max rectangle in binary matrix\""
+      ],
+      "usedIn": [
+        "stacks-largest-rectangle",
+        "stacks-max-rectangle-binary-matrix"
+      ]
+    },
+    {
+      "id": "sliding-window-min-max-via-deque",
+      "name": "Sliding-Window Min / Max via Deque",
+      "section": "Section 2",
+      "topic": "Queues",
+      "day": "d28",
+      "formula": "<span class=\"com\">// Window is valid for i ≥ B − 1</span><br>\n            answer[<span class=\"var\">i</span>] = <span class=\"var\">A</span>[deque.peekFirst()]<br>\n            <span class=\"com\">// Maintain decreasing deque for MAX, increasing for MIN</span><br>\n            evict from front: while front index <span class=\"op\">&lt;</span> <span class=\"var\">i</span> <span class=\"op\">−</span> <span class=\"var\">B</span> <span class=\"op\">+</span> <span class=\"num\">1</span><br>\n            evict from back: while A[back] <span class=\"op\">≤</span> A[i]  <span class=\"com\">(for max)</span>",
+      "example": "<strong>Ex:</strong> A=[1,3,-1,-3,5,3,6,7], B=3 → max per window = [3, 3, 5, 5, 6, 7].",
+      "whenToUse": [
+        "Fixed-size window max/min in O(N) (not O(N·B))",
+        "Σ window-max + window-min over all windows"
+      ],
+      "usedIn": [
+        "queues-sliding-window-max",
+        "queues-sum-of-min-max"
+      ],
+      "note": "Each index enters and leaves the deque at most once → amortized O(1) per step → O(N) total."
+    },
+    {
+      "id": "balanced-tree-check",
+      "name": "Balanced-Tree Check",
+      "section": "Section 2",
+      "topic": "Trees",
+      "day": "d30",
+      "formula": "isBalanced(node):<br>\n            &nbsp;&nbsp;hL = height(left), hR = height(right)<br>\n            &nbsp;&nbsp;return |hL <span class=\"op\">−</span> hR| <span class=\"op\">≤</span> <span class=\"num\">1</span> <span class=\"op\">&&</span> isBalanced(left) <span class=\"op\">&&</span> isBalanced(right)<br><br>\n            <span class=\"com\">// O(N) trick: return -1 from height() if any subtree is unbalanced</span><br>\n            heightOrFail(node):<br>\n            &nbsp;&nbsp;if (hL == -1 <span class=\"op\">||</span> hR == -1 <span class=\"op\">||</span> |hL−hR| <span class=\"op\">&gt;</span> <span class=\"num\">1</span>) return <span class=\"num\">−1</span>",
+      "example": "<strong>Ex:</strong> tree with hL=2, hR=4 at root → |2−4| = 2 → NOT balanced.",
+      "whenToUse": [
+        "AVL property check (every node)",
+        "Any \"no two subtrees differ by more than k\""
+      ],
+      "usedIn": [
+        "trees-balanced"
+      ],
+      "note": "The \"-1 sentinel\" trick avoids re-computing height per recursion call — turns O(N²) into O(N)."
+    },
+    {
+      "id": "bst-validity-range-carry",
+      "name": "BST Validity (range carry)",
+      "section": "Section 2",
+      "topic": "Trees",
+      "day": "d31",
+      "formula": "isBST(node, min, max):<br>\n            &nbsp;&nbsp;if (node == null) return true<br>\n            &nbsp;&nbsp;if (node.val <span class=\"op\">≤</span> min <span class=\"op\">||</span> node.val <span class=\"op\">≥</span> max) return false<br>\n            &nbsp;&nbsp;return isBST(left, min, node.val) <span class=\"op\">&&</span> isBST(right, node.val, max)<br><br>\n            <span class=\"com\">// initial call: isBST(root, Long.MIN_VALUE, Long.MAX_VALUE)</span>",
+      "example": "<strong>Why long:</strong> a node with val = Integer.MIN_VALUE would fail the int-range check at the root — promote bounds to <code>long</code>.",
+      "whenToUse": [
+        "Validate BST property recursively",
+        "Any \"every node must respect ancestor constraints\""
+      ],
+      "usedIn": [
+        "trees-valid-bst"
+      ]
+    },
+    {
+      "id": "height-of-a-node",
+      "name": "Height of a Node",
+      "section": "Section 2",
+      "topic": "Trees",
+      "day": "d29–d30",
+      "formula": "height(null) = <span class=\"num\">−1</span> <span class=\"com\">// or 0, depending on convention</span><br>\n            height(node) = <span class=\"num\">1</span> <span class=\"op\">+</span> max(height(left), height(right))",
+      "example": "<strong>Ex:</strong> single root → height = 0 (or 1). Leaf with two null kids → 1 + max(−1,−1) = 0.",
+      "whenToUse": [
+        "Max depth / min depth",
+        "Diameter of a tree (longest path through a node)",
+        "Balanced-tree check (|hL − hR| ≤ 1 at every node)"
+      ],
+      "usedIn": [
+        "trees-max-depth",
+        "trees-balanced",
+        "trees-diameter"
+      ]
+    },
+    {
+      "id": "subtree-sum-path-sum-recurrence",
+      "name": "Subtree Sum / Path Sum Recurrence",
+      "section": "Section 2",
+      "topic": "Trees",
+      "day": "d29",
+      "formula": "subtreeSum(node) = node.val <span class=\"op\">+</span> subtreeSum(left) <span class=\"op\">+</span> subtreeSum(right)<br>\n            pathSum(node, target) = pathSum(left, target <span class=\"op\">−</span> node.val) <span class=\"op\">||</span> pathSum(right, …)",
+      "example": "<strong>Sum-tree check:</strong> node.val == subtreeSum(left) + subtreeSum(right) at every internal node.",
+      "whenToUse": [
+        "\"Does any root-to-leaf path sum to B?\"",
+        "Sum tree validation",
+        "Equal tree partition (split sum / 2)"
+      ],
+      "usedIn": [
+        "trees-path-sum",
+        "trees-sum-binary-tree",
+        "trees-equal-tree-partition"
+      ]
+    },
+    {
+      "id": "bst-range-pruning",
+      "name": "BST Range Pruning",
+      "section": "Section 2",
+      "topic": "Trees",
+      "day": "d31",
+      "formula": "if node.val <span class=\"op\">&lt;</span> L → recurse right only<br>\n            if node.val <span class=\"op\">&gt;</span> R → recurse left only<br>\n            else → <span class=\"num\">1</span> <span class=\"op\">+</span> recurse(left) <span class=\"op\">+</span> recurse(right)",
+      "example": "<strong>Why it's fast:</strong> we skip entire subtrees that can't contain a valid value — average O(log N + K) for K hits.",
+      "whenToUse": [
+        "\"Count / list nodes in [L, R] inside a BST\"",
+        "BST search, delete, validate — all use the same pruning idea"
+      ],
+      "usedIn": [
+        "trees-bst-nodes-in-range",
+        "trees-search-bst",
+        "trees-delete-bst-node"
+      ]
+    },
+    {
+      "id": "level-order-index-map-heap-style",
+      "name": "Level-Order Index Map (heap-style)",
+      "section": "Section 2",
+      "topic": "Trees",
+      "day": "d30",
+      "formula": "<span class=\"com\">// For a complete tree stored in array at index i (1-indexed):</span><br>\n            left(<span class=\"var\">i</span>)   = <span class=\"num\">2</span> <span class=\"op\">*</span> <span class=\"var\">i</span><br>\n            right(<span class=\"var\">i</span>)  = <span class=\"num\">2</span> <span class=\"op\">*</span> <span class=\"var\">i</span> <span class=\"op\">+</span> <span class=\"num\">1</span><br>\n            parent(<span class=\"var\">i</span>) = <span class=\"var\">i</span> <span class=\"op\">/</span> <span class=\"num\">2</span>",
+      "example": "<strong>0-indexed:</strong> left = 2i+1, right = 2i+2, parent = (i−1)/2.",
+      "whenToUse": [
+        "Serialize / deserialize complete binary trees",
+        "Heap implementation (priority queue)",
+        "Segment tree layout"
+      ],
+      "usedIn": [
+        "trees-deserialize-level-order"
+      ]
+    }
+  ]
+};

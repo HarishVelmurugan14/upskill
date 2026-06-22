@@ -372,6 +372,8 @@
   <div id="view"></div>
 </main>
 
+<!-- Data as a sibling script: resolves regardless of server root and works under file://. -->
+<script src="formulas.data.js"></script>
 <script>
 const $ = s => document.querySelector(s);
 let DATA = {taxonomy:[], formulas:[]};
@@ -388,17 +390,18 @@ function dataCandidates(){
   out.push('../data/formulas.json','data/formulas.json','./data/formulas.json');
   return [...new Set(out)];
 }
+function applyData(d){DATA=d;buildChips();bindControls();render();}
 async function loadFormulas(){
+  if(window.FORMULAS_DATA){applyData(window.FORMULAS_DATA);return;}  // sibling script (preferred)
   let lastErr='';
   for(const url of dataCandidates()){
     try{
       const r=await fetch(url);
       if(!r.ok){lastErr='HTTP '+r.status+' for '+url;continue;}
-      const d=await r.json();  // throws if HTML/invalid
-      DATA=d;buildChips();bindControls();render();return;
+      applyData(await r.json());return;  // throws if HTML/invalid
     }catch(e){lastErr=String(e);}
   }
-  $('#view').innerHTML='<div class="empty">Could not load formulas.json &mdash; '+esc(lastErr)+'</div>';
+  $('#view').innerHTML='<div class="empty">Could not load formulas data &mdash; '+esc(lastErr)+'</div>';
 }
 loadFormulas();
 
