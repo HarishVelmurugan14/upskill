@@ -252,6 +252,51 @@
       color: var(--text-muted);
       margin-bottom: 24px;
     }
+
+    /* ===== Revision controls ===== */
+    .toolbar{background:var(--bg);padding:0 0 12px;margin-bottom:18px;border-bottom:1px solid var(--border);display:flex;flex-wrap:wrap;gap:12px;align-items:center}
+    .search-box{flex:1;min-width:220px;position:relative}
+    .search-box input{width:100%;background:var(--bg-card);border:1px solid var(--border);border-radius:10px;padding:10px 14px 10px 36px;color:var(--text);font-size:14px;outline:none}
+    .search-box input:focus{border-color:var(--amber)}
+    .search-box::before{content:'\2315';position:absolute;left:12px;top:50%;transform:translateY(-50%);color:var(--text-muted);font-size:16px}
+    .seg{display:inline-flex;background:var(--bg-card);border:1px solid var(--border);border-radius:10px;overflow:hidden}
+    .seg button{background:transparent;border:none;color:var(--text-muted);padding:9px 16px;font-size:12.5px;font-weight:600;cursor:pointer;letter-spacing:.3px}
+    .seg button.active{background:var(--amber);color:#1a1205}
+    .count-pill{font-size:12px;color:var(--text-muted)}
+    .chips{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:26px}
+    .chip{background:var(--bg-card);border:1px solid var(--border);color:var(--text-body);padding:6px 13px;border-radius:999px;font-size:12px;cursor:pointer;transition:all .15s}
+    .chip:hover{border-color:var(--amber)}
+    .chip.active{background:rgba(210,153,34,.14);border-color:var(--amber);color:var(--amber);font-weight:600}
+
+    /* ===== Cheatsheet ===== */
+    .cheat-group{margin-bottom:30px}
+    .cheat-cat{font-size:11px;letter-spacing:2px;text-transform:uppercase;color:var(--amber);font-weight:700;margin:0 0 12px;padding-bottom:8px;border-bottom:1px solid var(--border)}
+    .cheat-row{background:var(--bg-card);border:1px solid var(--border);border-radius:10px;padding:12px 16px;margin-bottom:10px;cursor:pointer;transition:border-color .15s}
+    .cheat-row:hover{border-color:rgba(210,153,34,.45)}
+    .cheat-top{display:flex;align-items:center;gap:12px;justify-content:space-between;margin-bottom:7px}
+    .cheat-name{font-size:14px;font-weight:600;color:var(--text)}
+    .cheat-name .twist{color:var(--text-muted);font-size:10px;margin-right:8px;display:inline-block;transition:transform .15s}
+    .cheat-day{font-size:10px;letter-spacing:.6px;color:var(--amber);background:rgba(210,153,34,.10);border:1px solid rgba(210,153,34,.3);padding:2px 8px;border-radius:6px;white-space:nowrap}
+    .cheat-eq{font-family:'JetBrains Mono','SF Mono',Menlo,monospace;font-size:12.5px;color:var(--text-body);line-height:1.9;overflow-x:auto}
+    .cheat-eq .var{color:#79c0ff;font-style:italic}.cheat-eq .op{color:#ff7b72;font-weight:600}.cheat-eq .num{color:#d2a8ff}.cheat-eq .com{color:#6e7681;font-style:italic;font-size:11.5px}
+    .cheat-detail{display:none;margin-top:14px;padding-top:14px;border-top:1px dashed var(--border)}
+    .cheat-row.open .cheat-detail{display:block}
+    .cheat-row.open .twist{transform:rotate(90deg)}
+
+    /* ===== Flashcards ===== */
+    .flash-wrap{max-width:680px;margin:10px auto 0}
+    .flash-progress{text-align:center;color:var(--text-muted);font-size:12px;margin-bottom:14px;letter-spacing:.4px}
+    .flash-card{background:var(--bg-card);border:1px solid var(--border);border-radius:16px;padding:30px 28px;min-height:260px}
+    .flash-cat{font-size:10px;letter-spacing:2px;text-transform:uppercase;color:var(--amber);font-weight:700}
+    .flash-name{font-size:22px;font-weight:700;color:var(--text);margin:8px 0 20px;letter-spacing:-.3px;line-height:1.3}
+    .flash-q{font-size:10px;letter-spacing:1.6px;text-transform:uppercase;color:var(--text-muted);font-weight:700;margin-bottom:8px}
+    .flash-back{margin-top:22px;padding-top:22px;border-top:1px solid var(--border)}
+    .flash-controls{display:flex;flex-wrap:wrap;gap:10px;justify-content:center;margin-top:22px}
+    .fbtn{background:var(--bg-card);border:1px solid var(--border);color:var(--text);padding:10px 20px;border-radius:10px;font-size:13px;font-weight:600;cursor:pointer;transition:all .15s}
+    .fbtn:hover{border-color:var(--amber)}
+    .fbtn.primary{background:var(--amber);color:#1a1205;border-color:var(--amber)}
+    .hint{text-align:center;color:var(--text-muted);font-size:11px;margin-top:14px}
+    .empty{text-align:center;color:var(--text-muted);padding:50px 20px;font-size:14px}
   </style>
 </head>
 <body>
@@ -278,869 +323,145 @@
 
 <main>
   <div class="page-title">Formulas &amp; Identities</div>
-  <div class="page-sub">Every formula we actually used across Part 2 · Days 21–31</div>
-  <div class="note">Left = the formula or identity. Right = when it shows up, plus a tiny example. Each card lists the methods that depend on it.</div>
+  <div class="page-sub">Searchable &amp; categorized. Use <strong>Flashcards</strong> to actively recall a formula before revealing it.</div>
 
-  <!-- ════════════════ MATH BASICS ════════════════ -->
-  <div class="sec">
-  <div class="sec-title">Math Basics</div>
-
-  <div class="pat-card">
-    <div class="pat-hdr">
-      <div class="pat-hdr-name">GCD (Euclidean algorithm)</div>
-      <div class="pat-day">d21</div>
+  <div class="toolbar">
+    <div class="search-box"><input id="search" type="text" placeholder="Search name, formula, day, problem id…" autocomplete="off"></div>
+    <div class="seg" id="modeSeg">
+      <button data-mode="cheat" class="active">Cheatsheet</button>
+      <button data-mode="cards">Cards</button>
+      <button data-mode="flash">Flashcards</button>
     </div>
-    <div class="pat-body">
-      <div class="pat-cols">
-        <div>
-          <div class="formula-eq">
-            gcd(<span class="var">a</span>, <span class="var">b</span>) = gcd(<span class="var">b</span>, <span class="var">a</span> <span class="op">%</span> <span class="var">b</span>) <span class="com">// until b == 0</span><br>
-            gcd(<span class="var">a</span>, <span class="num">0</span>) = <span class="var">a</span>
-          </div>
-          <div class="mini-ex"><strong>Ex:</strong> gcd(48, 18) → gcd(18, 12) → gcd(12, 6) → gcd(6, 0) = <strong>6</strong></div>
-        </div>
-        <div>
-          <span class="sig-label">When to reach for it</span>
-          <ul class="sig-list">
-            <li>Reducing fractions / simplifying ratios</li>
-            <li>"Largest equal-size group" problems</li>
-            <li>LCM derivation (needs gcd)</li>
-            <li>Stride / cycle problems on arrays</li>
-          </ul>
-          <div class="used-row">
-            <span class="lbl">Used in</span>
-            <span class="used-in">Maths Formulas</span>
-            <span class="used-in">LCM</span>
-          </div>
-        </div>
-      </div>
-      <div class="pat-note">Recursive form is O(log(min(a, b))). Iterative <code>while (b != 0) { t = b; b = a % b; a = t; }</code> avoids stack frames.</div>
-    </div>
+    <span class="count-pill" id="countPill"></span>
   </div>
 
-  <div class="pat-card">
-    <div class="pat-hdr">
-      <div class="pat-hdr-name">LCM (via GCD)</div>
-      <div class="pat-day">d21</div>
-    </div>
-    <div class="pat-body">
-      <div class="pat-cols">
-        <div>
-          <div class="formula-eq">
-            lcm(<span class="var">a</span>, <span class="var">b</span>) = (<span class="var">a</span> <span class="op">/</span> gcd(<span class="var">a</span>, <span class="var">b</span>)) <span class="op">*</span> <span class="var">b</span>
-          </div>
-          <div class="mini-ex"><strong>Ex:</strong> lcm(4, 6) = (4 / gcd(4,6)) * 6 = (4 / 2) * 6 = <strong>12</strong></div>
-        </div>
-        <div>
-          <span class="sig-label">When to reach for it</span>
-          <ul class="sig-list">
-            <li>Aligning two cyclic events</li>
-            <li>"Smallest number divisible by both"</li>
-            <li>Period of repeating patterns</li>
-          </ul>
-          <div class="used-row">
-            <span class="lbl">Used in</span>
-            <span class="used-in">Maths Formulas</span>
-          </div>
-        </div>
-      </div>
-      <div class="pat-note">Always divide first, then multiply — <code>a * b / gcd</code> can overflow even when the result fits.</div>
-    </div>
-  </div>
-
-  <div class="pat-card">
-    <div class="pat-hdr">
-      <div class="pat-hdr-name">Sum of First N Natural Numbers</div>
-      <div class="pat-day">d21</div>
-    </div>
-    <div class="pat-body">
-      <div class="pat-cols">
-        <div>
-          <div class="formula-eq">
-            <span class="num">1</span> <span class="op">+</span> <span class="num">2</span> <span class="op">+</span> … <span class="op">+</span> <span class="var">N</span> = <span class="var">N</span> <span class="op">*</span> (<span class="var">N</span> <span class="op">+</span> <span class="num">1</span>) <span class="op">/</span> <span class="num">2</span>
-          </div>
-          <div class="mini-ex"><strong>Ex:</strong> N = 10 → 10 * 11 / 2 = <strong>55</strong></div>
-        </div>
-        <div>
-          <span class="sig-label">When to reach for it</span>
-          <ul class="sig-list">
-            <li>"Find the missing number in 1..N"</li>
-            <li>Counting total subarrays of an array (N*(N+1)/2)</li>
-            <li>Triangular number / staircase totals</li>
-            <li>Brute upper bound for staircase / sqrt problems</li>
-          </ul>
-          <div class="used-row">
-            <span class="lbl">Used in</span>
-            <span class="used-in">bs-staircase</span>
-            <span class="used-in">bs-special-integer</span>
-            <span class="used-in">missing number variants</span>
-          </div>
-        </div>
-      </div>
-      <div class="pat-note">Always use <code>long</code> — N=10⁵ already gives ~5·10⁹, overflows int.</div>
-    </div>
-  </div>
-
-  <div class="pat-card">
-    <div class="pat-hdr">
-      <div class="pat-hdr-name">Sum of Squares 1..N</div>
-      <div class="pat-day">d21</div>
-    </div>
-    <div class="pat-body">
-      <div class="pat-cols">
-        <div>
-          <div class="formula-eq">
-            <span class="num">1²</span> <span class="op">+</span> <span class="num">2²</span> <span class="op">+</span> … <span class="op">+</span> <span class="var">N²</span> = <span class="var">N</span> <span class="op">*</span> (<span class="var">N</span> <span class="op">+</span> <span class="num">1</span>) <span class="op">*</span> (<span class="num">2</span><span class="var">N</span> <span class="op">+</span> <span class="num">1</span>) <span class="op">/</span> <span class="num">6</span>
-          </div>
-          <div class="mini-ex"><strong>Ex:</strong> N=4 → 4·5·9/6 = <strong>30</strong> (1+4+9+16)</div>
-        </div>
-        <div>
-          <span class="sig-label">When to reach for it</span>
-          <ul class="sig-list">
-            <li>Closed-form for nested sums</li>
-            <li>Estimating brute-force work over partial sums</li>
-          </ul>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <div class="pat-card">
-    <div class="pat-hdr">
-      <div class="pat-hdr-name">Total Subarrays of an Array</div>
-      <div class="pat-day">d27, d28</div>
-    </div>
-    <div class="pat-body">
-      <div class="pat-cols">
-        <div>
-          <div class="formula-eq">
-            #subarrays(<span class="var">N</span>) = <span class="var">N</span> <span class="op">*</span> (<span class="var">N</span> <span class="op">+</span> <span class="num">1</span>) <span class="op">/</span> <span class="num">2</span>
-          </div>
-          <div class="mini-ex"><strong>Ex:</strong> N=4 → 4·5/2 = <strong>10</strong> subarrays</div>
-        </div>
-        <div>
-          <span class="sig-label">When to reach for it</span>
-          <ul class="sig-list">
-            <li>Sanity-checking that "sum of contributions" equals total work</li>
-            <li>Choosing whether O(N²) enumeration even fits</li>
-          </ul>
-        </div>
-      </div>
-      <div class="pat-note">Identical to "sum of 1..N" — every left endpoint <code>l</code> pairs with <code>N - l</code> right endpoints.</div>
-    </div>
-  </div>
-
-  <div class="pat-card">
-    <div class="pat-hdr">
-      <div class="pat-hdr-name">Inclusion–Exclusion (divisible by A or B)</div>
-      <div class="pat-day">d23</div>
-    </div>
-    <div class="pat-body">
-      <div class="pat-cols">
-        <div>
-          <div class="formula-eq">
-            #(<span class="num">1</span>..<span class="var">N</span> divisible by <span class="var">A</span> or <span class="var">B</span>)<br>
-            &nbsp;&nbsp;= ⌊<span class="var">N</span> <span class="op">/</span> <span class="var">A</span>⌋ <span class="op">+</span> ⌊<span class="var">N</span> <span class="op">/</span> <span class="var">B</span>⌋ <span class="op">−</span> ⌊<span class="var">N</span> <span class="op">/</span> lcm(<span class="var">A</span>, <span class="var">B</span>)⌋
-          </div>
-          <div class="mini-ex"><strong>Ex:</strong> N=12, A=2, B=3 → 6 + 4 − 2 = <strong>8</strong> (numbers: 2,3,4,6,8,9,10,12).</div>
-        </div>
-        <div>
-          <span class="sig-label">When to reach for it</span>
-          <ul class="sig-list">
-            <li>"K-th magical number divisible by A or B"</li>
-            <li>BS on answer where the predicate is "count ≤ mid ≥ K"</li>
-            <li>Any two-set "OR" count over [1..N]</li>
-          </ul>
-          <div class="used-row">
-            <span class="lbl">Used in</span>
-            <span class="used-in">bs-magical-number</span>
-          </div>
-        </div>
-      </div>
-      <div class="pat-note">Subtraction prevents double-counting multiples of <code>lcm(A,B)</code>. Generalizes to 3+ sets with alternating signs.</div>
-    </div>
-  </div>
-
-  </div>
-  <!-- end Math -->
-
-  <!-- ════════════════ BINARY SEARCH ════════════════ -->
-  <div class="sec">
-  <div class="sec-title">Binary Search</div>
-
-  <div class="pat-card">
-    <div class="pat-hdr">
-      <div class="pat-hdr-name">Safe Mid (no overflow)</div>
-      <div class="pat-day">d21–d23</div>
-    </div>
-    <div class="pat-body">
-      <div class="pat-cols">
-        <div>
-          <div class="formula-eq">
-            <span class="var">mid</span> = <span class="var">low</span> <span class="op">+</span> (<span class="var">high</span> <span class="op">-</span> <span class="var">low</span>) <span class="op">/</span> <span class="num">2</span>
-          </div>
-          <div class="mini-ex"><strong>Ex:</strong> low=2·10⁹, high=2·10⁹+8 → naive (low+high)/2 overflows int; safe form stays valid.</div>
-        </div>
-        <div>
-          <span class="sig-label">When to reach for it</span>
-          <ul class="sig-list">
-            <li>Every binary search — no exception</li>
-            <li>Especially: BS on answer space where bounds can be 10⁹</li>
-          </ul>
-          <div class="used-row">
-            <span class="lbl">Used in</span>
-            <span class="used-in">all bs-* problems</span>
-          </div>
-        </div>
-      </div>
-      <div class="pat-note">Mathematically equivalent to <code>(low+high)/2</code> — but immune to int overflow when low, high are near MAX_INT.</div>
-    </div>
-  </div>
-
-  <div class="pat-card">
-    <div class="pat-hdr">
-      <div class="pat-hdr-name">Matrix Median Position</div>
-      <div class="pat-day">d23</div>
-    </div>
-    <div class="pat-body">
-      <div class="pat-cols">
-        <div>
-          <div class="formula-eq">
-            target rank = (<span class="var">N</span> <span class="op">*</span> <span class="var">M</span> <span class="op">+</span> <span class="num">1</span>) <span class="op">/</span> <span class="num">2</span> <span class="com">// 1-indexed median in odd-size matrix</span>
-          </div>
-          <div class="mini-ex"><strong>Ex:</strong> 3×5 matrix → (15+1)/2 = <strong>8th</strong> smallest is the median.</div>
-        </div>
-        <div>
-          <span class="sig-label">When to reach for it</span>
-          <ul class="sig-list">
-            <li>Median of a row-wise sorted matrix</li>
-            <li>BS on value range + per-row lower_bound</li>
-          </ul>
-          <div class="used-row">
-            <span class="lbl">Used in</span>
-            <span class="used-in">bs-matrix-median</span>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <div class="pat-card">
-    <div class="pat-hdr">
-      <div class="pat-hdr-name">Lower Bound (count ≤ x in sorted row)</div>
-      <div class="pat-day">d23</div>
-    </div>
-    <div class="pat-body">
-      <div class="pat-cols">
-        <div>
-          <div class="formula-eq">
-            count(≤ x) = upper_bound(row, x) <span class="op">−</span> <span class="num">0</span><br>
-            count(&lt; x) = lower_bound(row, x)
-          </div>
-          <div class="mini-ex"><strong>Ex:</strong> row = [3,8,14,22], x=10 → upper=2 (3,8 ≤ 10), lower=2 (same since 10 missing).</div>
-        </div>
-        <div>
-          <span class="sig-label">When to reach for it</span>
-          <ul class="sig-list">
-            <li>Count "how many ≤ candidate" across N sorted rows in O(N log M)</li>
-            <li>BS-on-value-range driver function</li>
-          </ul>
-          <div class="used-row">
-            <span class="lbl">Used in</span>
-            <span class="used-in">bs-matrix-median</span>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <div class="pat-card">
-    <div class="pat-hdr">
-      <div class="pat-hdr-name">Integer Square Root via BS</div>
-      <div class="pat-day">d21, d23</div>
-    </div>
-    <div class="pat-body">
-      <div class="pat-cols">
-        <div>
-          <div class="formula-eq">
-            ⌊√<span class="var">N</span>⌋ = largest <span class="var">mid</span> with <span class="var">mid</span> <span class="op">*</span> <span class="var">mid</span> <span class="op">≤</span> <span class="var">N</span><br>
-            <span class="com">// search space: low=0, high=N (or 46341 cap if N fits in int)</span><br>
-            <span class="com">// use (long) cast on mid*mid to avoid overflow</span>
-          </div>
-          <div class="mini-ex"><strong>Ex:</strong> N=11 → mid=3 (9 ≤ 11 ✓), mid=4 (16 &gt; 11 ✗) → <strong>3</strong>.</div>
-        </div>
-        <div>
-          <span class="sig-label">When to reach for it</span>
-          <ul class="sig-list">
-            <li>"⌊√N⌋ without Math.sqrt"</li>
-            <li>Staircase: smallest k with k(k+1)/2 ≥ N</li>
-            <li>Any "largest x with monotone predicate"</li>
-          </ul>
-          <div class="used-row">
-            <span class="lbl">Used in</span>
-            <span class="used-in">bs-sqrt</span>
-            <span class="used-in">bs-staircase</span>
-          </div>
-        </div>
-      </div>
-      <div class="pat-note">Cast: <code>long sq = (long) mid * mid;</code> — int*int overflows when N ≥ 2³¹.</div>
-    </div>
-  </div>
-
-  <div class="pat-card">
-    <div class="pat-hdr">
-      <div class="pat-hdr-name">BS-on-Answer Bounds</div>
-      <div class="pat-day">d23</div>
-    </div>
-    <div class="pat-body">
-      <div class="pat-cols">
-        <div>
-          <div class="formula-eq">
-            <span class="com">// minimize-max (painters, books, paint cost):</span><br>
-            low = max(items)  <span class="com">// can't go below largest single item</span><br>
-            high = sum(items) <span class="com">// 1 worker takes everything</span><br><br>
-            <span class="com">// maximize-min (aggressive cows):</span><br>
-            low = <span class="num">1</span>                          <span class="com">// smallest gap</span><br>
-            high = max(items) <span class="op">−</span> min(items) <span class="com">// widest possible gap</span>
-          </div>
-          <div class="mini-ex"><strong>Painters [10, 20, 30, 40]:</strong> low=40, high=100. Feasible(70)? → yes → try 60.</div>
-        </div>
-        <div>
-          <span class="sig-label">When to reach for it</span>
-          <ul class="sig-list">
-            <li>BS on answer space — picking the right bounds is half the work</li>
-            <li>Wrong bounds (low=0 or low=1 for minimize-max) → infinite-loop or wrong answer</li>
-          </ul>
-          <div class="used-row">
-            <span class="lbl">Used in</span>
-            <span class="used-in">bs-painters</span>
-            <span class="used-in">bs-allocate-books</span>
-            <span class="used-in">bs-aggressive-cows</span>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <div class="pat-card">
-    <div class="pat-hdr">
-      <div class="pat-hdr-name">Pivot Detection in Rotated Sorted Array</div>
-      <div class="pat-day">d22</div>
-    </div>
-    <div class="pat-body">
-      <div class="pat-cols">
-        <div>
-          <div class="formula-eq">
-            <span class="com">// At each step exactly one half is sorted:</span><br>
-            if (<span class="var">A</span>[low] <span class="op">≤</span> <span class="var">A</span>[mid])  → <span class="op">left</span> half is sorted<br>
-            else                       → <span class="op">right</span> half is sorted<br><br>
-            <span class="com">// Then check if target lies inside the sorted half:</span><br>
-            if (target in [<span class="var">A</span>[low], <span class="var">A</span>[mid])) → go left, else → go right
-          </div>
-          <div class="mini-ex"><strong>Ex:</strong> A=[4,5,6,7,0,1,2], target=0. mid=3 (A[mid]=7). A[low]=4 ≤ 7 → left sorted, target 0 ∉ [4,7), go right.</div>
-        </div>
-        <div>
-          <span class="sig-label">When to reach for it</span>
-          <ul class="sig-list">
-            <li>Search in a rotated sorted array (no duplicates)</li>
-            <li>Find min in rotated sorted array (same half-test)</li>
-          </ul>
-          <div class="used-row">
-            <span class="lbl">Used in</span>
-            <span class="used-in">bs-rotated-search</span>
-          </div>
-        </div>
-      </div>
-      <div class="pat-note">Use <code>&lt;=</code> not <code>&lt;</code> on the left-sorted check — handles the case where low == mid.</div>
-    </div>
-  </div>
-
-  <div class="pat-card">
-    <div class="pat-hdr">
-      <div class="pat-hdr-name">Median by Partition (Two Sorted Arrays)</div>
-      <div class="pat-day">d23</div>
-    </div>
-    <div class="pat-body">
-      <div class="pat-cols">
-        <div>
-          <div class="formula-eq">
-            <span class="com">// Let N ≤ M; BS over partitionA in [0..N]:</span><br>
-            partitionA = (low <span class="op">+</span> high) <span class="op">/</span> <span class="num">2</span><br>
-            partitionB = (<span class="var">N</span> <span class="op">+</span> <span class="var">M</span> <span class="op">+</span> <span class="num">1</span>) <span class="op">/</span> <span class="num">2</span> <span class="op">−</span> partitionA<br><br>
-            <span class="com">// Valid when:</span><br>
-            maxLeftA <span class="op">≤</span> minRightB <span class="op">&&</span> maxLeftB <span class="op">≤</span> minRightA<br><br>
-            <span class="com">// Median:</span><br>
-            odd  → max(maxLeftA, maxLeftB)<br>
-            even → (max(maxLeftA, maxLeftB) <span class="op">+</span> min(minRightA, minRightB)) <span class="op">/</span> <span class="num">2.0</span>
-          </div>
-          <div class="mini-ex"><strong>Ex:</strong> A=[1,3], B=[2]. N=1, M=2. Trying partitionA=1, partitionB=1 → maxLeftA=1, minRightB=∞, maxLeftB=2, minRightA=3 → valid → median = max(1,2) = <strong>2</strong>.</div>
-        </div>
-        <div>
-          <span class="sig-label">When to reach for it</span>
-          <ul class="sig-list">
-            <li>Median of two sorted arrays in O(log(min(N, M)))</li>
-            <li>K-th element of two sorted arrays (similar partition trick)</li>
-          </ul>
-          <div class="used-row">
-            <span class="lbl">Used in</span>
-            <span class="used-in">bs-median-two-sorted</span>
-          </div>
-        </div>
-      </div>
-      <div class="pat-note">Use <code>Integer.MIN_VALUE</code> / <code>MAX_VALUE</code> as sentinels when a partition lands at the array edge.</div>
-    </div>
-  </div>
-
-  </div>
-  <!-- end BS -->
-
-  <!-- ════════════════ STACK / MONOTONIC ════════════════ -->
-  <div class="sec">
-  <div class="sec-title">Stack &amp; Monotonic Patterns</div>
-
-  <div class="pat-card">
-    <div class="pat-hdr">
-      <div class="pat-hdr-name">Min-Stack Encode/Decode (O(1) extra space)</div>
-      <div class="pat-day">d26</div>
-    </div>
-    <div class="pat-body">
-      <div class="pat-cols">
-        <div>
-          <div class="formula-eq">
-            <span class="com">// push x:</span><br>
-            if (stack empty) → push x, min = x<br>
-            else if (x <span class="op">&gt;=</span> min) → push x<br>
-            else → push (<span class="num">2</span><span class="op">*</span>x <span class="op">−</span> min), min = x<br><br>
-            <span class="com">// top:</span><br>
-            if (top <span class="op">&lt;</span> min) → return min  <span class="com">// encoded marker</span><br>
-            else → return top<br><br>
-            <span class="com">// pop:</span><br>
-            if (top <span class="op">&lt;</span> min) → min = <span class="num">2</span><span class="op">*</span>min <span class="op">−</span> top  <span class="com">// recover old min</span><br>
-            then pop
-          </div>
-          <div class="mini-ex"><strong>Why it works:</strong> when new x &lt; min, store the "deviation" 2x−min. Since 2x−min &lt; x &lt; min, it acts as a sentinel; on pop we reverse to get the previous min.</div>
-        </div>
-        <div>
-          <span class="sig-label">When to reach for it</span>
-          <ul class="sig-list">
-            <li>Min/Max stack with O(1) per op and O(1) extra space</li>
-            <li>Interview classic when "no auxiliary stack" is required</li>
-          </ul>
-          <div class="used-row">
-            <span class="lbl">Used in</span>
-            <span class="used-in">stacks-min-stack</span>
-          </div>
-        </div>
-      </div>
-      <div class="pat-note">Use <code>long</code> if values can be near MAX_INT — <code>2*x − min</code> can underflow int.</div>
-    </div>
-  </div>
-
-  <div class="pat-card">
-    <div class="pat-hdr">
-      <div class="pat-hdr-name">Contribution Technique — Subarray Sum</div>
-      <div class="pat-day">d27</div>
-    </div>
-    <div class="pat-body">
-      <div class="pat-cols">
-        <div>
-          <div class="formula-eq">
-            contribution(<span class="var">A[i]</span>) = <span class="var">A[i]</span> <span class="op">*</span> (<span class="var">i</span> <span class="op">−</span> <span class="var">L</span>) <span class="op">*</span> (<span class="var">R</span> <span class="op">−</span> <span class="var">i</span>)<br>
-            <span class="com">// L = prev boundary index, R = next boundary index</span><br>
-            <span class="com">// (i − L) = # subarrays where i is the chosen left side</span><br>
-            <span class="com">// (R − i) = # subarrays where i is the chosen right side</span>
-          </div>
-          <div class="mini-ex"><strong>Why it works:</strong> every subarray (l, r) containing i has exactly one "i" — sum across all subarrays = Σ A[i] × (ways i is included).</div>
-        </div>
-        <div>
-          <span class="sig-label">When to reach for it</span>
-          <ul class="sig-list">
-            <li>"Sum of f(subarray) over <em>all</em> subarrays"</li>
-            <li>f is min, max, sum, or count of a single element</li>
-            <li>Naive O(N²) or O(N³) is too slow</li>
-          </ul>
-          <div class="used-row">
-            <span class="lbl">Used in</span>
-            <span class="used-in">stacks-max-and-min</span>
-            <span class="used-in">stacks-sum-of-subarray-mins</span>
-            <span class="used-in">queues-sum-of-min-max</span>
-          </div>
-        </div>
-      </div>
-      <div class="pat-note">L and R come from <strong>prevSmaller / nextSmaller</strong> (for min contribution) or <strong>prevGreater / nextGreater</strong> (for max contribution) — built once with a monotonic stack in O(N).</div>
-    </div>
-  </div>
-
-  <div class="pat-card">
-    <div class="pat-hdr">
-      <div class="pat-hdr-name">Contribution to Min &amp; Max Stack Sum</div>
-      <div class="pat-day">d27</div>
-    </div>
-    <div class="pat-body">
-      <div class="pat-cols">
-        <div>
-          <div class="formula-eq">
-            answer = Σ <span class="var">A[i]</span> <span class="op">*</span> (<span class="var">i</span> <span class="op">−</span> PG[i]) <span class="op">*</span> (NG[i] <span class="op">−</span> <span class="var">i</span>)<br>
-            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="op">−</span> Σ <span class="var">A[i]</span> <span class="op">*</span> (<span class="var">i</span> <span class="op">−</span> PS[i]) <span class="op">*</span> (NS[i] <span class="op">−</span> <span class="var">i</span>)<br>
-            <span class="com">// PG/NG = prev/next Greater  ·  PS/NS = prev/next Smaller</span>
-          </div>
-          <div class="mini-ex"><strong>Reads as:</strong> "every element contributes A[i] × (# subarrays where it's the max) MINUS A[i] × (# where it's the min)".</div>
-        </div>
-        <div>
-          <span class="sig-label">When to reach for it</span>
-          <ul class="sig-list">
-            <li>Σ (max(sub) − min(sub)) over all subarrays</li>
-            <li>Distinct-element handling: use <code>&gt;</code> on one side, <code>&gt;=</code> on the other to avoid double-count</li>
-          </ul>
-          <div class="used-row">
-            <span class="lbl">Used in</span>
-            <span class="used-in">stacks-max-and-min</span>
-          </div>
-        </div>
-      </div>
-      <div class="pat-note">Tie-breaking matters: for "next greater" use strict <code>&gt;</code>, for "prev greater" use <code>&gt;=</code> (or vice versa) so each subarray is counted exactly once.</div>
-    </div>
-  </div>
-
-  <div class="pat-card">
-    <div class="pat-hdr">
-      <div class="pat-hdr-name">Largest Rectangle in Histogram</div>
-      <div class="pat-day">d27</div>
-    </div>
-    <div class="pat-body">
-      <div class="pat-cols">
-        <div>
-          <div class="formula-eq">
-            area(<span class="var">i</span>) = <span class="var">H[i]</span> <span class="op">*</span> (NS[i] <span class="op">−</span> PS[i] <span class="op">−</span> <span class="num">1</span>)<br>
-            answer = max over all <span class="var">i</span> of area(<span class="var">i</span>)
-          </div>
-          <div class="mini-ex"><strong>Ex:</strong> H=[2,1,5,6,2,3] → at i=3 (H=6): PS=2, NS=4, area = 6 * (4−2−1) = <strong>6</strong>; at i=2 (H=5): PS=1, NS=4, area = 5*2 = <strong>10</strong> ← max.</div>
-        </div>
-        <div>
-          <span class="sig-label">When to reach for it</span>
-          <ul class="sig-list">
-            <li>Maximum rectangle inside a bar chart</li>
-            <li>Building block for "max rectangle in binary matrix"</li>
-          </ul>
-          <div class="used-row">
-            <span class="lbl">Used in</span>
-            <span class="used-in">stacks-largest-rectangle</span>
-            <span class="used-in">stacks-max-rectangle-binary-matrix</span>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <div class="pat-card">
-    <div class="pat-hdr">
-      <div class="pat-hdr-name">Sliding-Window Min / Max via Deque</div>
-      <div class="pat-day">d28</div>
-    </div>
-    <div class="pat-body">
-      <div class="pat-cols">
-        <div>
-          <div class="formula-eq">
-            <span class="com">// Window is valid for i ≥ B − 1</span><br>
-            answer[<span class="var">i</span>] = <span class="var">A</span>[deque.peekFirst()]<br>
-            <span class="com">// Maintain decreasing deque for MAX, increasing for MIN</span><br>
-            evict from front: while front index <span class="op">&lt;</span> <span class="var">i</span> <span class="op">−</span> <span class="var">B</span> <span class="op">+</span> <span class="num">1</span><br>
-            evict from back: while A[back] <span class="op">≤</span> A[i]  <span class="com">(for max)</span>
-          </div>
-          <div class="mini-ex"><strong>Ex:</strong> A=[1,3,-1,-3,5,3,6,7], B=3 → max per window = [3, 3, 5, 5, 6, 7].</div>
-        </div>
-        <div>
-          <span class="sig-label">When to reach for it</span>
-          <ul class="sig-list">
-            <li>Fixed-size window max/min in O(N) (not O(N·B))</li>
-            <li>Σ window-max + window-min over all windows</li>
-          </ul>
-          <div class="used-row">
-            <span class="lbl">Used in</span>
-            <span class="used-in">queues-sliding-window-max</span>
-            <span class="used-in">queues-sum-of-min-max</span>
-          </div>
-        </div>
-      </div>
-      <div class="pat-note">Each index enters and leaves the deque at most once → amortized O(1) per step → O(N) total.</div>
-    </div>
-  </div>
-
-  </div>
-  <!-- end Stack -->
-
-  <!-- ════════════════ TREE / RECURSION ════════════════ -->
-  <div class="sec">
-  <div class="sec-title">Tree &amp; Recursion Identities</div>
-
-  <div class="pat-card">
-    <div class="pat-hdr">
-      <div class="pat-hdr-name">Balanced-Tree Check</div>
-      <div class="pat-day">d30</div>
-    </div>
-    <div class="pat-body">
-      <div class="pat-cols">
-        <div>
-          <div class="formula-eq">
-            isBalanced(node):<br>
-            &nbsp;&nbsp;hL = height(left), hR = height(right)<br>
-            &nbsp;&nbsp;return |hL <span class="op">−</span> hR| <span class="op">≤</span> <span class="num">1</span> <span class="op">&&</span> isBalanced(left) <span class="op">&&</span> isBalanced(right)<br><br>
-            <span class="com">// O(N) trick: return -1 from height() if any subtree is unbalanced</span><br>
-            heightOrFail(node):<br>
-            &nbsp;&nbsp;if (hL == -1 <span class="op">||</span> hR == -1 <span class="op">||</span> |hL−hR| <span class="op">&gt;</span> <span class="num">1</span>) return <span class="num">−1</span>
-          </div>
-          <div class="mini-ex"><strong>Ex:</strong> tree with hL=2, hR=4 at root → |2−4| = 2 → NOT balanced.</div>
-        </div>
-        <div>
-          <span class="sig-label">When to reach for it</span>
-          <ul class="sig-list">
-            <li>AVL property check (every node)</li>
-            <li>Any "no two subtrees differ by more than k"</li>
-          </ul>
-          <div class="used-row">
-            <span class="lbl">Used in</span>
-            <span class="used-in">trees-balanced</span>
-          </div>
-        </div>
-      </div>
-      <div class="pat-note">The "-1 sentinel" trick avoids re-computing height per recursion call — turns O(N²) into O(N).</div>
-    </div>
-  </div>
-
-  <div class="pat-card">
-    <div class="pat-hdr">
-      <div class="pat-hdr-name">BST Validity (range carry)</div>
-      <div class="pat-day">d31</div>
-    </div>
-    <div class="pat-body">
-      <div class="pat-cols">
-        <div>
-          <div class="formula-eq">
-            isBST(node, min, max):<br>
-            &nbsp;&nbsp;if (node == null) return true<br>
-            &nbsp;&nbsp;if (node.val <span class="op">≤</span> min <span class="op">||</span> node.val <span class="op">≥</span> max) return false<br>
-            &nbsp;&nbsp;return isBST(left, min, node.val) <span class="op">&&</span> isBST(right, node.val, max)<br><br>
-            <span class="com">// initial call: isBST(root, Long.MIN_VALUE, Long.MAX_VALUE)</span>
-          </div>
-          <div class="mini-ex"><strong>Why long:</strong> a node with val = Integer.MIN_VALUE would fail the int-range check at the root — promote bounds to <code>long</code>.</div>
-        </div>
-        <div>
-          <span class="sig-label">When to reach for it</span>
-          <ul class="sig-list">
-            <li>Validate BST property recursively</li>
-            <li>Any "every node must respect ancestor constraints"</li>
-          </ul>
-          <div class="used-row">
-            <span class="lbl">Used in</span>
-            <span class="used-in">trees-valid-bst</span>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <div class="pat-card">
-    <div class="pat-hdr">
-      <div class="pat-hdr-name">Height of a Node</div>
-      <div class="pat-day">d29–d30</div>
-    </div>
-    <div class="pat-body">
-      <div class="pat-cols">
-        <div>
-          <div class="formula-eq">
-            height(null) = <span class="num">−1</span> <span class="com">// or 0, depending on convention</span><br>
-            height(node) = <span class="num">1</span> <span class="op">+</span> max(height(left), height(right))
-          </div>
-          <div class="mini-ex"><strong>Ex:</strong> single root → height = 0 (or 1). Leaf with two null kids → 1 + max(−1,−1) = 0.</div>
-        </div>
-        <div>
-          <span class="sig-label">When to reach for it</span>
-          <ul class="sig-list">
-            <li>Max depth / min depth</li>
-            <li>Diameter of a tree (longest path through a node)</li>
-            <li>Balanced-tree check (|hL − hR| ≤ 1 at every node)</li>
-          </ul>
-          <div class="used-row">
-            <span class="lbl">Used in</span>
-            <span class="used-in">trees-max-depth</span>
-            <span class="used-in">trees-balanced</span>
-            <span class="used-in">trees-diameter</span>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <div class="pat-card">
-    <div class="pat-hdr">
-      <div class="pat-hdr-name">Subtree Sum / Path Sum Recurrence</div>
-      <div class="pat-day">d29</div>
-    </div>
-    <div class="pat-body">
-      <div class="pat-cols">
-        <div>
-          <div class="formula-eq">
-            subtreeSum(node) = node.val <span class="op">+</span> subtreeSum(left) <span class="op">+</span> subtreeSum(right)<br>
-            pathSum(node, target) = pathSum(left, target <span class="op">−</span> node.val) <span class="op">||</span> pathSum(right, …)
-          </div>
-          <div class="mini-ex"><strong>Sum-tree check:</strong> node.val == subtreeSum(left) + subtreeSum(right) at every internal node.</div>
-        </div>
-        <div>
-          <span class="sig-label">When to reach for it</span>
-          <ul class="sig-list">
-            <li>"Does any root-to-leaf path sum to B?"</li>
-            <li>Sum tree validation</li>
-            <li>Equal tree partition (split sum / 2)</li>
-          </ul>
-          <div class="used-row">
-            <span class="lbl">Used in</span>
-            <span class="used-in">trees-path-sum</span>
-            <span class="used-in">trees-sum-binary-tree</span>
-            <span class="used-in">trees-equal-tree-partition</span>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <div class="pat-card">
-    <div class="pat-hdr">
-      <div class="pat-hdr-name">BST Range Pruning</div>
-      <div class="pat-day">d31</div>
-    </div>
-    <div class="pat-body">
-      <div class="pat-cols">
-        <div>
-          <div class="formula-eq">
-            if node.val <span class="op">&lt;</span> L → recurse right only<br>
-            if node.val <span class="op">&gt;</span> R → recurse left only<br>
-            else → <span class="num">1</span> <span class="op">+</span> recurse(left) <span class="op">+</span> recurse(right)
-          </div>
-          <div class="mini-ex"><strong>Why it's fast:</strong> we skip entire subtrees that can't contain a valid value — average O(log N + K) for K hits.</div>
-        </div>
-        <div>
-          <span class="sig-label">When to reach for it</span>
-          <ul class="sig-list">
-            <li>"Count / list nodes in [L, R] inside a BST"</li>
-            <li>BST search, delete, validate — all use the same pruning idea</li>
-          </ul>
-          <div class="used-row">
-            <span class="lbl">Used in</span>
-            <span class="used-in">trees-bst-nodes-in-range</span>
-            <span class="used-in">trees-search-bst</span>
-            <span class="used-in">trees-delete-bst-node</span>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <div class="pat-card">
-    <div class="pat-hdr">
-      <div class="pat-hdr-name">Level-Order Index Map (heap-style)</div>
-      <div class="pat-day">d30</div>
-    </div>
-    <div class="pat-body">
-      <div class="pat-cols">
-        <div>
-          <div class="formula-eq">
-            <span class="com">// For a complete tree stored in array at index i (1-indexed):</span><br>
-            left(<span class="var">i</span>)   = <span class="num">2</span> <span class="op">*</span> <span class="var">i</span><br>
-            right(<span class="var">i</span>)  = <span class="num">2</span> <span class="op">*</span> <span class="var">i</span> <span class="op">+</span> <span class="num">1</span><br>
-            parent(<span class="var">i</span>) = <span class="var">i</span> <span class="op">/</span> <span class="num">2</span>
-          </div>
-          <div class="mini-ex"><strong>0-indexed:</strong> left = 2i+1, right = 2i+2, parent = (i−1)/2.</div>
-        </div>
-        <div>
-          <span class="sig-label">When to reach for it</span>
-          <ul class="sig-list">
-            <li>Serialize / deserialize complete binary trees</li>
-            <li>Heap implementation (priority queue)</li>
-            <li>Segment tree layout</li>
-          </ul>
-          <div class="used-row">
-            <span class="lbl">Used in</span>
-            <span class="used-in">trees-deserialize-level-order</span>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  </div>
-  <!-- end Tree -->
-
-  <!-- ════════════════ MODULAR ════════════════ -->
-  <div class="sec">
-  <div class="sec-title">Modular Arithmetic</div>
-
-  <div class="pat-card">
-    <div class="pat-hdr">
-      <div class="pat-hdr-name">Safe Modulo of Subtraction (avoid negatives)</div>
-      <div class="pat-day">d27, d28</div>
-    </div>
-    <div class="pat-body">
-      <div class="pat-cols">
-        <div>
-          <div class="formula-eq">
-            result = ((<span class="var">a</span> <span class="op">−</span> <span class="var">b</span>) <span class="op">%</span> MOD <span class="op">+</span> MOD) <span class="op">%</span> MOD
-          </div>
-          <div class="mini-ex"><strong>Ex:</strong> a=3, b=10, MOD=7 → (-7 % 7 + 7) % 7 = <strong>0</strong>. Without the +MOD, Java would return −0 or a negative depending on language.</div>
-        </div>
-        <div>
-          <span class="sig-label">When to reach for it</span>
-          <ul class="sig-list">
-            <li>Any modular running sum that involves subtraction</li>
-            <li>"Max − min" contribution sums with mod</li>
-          </ul>
-          <div class="used-row">
-            <span class="lbl">Used in</span>
-            <span class="used-in">stacks-max-and-min</span>
-            <span class="used-in">queues-sum-of-min-max</span>
-          </div>
-        </div>
-      </div>
-      <div class="pat-note">In Java, <code>%</code> on negatives returns negative — always wrap with <code>+ MOD) % MOD</code> after any subtraction.</div>
-    </div>
-  </div>
-
-  <div class="pat-card">
-    <div class="pat-hdr">
-      <div class="pat-hdr-name">Modular Product (long cast)</div>
-      <div class="pat-day">d27</div>
-    </div>
-    <div class="pat-body">
-      <div class="pat-cols">
-        <div>
-          <div class="formula-eq">
-            (<span class="var">a</span> <span class="op">*</span> <span class="var">b</span>) <span class="op">%</span> MOD = ((<span class="op">long</span>)<span class="var">a</span> <span class="op">*</span> <span class="var">b</span>) <span class="op">%</span> MOD
-          </div>
-          <div class="mini-ex"><strong>Ex:</strong> a=b=10⁵, int * int overflows; (long)a * b = 10¹⁰ fits in long.</div>
-        </div>
-        <div>
-          <span class="sig-label">When to reach for it</span>
-          <ul class="sig-list">
-            <li>Any product where both operands can reach √MAX_LONG</li>
-            <li>Contribution sums multiplying counts × values</li>
-          </ul>
-          <div class="used-row">
-            <span class="lbl">Used in</span>
-            <span class="used-in">bs-add-or-not</span>
-            <span class="used-in">bs-painters</span>
-            <span class="used-in">bs-staircase</span>
-            <span class="used-in">bs-magical-number</span>
-            <span class="used-in">trees-valid-bst</span>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  </div>
-  <!-- end Modular -->
-
-  <div class="note" style="margin-top: 32px;">More formulas land here as we revisit Parts 0–4. If a problem leans on a recurring identity, it belongs above.</div>
+  <div class="chips" id="chips"></div>
+  <div id="view"></div>
 </main>
+
+<script>
+const $ = s => document.querySelector(s);
+let DATA = {categories:[], formulas:[]};
+let mode='cheat', activeCat='All', query='';
+let flashIdx=0, flashRevealed=false, flashPool=[];
+const esc = s => (s||'').replace(/[&<>]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;'}[c]));
+const stripTags = s => (s||'').replace(/<[^>]+>/g,'');
+
+fetch('../data/formulas.json').then(r=>r.json()).then(d=>{DATA=d;buildChips();bindControls();render();})
+  .catch(e=>{$('#view').innerHTML='<div class="empty">Could not load formulas.json &mdash; '+esc(String(e))+'</div>';});
+
+function filtered(){
+  const q=query.trim().toLowerCase();
+  return DATA.formulas.filter(f=>{
+    if(activeCat!=='All' && f.category!==activeCat) return false;
+    if(!q) return true;
+    const hay=[f.name,f.category,f.day,stripTags(f.formula),stripTags(f.example),
+      (f.whenToUse||[]).join(' '),(f.usedIn||[]).join(' '),stripTags(f.note)].join(' ').toLowerCase();
+    return hay.includes(q);
+  });
+}
+function buildChips(){
+  const cats=['All',...DATA.categories];
+  $('#chips').innerHTML=cats.map(c=>`<span class="chip${c===activeCat?' active':''}" data-cat="${esc(c)}">${esc(c)}</span>`).join('');
+  $('#chips').querySelectorAll('.chip').forEach(ch=>ch.onclick=()=>{activeCat=ch.dataset.cat;flashIdx=0;flashRevealed=false;buildChips();render();});
+}
+function bindControls(){
+  $('#search').oninput=e=>{query=e.target.value;flashIdx=0;flashRevealed=false;render();};
+  $('#modeSeg').querySelectorAll('button').forEach(b=>b.onclick=()=>{mode=b.dataset.mode;flashIdx=0;flashRevealed=false;
+    $('#modeSeg').querySelectorAll('button').forEach(x=>x.classList.toggle('active',x===b));render();});
+  document.addEventListener('keydown',e=>{
+    if(mode!=='flash'||e.target.tagName==='INPUT') return;
+    if(e.code==='Space'){e.preventDefault(); if(!flashRevealed){flashRevealed=true;renderFlashCard();}else{flashNext();}}
+    else if(e.key==='ArrowRight'){flashNext();}
+    else if(e.key==='ArrowLeft'){flashPrev();}
+  });
+}
+function render(){
+  const list=filtered();
+  $('#countPill').textContent=list.length+(list.length===1?' formula':' formulas');
+  if(!list.length){$('#view').innerHTML='<div class="empty">No formulas match your search.</div>';return;}
+  if(mode==='cheat') renderCheat(list);
+  else if(mode==='cards') renderCards(list);
+  else renderFlash(list);
+}
+function detailHTML(f){
+  const when=(f.whenToUse||[]).map(w=>`<li>${w}</li>`).join('');
+  const used=(f.usedIn||[]).length?`<div class="used-row"><span class="lbl">Used in</span>${f.usedIn.map(u=>`<span class="used-in">${esc(u)}</span>`).join('')}</div>`:'';
+  const ex=f.example?`<div class="mini-ex">${f.example}</div>`:'';
+  const note=f.note?`<div class="pat-note">${f.note}</div>`:'';
+  const whenBlock=when?`<span class="sig-label">When to reach for it</span><ul class="sig-list">${when}</ul>`:'';
+  return ex+whenBlock+used+note;
+}
+function renderCheat(list){
+  let html='';
+  DATA.categories.forEach(cat=>{
+    const items=list.filter(f=>f.category===cat); if(!items.length) return;
+    html+=`<div class="cheat-group"><div class="cheat-cat">${esc(cat)}</div>`;
+    items.forEach(f=>{
+      html+=`<div class="cheat-row" data-id="${esc(f.id)}">
+        <div class="cheat-top"><div class="cheat-name"><span class="twist">&#9654;</span>${esc(f.name)}</div><div class="cheat-day">${esc(f.day||'')}</div></div>
+        <div class="cheat-eq">${f.formula}</div>
+        <div class="cheat-detail">${detailHTML(f)}</div></div>`;
+    });
+    html+=`</div>`;
+  });
+  $('#view').innerHTML=html;
+  $('#view').querySelectorAll('.cheat-row').forEach(r=>r.onclick=()=>r.classList.toggle('open'));
+}
+function cardHTML(f){
+  const ex=f.example?`<div class="mini-ex">${f.example}</div>`:'';
+  const when=(f.whenToUse||[]).map(w=>`<li>${w}</li>`).join('');
+  const used=(f.usedIn||[]).length?`<div class="used-row"><span class="lbl">Used in</span>${f.usedIn.map(u=>`<span class="used-in">${esc(u)}</span>`).join('')}</div>`:'';
+  const note=f.note?`<div class="pat-note">${f.note}</div>`:'';
+  return `<div class="pat-card"><div class="pat-hdr"><div class="pat-hdr-name">${esc(f.name)}</div><div class="pat-day">${esc(f.day||'')}</div></div>
+    <div class="pat-body"><div class="pat-cols">
+      <div><div class="formula-eq">${f.formula}</div>${ex}</div>
+      <div><span class="sig-label">When to reach for it</span><ul class="sig-list">${when}</ul>${used}</div>
+    </div>${note}</div></div>`;
+}
+function renderCards(list){
+  let html='';
+  DATA.categories.forEach(cat=>{
+    const items=list.filter(f=>f.category===cat); if(!items.length) return;
+    html+=`<div class="sec"><div class="sec-title">${esc(cat)}</div>${items.map(cardHTML).join('')}</div>`;
+  });
+  $('#view').innerHTML=html;
+}
+function flashNext(){if(flashIdx<flashPool.length-1){flashIdx++;flashRevealed=false;renderFlashCard();}}
+function flashPrev(){if(flashIdx>0){flashIdx--;flashRevealed=false;renderFlashCard();}}
+function flashShuffle(){for(let i=flashPool.length-1;i>0;i--){const j=(Math.random()*(i+1))|0;[flashPool[i],flashPool[j]]=[flashPool[j],flashPool[i]];}flashIdx=0;flashRevealed=false;renderFlashCard();}
+function renderFlash(list){
+  flashPool=list; if(flashIdx>=flashPool.length) flashIdx=0;
+  $('#view').innerHTML=`<div class="flash-wrap">
+    <div class="flash-progress" id="flashProg"></div>
+    <div id="flashCard"></div>
+    <div class="flash-controls">
+      <button class="fbtn" id="fPrev">&lsaquo; Prev</button>
+      <button class="fbtn primary" id="fReveal">Reveal</button>
+      <button class="fbtn" id="fNext">Next &rsaquo;</button>
+      <button class="fbtn" id="fShuffle">&#10862; Shuffle</button>
+    </div>
+    <div class="hint">Space = reveal / next &middot; &larr; &rarr; to move</div></div>`;
+  $('#fPrev').onclick=flashPrev;$('#fNext').onclick=flashNext;$('#fShuffle').onclick=flashShuffle;
+  $('#fReveal').onclick=()=>{flashRevealed=!flashRevealed;renderFlashCard();};
+  renderFlashCard();
+}
+function renderFlashCard(){
+  const f=flashPool[flashIdx]; if(!f) return;
+  $('#flashProg').textContent=`${flashIdx+1} / ${flashPool.length}`;
+  const when=(f.whenToUse||[]).map(w=>`<li>${w}</li>`).join('');
+  const used=(f.usedIn||[]).length?`<div class="used-row"><span class="lbl">Used in</span>${f.usedIn.map(u=>`<span class="used-in">${esc(u)}</span>`).join('')}</div>`:'';
+  const ex=f.example?`<div class="mini-ex">${f.example}</div>`:'';
+  const note=f.note?`<div class="pat-note">${f.note}</div>`:'';
+  const back=flashRevealed?`<div class="flash-back"><div class="flash-q">Formula</div><div class="formula-eq">${f.formula}</div>${ex}${note}</div>`:'';
+  $('#flashCard').innerHTML=`<div class="flash-card">
+    <div class="flash-cat">${esc(f.category)} &middot; ${esc(f.day||'')}</div>
+    <div class="flash-name">${esc(f.name)}</div>
+    <div class="flash-q">When to reach for it</div>
+    <ul class="sig-list">${when}</ul>${used}${back}</div>`;
+  $('#fReveal').textContent=flashRevealed?'Hide':'Reveal';
+}
+</script>
 
 </body>
 </html>

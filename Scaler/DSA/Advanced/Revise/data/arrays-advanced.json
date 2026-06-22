@@ -439,6 +439,131 @@
       }
     }
   },
+
+  {
+    "num": 149,
+    "id": "aadv-add-one-to-number",
+    "title": "Add One To Number",
+    "subTopic": "Array Simulation \u2014 Carry Propagation",
+    "tags": [
+      "Arrays",
+      "Math",
+      "Carry",
+      "Simulation"
+    ],
+    "description": "Given a non-negative number represented as an array of digits, add 1 to the number (increment the number represented by the digits).\n\nThe digits are stored such that the most significant digit is at the head of the list.\n\nNOTE: Certain things are intentionally left unclear in this question which you should practice asking the interviewer.\nQ: Can the input have 0's before the most significant digit? -> YES, the input may have leading zeros.\nQ: Can the output have 0's before the most significant digit? -> NO, strip leading zeros from the output even if the input had them.\n\nProblem Constraints\n1 <= size of the array <= 1000000\n\nInput Format\nFirst argument is an array of digits.\n\nOutput Format\nReturn the array of digits after adding one.\n\nExample Input\nInput 1: [1, 2, 3]\n\nExample Output\nOutput 1: [1, 2, 4]\n\nExample Explanation\nExplanation 1: Given vector is [1, 2, 3]. The returned vector should be [1, 2, 4] as 123 + 1 = 124.",
+    "sampleInput": "A = [0, 1, 2, 9]",
+    "sampleOutput": "[1, 3, 0]",
+    "story": "Add from the right with a carry, like grade-school addition. Strip leading zeros first; prepend a 1 only if the carry survives the most significant digit (all 9s).",
+    "plain": "The digits live in an array, most significant first. Adding 1 is school-book addition starting from the rightmost digit: digit + carry, keep the units place, push the tens place as the next carry. Start carry = 1 (the '+1'). The moment a digit + carry < 10 the carry dies and you can stop. Two corner cases matter: (1) leading zeros in the INPUT must be dropped from the OUTPUT, so find the first non-zero digit and treat the answer as starting there; (2) if the number is all 9s (e.g. 999), the carry survives past the most significant digit and you must prepend a fresh 1, giving 1000. Don't convert the whole array to a long \u2014 N can be 1e6 digits, which overflows everything.",
+    "tale": "A shopkeeper tallies a long bill on a paper tape, rightmost digit first. She adds the final coin: if a column tips past 9 she writes the units and carries the 1 left, column by column. If the whole tape was 9s, she tapes a fresh '1' onto the front. And any blank zero-padding she'd scribbled on the left of the tape, she simply tears off before handing over the total.",
+    "solutions": [
+      {
+        "label": "Brute",
+        "complexity": {
+          "time": "O(N)",
+          "space": "O(N)"
+        },
+        "plain": "Treat the digits as one big number: concatenate them into a string, parse into a BigInteger, add ONE, then split the result back into digits. BigInteger sidesteps overflow and its parser drops leading zeros for free, so the output is already canonical. Works, but it allocates a full big-number object and does heavy string/byte conversions instead of a single in-place pass.",
+        "tale": "The shopkeeper photocopies the entire tape into a calculator, presses +1, then re-copies every digit back onto a fresh tape. Correct, but a lot of copying for a one-coin addition.",
+        "approach": [
+          "Concatenate every digit of A into a string builder.",
+          "Construct a BigInteger from that string (this normalises away leading zeros).",
+          "Add BigInteger.ONE.",
+          "Walk the decimal string of the result, pushing each char-digit into the answer list.",
+          "Return the answer list."
+        ],
+        "pseudocode": "s = join(A)\nnum = BigInteger(s) + 1\nreturn [c - '0' for c in num.toString()]",
+        "story": "Brute. Parse the whole number, add one, re-split.",
+        "code": "public ArrayList<Integer> plusOne(ArrayList<Integer> A) {\n    StringBuilder sb = new StringBuilder();\n    for (int d : A) sb.append(d);\n    java.math.BigInteger num =\n        new java.math.BigInteger(sb.toString()).add(java.math.BigInteger.ONE);\n    ArrayList<Integer> res = new ArrayList<>();\n    for (char c : num.toString().toCharArray()) {\n        res.add(c - '0');\n    }\n    return res;\n}"
+      },
+      {
+        "label": "Optimal",
+        "complexity": {
+          "time": "O(N)",
+          "space": "O(N)"
+        },
+        "plain": "Single right-to-left pass. First skip leading zeros to find 'start', the index of the most significant real digit. Then from the last index, repeatedly do sum = A[i] + carry, write sum % 10 back, set carry = sum / 10, and stop the moment carry becomes 0. Finally build the result from 'start' onward; if a carry still remains (the all-9s case) prepend it. O(N) time, no big-number allocation, and the only extra space is the output list itself.",
+        "tale": "The shopkeeper works the tape directly: tear off the blank left padding, add the coin to the last column, carry left only as far as it tips, and tape a '1' on the front only if the very first column overflowed.",
+        "approach": [
+          "n = A.size(). Find start: while start < n-1 and A[start] == 0, start++.",
+          "Set i = n-1, carry = 1.",
+          "While i >= start and carry > 0: sum = A[i] + carry; A.set(i, sum % 10); carry = sum / 10; i--.",
+          "Create result list. If carry > 0, add carry first (the leading 1 for all-9s).",
+          "Append A[start..n-1] to the result.",
+          "Return result."
+        ],
+        "pseudocode": "start = first non-zero index (or n-1)\ni = n-1, carry = 1\nwhile i >= start and carry > 0:\n  s = A[i] + carry; A[i] = s % 10; carry = s / 10; i--\nres = (carry > 0 ? [carry] : []) + A[start..]\nreturn res",
+        "story": "Optimal. Carry from the right, prepend only on all-9s.",
+        "code": "public ArrayList<Integer> plusOne(ArrayList<Integer> A) {\n    int n = A.size();\n    int start = 0;\n    while (start < n - 1 && A.get(start) == 0) {\n        start++;\n    }\n\n    int i = n - 1;\n    int carry = 1;\n    while (i >= start && carry > 0) {\n        int sum = A.get(i) + carry;\n        A.set(i, sum % 10);\n        carry = sum / 10;\n        i--;\n    }\n\n    ArrayList<Integer> res = new ArrayList<>();\n    if (carry > 0) {\n        res.add(carry);\n    }\n    for (int k = start; k < n; k++) {\n        res.add(A.get(k));\n    }\n    return res;\n}"
+      }
+    ],
+    "viz": {
+      "kind": "scripted-array",
+      "data": {
+        "A": [
+          0,
+          1,
+          2,
+          9
+        ],
+        "footer": "Add One \u2014 A = [0,1,2,9]. Drop the leading 0, then propagate carry right\u2192left. Prepend 1 only if the carry survives the most significant digit.",
+        "legend": [
+          "c-input",
+          "c-low",
+          "c-active",
+          "c-result"
+        ],
+        "script": [
+          {
+            "label": "SETUP",
+            "marks": {
+              "0": "c-input",
+              "1": "c-input",
+              "2": "c-input",
+              "3": "c-input"
+            },
+            "msg": "A = <strong>[0, 1, 2, 9]</strong>. Start carry = 1 (the +1).",
+            "overlay": "<strong>Leading zeros</strong> in the input are dropped from the output."
+          },
+          {
+            "label": "skip leading zero",
+            "marks": {
+              "0": "c-low",
+              "1": "c-input",
+              "2": "c-input",
+              "3": "c-input"
+            },
+            "msg": "Index 0 is a leading 0 \u2192 <strong>start = 1</strong>. The answer begins at the first non-zero digit."
+          },
+          {
+            "label": "i=3: 9 + 1 = 10",
+            "marks": {
+              "3": "c-active"
+            },
+            "msg": "9 + carry(1) = 10 \u2192 write <strong>0</strong>, carry becomes <strong>1</strong>."
+          },
+          {
+            "label": "i=2: 2 + 1 = 3",
+            "marks": {
+              "2": "c-active"
+            },
+            "msg": "2 + carry(1) = 3 \u2192 write <strong>3</strong>, carry becomes <strong>0</strong>. Stop."
+          },
+          {
+            "label": "RESULT",
+            "marks": {
+              "1": "c-result",
+              "2": "c-result",
+              "3": "c-result"
+            },
+            "msg": "Carry is 0 and start = 1 \u2192 answer = <strong>[1, 3, 0]</strong>.",
+            "overlay": "All-9s case (e.g. 999) is the only time the carry survives \u2192 prepend a fresh 1 \u2192 1000."
+          }
+        ]
+      }
+    }
+  },
   {
     "num": 27,
     "id": "aadv-flip",
