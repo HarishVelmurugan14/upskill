@@ -7,6 +7,32 @@
   <link rel="stylesheet" href="style.css">
   <style>
     /* ════════════════════════════════════════════════
+       Match the DSA Revisor (problem) palette:
+       Darcula slate base × Claude-orange accent
+       ════════════════════════════════════════════════ */
+    :root {
+      --bg:            #1e1f22 !important;
+      --bg-card:       #2b2d30 !important;
+      --bg-card-hover: #393b40 !important;
+      --bg-elevated:   #2b2d30 !important;
+      --border:        #393b40 !important;
+      --text:          #dfe1e5 !important;
+      --text-body:     #bcbec4 !important;
+      --text-muted:    #7c7d80 !important;
+      --blue:   #4eade5 !important;
+      --green:  #6aab73 !important;
+      --red:    #cf5b56 !important;
+      --purple: #c77dbb !important;
+      --amber:  #d6bd72 !important;
+      --orange: #cc7832 !important;
+      --teal:   #56a8f5 !important;
+      --accent:        #d97757;
+      --accent-soft:   rgba(217,119,87,0.12);
+      --accent-border: rgba(217,119,87,0.40);
+    }
+    body { background: var(--bg); color: var(--text-body); }
+
+    /* ════════════════════════════════════════════════
        FORMULAS PAGE — dedicated typography & layout
        ════════════════════════════════════════════════ */
 
@@ -261,12 +287,19 @@
     .search-box::before{content:'\2315';position:absolute;left:12px;top:50%;transform:translateY(-50%);color:var(--text-muted);font-size:16px}
     .seg{display:inline-flex;background:var(--bg-card);border:1px solid var(--border);border-radius:10px;overflow:hidden}
     .seg button{background:transparent;border:none;color:var(--text-muted);padding:9px 16px;font-size:12.5px;font-weight:600;cursor:pointer;letter-spacing:.3px}
-    .seg button.active{background:var(--amber);color:#1a1205}
+    .seg button.active{background:var(--accent);color:#1a1205}
     .count-pill{font-size:12px;color:var(--text-muted)}
     .chips{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:26px}
     .chip{background:var(--bg-card);border:1px solid var(--border);color:var(--text-body);padding:6px 13px;border-radius:999px;font-size:12px;cursor:pointer;transition:all .15s}
-    .chip:hover{border-color:var(--amber)}
-    .chip.active{background:rgba(210,153,34,.14);border-color:var(--amber);color:var(--amber);font-weight:600}
+    .chip:hover{border-color:var(--accent)}
+    .chip.active{background:var(--accent-soft);border-color:var(--accent-border);color:var(--accent);font-weight:600}
+
+    /* ===== Section / Topic taxonomy headers (mirrors problem grouping) ===== */
+    .tax-section{font-size:12px;letter-spacing:2.5px;text-transform:uppercase;color:var(--text);font-weight:800;margin:38px 0 18px;display:flex;align-items:center;gap:12px}
+    .tax-section:first-child{margin-top:4px}
+    .tax-section::after{content:'';flex:1;height:2px;background:var(--border)}
+    .tax-topic{font-size:11px;letter-spacing:2px;text-transform:uppercase;color:var(--amber);font-weight:700;margin:0 0 12px;padding-bottom:8px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:8px}
+    .tax-topic .tcount{font-size:9px;letter-spacing:.5px;color:var(--text-muted);background:var(--bg-card);border:1px solid var(--border);padding:1px 7px;border-radius:999px;font-weight:600}
 
     /* ===== Cheatsheet ===== */
     .cheat-group{margin-bottom:30px}
@@ -293,8 +326,8 @@
     .flash-back{margin-top:22px;padding-top:22px;border-top:1px solid var(--border)}
     .flash-controls{display:flex;flex-wrap:wrap;gap:10px;justify-content:center;margin-top:22px}
     .fbtn{background:var(--bg-card);border:1px solid var(--border);color:var(--text);padding:10px 20px;border-radius:10px;font-size:13px;font-weight:600;cursor:pointer;transition:all .15s}
-    .fbtn:hover{border-color:var(--amber)}
-    .fbtn.primary{background:var(--amber);color:#1a1205;border-color:var(--amber)}
+    .fbtn:hover{border-color:var(--accent)}
+    .fbtn.primary{background:var(--accent);color:#1a1205;border-color:var(--accent)}
     .hint{text-align:center;color:var(--text-muted);font-size:11px;margin-top:14px}
     .empty{text-align:center;color:var(--text-muted);padding:50px 20px;font-size:14px}
   </style>
@@ -323,7 +356,7 @@
 
 <main>
   <div class="page-title">Formulas &amp; Identities</div>
-  <div class="page-sub">Searchable &amp; categorized. Use <strong>Flashcards</strong> to actively recall a formula before revealing it.</div>
+  <div class="page-sub">Grouped by <strong>Section &rarr; Topic</strong>, same as the problem list. Use <strong>Flashcards</strong> to actively recall a formula before revealing it.</div>
 
   <div class="toolbar">
     <div class="search-box"><input id="search" type="text" placeholder="Search name, formula, day, problem id…" autocomplete="off"></div>
@@ -341,8 +374,8 @@
 
 <script>
 const $ = s => document.querySelector(s);
-let DATA = {categories:[], formulas:[]};
-let mode='cheat', activeCat='All', query='';
+let DATA = {taxonomy:[], formulas:[]};
+let mode='cheat', activeTopic='All', query='';
 let flashIdx=0, flashRevealed=false, flashPool=[];
 const esc = s => (s||'').replace(/[&<>]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;'}[c]));
 const stripTags = s => (s||'').replace(/<[^>]+>/g,'');
@@ -353,17 +386,33 @@ fetch('../data/formulas.json').then(r=>r.json()).then(d=>{DATA=d;buildChips();bi
 function filtered(){
   const q=query.trim().toLowerCase();
   return DATA.formulas.filter(f=>{
-    if(activeCat!=='All' && f.category!==activeCat) return false;
+    if(activeTopic!=='All' && f.topic!==activeTopic) return false;
     if(!q) return true;
-    const hay=[f.name,f.category,f.day,stripTags(f.formula),stripTags(f.example),
+    const hay=[f.name,f.section,f.topic,f.day,stripTags(f.formula),stripTags(f.example),
       (f.whenToUse||[]).join(' '),(f.usedIn||[]).join(' '),stripTags(f.note)].join(' ').toLowerCase();
     return hay.includes(q);
   });
 }
+// Group a list into [{section, topic, items}] following DATA.taxonomy order.
+function groupByTaxonomy(list){
+  return (DATA.taxonomy||[]).map(t=>({
+    section:t.section, topic:t.topic,
+    items:list.filter(f=>f.section===t.section && f.topic===t.topic)
+  })).filter(g=>g.items.length);
+}
+// Render grouped HTML with Section banners + Topic headings; per-group body via bodyFn(items).
+function renderGroups(list, bodyFn){
+  let html='', lastSection=null;
+  groupByTaxonomy(list).forEach(g=>{
+    if(g.section!==lastSection){ html+=`<div class="tax-section">${esc(g.section)}</div>`; lastSection=g.section; }
+    html+=`<div class="cheat-group"><div class="tax-topic">${esc(g.topic)}<span class="tcount">${g.items.length}</span></div>${bodyFn(g.items)}</div>`;
+  });
+  return html;
+}
 function buildChips(){
-  const cats=['All',...DATA.categories];
-  $('#chips').innerHTML=cats.map(c=>`<span class="chip${c===activeCat?' active':''}" data-cat="${esc(c)}">${esc(c)}</span>`).join('');
-  $('#chips').querySelectorAll('.chip').forEach(ch=>ch.onclick=()=>{activeCat=ch.dataset.cat;flashIdx=0;flashRevealed=false;buildChips();render();});
+  const topics=['All',...(DATA.taxonomy||[]).map(t=>t.topic)];
+  $('#chips').innerHTML=topics.map(t=>`<span class="chip${t===activeTopic?' active':''}" data-topic="${esc(t)}">${esc(t)}</span>`).join('');
+  $('#chips').querySelectorAll('.chip').forEach(ch=>ch.onclick=()=>{activeTopic=ch.dataset.topic;flashIdx=0;flashRevealed=false;buildChips();render();});
 }
 function bindControls(){
   $('#search').oninput=e=>{query=e.target.value;flashIdx=0;flashRevealed=false;render();};
@@ -393,19 +442,11 @@ function detailHTML(f){
   return ex+whenBlock+used+note;
 }
 function renderCheat(list){
-  let html='';
-  DATA.categories.forEach(cat=>{
-    const items=list.filter(f=>f.category===cat); if(!items.length) return;
-    html+=`<div class="cheat-group"><div class="cheat-cat">${esc(cat)}</div>`;
-    items.forEach(f=>{
-      html+=`<div class="cheat-row" data-id="${esc(f.id)}">
+  const body=items=>items.map(f=>`<div class="cheat-row" data-id="${esc(f.id)}">
         <div class="cheat-top"><div class="cheat-name"><span class="twist">&#9654;</span>${esc(f.name)}</div><div class="cheat-day">${esc(f.day||'')}</div></div>
         <div class="cheat-eq">${f.formula}</div>
-        <div class="cheat-detail">${detailHTML(f)}</div></div>`;
-    });
-    html+=`</div>`;
-  });
-  $('#view').innerHTML=html;
+        <div class="cheat-detail">${detailHTML(f)}</div></div>`).join('');
+  $('#view').innerHTML=renderGroups(list, body);
   $('#view').querySelectorAll('.cheat-row').forEach(r=>r.onclick=()=>r.classList.toggle('open'));
 }
 function cardHTML(f){
@@ -420,12 +461,7 @@ function cardHTML(f){
     </div>${note}</div></div>`;
 }
 function renderCards(list){
-  let html='';
-  DATA.categories.forEach(cat=>{
-    const items=list.filter(f=>f.category===cat); if(!items.length) return;
-    html+=`<div class="sec"><div class="sec-title">${esc(cat)}</div>${items.map(cardHTML).join('')}</div>`;
-  });
-  $('#view').innerHTML=html;
+  $('#view').innerHTML=renderGroups(list, items=>items.map(cardHTML).join(''));
 }
 function flashNext(){if(flashIdx<flashPool.length-1){flashIdx++;flashRevealed=false;renderFlashCard();}}
 function flashPrev(){if(flashIdx>0){flashIdx--;flashRevealed=false;renderFlashCard();}}
@@ -455,7 +491,7 @@ function renderFlashCard(){
   const note=f.note?`<div class="pat-note">${f.note}</div>`:'';
   const back=flashRevealed?`<div class="flash-back"><div class="flash-q">Formula</div><div class="formula-eq">${f.formula}</div>${ex}${note}</div>`:'';
   $('#flashCard').innerHTML=`<div class="flash-card">
-    <div class="flash-cat">${esc(f.category)} &middot; ${esc(f.day||'')}</div>
+    <div class="flash-cat">${esc(f.topic)} &middot; ${esc(f.day||'')}</div>
     <div class="flash-name">${esc(f.name)}</div>
     <div class="flash-q">When to reach for it</div>
     <ul class="sig-list">${when}</ul>${used}${back}</div>`;
