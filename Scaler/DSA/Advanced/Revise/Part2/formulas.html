@@ -380,8 +380,27 @@ let flashIdx=0, flashRevealed=false, flashPool=[];
 const esc = s => (s||'').replace(/[&<>]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;'}[c]));
 const stripTags = s => (s||'').replace(/<[^>]+>/g,'');
 
-fetch('../data/formulas.json').then(r=>r.json()).then(d=>{DATA=d;buildChips();bindControls();render();})
-  .catch(e=>{$('#view').innerHTML='<div class="empty">Could not load formulas.json &mdash; '+esc(String(e))+'</div>';});
+function dataCandidates(){
+  const out=[];
+  const p=location.pathname;
+  const i=p.indexOf('/Revise/');
+  if(i>=0) out.push(p.slice(0,i)+'/Revise/data/formulas.json');  // absolute, root-independent
+  out.push('../data/formulas.json','data/formulas.json','./data/formulas.json');
+  return [...new Set(out)];
+}
+async function loadFormulas(){
+  let lastErr='';
+  for(const url of dataCandidates()){
+    try{
+      const r=await fetch(url);
+      if(!r.ok){lastErr='HTTP '+r.status+' for '+url;continue;}
+      const d=await r.json();  // throws if HTML/invalid
+      DATA=d;buildChips();bindControls();render();return;
+    }catch(e){lastErr=String(e);}
+  }
+  $('#view').innerHTML='<div class="empty">Could not load formulas.json &mdash; '+esc(lastErr)+'</div>';
+}
+loadFormulas();
 
 function filtered(){
   const q=query.trim().toLowerCase();
