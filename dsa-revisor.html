@@ -3086,7 +3086,7 @@
     // Problem tab
     document.getElementById('problemEmpty').style.display = 'none';
     document.getElementById('problemContent').style.display = 'block';
-    document.getElementById('probTitle').textContent = p.title;
+    document.getElementById('probTitle').textContent = (p.num != null ? '#' + p.num + ' · ' : '') + p.title;
     document.getElementById('probSubTopic').textContent = p.subTopic || '';
     var pPlain = p.plain || p.story || '';
     var pTale  = p.tale  || '';
@@ -3194,7 +3194,7 @@
     vizClearTimer();
     const kind = p.viz && p.viz.kind;
     const data = p.viz && p.viz.data;
-    document.getElementById('vizTitle').textContent = p.title || '';
+    document.getElementById('vizTitle').textContent = (p.num != null ? '#' + p.num + ' · ' : '') + (p.title || '');
     if (!kind || !window.VIZ_KINDS || !window.VIZ_KINDS[kind]) {
       document.getElementById('vizCanvas').innerHTML =
         `<div class="viz-empty">No visualizer registered for kind <code>${kind || '?'}</code>.</div>`;
