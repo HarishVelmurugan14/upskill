@@ -1,5 +1,6 @@
 [
   {
+    "num": 82,
     "id": "bs-left-right-index",
     "title": "Find Left Most and Right Most Index of Element",
     "subTopic": "Lower / Upper Bound",
@@ -237,6 +238,7 @@
     "tale": "Two siblings are sent into a long sorted gallery to find a painting titled 'B'. The elder sister has a rule: 'Whenever I see it, I keep walking LEFT — there might be an earlier copy.' The younger brother's rule is the mirror image: 'Whenever I see it, I keep walking RIGHT — there might be a later copy.' Both halve the gallery with every step. When they return to the entrance, the sister's last sighting is the first index of B, and the brother's last sighting is the last index. If neither ever saw it, the painting was never in the gallery."
   },
   {
+    "num": 83,
     "id": "bs-insert-position",
     "title": "Search Insert Position (Lower Bound)",
     "subTopic": "Lower Bound",
@@ -428,6 +430,7 @@
     "tale": "A bookkeeper keeps her ledger sorted by amount. A new entry of value B arrives. She slides her finger along the page until she finds the first row whose amount is at least B — that row's number is where the new entry belongs. If no row is large enough, the new entry goes at the very bottom."
   },
   {
+    "num": 84,
     "id": "bs-single-element",
     "title": "Single Element in Sorted Array",
     "subTopic": "BS on Pattern",
@@ -658,6 +661,7 @@
     "tale": "A row of identical twins stands hand-in-hand in a long line. One twin lost their sibling — they stand alone. Up to the lonely one, every pair starts at an even position. Past them, every pair starts at an odd position. A clever observer doesn't walk the whole line; she teleports to the middle, checks her neighbours' parity, and slices the line in half. In a few jumps the lonely one is found."
   },
   {
+    "num": 85,
     "id": "bs-peak-element",
     "title": "Find a Peak Element",
     "subTopic": "BS on Unimodal",
@@ -852,6 +856,7 @@
     }
   },
   {
+    "num": 86,
     "id": "bs-matrix-search",
     "title": "Matrix Search",
     "subTopic": "BS on 2D Matrix",
@@ -976,6 +981,7 @@
     "tale": "A storehouse keeps its crates in a grid, with each row strictly heavier than the row above and crates within a row sorted by weight. Searching looks daunting until the keeper realises the grid is just one giant sorted shelf folded into rows. He numbers the crates 0 to N*M-1, binary searches the number line, and unfolds each guess back into (row, col) using basic arithmetic."
   },
   {
+    "num": 87,
     "id": "bs-minimum-difference",
     "title": "Minimum Difference",
     "subTopic": "BS + Sorting (Closest Element)",
@@ -1096,6 +1102,7 @@
     "tale": "A village has A houses in a vertical column, each with B residents standing on its porch. Every neighbouring house wants to find the resident-pairing that minimises a fight — the two residents whose heights differ least. The mayor sorts each porch by height, then for every resident r in house i she points to the two residents in house i+1 most similar in height: the shortest one not shorter than r, and the tallest one shorter than r. The smallest difference across all houses wins."
   },
   {
+    "num": 88,
     "id": "bs-staircase",
     "title": "Maximum Height of Staircase",
     "subTopic": "BS on Answer (Math)",
@@ -1220,6 +1227,7 @@
     "tale": "A child has a pile of A wooden blocks and dreams of building the tallest staircase she can. The first step costs 1 block, the second costs 2, the third costs 3, and so on — each step a little heavier than the last. She doesn't want to start building blindly and run out halfway. So she imagines: 'What if I aimed for height 6? That would cost 1+2+3+4+5+6 = 21 blocks. Too many.' She tries smaller heights in her head, halving her guess each time, until she finds the tallest staircase her pile can afford — then she starts building, knowing she'll finish exactly."
   },
   {
+    "num": 89,
     "id": "bs-sqrt",
     "title": "Square Root of Integer",
     "subTopic": "BS on Answer (Math)",
@@ -1348,6 +1356,7 @@
     "tale": "An apprentice carpenter needs the side length of the largest square whose area fits inside a plank of area A. He has no measuring tape that does square roots — only a saw. So he guesses a side length, multiplies it by itself, and compares the resulting area to A. Too big? He halves his guess. Just right or smaller? He remembers it and tries a slightly bigger side. In O(log A) cuts he has the perfect square."
   },
   {
+    "num": 90,
     "id": "bs-rotated-search",
     "title": "Rotated Sorted Array Search",
     "subTopic": "Rotated Sorted Array",
@@ -1566,6 +1575,7 @@
     "tale": "An old manuscript was once perfectly alphabetised, but a clumsy scribe took a chunk from the top and stacked it at the bottom — no one remembers how much. A scholar must find a word B in O(log N) flips. Step 1: he binary searches for the seam, where the alphabet suddenly drops from Z back to A. Step 2: he compares B with the first word on the page. If B comes after it, B must be in the upper, before-the-seam half. Otherwise B is in the lower, after-the-seam half. A second binary search in that half finds B."
   },
   {
+    "num": 91,
     "id": "bs-median-two-sorted",
     "title": "Median of Two Sorted Arrays",
     "subTopic": "BS on Partition",
@@ -1708,6 +1718,7 @@
     "tale": "Two sorted lines of people stand side by side. You need the height of the median across both lines without rearranging anyone. A referee picks a partition: pX people from the left of the shorter line plus pY = leftCount - pX people from the left of the longer line will form 'the left team'; the rest form 'the right team'. A valid partition is one where the tallest of the left team is no taller than the shortest of the right team — on both sides. If the partition is off, the referee shifts pX left or right by half the remaining range. When it's valid, the median is just the boundary heights."
   },
   {
+    "num": 92,
     "id": "bs-matrix-median",
     "title": "Matrix Median",
     "subTopic": "BS on Value Range",
@@ -1872,6 +1883,7 @@
     }
   },
   {
+    "num": 93,
     "id": "bs-add-or-not",
     "title": "ADD OR NOT",
     "subTopic": "BS + Prefix Sum",
@@ -2036,6 +2048,7 @@
     "tale": "A potter has rows of clay pots of various heights and a daily allowance of B clay pellets. He can only add clay, never shave it. He wants to mould as many pots as possible to the same exact height — and if there's a tie, the shorter height wins (less clay wasted later). He sorts his pots by height, then for each pot's height v he asks: 'How many pots ending at v can I raise to v with my pellets?' Because his pots are sorted, the cheapest group is the tail group, and prefix sums let him compute the pellet cost of any tail group instantly. Binary search finds the longest affordable group for each candidate height."
   },
   {
+    "num": 94,
     "id": "bs-magical-number",
     "title": "Ath Magical Number",
     "subTopic": "BS on Answer (Math + GCD/LCM)",
@@ -2153,6 +2166,7 @@
     "tale": "A magician runs a long ribbon of integers 1, 2, 3, ... and stamps every multiple of B with a blue dot and every multiple of C with a red dot. A number with at least one dot is 'magical'. You want the A-th magical number along the ribbon, but the ribbon is too long to walk. So you guess a position x and ask the magician: 'How many dots are in [1..x]?' He answers instantly with x/B + x/C - x/lcm(B,C), because numbers that are multiples of both B and C are counted twice otherwise. You binary search the smallest x with at least A dots."
   },
   {
+    "num": 95,
     "id": "bs-triplet-sum",
     "title": "Bth Smallest Triplet Sum",
     "subTopic": "BS on Value + Counting",
@@ -2294,6 +2308,7 @@
     "tale": "Three jugglers stand on a long sorted bench and add their numbers. There are O(N^3) possible trios. To find the B-th smallest sum without listing them all, you guess a target sum v. For every fixed leftmost juggler, you sweep two more from the ends: if their combined sum is below v, every juggler to the right of the middle one also makes the cut, so you count e-s pairings at once and advance the middle juggler; if not, you pull the right juggler closer. Total count of trios below v computed in O(N^2). Binary search the smallest v whose count reaches B."
   },
   {
+    "num": 96,
     "id": "bs-painters",
     "title": "Painter's Partition",
     "subTopic": "BS on Answer (Minimize Max)",
@@ -2403,6 +2418,7 @@
     "tale": "A foreman has a long fence of boards and A painters. Each painter must take a contiguous stretch of the fence. He wants the foreman's nightmare — the slowest painter — to be as fast as possible. So he guesses a time-cap mid, then walks the fence: 'Painter 1 starts here... wait, adding this next board would exceed mid, so Painter 2 starts here... no, that's already past mid again, Painter 3...' If at any point he needs more than A painters, the cap is too tight. If A or fewer painters suffice, the cap is loose; he tries a tighter one. Binary search finds the tightest cap."
   },
   {
+    "num": 97,
     "id": "bs-aggressive-cows",
     "title": "Aggressive Cows",
     "subTopic": "BS on Answer (Maximize Min)",
@@ -2522,6 +2538,7 @@
     }
   },
   {
+    "num": 98,
     "id": "bs-allocate-books",
     "title": "Allocate Books",
     "subTopic": "BS on Answer (Minimize Max)",
@@ -2641,6 +2658,7 @@
     "tale": "A librarian must distribute a shelf of books across a row of students. The catch: each student takes a contiguous run of books. The pain-point is the unluckiest student who reads the most pages — she wants to minimise his suffering. So she guesses a cap, walks the shelf, and gives books to student 1 until adding the next would exceed the cap; then student 2 starts; and so on. If the cap is too tight she needs more students than she has. If the cap is loose she might do better. Binary search collapses the range."
   },
   {
+    "num": 99,
     "id": "bs-special-integer",
     "title": "Special Integer",
     "subTopic": "BS on Answer + Sliding Window",

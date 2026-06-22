@@ -1,5 +1,6 @@
 [
   {
+    "num": 68,
     "id": "hash-frequency-query",
     "title": "Frequency of element query",
     "subTopic": "HashMap — Frequency Counting",
@@ -111,6 +112,7 @@
     }
   },
   {
+    "num": 69,
     "id": "hash-count-distinct",
     "title": "Count Distinct Elements",
     "subTopic": "HashSet — Membership",
@@ -238,6 +240,7 @@
     }
   },
   {
+    "num": 70,
     "id": "hash-first-repeating",
     "title": "First Repeating element",
     "subTopic": "HashMap — Frequency + Linear Scan",
@@ -351,6 +354,7 @@
     }
   },
   {
+    "num": 71,
     "id": "hash-subarray-zero-sum",
     "title": "Sub-array with 0 sum",
     "subTopic": "Prefix Sum + HashSet",
@@ -459,6 +463,7 @@
     }
   },
   {
+    "num": 72,
     "id": "hash-common-elements",
     "title": "Common Elements",
     "subTopic": "HashMap — Multiset Intersection",
@@ -576,6 +581,7 @@
     }
   },
   {
+    "num": 73,
     "id": "hash-count-unique",
     "title": "Count Unique Elements",
     "subTopic": "HashMap — Filter by Count",
@@ -675,6 +681,7 @@
     }
   },
   {
+    "num": 74,
     "id": "hash-count-subarray-zero",
     "title": "Count Subarray Zero Sum",
     "subTopic": "Prefix Sum + HashMap",
@@ -791,6 +798,7 @@
     }
   },
   {
+    "num": 75,
     "id": "hash-check-pair-sum",
     "title": "Check Pair Sum",
     "subTopic": "HashSet — Complement Search",
@@ -897,6 +905,7 @@
     }
   },
   {
+    "num": 76,
     "id": "hash-count-pair-diff",
     "title": "Count Pair Difference",
     "subTopic": "HashMap — Frequency for Pair Difference",
@@ -1033,6 +1042,7 @@
     }
   },
   {
+    "num": 77,
     "id": "hash-subarray-sum-k",
     "title": "Subarray Sum Equals K",
     "subTopic": "Prefix Sum + HashMap",
@@ -1136,6 +1146,7 @@
     }
   },
   {
+    "num": 78,
     "id": "hash-distinct-window",
     "title": "Distinct Numbers in Window",
     "subTopic": "Sliding Window + HashMap",
@@ -1264,6 +1275,7 @@
     }
   },
   {
+    "num": 79,
     "id": "hash-longest-subarray-zero",
     "title": "Longest Subarray Zero Sum",
     "subTopic": "Prefix Sum + HashMap (earliest index)",
@@ -1379,6 +1391,7 @@
     }
   },
   {
+    "num": 80,
     "id": "hash-count-pair-sum",
     "title": "Count Pair Sum",
     "subTopic": "HashMap — Pair Counting (sum target)",
@@ -1492,6 +1505,7 @@
     }
   },
   {
+    "num": 81,
     "id": "hash-subarray-given-sum",
     "title": "Subarray with given sum",
     "subTopic": "Sliding Window (positive ints) OR Prefix Sum Map",

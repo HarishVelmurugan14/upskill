@@ -1,5 +1,6 @@
 [
   {
+    "num": 34,
     "id": "bm-number-of-1-bits",
     "title": "Number of 1 Bits",
     "subTopic": "Bit Counting",
@@ -127,6 +128,7 @@
     }
   },
   {
+    "num": 35,
     "id": "bm-single-number",
     "title": "Single Number",
     "subTopic": "XOR Fold",
@@ -273,6 +275,7 @@
     }
   },
   {
+    "num": 36,
     "id": "bm-unset-bit",
     "title": "Unset i-th Bit",
     "subTopic": "Single-Bit Op",
@@ -365,6 +368,7 @@
     }
   },
   {
+    "num": 37,
     "id": "bm-toggle-bit",
     "title": "Toggle i-th Bit",
     "subTopic": "Single-Bit Op",
@@ -453,6 +457,7 @@
     }
   },
   {
+    "num": 38,
     "id": "bm-check-bit",
     "title": "Check i-th Bit",
     "subTopic": "Single-Bit Op",
@@ -539,6 +544,7 @@
     }
   },
   {
+    "num": 39,
     "id": "bm-set-two-bits",
     "title": "Set Two Bits (in 0)",
     "subTopic": "OR Composition",
@@ -643,6 +649,7 @@
     }
   },
   {
+    "num": 40,
     "id": "bm-nth-magic-number",
     "title": "Find nth Magic Number",
     "subTopic": "Binary-to-Base5 Mapping",
@@ -737,6 +744,7 @@
     }
   },
   {
+    "num": 41,
     "id": "bm-help-from-sam",
     "title": "Help From Sam",
     "subTopic": "Count Set Bits = Sam's Calls",
@@ -834,6 +842,7 @@
     }
   },
   {
+    "num": 42,
     "id": "bm-finding-good-days",
     "title": "Finding Good Days",
     "subTopic": "Set-Bit Count",
@@ -933,6 +942,7 @@
     }
   },
   {
+    "num": 43,
     "id": "bm-single-number-ii",
     "title": "Single Number II",
     "subTopic": "Per-Bit Mod-3 Count",
@@ -1044,6 +1054,7 @@
     }
   },
   {
+    "num": 44,
     "id": "bm-single-number-iii",
     "title": "Single Number III",
     "subTopic": "XOR Partition by Differing Bit",
@@ -1149,6 +1160,7 @@
     }
   },
   {
+    "num": 45,
     "id": "bm-subarrays-with-or-1",
     "title": "Subarrays with OR 1",
     "subTopic": "Complement Counting on Zero Runs",
@@ -1267,6 +1279,7 @@
     }
   },
   {
+    "num": 46,
     "id": "bm-subarray-or",
     "title": "Subarray OR (Sum of ORs)",
     "subTopic": "Per-Bit Contribution",
@@ -1364,6 +1377,7 @@
     }
   },
   {
+    "num": 47,
     "id": "bm-find-two-missing",
     "title": "Find Two Missing Numbers",
     "subTopic": "XOR Partition (a la Single Number III)",

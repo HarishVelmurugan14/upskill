@@ -1,5 +1,6 @@
 [
   {
+    "num": 48,
     "id": "rec-factorial",
     "title": "Find Factorial!",
     "subTopic": "Linear Recursion",
@@ -100,6 +101,7 @@
     }
   },
   {
+    "num": 49,
     "id": "rec-fibonacci-ii",
     "title": "Find Fibonacci - II",
     "subTopic": "Tree Recursion (Exponential)",
@@ -231,6 +233,7 @@
     }
   },
   {
+    "num": 50,
     "id": "rec-print-1-to-a",
     "title": "Print 1 to A",
     "subTopic": "Recursion — Print After Recurse (Ascending)",
@@ -348,6 +351,7 @@
     }
   },
   {
+    "num": 51,
     "id": "rec-print-a-to-1",
     "title": "Print A to 1",
     "subTopic": "Recursion — Print Before Recurse (Descending)",
@@ -461,6 +465,7 @@
     }
   },
   {
+    "num": 52,
     "id": "rec-decreasing-increasing",
     "title": "Decreasing-Increasing in One Function",
     "subTopic": "Work Before AND After Recurse",
@@ -581,6 +586,7 @@
     }
   },
   {
+    "num": 53,
     "id": "rec-palindrome",
     "title": "Check Palindrome",
     "subTopic": "Two-Pointer Recursion",
@@ -699,6 +705,7 @@
     }
   },
   {
+    "num": 54,
     "id": "rec-tower-of-hanoi",
     "title": "Tower of Hanoi",
     "subTopic": "Classic Recursive Reduction",
@@ -806,6 +813,7 @@
     }
   },
   {
+    "num": 55,
     "id": "rec-all-indices",
     "title": "All Indices Of Array",
     "subTopic": "Recursion Building List",
@@ -913,6 +921,7 @@
     }
   },
   {
+    "num": 56,
     "id": "rec-print-array",
     "title": "Print Array using Recursion",
     "subTopic": "Recurse First, Print After",
@@ -1026,6 +1035,7 @@
     }
   },
   {
+    "num": 57,
     "id": "rec-fast-power",
     "title": "Fast Power (A^B)",
     "subTopic": "Binary Exponentiation",
@@ -1160,6 +1170,7 @@
     }
   },
   {
+    "num": 58,
     "id": "rec-first-index",
     "title": "First Index using Recursion",
     "subTopic": "Forward Recursion with Early Return",
@@ -1257,6 +1268,7 @@
     }
   },
   {
+    "num": 59,
     "id": "rec-last-index",
     "title": "Last Index using Recursion",
     "subTopic": "Recurse First, Check After",

@@ -1,5 +1,6 @@
 [
   {
+    "num": 1,
     "id": "arr-range-sum-query",
     "title": "Range Sum Query",
     "subTopic": "Prefix Sum — Range Queries",
@@ -171,6 +172,7 @@
     }
   },
   {
+    "num": 2,
     "id": "arr-special-index",
     "title": "Special Index",
     "subTopic": "Prefix Sum — Odd/Even Split",
@@ -331,6 +333,7 @@
     }
   },
   {
+    "num": 3,
     "id": "arr-inplace-prefix-sum",
     "title": "In-place Prefix Sum",
     "subTopic": "Prefix Sum — In-place",
@@ -486,6 +489,7 @@
     }
   },
   {
+    "num": 4,
     "id": "arr-equilibrium-index",
     "title": "Equilibrium Index of an Array",
     "subTopic": "Prefix Sum — Equilibrium",
@@ -656,6 +660,7 @@
     }
   },
   {
+    "num": 5,
     "id": "arr-closest-minmax",
     "title": "Closest MinMax",
     "subTopic": "Carry-Forward — Latest Positions",
@@ -821,6 +826,7 @@
     }
   },
   {
+    "num": 6,
     "id": "arr-subarray-in-range",
     "title": "Subarray in Given Range",
     "subTopic": "Indexing — Slice",
@@ -932,6 +938,7 @@
     }
   },
   {
+    "num": 7,
     "id": "arr-generate-all-subarrays",
     "title": "Generate All SubArrays",
     "subTopic": "Enumeration — Two Nested Loops",
@@ -1038,6 +1045,7 @@
     }
   },
   {
+    "num": 8,
     "id": "arr-special-subsequences-ag",
     "title": "Special Subsequences \"AG\" - 2",
     "subTopic": "Carry-Forward — Count Pairs",
@@ -1221,6 +1229,7 @@
     }
   },
   {
+    "num": 9,
     "id": "arr-pick-from-both-sides",
     "title": "Pick from Both Sides!",
     "subTopic": "Rolling Boundary — Two-Pointer Sum",
@@ -1373,6 +1382,7 @@
     }
   },
   {
+    "num": 10,
     "id": "arr-leaders",
     "title": "Leaders in an Array",
     "subTopic": "Carry-Forward — Right-to-Left Max",
@@ -1559,6 +1569,7 @@
     }
   },
   {
+    "num": 11,
     "id": "arr-best-buy-sell-stock-i",
     "title": "Best Time to Buy and Sell Stocks I",
     "subTopic": "Carry-Forward — Running Min / Max Profit",
@@ -1730,6 +1741,7 @@
     }
   },
   {
+    "num": 12,
     "id": "arr-max-subarray-le-b",
     "title": "Maximum Subarray Easy",
     "subTopic": "Enumeration — Sum ≤ B",
@@ -1847,6 +1859,7 @@
     }
   },
   {
+    "num": 13,
     "id": "arr-sum-all-subarrays",
     "title": "Sum of All Subarrays",
     "subTopic": "Contribution Technique",
@@ -1977,6 +1990,7 @@
     }
   },
   {
+    "num": 14,
     "id": "arr-subarray-sum-and-length",
     "title": "Subarray with Given Sum and Length",
     "subTopic": "Sliding Window — Fixed Size",
@@ -2086,6 +2100,7 @@
     }
   },
   {
+    "num": 15,
     "id": "arr-subarray-master-cheatsheet",
     "title": "Subarray Patterns — Master Cheatsheet",
     "subTopic": "Decision Tree — Sum / Count / Length / Distinct",
@@ -2289,6 +2304,7 @@
     }
   },
   {
+    "num": 16,
     "id": "arr-good-subarrays-easy",
     "title": "Good Subarrays Easy",
     "subTopic": "Enumeration with Parity Predicate",
@@ -2378,6 +2394,7 @@
     }
   },
   {
+    "num": 17,
     "id": "arr-subarray-least-average",
     "title": "Subarray with Least Average",
     "subTopic": "Sliding Window — Min by Average",
@@ -2535,6 +2552,7 @@
     }
   },
   {
+    "num": 18,
     "id": "arr-counting-subarrays-easy",
     "title": "Counting Subarrays Easy",
     "subTopic": "Sliding Window — Count by Sum",
@@ -2702,6 +2720,7 @@
     }
   },
   {
+    "num": 19,
     "id": "arr-column-sum",
     "title": "Column Sum",
     "subTopic": "2D Matrix — Column Walk",
@@ -2819,6 +2838,7 @@
     }
   },
   {
+    "num": 20,
     "id": "arr-main-diagonal-sum",
     "title": "Main Diagonal Sum",
     "subTopic": "2D Matrix — Diagonal Walk",
@@ -2935,6 +2955,7 @@
     }
   },
   {
+    "num": 21,
     "id": "arr-anti-diagonals",
     "title": "Anti Diagonals",
     "subTopic": "2D Matrix — Diagonal Enumeration",
@@ -3056,6 +3077,7 @@
     }
   },
   {
+    "num": 22,
     "id": "arr-matrix-transpose",
     "title": "Matrix Transpose",
     "subTopic": "2D Matrix — Flip Across Diagonal",
@@ -3173,6 +3195,7 @@
     }
   },
   {
+    "num": 23,
     "id": "arr-rotate-matrix",
     "title": "Rotate Matrix (90° Clockwise In-Place)",
     "subTopic": "2D Matrix — Transpose + Reverse",

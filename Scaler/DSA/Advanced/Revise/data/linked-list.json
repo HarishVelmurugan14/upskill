@@ -1,5 +1,6 @@
 [
   {
+    "num": 100,
     "id": "ll-print",
     "title": "Print Linked List",
     "subTopic": "Linked List Traversal",
@@ -98,6 +99,7 @@
     "tale": "A village elder walks down a long path of houses, each holding a number on a sign. At every house she calls out the number to the crowd behind her, then walks to the next house. When she reaches the end of the path (there is no next house), she returns to the square and bows."
   },
   {
+    "num": 101,
     "id": "ll-reverse",
     "title": "Reverse Linked List",
     "subTopic": "Linked List Reversal",
@@ -227,6 +229,7 @@
     }
   },
   {
+    "num": 102,
     "id": "ll-copy-random",
     "title": "Copy List with Random Pointer",
     "subTopic": "Linked List Deep Copy",
@@ -359,6 +362,7 @@
     "tale": "An archivist must copy an ancient scroll where each line not only follows the next line but also points to one other random line elsewhere. She must produce a perfect duplicate where every random arrow lands on the new scroll's line, not the old one. There are two ways: (1) she keeps a paired ledger — 'old line 7 means new line 7' — and consults it twice, or (2) she cleverly interleaves the new lines between the old ones, making the random arrows easy to copy without any external bookkeeping."
   },
   {
+    "num": 103,
     "id": "ll-insert-at-position",
     "title": "Insert at Position",
     "subTopic": "Linked List Insertion",
@@ -465,6 +469,7 @@
     "tale": "A scribe maintains a numbered list of names. A new name arrives with instructions: 'slot me at position C'. He walks his finger to the entry just before slot C, writes the new name on a fresh card, points it to whatever the predecessor was pointing at, then redirects the predecessor to point at the new card. If position C is past the end of his list, he writes the card at the tail."
   },
   {
+    "num": 104,
     "id": "ll-delete-at-position",
     "title": "Delete at Position",
     "subTopic": "Linked List Deletion",
@@ -570,6 +575,7 @@
     "tale": "An archivist must remove the B-th entry from his ledger. He walks his finger to the predecessor of that entry, then erases the forward arrow's destination and redraws it to skip directly to the entry after the doomed one. If the doomed entry doesn't exist, he changes nothing."
   },
   {
+    "num": 105,
     "id": "ll-remove-duplicates",
     "title": "Remove Duplicates from Sorted List",
     "subTopic": "Linked List Deduplication",
@@ -679,6 +685,7 @@
     "tale": "A clerk reviews a sorted attendance sheet where repeated visitors got scribbled multiple times in a row. He puts his finger on the first name. If the next name on the sheet matches his, he draws a line through it and stays put — there might be a third copy right after. If the next name differs, he advances his finger."
   },
   {
+    "num": 106,
     "id": "ll-remove-nth-end",
     "title": "Remove Nth Node from End",
     "subTopic": "Linked List Two-Pointer",
@@ -791,6 +798,7 @@
     "tale": "A surveyor needs to skip the B-th milestone from the END of a long road but can only walk forward once. He sends a scout B paces ahead. Then both surveyor and scout walk in lockstep. When the scout reaches the final milestone, the surveyor is standing exactly B paces behind — that's the milestone he must skip."
   },
   {
+    "num": 107,
     "id": "ll-reverse-partial",
     "title": "Reverse Linked List II (Partial)",
     "subTopic": "Linked List Partial Reversal",
@@ -897,6 +905,7 @@
     "tale": "A bookbinder must flip pages B through C of a long bound book without removing the cover. She places her thumb on the binding right before page B. Then she lifts page (B+1) out and slips it in right after her thumb. Then she lifts the new next page and slips IT in right after her thumb. Repeat C-B times. The segment ends up reversed, and the binding holding the book together is intact."
   },
   {
+    "num": 108,
     "id": "ll-reverse-k",
     "title": "Reverse Linked List in K Groups",
     "subTopic": "Linked List Group Reversal",

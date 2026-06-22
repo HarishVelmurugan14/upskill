@@ -1,5 +1,6 @@
 [
   {
+    "num": 123,
     "id": "queues-parking-ice-cream-truck",
     "title": "Parking Ice Cream Truck (Sliding Window Maximum)",
     "subTopic": "Deque for Sliding Window Max",
@@ -159,6 +160,7 @@
     }
   },
   {
+    "num": 124,
     "id": "queues-implement-using-stacks",
     "title": "Implement Queue Using Two Stacks",
     "subTopic": "Queue Implementation",
@@ -267,6 +269,7 @@
     }
   },
   {
+    "num": 125,
     "id": "queues-n-integers-containing-123",
     "title": "N Integers Containing Only 1, 2, and 3",
     "subTopic": "BFS Generation with Queue",
@@ -386,6 +389,7 @@
     }
   },
   {
+    "num": 126,
     "id": "queues-unique-letter",
     "title": "First Non-Repeating Character in Stream",
     "subTopic": "Queue + HashMap for Stream Processing",
@@ -511,6 +515,7 @@
     }
   },
   {
+    "num": 127,
     "id": "queues-sum-of-min-max",
     "title": "Sum of Min and Max in All Subarrays",
     "subTopic": "Sliding Window with Two Deques",

@@ -1,5 +1,6 @@
 [
   {
+    "num": 60,
     "id": "math-power-function",
     "title": "Implement Power Function",
     "subTopic": "Modular Arithmetic / Fast Power",
@@ -62,6 +63,7 @@
     }
   },
   {
+    "num": 61,
     "id": "math-gcd",
     "title": "Greatest Common Divisor",
     "subTopic": "Euclidean Algorithm",
@@ -119,6 +121,7 @@
     }
   },
   {
+    "num": 62,
     "id": "math-pair-sum-divisible",
     "title": "Pair Sum divisible by M",
     "subTopic": "Modular Arithmetic / Frequency Counting",
@@ -179,6 +182,7 @@
     }
   },
   {
+    "num": 63,
     "id": "math-largest-coprime-divisor",
     "title": "Largest Coprime Divisor",
     "subTopic": "GCD Repeated Division",
@@ -234,6 +238,7 @@
     }
   },
   {
+    "num": 64,
     "id": "math-divisor-game",
     "title": "Divisor Game",
     "subTopic": "GCD / LCM",
@@ -289,6 +294,7 @@
     }
   },
   {
+    "num": 65,
     "id": "math-mod-sum",
     "title": "Mod Sum",
     "subTopic": "Modular Arithmetic / Frequency Trick",
@@ -346,6 +352,7 @@
     }
   },
   {
+    "num": 66,
     "id": "math-a-b-modulo",
     "title": "A, B and Modulo",
     "subTopic": "Modular Arithmetic / Number Theory",
@@ -398,6 +405,7 @@
     }
   },
   {
+    "num": 67,
     "id": "math-delete-one",
     "title": "Delete one",
     "subTopic": "Prefix / Suffix GCD",

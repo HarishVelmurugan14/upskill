@@ -1,5 +1,6 @@
 [
   {
+    "num": 109,
     "id": "stacks-eval-rpn",
     "title": "Evaluate Expression (RPN)",
     "subTopic": "Stack Basics",
@@ -104,6 +105,7 @@
     }
   },
   {
+    "num": 110,
     "id": "stacks-balanced-parens",
     "title": "Balanced Parenthesis",
     "subTopic": "Stack Basics",
@@ -213,6 +215,7 @@
     }
   },
   {
+    "num": 111,
     "id": "stacks-min-stack",
     "title": "Min Stack",
     "subTopic": "Design Problem",
@@ -319,6 +322,7 @@
     }
   },
   {
+    "num": 112,
     "id": "stacks-redundant-braces",
     "title": "Redundant Braces",
     "subTopic": "Expression Parsing",
@@ -425,6 +429,7 @@
     }
   },
   {
+    "num": 113,
     "id": "stacks-largest-rectangle",
     "title": "Largest Rectangle in Histogram",
     "subTopic": "Monotonic Stack",
@@ -605,6 +610,7 @@
     }
   },
   {
+    "num": 114,
     "id": "stacks-nearest-smaller",
     "title": "Nearest Smaller Element",
     "subTopic": "Monotonic Stack",
@@ -744,6 +750,7 @@
     }
   },
   {
+    "num": 115,
     "id": "stacks-double-character-trouble",
     "title": "Double Character Trouble",
     "subTopic": "Stack Basics",
@@ -863,6 +870,7 @@
     }
   },
   {
+    "num": 116,
     "id": "stacks-passing-game",
     "title": "Passing Game",
     "subTopic": "Stack Simulation",
@@ -961,6 +969,7 @@
     }
   },
   {
+    "num": 117,
     "id": "stacks-check-two-expressions",
     "title": "Check Two Bracket Expressions",
     "subTopic": "Expression Parsing",
@@ -1091,6 +1100,7 @@
     }
   },
   {
+    "num": 118,
     "id": "stacks-infix-to-postfix",
     "title": "Infix to Postfix",
     "subTopic": "Expression Conversion",
@@ -1201,6 +1211,7 @@
     }
   },
   {
+    "num": 119,
     "id": "stacks-max-and-min",
     "title": "MAX and MIN",
     "subTopic": "Contribution Technique",
@@ -1339,6 +1350,7 @@
     }
   },
   {
+    "num": 120,
     "id": "stacks-max-rectangle-binary-matrix",
     "title": "Max Rectangle in Binary Matrix",
     "subTopic": "Histogram Application",
@@ -1461,6 +1473,7 @@
     }
   },
   {
+    "num": 121,
     "id": "stacks-next-greater",
     "title": "Next Greater Element",
     "subTopic": "Monotonic Stack",
@@ -1604,6 +1617,7 @@
     }
   },
   {
+    "num": 122,
     "id": "stacks-sort-using-another-stack",
     "title": "Sort Stack Using Another Stack",
     "subTopic": "Stack Manipulation",

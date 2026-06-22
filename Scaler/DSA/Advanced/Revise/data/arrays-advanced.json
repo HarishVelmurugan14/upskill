@@ -1,5 +1,6 @@
 [
   {
+    "num": 24,
     "id": "aadv-max-sum-contiguous-subarray",
     "title": "Max Sum Contiguous Subarray (Kadane)",
     "subTopic": "Kadane — Local vs Global",
@@ -164,6 +165,7 @@
     }
   },
   {
+    "num": 25,
     "id": "aadv-continuous-sum-query",
     "title": "Continuous Sum Query (Beggars)",
     "subTopic": "Difference Array — Range Updates",
@@ -299,6 +301,7 @@
     }
   },
   {
+    "num": 26,
     "id": "aadv-rain-water-trapped",
     "title": "Rain Water Trapped",
     "subTopic": "Prefix/Suffix Max",
@@ -437,6 +440,7 @@
     }
   },
   {
+    "num": 27,
     "id": "aadv-flip",
     "title": "Flip",
     "subTopic": "Kadane on Transformed Array",
@@ -570,6 +574,7 @@
     }
   },
   {
+    "num": 28,
     "id": "aadv-spiral-matrix-ii",
     "title": "Spiral Order Matrix II",
     "subTopic": "2D Matrix — Spiral Generation",
@@ -697,6 +702,7 @@
     }
   },
   {
+    "num": 29,
     "id": "aadv-search-sorted-matrix",
     "title": "Search in Row+Column Sorted Matrix",
     "subTopic": "Staircase Search",
@@ -813,6 +819,7 @@
     }
   },
   {
+    "num": 30,
     "id": "aadv-sum-all-submatrices",
     "title": "Sum of All Submatrices",
     "subTopic": "Contribution Technique — 2D",
@@ -918,6 +925,7 @@
     }
   },
   {
+    "num": 31,
     "id": "aadv-first-missing-positive",
     "title": "First Missing Positive Integer",
     "subTopic": "In-Place Sign Marking",
@@ -1045,6 +1053,7 @@
     }
   },
   {
+    "num": 32,
     "id": "aadv-merge-sorted-intervals",
     "title": "Merge Sorted Overlapping Intervals",
     "subTopic": "One-Pass Fold",
@@ -1181,6 +1190,7 @@
     }
   },
   {
+    "num": 33,
     "id": "aadv-max-subarray-easy",
     "title": "Maximum Subarray Easy",
     "subTopic": "Sliding Window — Sum Ceiling",
