@@ -1049,6 +1049,266 @@
       }
     }
   },
+
+  {
+    "num": 150,
+    "id": "aadv-minimum-swaps",
+    "title": "Minimum Swaps",
+    "subTopic": "Fixed-Size Sliding Window \u2014 Grouping",
+    "tags": [
+      "Arrays",
+      "Sliding Window",
+      "Two Pointers"
+    ],
+    "description": "Given an array of integers A and an integer B, find and return the minimum number of swaps required to bring all the numbers less than or equal to B together.\n\nNote: It is possible to swap any two elements, not necessarily consecutive.\n\nProblem Constraints\n1 <= length of the array <= 100000\n-10^9 <= A[i], B <= 10^9\n\nInput Format\nThe first argument given is the integer array A.\nThe second argument given is the integer B.\n\nOutput Format\nReturn the minimum number of swaps.\n\nExample Input\nInput 1: A = [1, 12, 10, 3, 14, 10, 5], B = 8\nInput 2: A = [5, 17, 100, 11], B = 20\n\nExample Output\nOutput 1: 2\nOutput 2: 1",
+    "sampleInput": "A = [1, 12, 10, 3, 14, 10, 5]\nB = 8",
+    "sampleOutput": "2",
+    "story": "Count the 'good' elements (<= B) \u2014 call it K. The answer is K minus the most good elements any window of size K already holds, i.e. the minimum number of 'bad' elements across all size-K windows. Each bad element inside the final window needs exactly one swap.",
+    "plain": "Since any two elements can be swapped, the only thing that matters is WHERE the good elements (<= B) end up. If there are K good elements, they must finish inside one contiguous block of length K. For a chosen block, every bad element (> B) currently sitting in it must be swapped out with a good element sitting outside \u2014 that's exactly (number of bad elements in the block) swaps. So the answer = the minimum number of bad elements over every window of size K. Slide a fixed window of size K across the array, maintaining the bad-count in O(1) per step. Edge case: if K == 0 or K == n, everything is already grouped \u2192 0 swaps.",
+    "tale": "You want all your close friends seated together in one row of K chairs. Strangers currently in those chairs each cost one swap to trade with a friend sitting elsewhere. You scan every possible block of K adjacent chairs and pick the one already holding the most friends \u2014 fewest strangers to evict.",
+    "solutions": [
+      {
+        "label": "Brute",
+        "complexity": {
+          "time": "O(N * K)",
+          "space": "O(1)"
+        },
+        "plain": "Count K = number of good elements. For every starting index of a size-K window, rescan the window counting bad elements, and keep the minimum. Re-counting each window from scratch makes it O(N*K), which is O(N^2) when half the array is good \u2014 too slow at N = 1e5.",
+        "tale": "For every block of chairs, you recount the strangers one by one before deciding. Correct, but you keep recounting people you already saw a moment ago.",
+        "approach": [
+          "Count K = number of elements <= B. If K == 0 or K == n, return 0.",
+          "Set ans = +infinity.",
+          "For each window start i from 0 to n-K: scan j in [i, i+K) and count bad = #(A[j] > B).",
+          "ans = min(ans, bad).",
+          "Return ans."
+        ],
+        "pseudocode": "K = count(x <= B)\nfor i in 0..n-K:\n  bad = count(A[i..i+K-1] > B)\n  ans = min(ans, bad)",
+        "story": "Brute. Recount bad elements for every window.",
+        "code": "public int solve(int[] A, int B) {\n    int n = A.length;\n    int count = 0;\n    for (int x : A) if (x <= B) count++;\n    if (count == 0 || count == n) return 0;\n\n    int ans = Integer.MAX_VALUE;\n    for (int i = 0; i + count <= n; i++) {\n        int bad = 0;\n        for (int j = i; j < i + count; j++) {\n            if (A[j] > B) bad++;\n        }\n        ans = Math.min(ans, bad);\n    }\n    return ans;\n}"
+      },
+      {
+        "label": "Optimal",
+        "complexity": {
+          "time": "O(N)",
+          "space": "O(1)"
+        },
+        "plain": "Count K good elements. Count bad in the first window [0, K). Then slide: when the window moves right by one, the element leaving (A[left]) and the one entering (A[right]) each adjust the bad-count by at most 1. Track the running minimum of bad. One pass, constant extra space.",
+        "tale": "Instead of recounting each block, you watch only the chair that leaves and the chair that joins as the block shifts by one seat \u2014 a single addition and subtraction per step.",
+        "approach": [
+          "Count K = number of elements <= B. If K == 0 or K == n, return 0.",
+          "Count bad = #(A[i] > B) for i in [0, K).",
+          "ans = bad; left = 0, right = K.",
+          "While right < n: if A[left] > B, bad--; if A[right] > B, bad++; ans = min(ans, bad); left++; right++.",
+          "Return ans."
+        ],
+        "pseudocode": "K = count(x <= B)\nbad = count(A[0..K-1] > B); ans = bad\nfor right = K..n-1:\n  bad -= (A[right-K] > B); bad += (A[right] > B)\n  ans = min(ans, bad)",
+        "story": "Optimal. Fixed-size window, O(1) update per slide.",
+        "code": "public int solve(int[] A, int B) {\n    int n = A.length;\n    int count = 0;\n    for (int x : A) if (x <= B) count++;\n    if (count == 0 || count == n) return 0;\n\n    int bad = 0;\n    for (int i = 0; i < count; i++) {\n        if (A[i] > B) bad++;\n    }\n\n    int ans = bad;\n    int left = 0, right = count;\n    while (right < n) {\n        if (A[left] > B) bad--;\n        if (A[right] > B) bad++;\n        ans = Math.min(ans, bad);\n        left++;\n        right++;\n    }\n    return ans;\n}"
+      }
+    ],
+    "viz": {
+      "kind": "scripted-array",
+      "data": {
+        "A": [
+          1,
+          12,
+          10,
+          3,
+          14,
+          10,
+          5
+        ],
+        "footer": "Minimum Swaps \u2014 A = [1,12,10,3,14,10,5], B = 8. Good (\u22648) elements = 3 \u2192 slide a window of size 3 and minimise the bad count.",
+        "legend": [
+          "c-input",
+          "c-low",
+          "c-active",
+          "c-result"
+        ],
+        "script": [
+          {
+            "label": "SETUP",
+            "marks": {
+              "0": "c-low",
+              "1": "c-input",
+              "2": "c-input",
+              "3": "c-low",
+              "4": "c-input",
+              "5": "c-input",
+              "6": "c-low"
+            },
+            "msg": "Good elements (\u22648): <strong>1, 3, 5</strong> \u2192 K = <strong>3</strong>. They must end up in one block of size 3.",
+            "overlay": "<strong>Each bad element inside the final block = one swap.</strong>"
+          },
+          {
+            "label": "window [0..2]",
+            "marks": {
+              "0": "c-active",
+              "1": "c-active",
+              "2": "c-active"
+            },
+            "msg": "[1, 12, 10] \u2192 bad (>8) = <strong>2</strong> (12, 10)."
+          },
+          {
+            "label": "window [3..5]",
+            "marks": {
+              "3": "c-active",
+              "4": "c-active",
+              "5": "c-active"
+            },
+            "msg": "[3, 14, 10] \u2192 bad = <strong>2</strong> (14, 10)."
+          },
+          {
+            "label": "window [4..6]",
+            "marks": {
+              "4": "c-active",
+              "5": "c-active",
+              "6": "c-active"
+            },
+            "msg": "[14, 10, 5] \u2192 bad = <strong>2</strong> (14, 10)."
+          },
+          {
+            "label": "RESULT",
+            "marks": {
+              "4": "c-result",
+              "5": "c-result",
+              "6": "c-result"
+            },
+            "msg": "Minimum bad across all size-3 windows = <strong>2</strong> \u2192 answer = 2.",
+            "overlay": "K = 0 or K = n \u2192 already grouped \u2192 0 swaps."
+          }
+        ]
+      }
+    }
+  },
+  {
+    "num": 151,
+    "id": "aadv-row-max-ones",
+    "title": "Row with Maximum Number of Ones",
+    "subTopic": "Staircase Search \u2014 Sorted Matrix",
+    "tags": [
+      "Arrays",
+      "Matrix",
+      "Staircase",
+      "Binary Search"
+    ],
+    "description": "Given a binary sorted matrix A of size N x N, find the row with the maximum number of 1s.\n\nNOTE:\n- If two rows have the maximum number of 1 then return the row which has a lower index.\n- Rows are numbered from top to bottom and columns are numbered from left to right.\n- Assume 0-based indexing.\n- Assume each row to be sorted by values.\n- Expected time complexity is O(rows + columns).\n\nProblem Constraints\n1 <= N <= 1000\n0 <= A[i] <= 1\n\nInput Format\nThe only argument given is the integer matrix A.\n\nOutput Format\nReturn the row with the maximum number of 1.\n\nExample Input\nInput 1: A = [[0,1,1],[0,0,1],[0,1,1]]\nInput 2: A = [[0,0,0,0],[0,0,0,1],[0,0,1,1],[0,1,1,1]]\n\nExample Output\nOutput 1: 0\nOutput 2: 3",
+    "sampleInput": "A = [[0, 1, 1],\n     [0, 0, 1],\n     [0, 1, 1]]",
+    "sampleOutput": "0",
+    "story": "Each row is sorted, so 1s are right-aligned. Walk a staircase from the top-right corner: on a 1, step LEFT (this row gained a 1, remember it); on a 0, step DOWN. The 'left' pointer never resets, so total work is O(N + M).",
+    "plain": "Because every row is sorted (0s then 1s), the row with more 1s has its leftmost 1 further to the left. Start at the top-right cell (row 0, last column). While you see a 1, move left and record the current row as the best so far \u2014 you only move left when a row beats the previous best's 1-count. When you hit a 0, drop down to the next row without resetting the column. Since the column index only ever decreases and the row index only ever increases, you touch at most N + M cells. Ties naturally resolve to the lower row index because we move left (update best) only on a strictly better row.",
+    "tale": "Imagine inspectors checking shelves where boxes are pushed to the right. Standing at the top-right, you slide left as long as you keep finding boxes, marking each shelf that lets you go further left as the new record-holder. The moment you hit a gap, you step down a shelf \u2014 never walking back right.",
+    "solutions": [
+      {
+        "label": "Brute",
+        "complexity": {
+          "time": "O(N * M)",
+          "space": "O(1)"
+        },
+        "plain": "Count the 1s in every row and keep the row with the largest count, preferring the lower index on ties. Simple and correct, but it ignores the sorted property and scans every cell \u2192 O(N*M).",
+        "tale": "You count every box on every shelf from scratch. Reliable, but you never use the fact that the boxes are already lined up on the right.",
+        "approach": [
+          "best = 0, bestCount = -1.",
+          "For each row i: ones = sum of A[i][j] over all j.",
+          "If ones > bestCount: bestCount = ones, best = i (strict > keeps the lower index on ties).",
+          "Return best."
+        ],
+        "pseudocode": "for i in rows:\n  ones = sum(A[i])\n  if ones > bestCount: bestCount = ones; best = i\nreturn best",
+        "story": "Brute. Count ones in each row, track the max.",
+        "code": "public int solve(int[][] A) {\n    int N = A.length, M = A[0].length;\n    int best = 0, bestCount = -1;\n    for (int i = 0; i < N; i++) {\n        int ones = 0;\n        for (int j = 0; j < M; j++) {\n            ones += A[i][j];\n        }\n        if (ones > bestCount) {\n            bestCount = ones;\n            best = i;\n        }\n    }\n    return best;\n}"
+      },
+      {
+        "label": "Optimal",
+        "complexity": {
+          "time": "O(N + M)",
+          "space": "O(1)"
+        },
+        "plain": "Staircase from the top-right corner. Keep a single column pointer j (starts at M-1) that never moves back right, and a row pointer i that only moves down. While A[i][j] == 1, decrement j and set best = i. On a 0, move to the next row. Because each pointer moves monotonically, the whole walk is O(N + M).",
+        "tale": "From the top-right, slide left through the boxes, marking each shelf that lets you reach a new low column as the record-holder; the instant you meet a gap, step down. You never retrace rightwards.",
+        "approach": [
+          "i = 0, j = M-1, row = 0.",
+          "While i < N: while j >= 0 and A[i][j] == 1 \u2192 j--, row = i.",
+          "i++ (move down, keeping j where it is).",
+          "Return row."
+        ],
+        "pseudocode": "i = 0, j = M-1, row = 0\nwhile i < N:\n  while j >= 0 and A[i][j] == 1: j--; row = i\n  i++\nreturn row",
+        "story": "Optimal. Top-right staircase, O(N + M).",
+        "code": "public int solve(int[][] A) {\n    int N = A.length;\n    int M = A[0].length;\n    int row = 0;\n    int j = M - 1;\n    int i = 0;\n    while (i < N) {\n        while (j >= 0 && A[i][j] == 1) {\n            j--;\n            row = i;\n        }\n        i++;\n    }\n    return row;\n}"
+      }
+    ],
+    "viz": {
+      "kind": "scripted-array",
+      "data": {
+        "A": [
+          0,
+          1,
+          1,
+          0,
+          0,
+          1,
+          0,
+          1,
+          1
+        ],
+        "footer": "Row with Max 1s \u2014 3x3 binary matrix [[0,1,1],[0,0,1],[0,1,1]] flattened row-major. Staircase from top-right (0,2).",
+        "legend": [
+          "c-input",
+          "c-active",
+          "c-result"
+        ],
+        "script": [
+          {
+            "label": "SETUP",
+            "marks": {
+              "0": "c-input",
+              "1": "c-input",
+              "2": "c-input",
+              "3": "c-input",
+              "4": "c-input",
+              "5": "c-input",
+              "6": "c-input",
+              "7": "c-input",
+              "8": "c-input"
+            },
+            "msg": "Flattened as rows of 3: <strong>[0,1,1] [0,0,1] [0,1,1]</strong>. Start at top-right cell (0,2) = index 2.",
+            "overlay": "Each row is sorted \u2192 1s are pushed to the right."
+          },
+          {
+            "label": "row 0: slide left",
+            "marks": {
+              "2": "c-active",
+              "1": "c-active"
+            },
+            "msg": "A[0][2]=1, A[0][1]=1 \u2192 j drops to 0, <strong>best row = 0</strong>. A[0][0]=0 \u2192 stop, move down."
+          },
+          {
+            "label": "row 1",
+            "marks": {
+              "3": "c-active"
+            },
+            "msg": "j is at column 0: A[1][0]=0 \u2192 no row beats 2 ones here. Move down."
+          },
+          {
+            "label": "row 2",
+            "marks": {
+              "6": "c-active"
+            },
+            "msg": "A[2][0]=0 \u2192 row 2 also has 2 ones but cannot push j further left. Done."
+          },
+          {
+            "label": "RESULT",
+            "marks": {
+              "0": "c-result",
+              "1": "c-result",
+              "2": "c-result"
+            },
+            "msg": "Most 1s reached at the lowest row index \u2192 answer = <strong>row 0</strong>.",
+            "overlay": "Tie (rows 0 and 2 both have two 1s) \u2192 lower index wins, exactly what the left-only walk gives."
+          }
+        ]
+      }
+    }
+  },
   {
     "num": 31,
     "id": "aadv-first-missing-positive",
