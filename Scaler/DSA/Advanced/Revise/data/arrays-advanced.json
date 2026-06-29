@@ -439,12 +439,11 @@
       }
     }
   },
-
   {
     "num": 149,
     "id": "aadv-add-one-to-number",
     "title": "Add One To Number",
-    "subTopic": "Array Simulation \u2014 Carry Propagation",
+    "subTopic": "Array Simulation — Carry Propagation",
     "tags": [
       "Arrays",
       "Math",
@@ -455,7 +454,7 @@
     "sampleInput": "A = [0, 1, 2, 9]",
     "sampleOutput": "[1, 3, 0]",
     "story": "Add from the right with a carry, like grade-school addition. Strip leading zeros first; prepend a 1 only if the carry survives the most significant digit (all 9s).",
-    "plain": "The digits live in an array, most significant first. Adding 1 is school-book addition starting from the rightmost digit: digit + carry, keep the units place, push the tens place as the next carry. Start carry = 1 (the '+1'). The moment a digit + carry < 10 the carry dies and you can stop. Two corner cases matter: (1) leading zeros in the INPUT must be dropped from the OUTPUT, so find the first non-zero digit and treat the answer as starting there; (2) if the number is all 9s (e.g. 999), the carry survives past the most significant digit and you must prepend a fresh 1, giving 1000. Don't convert the whole array to a long \u2014 N can be 1e6 digits, which overflows everything.",
+    "plain": "The digits live in an array, most significant first. Adding 1 is school-book addition starting from the rightmost digit: digit + carry, keep the units place, push the tens place as the next carry. Start carry = 1 (the '+1'). The moment a digit + carry < 10 the carry dies and you can stop. Two corner cases matter: (1) leading zeros in the INPUT must be dropped from the OUTPUT, so find the first non-zero digit and treat the answer as starting there; (2) if the number is all 9s (e.g. 999), the carry survives past the most significant digit and you must prepend a fresh 1, giving 1000. Don't convert the whole array to a long — N can be 1e6 digits, which overflows everything.",
     "tale": "A shopkeeper tallies a long bill on a paper tape, rightmost digit first. She adds the final coin: if a column tips past 9 she writes the units and carries the 1 left, column by column. If the whole tape was 9s, she tapes a fresh '1' onto the front. And any blank zero-padding she'd scribbled on the left of the tape, she simply tears off before handing over the total.",
     "solutions": [
       {
@@ -507,7 +506,7 @@
           2,
           9
         ],
-        "footer": "Add One \u2014 A = [0,1,2,9]. Drop the leading 0, then propagate carry right\u2192left. Prepend 1 only if the carry survives the most significant digit.",
+        "footer": "Add One — A = [0,1,2,9]. Drop the leading 0, then propagate carry right→left. Prepend 1 only if the carry survives the most significant digit.",
         "legend": [
           "c-input",
           "c-low",
@@ -534,21 +533,21 @@
               "2": "c-input",
               "3": "c-input"
             },
-            "msg": "Index 0 is a leading 0 \u2192 <strong>start = 1</strong>. The answer begins at the first non-zero digit."
+            "msg": "Index 0 is a leading 0 → <strong>start = 1</strong>. The answer begins at the first non-zero digit."
           },
           {
             "label": "i=3: 9 + 1 = 10",
             "marks": {
               "3": "c-active"
             },
-            "msg": "9 + carry(1) = 10 \u2192 write <strong>0</strong>, carry becomes <strong>1</strong>."
+            "msg": "9 + carry(1) = 10 → write <strong>0</strong>, carry becomes <strong>1</strong>."
           },
           {
             "label": "i=2: 2 + 1 = 3",
             "marks": {
               "2": "c-active"
             },
-            "msg": "2 + carry(1) = 3 \u2192 write <strong>3</strong>, carry becomes <strong>0</strong>. Stop."
+            "msg": "2 + carry(1) = 3 → write <strong>3</strong>, carry becomes <strong>0</strong>. Stop."
           },
           {
             "label": "RESULT",
@@ -557,8 +556,8 @@
               "2": "c-result",
               "3": "c-result"
             },
-            "msg": "Carry is 0 and start = 1 \u2192 answer = <strong>[1, 3, 0]</strong>.",
-            "overlay": "All-9s case (e.g. 999) is the only time the carry survives \u2192 prepend a fresh 1 \u2192 1000."
+            "msg": "Carry is 0 and start = 1 → answer = <strong>[1, 3, 0]</strong>.",
+            "overlay": "All-9s case (e.g. 999) is the only time the carry survives → prepend a fresh 1 → 1000."
           }
         ]
       }
@@ -1049,12 +1048,11 @@
       }
     }
   },
-
   {
     "num": 150,
     "id": "aadv-minimum-swaps",
     "title": "Minimum Swaps",
-    "subTopic": "Fixed-Size Sliding Window \u2014 Grouping",
+    "subTopic": "Fixed-Size Sliding Window — Grouping",
     "tags": [
       "Arrays",
       "Sliding Window",
@@ -1063,9 +1061,9 @@
     "description": "Given an array of integers A and an integer B, find and return the minimum number of swaps required to bring all the numbers less than or equal to B together.\n\nNote: It is possible to swap any two elements, not necessarily consecutive.\n\nProblem Constraints\n1 <= length of the array <= 100000\n-10^9 <= A[i], B <= 10^9\n\nInput Format\nThe first argument given is the integer array A.\nThe second argument given is the integer B.\n\nOutput Format\nReturn the minimum number of swaps.\n\nExample Input\nInput 1: A = [1, 12, 10, 3, 14, 10, 5], B = 8\nInput 2: A = [5, 17, 100, 11], B = 20\n\nExample Output\nOutput 1: 2\nOutput 2: 1",
     "sampleInput": "A = [1, 12, 10, 3, 14, 10, 5]\nB = 8",
     "sampleOutput": "2",
-    "story": "Count the 'good' elements (<= B) \u2014 call it K. The answer is K minus the most good elements any window of size K already holds, i.e. the minimum number of 'bad' elements across all size-K windows. Each bad element inside the final window needs exactly one swap.",
-    "plain": "Since any two elements can be swapped, the only thing that matters is WHERE the good elements (<= B) end up. If there are K good elements, they must finish inside one contiguous block of length K. For a chosen block, every bad element (> B) currently sitting in it must be swapped out with a good element sitting outside \u2014 that's exactly (number of bad elements in the block) swaps. So the answer = the minimum number of bad elements over every window of size K. Slide a fixed window of size K across the array, maintaining the bad-count in O(1) per step. Edge case: if K == 0 or K == n, everything is already grouped \u2192 0 swaps.",
-    "tale": "You want all your close friends seated together in one row of K chairs. Strangers currently in those chairs each cost one swap to trade with a friend sitting elsewhere. You scan every possible block of K adjacent chairs and pick the one already holding the most friends \u2014 fewest strangers to evict.",
+    "story": "Count the 'good' elements (<= B) — call it K. The answer is K minus the most good elements any window of size K already holds, i.e. the minimum number of 'bad' elements across all size-K windows. Each bad element inside the final window needs exactly one swap.",
+    "plain": "Since any two elements can be swapped, the only thing that matters is WHERE the good elements (<= B) end up. If there are K good elements, they must finish inside one contiguous block of length K. For a chosen block, every bad element (> B) currently sitting in it must be swapped out with a good element sitting outside — that's exactly (number of bad elements in the block) swaps. So the answer = the minimum number of bad elements over every window of size K. Slide a fixed window of size K across the array, maintaining the bad-count in O(1) per step. Edge case: if K == 0 or K == n, everything is already grouped → 0 swaps.",
+    "tale": "You want all your close friends seated together in one row of K chairs. Strangers currently in those chairs each cost one swap to trade with a friend sitting elsewhere. You scan every possible block of K adjacent chairs and pick the one already holding the most friends — fewest strangers to evict.",
     "solutions": [
       {
         "label": "Brute",
@@ -1073,7 +1071,7 @@
           "time": "O(N * K)",
           "space": "O(1)"
         },
-        "plain": "Count K = number of good elements. For every starting index of a size-K window, rescan the window counting bad elements, and keep the minimum. Re-counting each window from scratch makes it O(N*K), which is O(N^2) when half the array is good \u2014 too slow at N = 1e5.",
+        "plain": "Count K = number of good elements. For every starting index of a size-K window, rescan the window counting bad elements, and keep the minimum. Re-counting each window from scratch makes it O(N*K), which is O(N^2) when half the array is good — too slow at N = 1e5.",
         "tale": "For every block of chairs, you recount the strangers one by one before deciding. Correct, but you keep recounting people you already saw a moment ago.",
         "approach": [
           "Count K = number of elements <= B. If K == 0 or K == n, return 0.",
@@ -1093,7 +1091,7 @@
           "space": "O(1)"
         },
         "plain": "Count K good elements. Count bad in the first window [0, K). Then slide: when the window moves right by one, the element leaving (A[left]) and the one entering (A[right]) each adjust the bad-count by at most 1. Track the running minimum of bad. One pass, constant extra space.",
-        "tale": "Instead of recounting each block, you watch only the chair that leaves and the chair that joins as the block shifts by one seat \u2014 a single addition and subtraction per step.",
+        "tale": "Instead of recounting each block, you watch only the chair that leaves and the chair that joins as the block shifts by one seat — a single addition and subtraction per step.",
         "approach": [
           "Count K = number of elements <= B. If K == 0 or K == n, return 0.",
           "Count bad = #(A[i] > B) for i in [0, K).",
@@ -1118,7 +1116,7 @@
           10,
           5
         ],
-        "footer": "Minimum Swaps \u2014 A = [1,12,10,3,14,10,5], B = 8. Good (\u22648) elements = 3 \u2192 slide a window of size 3 and minimise the bad count.",
+        "footer": "Minimum Swaps — A = [1,12,10,3,14,10,5], B = 8. Good (≤8) elements = 3 → slide a window of size 3 and minimise the bad count.",
         "legend": [
           "c-input",
           "c-low",
@@ -1137,7 +1135,7 @@
               "5": "c-input",
               "6": "c-low"
             },
-            "msg": "Good elements (\u22648): <strong>1, 3, 5</strong> \u2192 K = <strong>3</strong>. They must end up in one block of size 3.",
+            "msg": "Good elements (≤8): <strong>1, 3, 5</strong> → K = <strong>3</strong>. They must end up in one block of size 3.",
             "overlay": "<strong>Each bad element inside the final block = one swap.</strong>"
           },
           {
@@ -1147,7 +1145,7 @@
               "1": "c-active",
               "2": "c-active"
             },
-            "msg": "[1, 12, 10] \u2192 bad (>8) = <strong>2</strong> (12, 10)."
+            "msg": "[1, 12, 10] → bad (>8) = <strong>2</strong> (12, 10)."
           },
           {
             "label": "window [3..5]",
@@ -1156,7 +1154,7 @@
               "4": "c-active",
               "5": "c-active"
             },
-            "msg": "[3, 14, 10] \u2192 bad = <strong>2</strong> (14, 10)."
+            "msg": "[3, 14, 10] → bad = <strong>2</strong> (14, 10)."
           },
           {
             "label": "window [4..6]",
@@ -1165,7 +1163,7 @@
               "5": "c-active",
               "6": "c-active"
             },
-            "msg": "[14, 10, 5] \u2192 bad = <strong>2</strong> (14, 10)."
+            "msg": "[14, 10, 5] → bad = <strong>2</strong> (14, 10)."
           },
           {
             "label": "RESULT",
@@ -1174,8 +1172,8 @@
               "5": "c-result",
               "6": "c-result"
             },
-            "msg": "Minimum bad across all size-3 windows = <strong>2</strong> \u2192 answer = 2.",
-            "overlay": "K = 0 or K = n \u2192 already grouped \u2192 0 swaps."
+            "msg": "Minimum bad across all size-3 windows = <strong>2</strong> → answer = 2.",
+            "overlay": "K = 0 or K = n → already grouped → 0 swaps."
           }
         ]
       }
@@ -1185,7 +1183,7 @@
     "num": 151,
     "id": "aadv-row-max-ones",
     "title": "Row with Maximum Number of Ones",
-    "subTopic": "Staircase Search \u2014 Sorted Matrix",
+    "subTopic": "Staircase Search — Sorted Matrix",
     "tags": [
       "Arrays",
       "Matrix",
@@ -1196,8 +1194,8 @@
     "sampleInput": "A = [[0, 1, 1],\n     [0, 0, 1],\n     [0, 1, 1]]",
     "sampleOutput": "0",
     "story": "Each row is sorted, so 1s are right-aligned. Walk a staircase from the top-right corner: on a 1, step LEFT (this row gained a 1, remember it); on a 0, step DOWN. The 'left' pointer never resets, so total work is O(N + M).",
-    "plain": "Because every row is sorted (0s then 1s), the row with more 1s has its leftmost 1 further to the left. Start at the top-right cell (row 0, last column). While you see a 1, move left and record the current row as the best so far \u2014 you only move left when a row beats the previous best's 1-count. When you hit a 0, drop down to the next row without resetting the column. Since the column index only ever decreases and the row index only ever increases, you touch at most N + M cells. Ties naturally resolve to the lower row index because we move left (update best) only on a strictly better row.",
-    "tale": "Imagine inspectors checking shelves where boxes are pushed to the right. Standing at the top-right, you slide left as long as you keep finding boxes, marking each shelf that lets you go further left as the new record-holder. The moment you hit a gap, you step down a shelf \u2014 never walking back right.",
+    "plain": "Because every row is sorted (0s then 1s), the row with more 1s has its leftmost 1 further to the left. Start at the top-right cell (row 0, last column). While you see a 1, move left and record the current row as the best so far — you only move left when a row beats the previous best's 1-count. When you hit a 0, drop down to the next row without resetting the column. Since the column index only ever decreases and the row index only ever increases, you touch at most N + M cells. Ties naturally resolve to the lower row index because we move left (update best) only on a strictly better row.",
+    "tale": "Imagine inspectors checking shelves where boxes are pushed to the right. Standing at the top-right, you slide left as long as you keep finding boxes, marking each shelf that lets you go further left as the new record-holder. The moment you hit a gap, you step down a shelf — never walking back right.",
     "solutions": [
       {
         "label": "Brute",
@@ -1205,7 +1203,7 @@
           "time": "O(N * M)",
           "space": "O(1)"
         },
-        "plain": "Count the 1s in every row and keep the row with the largest count, preferring the lower index on ties. Simple and correct, but it ignores the sorted property and scans every cell \u2192 O(N*M).",
+        "plain": "Count the 1s in every row and keep the row with the largest count, preferring the lower index on ties. Simple and correct, but it ignores the sorted property and scans every cell → O(N*M).",
         "tale": "You count every box on every shelf from scratch. Reliable, but you never use the fact that the boxes are already lined up on the right.",
         "approach": [
           "best = 0, bestCount = -1.",
@@ -1227,7 +1225,7 @@
         "tale": "From the top-right, slide left through the boxes, marking each shelf that lets you reach a new low column as the record-holder; the instant you meet a gap, step down. You never retrace rightwards.",
         "approach": [
           "i = 0, j = M-1, row = 0.",
-          "While i < N: while j >= 0 and A[i][j] == 1 \u2192 j--, row = i.",
+          "While i < N: while j >= 0 and A[i][j] == 1 → j--, row = i.",
           "i++ (move down, keeping j where it is).",
           "Return row."
         ],
@@ -1250,7 +1248,7 @@
           1,
           1
         ],
-        "footer": "Row with Max 1s \u2014 3x3 binary matrix [[0,1,1],[0,0,1],[0,1,1]] flattened row-major. Staircase from top-right (0,2).",
+        "footer": "Row with Max 1s — 3x3 binary matrix [[0,1,1],[0,0,1],[0,1,1]] flattened row-major. Staircase from top-right (0,2).",
         "legend": [
           "c-input",
           "c-active",
@@ -1271,7 +1269,7 @@
               "8": "c-input"
             },
             "msg": "Flattened as rows of 3: <strong>[0,1,1] [0,0,1] [0,1,1]</strong>. Start at top-right cell (0,2) = index 2.",
-            "overlay": "Each row is sorted \u2192 1s are pushed to the right."
+            "overlay": "Each row is sorted → 1s are pushed to the right."
           },
           {
             "label": "row 0: slide left",
@@ -1279,21 +1277,21 @@
               "2": "c-active",
               "1": "c-active"
             },
-            "msg": "A[0][2]=1, A[0][1]=1 \u2192 j drops to 0, <strong>best row = 0</strong>. A[0][0]=0 \u2192 stop, move down."
+            "msg": "A[0][2]=1, A[0][1]=1 → j drops to 0, <strong>best row = 0</strong>. A[0][0]=0 → stop, move down."
           },
           {
             "label": "row 1",
             "marks": {
               "3": "c-active"
             },
-            "msg": "j is at column 0: A[1][0]=0 \u2192 no row beats 2 ones here. Move down."
+            "msg": "j is at column 0: A[1][0]=0 → no row beats 2 ones here. Move down."
           },
           {
             "label": "row 2",
             "marks": {
               "6": "c-active"
             },
-            "msg": "A[2][0]=0 \u2192 row 2 also has 2 ones but cannot push j further left. Done."
+            "msg": "A[2][0]=0 → row 2 also has 2 ones but cannot push j further left. Done."
           },
           {
             "label": "RESULT",
@@ -1302,8 +1300,8 @@
               "1": "c-result",
               "2": "c-result"
             },
-            "msg": "Most 1s reached at the lowest row index \u2192 answer = <strong>row 0</strong>.",
-            "overlay": "Tie (rows 0 and 2 both have two 1s) \u2192 lower index wins, exactly what the left-only walk gives."
+            "msg": "Most 1s reached at the lowest row index → answer = <strong>row 0</strong>.",
+            "overlay": "Tie (rows 0 and 2 both have two 1s) → lower index wins, exactly what the left-only walk gives."
           }
         ]
       }
@@ -1359,6 +1357,24 @@
         "pseudocode": "sanitise; mark by negating A[val-1]; scan for first positive",
         "story": "Optimal. Three linear passes; O(1) extra.",
         "code": "public int firstMissingPositive(int[] A) {\n    int N = A.length;\n    for (int i = 0; i < N; i++) {\n        if (A[i] <= 0 || A[i] > N) {\n            A[i] = N + 2;\n        }\n    }\n    for (int i = 0; i < N; i++) {\n        int val = Math.abs(A[i]);\n        if (val <= N) {\n            A[val - 1] = -1 * Math.abs(A[val - 1]);\n        }\n    }\n    for (int i = 0; i < N; i++) {\n        if (A[i] > 0) {\n            return i + 1;\n        }\n    }\n    return N + 1;\n}"
+      },
+      {
+        "label": "Optimal — Cyclic Sort (Swap to Home)",
+        "complexity": {
+          "time": "O(N)",
+          "space": "O(1)"
+        },
+        "plain": "Send every value v ∈ [1, N] to its 'home' index v-1 by swapping. After one in-place pass, slot i should hold i+1; the first slot where it doesn't is the missing number. The guard A[i] != A[A[i]-1] is what stops infinite swaps when the home already holds the right value (duplicates / already-placed).",
+        "tale": "Guests numbered 1..N must each sit in their own numbered seat. Whoever is holding seat i but isn't guest i+1 gets walked to their real seat, displacing whoever was there — repeat until every valid guest is seated. The first seat with the wrong occupant is the missing guest.",
+        "approach": [
+          "Place each value at its home: for i = 0..N-1, while A[i] ∈ [1, N] and A[i] != A[A[i]-1], swap A[i] with A[A[i]-1] (value v belongs at index v-1).",
+          "The guard A[i] != A[A[i]-1] is the key: stop the while when the home slot already holds the correct value — this avoids an infinite loop on duplicates.",
+          "Scan: for i = 0..N-1, the first index where A[i] != i+1 → return i+1.",
+          "If every slot matches (A[i] == i+1 for all i), return N+1."
+        ],
+        "pseudocode": "for i in 0..N-1: while A[i] in [1,N] and A[i] != A[A[i]-1]: swap(i, A[i]-1)\nfor i in 0..N-1: if A[i] != i+1: return i+1\nreturn N+1",
+        "story": "Optimal, in-place, and non-destructive of values (no sign tricks). Each successful swap places one element in its final seat, so total swaps ≤ N → overall O(N) despite the nested while.",
+        "code": "public int firstMissingPositive(int[] A) {\n    int N = A.length;\n    for (int i = 0; i < N; i++) {\n        // swap A[i] to its home A[i]-1, while in range AND not already correctly placed\n        while (A[i] > 0 && A[i] <= N && A[i] != A[A[i] - 1]) {\n            swap(i, A[i] - 1, A);\n        }\n    }\n    for (int i = 0; i < N; i++) {\n        if (A[i] != i + 1) return i + 1;\n    }\n    return N + 1;\n}\n\npublic void swap(int x, int y, int[] A) {\n    int temp = A[x];\n    A[x] = A[y];\n    A[y] = temp;\n}"
       }
     ],
     "viz": {
@@ -1569,6 +1585,121 @@
             "label": "DONE",
             "msg": "Merged = <strong>[[1,5], [7,12], [15,18]]</strong>.",
             "overlay": "<strong>Edge:</strong> intervals touching at a point (e.g., [1,3] and [3,5]) overlap if you use ≤; check problem spec."
+          }
+        ]
+      }
+    }
+  },
+  {
+    "num": 152,
+    "id": "aadv-insert-merge-interval",
+    "title": "Merge Intervals 2 — Insert Interval",
+    "subTopic": "Three-Phase Sweep",
+    "tags": [
+      "Intervals",
+      "Greedy",
+      "Sweep"
+    ],
+    "description": "You have a set of non-overlapping intervals. You are given a new interval [start, end]; insert it into the set of intervals (merge if necessary).\n\nYou may assume that the intervals were initially sorted according to their start times.\n\nProblem Constraints\n0 <= |intervals| <= 10^5\n\nInput Format\nFirst argument: the vector of intervals.\nSecond argument: the new interval to be merged.\n\nOutput Format\nReturn the vector of intervals after merging.\n\nExample Input\nInput 1: intervals [[1,3],[6,9]], new interval [2,5]\nInput 2: intervals [[1,3],[6,9]], new interval [2,6]\n\nExample Output\nOutput 1: [[1,5],[6,9]]\nOutput 2: [[1,9]]\n\nExample Explanation\nIn 1, [2,5] overlaps [1,3] → merge to [1,5]; [6,9] is disjoint and stays. In 2, [2,6] overlaps both [1,3] and [6,9], so everything collapses to [1,9].",
+    "sampleInput": "A = [[1, 3], [6, 9]], B = [2, 5]",
+    "sampleOutput": "[[1, 5], [6, 9]]",
+    "story": "Sorted input → one pass in 3 phases: copy intervals that end before B; absorb every interval that overlaps B into a widened B = [min start, max end]; drop the merged B in once; then copy the rest.",
+    "plain": "Because the set is already sorted by start, a single left-to-right pass works. Phase 1: copy intervals that end strictly before B starts (A[i].end < B.start). Phase 2: while the next interval starts at or before B's end (A[i].start ≤ B.end), it overlaps — widen B to [min(B.start, A[i].start), max(B.end, A[i].end)]. Phase 3: B is now fully merged, so push it once, then copy every remaining interval (they all start after B ends). Work on a copy of B so the input isn't mutated.",
+    "tale": "A receptionist slots a new meeting B into a sorted day planner. Meetings finishing before B begins are left untouched; any meeting that bumps into B gets swallowed, stretching B's block wider; once nothing else collides, she pins the widened block down and lets the later meetings through unchanged.",
+    "solutions": [
+      {
+        "label": "Optimal — Three-Phase Sweep",
+        "complexity": {
+          "time": "O(N)",
+          "space": "O(N) output"
+        },
+        "plain": "One pass split into before / overlap / after. Overlapping intervals are folded into B by taking min start and max end; B is emitted exactly once between the two disjoint groups.",
+        "tale": "Copy the meetings before, swallow the ones that collide, pin B, then copy the meetings after.",
+        "approach": [
+          "Copy B into locals bs, be so the input interval isn't mutated.",
+          "Phase 1 — before: while i < N and A[i][1] < bs, push A[i] (it ends strictly before B starts).",
+          "Phase 2 — overlap: while i < N and A[i][0] <= be, widen B: bs = min(bs, A[i][0]), be = max(be, A[i][1]).",
+          "Push the merged interval [bs, be] exactly once.",
+          "Phase 3 — after: push every remaining A[i] (each starts strictly after B ends). Return the result."
+        ],
+        "pseudocode": "bs,be = B\nwhile A[i].end < bs: emit A[i]; i++\nwhile A[i].start <= be: bs=min(bs,A[i].start); be=max(be,A[i].end); i++\nemit [bs,be]\nwhile i<N: emit A[i]; i++",
+        "story": "Optimal, single pass, input untouched (B copied locally). The three while-loops are mutually exclusive phases — total work is O(N).",
+        "code": "public int[][] insert(int[][] A, int[] B) {\n    int n = A.length, i = 0;\n    List<int[]> res = new ArrayList<>();\n    int bs = B[0], be = B[1];                 // work on a copy, don't mutate B\n\n    // Phase 1: intervals entirely before B\n    while (i < n && A[i][1] < bs) {\n        res.add(A[i]);\n        i++;\n    }\n    // Phase 2: overlapping intervals -> widen B\n    while (i < n && A[i][0] <= be) {\n        bs = Math.min(bs, A[i][0]);\n        be = Math.max(be, A[i][1]);\n        i++;\n    }\n    res.add(new int[]{bs, be});               // place merged B\n\n    // Phase 3: intervals entirely after B\n    while (i < n) {\n        res.add(A[i]);\n        i++;\n    }\n    return res.toArray(new int[res.size()][]);\n}"
+      }
+    ],
+    "viz": {
+      "kind": "scripted-array",
+      "data": {
+        "A": [
+          1,
+          3,
+          6,
+          9
+        ],
+        "footer": "Insert B=[2,5] into sorted intervals [1,3],[6,9] — flattened [s,e] pairs.",
+        "legend": [
+          "c-input",
+          "c-low",
+          "c-active",
+          "c-result",
+          "c-eliminated"
+        ],
+        "script": [
+          {
+            "label": "SETUP",
+            "marks": {
+              "0": "c-input",
+              "1": "c-input",
+              "2": "c-input",
+              "3": "c-input"
+            },
+            "msg": "Sorted intervals [1,3], [6,9]. Insert new interval B = [2,5].",
+            "overlay": "<strong>3 phases:</strong> copy intervals before B · widen B over overlaps · copy intervals after B."
+          },
+          {
+            "label": "Phase 1 — before B?",
+            "marks": {
+              "0": "c-low",
+              "1": "c-low"
+            },
+            "msg": "[1,3] ends at 3, B starts at 2. Since 3 ≥ 2 it is NOT before B → it overlaps. Phase 1 copies nothing."
+          },
+          {
+            "label": "Phase 2 — overlap → widen B",
+            "marks": {
+              "0": "c-active",
+              "1": "c-active"
+            },
+            "msg": "[1,3] overlaps. B = [min(2,1), max(5,3)] = <strong>[1,5]</strong>."
+          },
+          {
+            "label": "Phase 2 — next [6,9]?",
+            "marks": {
+              "2": "c-eliminated",
+              "3": "c-eliminated"
+            },
+            "msg": "[6,9]: start 6 > B.end 5 → no overlap. Stop widening."
+          },
+          {
+            "label": "Place merged B = [1,5]",
+            "marks": {
+              "0": "c-result",
+              "1": "c-result"
+            },
+            "msg": "Emit the merged interval <strong>[1,5]</strong> once."
+          },
+          {
+            "label": "Phase 3 — copy the rest",
+            "marks": {
+              "2": "c-result",
+              "3": "c-result"
+            },
+            "msg": "[6,9] starts after B ends → copy it unchanged."
+          },
+          {
+            "label": "DONE",
+            "msg": "Result = <strong>[[1,5], [6,9]]</strong>.",
+            "overlay": "<strong>Edge:</strong> B=[2,6] would overlap BOTH → collapses to a single [1,9]."
           }
         ]
       }
