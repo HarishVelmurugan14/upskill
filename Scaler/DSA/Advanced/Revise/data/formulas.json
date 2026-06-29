@@ -6,6 +6,10 @@
     },
     {
       "section": "Section 1",
+      "topic": "Bit Manipulation"
+    },
+    {
+      "section": "Section 1",
       "topic": "Maths"
     },
     {
@@ -62,6 +66,81 @@
         "aadv-sum-all-submatrices"
       ],
       "note": "The 1D analogue is <code>contribution(A[i]) = A[i]·(i+1)·(N−i)</code>; the 2D form just multiplies the independent row-count and column-count of ranges."
+    },
+    {
+      "id": "why-32-bits-int-width",
+      "name": "Why 32 Bits? (int width)",
+      "section": "Section 1",
+      "topic": "Bit Manipulation",
+      "day": "Bit Manip",
+      "formula": "<span class=\"com\">// Java int is FIXED at 32 bits → bits 0..31</span><br>\n            <span class=\"op\">for</span> (<span class=\"op\">int</span> <span class=\"var\">i</span> = <span class=\"num\">0</span>; <span class=\"var\">i</span> &lt; <span class=\"num\">32</span>; <span class=\"var\">i</span>++) { ... }   <span class=\"com\">// covers every bit</span><br>\n            <span class=\"com\">// bit 31 = sign bit (two's complement)</span><br>\n            <span class=\"com\">// walk with &gt;&gt;&gt; (unsigned), NOT &gt;&gt;, so the sign bit doesn't smear</span>",
+      "example": "<strong>Count set bits:</strong> <code>int c=0; for(int i=0;i&lt;32;i++) if((n&gt;&gt;&gt;i &amp; 1)==1) c++;</code> — 32 iterations cover all of int, including negatives.",
+      "whenToUse": [
+        "Looping over bits, building masks, reverse-bits, count-set-bits",
+        "Input is a \"32-bit signed integer\" (the usual LeetCode constraint = int range)",
+        "Use <code>long</code> + loop to 64 instead when values exceed int"
+      ],
+      "usedIn": [
+        "bm-number-of-1-bits",
+        "bm-single-number",
+        "bm-single-number-ii"
+      ],
+      "note": "Java guarantees <code>int</code>=32 bits, <code>long</code>=64 (unlike C, where int width is platform-dependent). Bit 31 is the sign, so for negatives use unsigned shift <code>&gt;&gt;&gt;</code> — plain <code>&gt;&gt;</code> copies the sign bit and loops forever / misreads high bits."
+    },
+    {
+      "id": "sorted-neighbors-min-xor",
+      "name": "Min-XOR Pair = Adjacent After Sort",
+      "section": "Section 1",
+      "topic": "Bit Manipulation",
+      "day": "Bit Manip",
+      "formula": "sort(<span class=\"var\">A</span>);<br>\n            min XOR over <em>all</em> pairs == min over <strong>ADJACENT</strong> pairs<br>\n            answer = <span class=\"op\">min</span><sub>i</sub> ( <span class=\"var\">A[i]</span> <span class=\"op\">^</span> <span class=\"var\">A[i+1]</span> )   <span class=\"com\">// only N−1 pairs</span><br>\n            <span class=\"com\">// small XOR ⇔ longer shared leading-bit prefix</span>",
+      "example": "<strong>Ex:</strong> A=[0,2,5,7] → check 0^2=2, 2^5=7, 5^7=2 → <strong>min 2</strong>. No skipped pair beats it (0^5=5, 2^7=5, 0^7=7).",
+      "whenToUse": [
+        "\"Minimum XOR of any two elements\" in an array",
+        "Turning a brute O(N²) all-pairs scan into O(N log N) sort + linear sweep",
+        "Any \"closest two values\" argument that rides on shared high bits"
+      ],
+      "usedIn": [],
+      "note": "Why adjacent suffices: for sorted a ≤ b ≤ c, the middle b shares at least as many <strong>leading bits</strong> with each neighbor as the neighbors share with each other, so a^c can never be strictly smaller than both a^b and b^c — the minimum can't \"jump over\" b. Hence only neighbouring pairs can win."
+    },
+    {
+      "id": "bitwise-independence",
+      "name": "Bitwise Independence (per-bit decomposition)",
+      "section": "Section 1",
+      "topic": "Bit Manipulation",
+      "day": "Bit Manip",
+      "formula": "<span class=\"com\">// AND / OR / XOR act on each bit position alone — NO carry between bits</span><br>\n            answer = <span class=\"op\">Σ</span><sub>b=0..31</sub> ( solveForBit(<span class=\"var\">b</span>) ) <span class=\"op\">&lt;&lt;</span> <span class=\"var\">b</span><br>\n            <span class=\"com\">// a 32-bit problem splits into 32 independent 1-bit problems</span>",
+      "example": "<strong>Ex:</strong> Σ A[i] = <span class=\"op\">Σ</span><sub>b</sub> (count of numbers with bit b set) × 2<sup>b</sup> — each bit tallied on its own, then weighted.",
+      "whenToUse": [
+        "Build an answer bit-by-bit (decide each output bit separately)",
+        "Single Number II/III: count set bits per position, take mod k",
+        "Anything where you can ask \"what happens at bit b?\" in isolation"
+      ],
+      "usedIn": [
+        "bm-single-number-ii",
+        "bm-single-number-iii",
+        "bm-subarray-or"
+      ],
+      "note": "Unlike <code>+ − ×</code> (which carry across bits), bitwise ops don't — so you may treat each of the 32 columns as a separate, tiny problem and recombine with <code>&lt;&lt; b</code>. This is the foundation for <strong>bit contribution counting</strong>."
+    },
+    {
+      "id": "bit-contribution-counting",
+      "name": "Bit Contribution Counting",
+      "section": "Section 1",
+      "topic": "Bit Manipulation",
+      "day": "Bit Manip",
+      "formula": "<span class=\"com\">// per bit b: k = #numbers with bit b SET, n = total</span><br>\n            Σ XOR over all pairs = <span class=\"op\">Σ</span><sub>b</sub> <span class=\"var\">k</span>(<span class=\"var\">n</span><span class=\"op\">−</span><span class=\"var\">k</span>) · 2<sup>b</sup><br>\n            Σ AND over all pairs = <span class=\"op\">Σ</span><sub>b</sub> C(<span class=\"var\">k</span>,<span class=\"num\">2</span>) · 2<sup>b</sup><br>\n            Σ OR&nbsp; over all pairs = <span class=\"op\">Σ</span><sub>b</sub> ( C(<span class=\"var\">n</span>,<span class=\"num\">2</span>) <span class=\"op\">−</span> C(<span class=\"var\">n</span><span class=\"op\">−</span><span class=\"var\">k</span>,<span class=\"num\">2</span>) ) · 2<sup>b</sup>",
+      "example": "<strong>Ex (XOR pairs):</strong> A=[1,2,3], bit0 set in {1,3} → k=2, n−k=1 → 2·1=2 pairs contribute 2<sup>0</sup>; bit1 set in {2,3} → k=2 → 2 pairs contribute 2<sup>1</sup>. Total = 2·1 + 2·2 = <strong>6</strong>.",
+      "whenToUse": [
+        "\"Sum of XOR / AND / OR over all pairs (or subarrays)\"",
+        "Replace O(N²) all-pairs enumeration with O(32·N)",
+        "Count, per bit, how often it survives into the result"
+      ],
+      "usedIn": [
+        "bm-subarray-or",
+        "bm-subarrays-with-or-1"
+      ],
+      "note": "Rides on <strong>bitwise independence</strong>: a bit shows in the result of <code>k·(n−k)</code> XOR-pairs (one set, one unset), <code>C(k,2)</code> AND-pairs (both set), or <code>C(n,2)−C(n−k,2)</code> OR-pairs (at least one set). Multiply each count by 2<sup>b</sup> and sum."
     },
     {
       "id": "gcd-euclidean-algorithm",
