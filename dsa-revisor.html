@@ -439,6 +439,25 @@
       font-family: 'JetBrains Mono', monospace;
     }
 
+    /* ── Reference material links ── */
+    .ref-row { display: flex; gap: 8px; flex-wrap: wrap; }
+    .ref-link {
+      display: inline-flex;
+      align-items: center;
+      padding: 6px 12px;
+      border-radius: 8px;
+      font-size: 12.5px;
+      text-decoration: none;
+      background: rgba(217,119,87,0.08);
+      border: 1px solid rgba(217,119,87,0.30);
+      color: var(--accent, #d97757);
+      transition: all 0.15s;
+    }
+    .ref-link:hover {
+      background: rgba(217,119,87,0.16);
+      border-color: var(--accent, #d97757);
+    }
+
     /* ── Solutions panel ── */
     .sol-tabs {
       display: flex;
@@ -2702,6 +2721,11 @@
         <div class="ds-label">Sub-topic Tags</div>
         <div class="tag-row" id="probTags"></div>
       </div>
+
+      <div class="ds-block" id="probRefsBlock" style="display:none">
+        <div class="ds-label">📺 Reference Material</div>
+        <div class="ref-row" id="probRefs"></div>
+      </div>
     </div>
   </div>
 
@@ -3098,6 +3122,26 @@
       s.textContent = t;
       tagRow.appendChild(s);
     });
+
+    // Reference material (videos / articles)
+    const refsBlock = document.getElementById('probRefsBlock');
+    const refsRow = document.getElementById('probRefs');
+    refsRow.innerHTML = '';
+    const refs = p.refs || [];
+    if (refs.length) {
+      refs.forEach(r => {
+        const a = document.createElement('a');
+        a.className = 'ref-link';
+        a.href = r.url;
+        a.target = '_blank';
+        a.rel = 'noopener';
+        a.textContent = (r.kind === 'video' ? '▶ ' : '🔗 ') + (r.label || r.url);
+        refsRow.appendChild(a);
+      });
+      refsBlock.style.display = '';
+    } else {
+      refsBlock.style.display = 'none';
+    }
 
     // Solutions tab
     renderSolutionsTab();

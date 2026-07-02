@@ -810,7 +810,14 @@
           }
         ]
       }
-    }
+    },
+    "refs": [
+      {
+        "kind": "video",
+        "label": "Tower of Hanoi — visual walkthrough (YouTube)",
+        "url": "https://www.youtube.com/watch?v=3aag8Wpv8XM"
+      }
+    ]
   },
   {
     "num": 55,
@@ -1164,6 +1171,118 @@
             },
             "msg": "Final answer <strong>1594323</strong>.",
             "overlay": "<strong>Modular variant:</strong> wrap each multiply in '% MOD' to handle very large bases without overflow."
+          }
+        ]
+      }
+    }
+  },
+  {
+    "num": 153,
+    "id": "rec-is-magic",
+    "title": "Is Magic?",
+    "subTopic": "Digit-Sum Recursion (Digital Root)",
+    "tags": [
+      "Recursion",
+      "Digits",
+      "Digital Root"
+    ],
+    "description": "Given a number A, check if it is a magic number or not.\n\nA number is a magic number if the sum of its digits is calculated till a single digit recursively by adding the sum of the digits after every addition. If the single digit comes out to be 1, then the number is a magic number.\n\nProblem Constraints\n1 <= A <= 10^9\n\nInput Format\nFirst and only argument is an integer A.\n\nOutput Format\nReturn 1 if A is a magic number, otherwise return 0.\n\nExample Input\nInput 1: A = 1234\nInput 2: A = 83\n\nExample Output\nOutput 1: 1\nOutput 2: 0\n\nExample Explanation\n1234 → 1+2+3+4 = 10 → 1+0 = 1 → single digit is 1 → magic (return 1).\n83 → 8+3 = 11 → 1+1 = 2 → single digit is 2 → not magic (return 0).",
+    "sampleInput": "A = 1234",
+    "sampleOutput": "1",
+    "story": "Collapse the number to its digital root: keep summing digits until one digit remains; magic iff that digit is 1. Shortcut — digital root = 1 + (A−1) % 9, so a number is magic ⟺ A % 9 == 1.",
+    "plain": "Write a helper sum(A): if A < 10 it's already a single digit, return it. Otherwise add up all its digits (A%10, A/=10) into totalSum, then recurse on totalSum — repeating until a single digit falls out. The number is magic when that final digit equals 1. The whole reduction is exactly the 'digital root', which has a closed form: for A ≥ 1, root = 1 + (A−1) % 9, so magic ⟺ A % 9 == 1.",
+    "tale": "A courier keeps folding a long tracking number in half by summing its digits, again and again, until a single lucky digit remains. If that digit is 1, the parcel is 'magic' and jumps the queue.",
+    "solutions": [
+      {
+        "label": "Recursive Digit Sum",
+        "complexity": {
+          "time": "O(log A)",
+          "space": "O(log A) recursion depth"
+        },
+        "plain": "Sum the digits; if the result has more than one digit, recurse on it. Stop at a single digit and compare to 1.",
+        "tale": "Fold digits until one remains; magic if it's 1.",
+        "approach": [
+          "Base case: if A < 10 it is a single digit → return A.",
+          "Otherwise sum all digits: while A > 0, totalSum += A % 10; A /= 10.",
+          "Recurse: return sum(totalSum) — repeats until one digit remains.",
+          "Answer: sum(A) == 1 ? 1 : 0."
+        ],
+        "pseudocode": "sum(A):\n  if A < 10: return A\n  t = 0; while A>0: t += A%10; A/=10\n  return sum(t)\nreturn sum(A)==1 ? 1 : 0",
+        "story": "The digit count shrinks fast (10^9 → ≤ 2 digits after one pass), so only a couple of recursion levels ever run.",
+        "code": "public class Solution {\n    public int solve(int A) {\n        return sum(A) == 1 ? 1 : 0;\n    }\n\n    private int sum(int A) {\n        if (A < 10) return A;        // single digit, stop\n\n        int totalSum = 0;\n        while (A > 0) {\n            totalSum += A % 10;\n            A /= 10;\n        }\n        return sum(totalSum);        // recurse on sum\n    }\n}"
+      },
+      {
+        "label": "O(1) — Digital Root (mod 9)",
+        "complexity": {
+          "time": "O(1)",
+          "space": "O(1)"
+        },
+        "plain": "The repeated digit-sum is the digital root. For A ≥ 1 it equals 1 + (A−1) % 9, so the number is magic exactly when A % 9 == 1.",
+        "tale": "Skip the folding — a number's lucky digit is just A mod 9 (with 1..9 instead of 0).",
+        "approach": [
+          "Digital root formula (A ≥ 1): dr(A) = 1 + (A − 1) % 9.",
+          "dr(A) == 1  ⇔  (A − 1) % 9 == 0  ⇔  A % 9 == 1.",
+          "Return A % 9 == 1 ? 1 : 0."
+        ],
+        "pseudocode": "return A % 9 == 1 ? 1 : 0",
+        "story": "Constant time, no recursion. Check: 1234 % 9 = 1 → magic; 83 % 9 = 2 → not.",
+        "code": "public class Solution {\n    public int solve(int A) {\n        return A % 9 == 1 ? 1 : 0;   // digital root == 1\n    }\n}"
+      }
+    ],
+    "viz": {
+      "kind": "scripted-array",
+      "data": {
+        "A": [
+          1,
+          2,
+          3,
+          4
+        ],
+        "footer": "Is Magic? — reduce 1234 to its digital root by repeated digit-sum.",
+        "legend": [
+          "c-input",
+          "c-active",
+          "c-result"
+        ],
+        "script": [
+          {
+            "label": "SETUP",
+            "marks": {
+              "0": "c-input",
+              "1": "c-input",
+              "2": "c-input",
+              "3": "c-input"
+            },
+            "msg": "A = 1234. Sum digits repeatedly until one digit remains; magic if it is 1.",
+            "overlay": "<strong>Shortcut:</strong> digital root = 1 + (A−1) % 9, so magic ⟺ A % 9 == 1."
+          },
+          {
+            "label": "Sum digits: 1+2+3+4",
+            "marks": {
+              "0": "c-active",
+              "1": "c-active",
+              "2": "c-active",
+              "3": "c-active"
+            },
+            "msg": "totalSum = 1 + 2 + 3 + 4 = <strong>10</strong>."
+          },
+          {
+            "label": "10 has 2 digits → recurse",
+            "marks": {},
+            "msg": "Not single-digit yet → sum(10)."
+          },
+          {
+            "label": "Sum digits: 1+0",
+            "marks": {},
+            "msg": "1 + 0 = <strong>1</strong> — single digit, stop."
+          },
+          {
+            "label": "1 == 1 → MAGIC",
+            "marks": {
+              "0": "c-result"
+            },
+            "msg": "Digital root is 1 → return <strong>1</strong>.",
+            "overlay": "Check the shortcut: 1234 % 9 = 1 ✓ (and 83 % 9 = 2 → not magic)."
           }
         ]
       }
