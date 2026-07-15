@@ -15,6 +15,11 @@
     "story": "Build freq HashMap in O(N); each query is O(1) average.",
     "plain": "Brute: per query, scan A — O(N*Q). Optimal: one pass to build HashMap<value, count>, then answer each query with map.getOrDefault(B[i], 0).",
     "tale": "Pre-bake a phonebook of names→counts; answer 'how many John?' instantly instead of re-counting the room each time.",
+    "pitfalls": [
+      "A query value may not be in the map, so use `getOrDefault(B[i], 0)` not `get` or you get a null crash.",
+      "Values go up to 1e9, so don't index a plain `int[]` by value; you need a HashMap.",
+      "Build the freq map fully before answering any query, not while you scan queries."
+    ],
     "solutions": [
       {
         "label": "Brute — Scan per Query",
@@ -127,6 +132,11 @@
     "story": "Drop everything into a HashSet; answer is set.size().",
     "plain": "Brute: sort and count groups O(N log N). Optimal: HashSet insertion + size() in O(N) average.",
     "tale": "Put each marble in a labelled jar; the number of non-empty jars is the answer.",
+    "pitfalls": [
+      "You want the count of distinct values, so return `seen.size()`, not the array length.",
+      "Values reach 1e9, so a boolean array won't fit; use a HashSet.",
+      "Empty array should give 0, so make sure size() handles that (it does)."
+    ],
     "solutions": [
       {
         "label": "Brute — Sort & Count Groups",
@@ -255,6 +265,11 @@
     "story": "Two passes: (1) build freq map; (2) walk A left-to-right and return the first element with freq > 1.",
     "plain": "Brute O(N²) per element. Optimal: 1 pass to build HashMap<value, count>, then 1 pass to scan in order and return first key with count > 1.",
     "tale": "Take attendance to know who has a twin in the room, then point to the FIRST person whose twin you spotted.",
+    "pitfalls": [
+      "First repeating means smallest first-occurrence index, so scan the array in order, not the map (map order is undefined).",
+      "Build the whole freq map first, then do the order scan; don't try to do both in one loop.",
+      "Return -1 if nothing repeats; don't forget that case."
+    ],
     "solutions": [
       {
         "label": "Brute — Pairwise Search",
@@ -369,6 +384,11 @@
     "story": "Walk prefix sums; if any prefix repeats OR a prefix equals 0, found.",
     "plain": "Brute O(N²) — try all subarrays. Optimal: running prefix sum + HashSet of seen prefixes (include 0 sentinel). If currentSum is already in the set, subarray strictly after the previous occurrence sums to 0.",
     "tale": "Tally as you walk. If you ever return to a previously-seen total, the steps between were zero net.",
+    "pitfalls": [
+      "Seed the set with 0 first, or a zero-sum starting at index 0 gets missed.",
+      "Sums can hit ±1e14, so use a `Set<Long>`, not int, to dodge overflow.",
+      "Check `contains(sum)` before adding the current sum, not after."
+    ],
     "solutions": [
       {
         "label": "Brute — All Subarrays",
@@ -478,6 +498,11 @@
     "story": "Build freq map of A; walk B and for each x present in the map, emit it and decrement.",
     "plain": "Brute O(N*M) cross-search. Optimal: HashMap<value, count> of A; for each x in B: if count > 0, output x and decrement count. Order follows B.",
     "tale": "Hand A a bag of coloured marbles with counts. Walk B; each time you find a colour with stock, give one back.",
+    "pitfalls": [
+      "Use a freq map, not a set, or you lose multiplicity and `min(p,q)` counts break.",
+      "Decrement the count each time you emit, so you don't over-report a value.",
+      "Walk B to build output; the answer order follows B, not A."
+    ],
     "solutions": [
       {
         "label": "Brute — Cross Search with Used Flags",
@@ -596,6 +621,11 @@
     "story": "Build freq map; count entries with value == 1.",
     "plain": "Brute O(N²). Optimal: HashMap freq pass + count of entries with count == 1.",
     "tale": "Take attendance; count seats with exactly one person.",
+    "pitfalls": [
+      "Unique here means frequency exactly 1, not distinct values; don't confuse the two.",
+      "Count map entries where the value is 1, not the number of keys.",
+      "A value appearing twice counts as zero unique, not one."
+    ],
     "solutions": [
       {
         "label": "Brute — Pairwise Check",
@@ -696,6 +726,11 @@
     "story": "Running prefix sum; HashMap<prefix, count of times seen>. For each new prefix, add count_of(currentSum) — number of earlier positions where same prefix appeared.",
     "plain": "Brute O(N²) over all subarrays. Optimal: HashMap of prefix-sum frequencies, sentinel {0 → 1} so a subarray starting at index 0 is counted, accumulate getOrDefault(currentSum, 0) before incrementing the map.",
     "tale": "Every time the running tally returns to a past value, the steps between net to zero — count all such return-pairs.",
+    "pitfalls": [
+      "Seed the map with `{0:1}`, or subarrays starting at index 0 are undercounted.",
+      "Add `getOrDefault(sum,0)` to the answer before you bump the count for `sum`.",
+      "Prefix sums can overflow int, so key the map with `Long`; and apply the mod."
+    ],
     "solutions": [
       {
         "label": "Brute — Pair-Sum All Subarrays",
@@ -813,6 +848,11 @@
     "story": "Single-pass with HashSet of seen values; for each x, check if (B − x) was already seen.",
     "plain": "Brute O(N²) over pairs. Optimal: walk once, maintain HashSet; on each x, if (B − x) ∈ set → return 1; else add x to set. O(N) average.",
     "tale": "Walk a line of partygoers; before greeting each one, ask 'has my complement been here?'.",
+    "pitfalls": [
+      "Check `contains(B - x)` first, then add x; otherwise a single x can pair with itself.",
+      "`B - x` can overflow int with values near 1e9, so compute it as `long`.",
+      "Return 0 if no pair is found, and require i ≠ j (the check-before-insert handles it)."
+    ],
     "solutions": [
       {
         "label": "Brute — All Pairs",
@@ -920,6 +960,11 @@
     "story": "Two-pass: build full freq, then for every distinct value x add freq[x] * freq[x+B]. Special-case B == 0 with C(freq[x], 2).",
     "plain": "Brute O(N²). Optimal two-pass: (1) build HashMap<value, count> of A; (2) for each entry x add freq[x] * freq[x + B] to ans — captures both directions of |a−b|=B at once. Special case B == 0: result is Σ C(freq[x], 2).",
     "tale": "Walking a line; ask 'how many people behind me are exactly B less than me?' and add to the tally.",
+    "pitfalls": [
+      "B == 0 is a special case; count `C(freq[x],2)` per value instead of `freq[x]*freq[x+B]`.",
+      "Only look at `x + B` (not also `x - B`), or every pair gets counted twice.",
+      "Counts multiply up large, so use `long` keys/values and apply the mod."
+    ],
     "solutions": [
       {
         "label": "Brute — All Pairs",
@@ -1057,6 +1102,11 @@
     "story": "Walk prefix sums; ans += count of (currentSum − B) seen before.",
     "plain": "Brute O(N²). Optimal: HashMap<prefix sum, count>. Init {0:1}. For each step: ans += map[currentSum − B], then map[currentSum]++.",
     "tale": "Each prefix sum is a checkpoint; pair every current checkpoint with all past checkpoints exactly B below.",
+    "pitfalls": [
+      "Seed the map with `{0:1}`, or subarrays whose sum equals B from index 0 are missed.",
+      "Add `map[sum - B]` to the answer before incrementing `map[sum]`.",
+      "A[i] can be negative, so two pointers won't work; use the prefix-sum map, keyed with `Long`."
+    ],
     "solutions": [
       {
         "label": "Brute — All Subarrays",
@@ -1161,6 +1211,11 @@
     "story": "Sliding window; HashMap<value, count> maintained as the window moves. distinct = map.size() (drop keys when count → 0).",
     "plain": "Brute O(N*B). Optimal: build the first window, then slide one step at a time — increment the new entrant, decrement the departing entry (remove key if its count hits 0). Emit map.size() after each step.",
     "tale": "A moving spotlight on a parade; tally how many distinct costumes are visible at each moment.",
+    "pitfalls": [
+      "When a value's count drops to 0, remove the key, or `map.size()` counts ghosts.",
+      "Build the first window separately, then slide; don't rebuild each window.",
+      "Add the incoming element and remove the outgoing `A[i-B]` each step, in that order."
+    ],
     "solutions": [
       {
         "label": "Brute — Recount Each Window",
@@ -1290,6 +1345,11 @@
     "story": "Map<prefixSum, EARLIEST index>. If currentSum was seen at index k, subarray (k+1..i) sums to 0; length = i − k. Special case: if currentSum is 0 at index i, length = i + 1.",
     "plain": "Brute O(N²). Optimal: prefix sum + HashMap of FIRST occurrence of each prefix; do NOT overwrite. If sum == 0 at index i → maxLen = max(maxLen, i+1). Else if seen → maxLen = max(maxLen, i − seen[sum]).",
     "tale": "First time you reach a tally, plant a flag. Next time you pass it, measure the stretch back to the flag — longest such stretch is the answer.",
+    "pitfalls": [
+      "Store only the FIRST index of each prefix sum; never overwrite it or the stretch shrinks.",
+      "When `sum == 0` the length is `i + 1`, a separate case from the map lookup.",
+      "Prefix sums can overflow, so key the map with `Long`; return 0 if none found."
+    ],
     "solutions": [
       {
         "label": "Brute — All Subarrays",
@@ -1406,6 +1466,11 @@
     "story": "Walk once. For each x, ans += freq[B − x]; then freq[x]++. Enforces i < j and handles duplicates correctly.",
     "plain": "Brute O(N²) over pairs. Optimal: HashMap<value, count>. Single pass: pairs += freq.getOrDefault(B − x, 0) BEFORE inserting x. The 'add before insert' ordering ensures each pair is counted exactly once.",
     "tale": "Walk a queue; each person asks 'how many people behind me sum with me to B?'.",
+    "pitfalls": [
+      "Add `freq[B - x]` before inserting x, so each pair is counted once and i < j holds.",
+      "Duplicates matter; use a freq map so repeated values pair up the right number of times.",
+      "Count grows large, so accumulate in `long` and apply the mod at the end."
+    ],
     "solutions": [
       {
         "label": "Brute — All Pairs",
@@ -1520,6 +1585,11 @@
     "story": "All positive ⇒ shrink window when sum exceeds B (two pointers, O(N)). Alternative: prefix-sum + HashMap (works for negatives too).",
     "plain": "Brute O(N²) over subarrays. Optimal (positives only): two pointers l, r; expand r adding to sum; while sum > B shrink from l; if sum == B → return A[l..r]. For first occurrence: take the smallest l that hits sum == B.",
     "tale": "Inflate a balloon (advance r) until it overshoots, then deflate from the back (advance l) until it fits — perfectly positive-only logic.",
+    "pitfalls": [
+      "Two pointers only work because all values are positive; negatives would break the shrink logic.",
+      "Return `[-1]` (single element) when nothing matches, not an empty array.",
+      "Use `long` for the running sum, and return the FIRST match (smallest start index)."
+    ],
     "solutions": [
       {
         "label": "Brute — All Subarrays",

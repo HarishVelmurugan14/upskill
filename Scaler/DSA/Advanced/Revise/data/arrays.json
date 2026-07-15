@@ -15,6 +15,11 @@
     "story": "Build the running total ONCE; every query is a single subtraction. The L = 0 corner returns prefix[R] directly to avoid prefix[-1].",
     "plain": "Many queries, each asks 'sum from L to R'. Naively each query takes O(R - L) and the whole thing is O(N * M). Instead, build a prefix-sum array once where prefix[i] = A[0] + A[1] + ... + A[i]. Then any range sum from L to R becomes prefix[R] - prefix[L-1] in O(1). Build cost is O(N), each query O(1), total O(N + M). The only tricky case is L = 0 — there's no prefix[-1], so just return prefix[R] directly.",
     "tale": "A baker tracks daily bread sold and keeps a single ledger column called 'TOTAL THROUGH TODAY'. Every morning she adds yesterday's row to today's number. When a customer asks 'how much bread did you sell between Tuesday and Saturday?', she does ONE subtraction: Saturday's total minus Monday's total. No flipping through pages, no re-counting. The ledger paid for itself the very first query.",
+    "pitfalls": [
+      "Sums hit ~1e14 (N=1e5, A[i]=1e9) so use `long`, not `int`.",
+      "When `L == 0` there is no `prefix[L-1]`; return `prefix[R]` directly.",
+      "Build the prefix array once before the queries, not per query."
+    ],
     "solutions": [
       {
         "label": "Brute",
@@ -187,6 +192,11 @@
     "story": "Pre-compute two prefix sums (one of even-indexed elements, one of odd-indexed). Removing index i flips parity for everything to its right; combine left + flipped-right with subtraction.",
     "plain": "When you remove index i, the elements to the LEFT keep their original index-parity, but every element to the RIGHT of i shifts down by one — so its parity flips. Build prefixEven[] and prefixOdd[] once. For each i: newEvenSum = (left-half even sum) + (right-half ODD sum, because they shifted). Same for odd. If newEvenSum == newOddSum, count it.",
     "tale": "A teacher seats students in alternating red and blue chairs. When one student leaves, every student to their right slides one chair to the left — every red becomes blue and every blue becomes red. The teacher keeps two running counts: how many red-chair students are left of each position and how many blue-chair students are right of each. With those two ledgers, she checks every possible empty seat in one pass.",
+    "pitfalls": [
+      "Removing index i flips parity of everything to its right — don't forget the shift.",
+      "At `i == 0` there's no `prefix[i-1]`, so left sums are 0.",
+      "Use `long` for the sums since total can reach 1e9."
+    ],
     "solutions": [
       {
         "label": "Brute",
@@ -348,6 +358,11 @@
     "story": "Walk i from 1 to N-1 and do A[i] += A[i-1]. The original value at i-1 is already the prefix sum through i-1, so the assignment is safe.",
     "plain": "Convert A into its own prefix-sum array using O(1) extra space. Walk from left to right starting at i = 1 and add the previous (already-converted) cell into the current one: A[i] = A[i-1] + A[i]. After the loop, A[i] holds the sum of the original A[0..i]. Constraints are small (A[i] ≤ 10^3, N ≤ 10^5) so int is safe — max sum is 10^8.",
     "tale": "A relay runner carries a baton. At each stop she takes the runner-from-behind's TOTAL baton-weight and adds her own contribution before passing it forward. By the finish line, every runner is holding the cumulative weight of everyone before them — and they never needed a second baton.",
+    "pitfalls": [
+      "Start the loop at `i = 1`; `A[0]` stays as-is.",
+      "Read `A[i-1]` (already updated) then add — don't overwrite before reading.",
+      "Guard the empty array before touching `A[0]`."
+    ],
     "solutions": [
       {
         "label": "Optimal",
@@ -504,6 +519,11 @@
     "story": "Compute total once. Sweep i once tracking leftSum. rightSum = total - leftSum - A[i]. Stop on the first match.",
     "plain": "An equilibrium index has the property: sum of everything strictly LEFT == sum of everything strictly RIGHT. Compute the total sum once. Walk i = 0..N-1 maintaining leftSum (sum of A[0..i-1]). Then rightSum = total - leftSum - A[i]. Return the first i where leftSum equals rightSum. Two corners: i = 0 means leftSum = 0; i = N-1 means rightSum = 0.",
     "tale": "A tightrope walker checks each step on a thin beam. She knows the TOTAL weight strapped to the beam. At every step, she keeps a running tally of weight crossed so far (her left). The weight still ahead is just total − tally − the step she's on. The first step where 'crossed' equals 'ahead' is her balance point.",
+    "pitfalls": [
+      "Values can be negative, so equal sums may both be negative — compare, don't assume positive.",
+      "At `i == 0` leftSum is 0; at `i == N-1` rightSum is 0.",
+      "Return the first match — return early, don't keep scanning."
+    ],
     "solutions": [
       {
         "label": "Brute",
@@ -675,6 +695,11 @@
     "story": "Track the latest position of min and max separately. Every time either updates, the candidate window is |lastMin - lastMax| + 1. Keep the smallest.",
     "plain": "Find the global min and global max first (single pass). Walk the array left-to-right tracking lastMin (latest index of a min) and lastMax (latest index of a max). Every time you hit a min or a max, pair it with the OTHER's latest position to form a candidate window and update the best length. The smallest such window is the answer.",
     "tale": "Two lighthouses blink along a coastline — one signals MIN, the other signals MAX. A captain notes the latest flash from each. The moment either blinks again, he measures the distance between the two latest flashes. The shortest distance he ever measures is the answer.",
+    "pitfalls": [
+      "If min == max (all equal), answer is 1 — handle it before the sweep.",
+      "Only pair when the other position exists (`lastMin`/`lastMax` still -1 means skip).",
+      "Track the LATEST min and max positions, not the first ones."
+    ],
     "solutions": [
       {
         "label": "Brute",
@@ -840,6 +865,11 @@
     "story": "Allocate a new array of length C - B + 1 and copy A[B..C] into it. Off-by-one is the only hazard.",
     "plain": "Copy A[B..C] (inclusive) into a new array of size C - B + 1. One loop, single index translation. Use System.arraycopy in production, but the manual loop makes the index math explicit.",
     "tale": "A scribe is asked for a specific span of a long scroll. She measures the distance (C minus B plus one for inclusivity), unrolls a blank parchment of that size, and copies character by character from B to C.",
+    "pitfalls": [
+      "Length is `C - B + 1` (inclusive), easy to drop the +1.",
+      "Write into `result[i - B]`, not `result[i]`.",
+      "Range is inclusive of C, so loop `i <= C`."
+    ],
     "solutions": [
       {
         "label": "Optimal",
@@ -953,6 +983,11 @@
     "story": "Two nested loops: start in outer, end in inner. Inner copy fills A[start..end] into a fresh row. Total count = N*(N+1)/2.",
     "plain": "Enumerate every (start, end) pair with start ≤ end. For each pair, copy A[start..end] into a row of the output 2D array. The total number of subarrays is N*(N+1)/2 — pre-allocate exactly that many rows.",
     "tale": "A cartographer cuts a long ribbon into every possible contiguous segment. She nails each segment to a board so every possible cut and length is visible. The total scraps form a triangular pile of size N*(N+1)/2.",
+    "pitfalls": [
+      "Count is `N*(N+1)/2` — size the output array to exactly that.",
+      "Inner loop is `end = start..N-1`, so a single-element subarray `[start]` is included.",
+      "Copy `A[start..end]` into a fresh row each time; don't share the array."
+    ],
     "solutions": [
       {
         "label": "Optimal",
@@ -1060,6 +1095,11 @@
     "story": "Single pass keeping count of 'A's seen so far. Each 'G' adds that count to the running pair total.",
     "plain": "Walk left to right keeping a counter aSeen. Whenever you encounter 'A', increment aSeen. Whenever you encounter 'G', add aSeen to the answer (because every previous 'A' pairs with this 'G'). One pass, O(1) extra, O(N) time.",
     "tale": "An archaeologist walks a sequence of cave paintings tallying 'A' suns she has passed. Each time she sees a 'G' goat, she silently counts how many suns are behind her and adds that to her grand tally. Symbol order is preserved; every sun-goat pairing is counted exactly once.",
+    "pitfalls": [
+      "Pairs reach ~2.5e9 for N=1e5 — use `long` or it silently overflows.",
+      "Add `aSeen` to the answer on 'G', not on 'A'.",
+      "Only 'A' and 'G' matter; skip every other character."
+    ],
     "solutions": [
       {
         "label": "Brute",
@@ -1244,6 +1284,11 @@
     "story": "Start with all-from-left. Each step swap one left-pick for one right-pick. Track the max along the way.",
     "plain": "Start by picking all B elements from the LEFT — that's an initial sum. Then iteratively un-pick the rightmost of those left picks and pick one more from the RIGHT instead. After B+1 configurations (0..B from the right), report the max. The slide is O(B), so total O(B).",
     "tale": "A farmer at a long market may grab B baskets from either end. He starts by grabbing the first B from the left. Then he tries swapping his rightmost left-grab for a new right-grab one at a time, watching the total. After B+1 trials he picks the configuration that gave the biggest haul.",
+    "pitfalls": [
+      "Values can be negative, so picking more isn't always better — track the max, not the last.",
+      "Start from all-left and check that config too (best = initial sum before swapping).",
+      "The swap indexes are `A[B-1-k]` on the left and `A[N-1-k]` on the right — off-by-one bait."
+    ],
     "solutions": [
       {
         "label": "Optimal",
@@ -1397,6 +1442,11 @@
     "story": "Walk right to left tracking maxSoFar. If A[i] > maxSoFar, it's a leader; update maxSoFar.",
     "plain": "Walk from the right end leftward, tracking the maximum seen so far. The rightmost element is always a leader (nothing is to its right). Each subsequent element is a leader iff it strictly exceeds the running max — and if so, it becomes the new running max.",
     "tale": "A king reviews his processional from the back of the line forward. Each soldier is 'the tallest yet seen from behind' only if no soldier behind him is taller. He marks those, walks forward, and revises his 'tallest behind me' record as he goes.",
+    "pitfalls": [
+      "The rightmost element is always a leader — seed with `A[N-1]`.",
+      "Strictly greater: use `A[i] > maxRight`, not `>=`.",
+      "Collection order is right-to-left; reverse if you need left-to-right."
+    ],
     "solutions": [
       {
         "label": "Brute",
@@ -1584,6 +1634,11 @@
     "story": "Walk once tracking minSoFar. At each day, candidate profit = A[i] - minSoFar; track max. Then update minSoFar.",
     "plain": "Walk left to right keeping minSoFar (the lowest price seen up to day i). At each day, the best profit if you sell TODAY is A[i] - minSoFar. Track the maximum across all days. One pass, O(1) extra.",
     "tale": "A trader keeps a single sticky note: 'cheapest seen so far'. Every day she imagines selling at today's price and looks at the gain over her sticky note. She updates a 'best profit' counter and, if today's price beats her sticky note, she rewrites it.",
+    "pitfalls": [
+      "If no profit is possible, return 0 (never sell at a loss).",
+      "Guard the empty array before reading `A[0]`.",
+      "Update `best` with today's price BEFORE updating `minSoFar`, or you buy and sell same day."
+    ],
     "solutions": [
       {
         "label": "Brute",
@@ -1756,6 +1811,11 @@
     "story": "N is small (≤10^3). Two nested loops enumerate all subarrays; running sum within the inner loop avoids re-summing.",
     "plain": "Constraints are loose enough (A ≤ 1000) for O(N^2). Outer loop start, inner loop end, maintain running sum. Each time sum ≤ B and sum > best, update best. Start best at 0 — if every single element exceeds B, the answer is 0.",
     "tale": "A treasure hunter has a budget B. She tries every contiguous chest set, weighs the gold, and remembers the heaviest haul that still fits her wagon (≤ B).",
+    "pitfalls": [
+      "Start `best = 0` — if every element exceeds B, the answer is 0.",
+      "Early break only works because all C[i] >= 1; with negatives you couldn't break.",
+      "Use `long` for the running sum before comparing to B."
+    ],
     "solutions": [
       {
         "label": "Optimal (for N ≤ 1000)",
@@ -1874,6 +1934,11 @@
     "story": "<strong>Mnemonic — Left Fence × Right Fence.</strong> For A[i] to sit inside a subarray you need a left wall and a right wall. Left wall can be ANY position 0..i → that's <code>i+1</code> choices. Right wall can be ANY position i..N-1 → that's <code>N-i</code> choices. Multiply: A[i] lives in <code>(i+1) * (N-i)</code> subarrays. So <code>total = Σ A[i] * (i+1) * (N-i)</code>. One pass, O(N).",
     "plain": "The number of subarrays that include index i equals (i+1) * (N-i) — pick any start ≤ i (i+1 choices, namely 0,1,...,i) and any end ≥ i (N-i choices, namely i,i+1,...,N-1). Each (start, end) pair defines a unique subarray containing i. So total = Σ A[i] * (i+1) * (N-i). One pass, O(N). Cast A[i] to long BEFORE multiplying to avoid silent overflow.",
     "tale": "<strong>Two fences enclose every garden gnome.</strong> Gnome i needs a fence on its LEFT (planted anywhere from the start of the row up to and including i → i+1 spots) and a fence on its RIGHT (anywhere from i to the end of the row → N-i spots). Every (left, right) fence pair creates one subarray that contains the gnome. Count fences, not subarrays.",
+    "pitfalls": [
+      "Cast `A[i]` to `long` BEFORE multiplying, or `(i+1)*(N-i)` overflows int.",
+      "It's `(i+1) * (N-i)`, not `i * (N-i)` — count includes index i itself.",
+      "Per-element contribution can reach ~2.5e13, so the total needs `long`."
+    ],
     "solutions": [
       {
         "label": "Brute",
@@ -2005,6 +2070,11 @@
     "story": "Compute first window sum once. Slide: sum += A[r] - A[l]. Match against C at every step.",
     "plain": "Window length B is fixed. Sum the first B elements; if equal to C return 1. Otherwise slide one step at a time: new sum = old sum - A[l] + A[r] where l moves from 0 and r from B. Check equality after each slide. O(N) total.",
     "tale": "A surveyor measures sand drifts in a fixed-width plot. She weighs the first stretch fully, then slides her ruler one yard at a time, subtracting yesterday's leftmost yard and adding today's rightmost — never re-weighing the middle.",
+    "pitfalls": [
+      "Window size is fixed at B — don't shrink it, just slide.",
+      "Check the very first window (indices 0..B-1) before sliding.",
+      "Slide with `sum += A[r] - A[r-B]`; the dropped index is `r-B`, not `l`."
+    ],
     "solutions": [
       {
         "label": "Optimal",
@@ -2119,6 +2189,11 @@
     "story": "<strong>Three algorithms cover almost every subarray problem.</strong> Pick by asking two questions: (1) Are negatives allowed? (2) Is the constraint equality, ≤/≥, or fixed window? The decision tree picks the algorithm; the rest is template typing.",
     "plain": "Every subarray problem reduces to a (constraint, signs) pair:\n• (= K, any signs) → HashMap of prefix sums; for each running sum S add count of (S − K) seen, then bump count of S.\n• (= K, positives) → HashMap also works; sliding-window-with-atMost trick also works.\n• (≤ K or ≥ K, positives) → Sliding window: expand right, shrink left when constraint breaks.\n• (≤ K or ≥ K, mixed signs) → Merge-sort on prefix sums (counting inversions / sum-bounded pairs).\n• (Fixed window of size K) → Sliding window of fixed size; add new, drop old.\n• (Exactly K distinct) → atMost(K) − atMost(K − 1).\n• (Max sum subarray, mixed signs) → Kadane (reset currSum when it dips below 0).",
     "tale": "<strong>The toolbox-and-toggle.</strong> The toggle is sign-of-elements; the toolbox has three bays. Positive-only? → Sliding window. Equality? → HashMap. Inequality with negatives? → Merge-sort prefix. Pull the right tool — never mix.",
+    "pitfalls": [
+      "Sliding window only works when values are non-negative (sums monotone); negatives break it.",
+      "For sum == K with negatives use a HashMap of prefix sums, not two pointers.",
+      "'Exactly K distinct' = atMost(K) - atMost(K-1); don't try to count it directly."
+    ],
     "solutions": [
       {
         "label": "Tool 1 — HashMap of Prefix Sums (handles negatives, sum == K)",
@@ -2319,6 +2394,11 @@
     "story": "Two nested loops, running sum, length-parity branch on the predicate.",
     "plain": "N ≤ 5000 so O(N^2) is fine. Two nested loops; maintain running sum. For each subarray of length L = end - start + 1: if L is even and sum < B, count++; if L is odd and sum > B, count++.",
     "tale": "A baker tries every contiguous batch of buns. She has two rules: even-batch must weigh less than B, odd-batch must weigh more. She tallies every batch passing its respective rule.",
+    "pitfalls": [
+      "Even length uses `sum < B`, odd length uses `sum > B` — don't mix the two.",
+      "Length is `end - start + 1`; check its parity, not the index parity.",
+      "N is only 5000 so O(N^2) is fine — no need to over-engineer."
+    ],
     "solutions": [
       {
         "label": "Optimal (for N ≤ 5000)",
@@ -2409,6 +2489,11 @@
     "story": "Fixed window B. Track the window with the smallest SUM (denominator is constant → same minimiser).",
     "plain": "Since window length is fixed at B, comparing averages is the same as comparing sums (avg = sum / B). Maintain a fixed-window sum; track the start index where the min sum occurred. Return that index.",
     "tale": "A weather analyst scans a fixed B-day window across temperature logs, sliding one day at a time. He remembers the start day of the coldest stretch he has seen.",
+    "pitfalls": [
+      "Window size is fixed, so compare sums directly — never divide (avoids float error).",
+      "Values can be negative, so `bestSum` must start at the first window's sum, not 0.",
+      "Return the START index `r - B + 1`, not the current pointer `r`."
+    ],
     "solutions": [
       {
         "label": "Optimal",
@@ -2567,6 +2652,11 @@
     "story": "Two-pointer slide: extend r while sum<B; when overflowed, advance l. Count contributions per fixed r.",
     "plain": "Since A[i] are non-negative, sums are monotone in window size. Use a two-pointer slide: maintain window [l..r] with sum < B. When adding A[r] would overflow, shrink from the left. For each valid (l, r) every subarray [l..r], [l+1..r], ..., [r..r] is valid → (r - l + 1) contributions. O(N) total.",
     "tale": "A grocer slides a basket along a shelf, adding items. Whenever the basket weight exceeds B, she lifts off items from the back until it's under again. Every shelf-front position is one valid basket start; she sums basket-count over all positions.",
+    "pitfalls": [
+      "Sum is strictly less than B — use `sum >= B` to shrink, not `>`.",
+      "Each valid window adds `r - l + 1` subarrays, not just 1.",
+      "Two pointers work only because values are non-negative."
+    ],
     "solutions": [
       {
         "label": "Brute",
@@ -2735,6 +2825,11 @@
     "story": "Outer loop columns, inner loop rows. Accumulate A[i][j] into out[j].",
     "plain": "Allocate result[] of length cols. Outer loop j over columns, inner loop i over rows, accumulate A[i][j] into result[j]. Watch the loop order — putting j outside is cleaner here than j inside.",
     "tale": "An accountant tallies cash-register columns. She walks down each column from top to bottom, scribbling the column total at the bottom, then moves to the next column.",
+    "pitfalls": [
+      "Result length is the number of columns `C`, not rows.",
+      "Index as `A[i][j]` with i=row, j=column — easy to swap.",
+      "Get column count from `A[0].length`, and remember rows may differ from columns."
+    ],
     "solutions": [
       {
         "label": "Optimal",
@@ -2853,6 +2948,11 @@
     "story": "Walk i = 0..N-1 and sum A[i][i].",
     "plain": "Main diagonal is the cells where row == column. Walk i from 0 to N-1 and add A[i][i]. O(N).",
     "tale": "A janitor mops only the central crease of a tiled hall — every tile where row equals column. He starts at the top-left and walks south-east one tile at a time.",
+    "pitfalls": [
+      "Main diagonal is where row == column, so just sum `A[i][i]`.",
+      "Values can be negative (down to -1000) — the sum can go negative.",
+      "This is the main diagonal (i == j), not the anti-diagonal."
+    ],
     "solutions": [
       {
         "label": "Optimal",
@@ -2970,6 +3070,11 @@
     "story": "There are 2N-1 anti-diagonals. The k-th has cells where i + j = k. Two phases: top edge (start j varies), then left edge (start i varies).",
     "plain": "Anti-diagonals satisfy i + j = constant (0 to 2N-2 → 2N-1 of them). Easiest enumeration: phase 1 — for each starting column j = 0..N-1, walk (row=0, col=j) → (row+1, col-1) until col < 0; phase 2 — for each starting row i = 1..N-1, walk (i, N-1) → (i+1, N-2) until row >= N. Append each walk to output, pad with zeros to length N.",
     "tale": "A choreographer assigns dancers to /-shaped lines across a square stage. She first lines up dancers starting at the top edge (column varying), then continues from the right edge downward, so every diagonal of the stage is captured in order.",
+    "pitfalls": [
+      "Output is `(2N-1) x N`; pad each short diagonal with 0 to length N.",
+      "Two phases: top row start columns, then left column start rows beginning at `i = 1` (skip the corner twice).",
+      "Values reach 1e9 — the stored ints are fine but don't sum them into an int."
+    ],
     "solutions": [
       {
         "label": "Optimal",
@@ -3092,6 +3197,11 @@
     "story": "B[j][i] = A[i][j]. Allocate new matrix with swapped dimensions; one pass copies.",
     "plain": "Allocate new matrix B of dimensions cols x rows. Loop i over rows of A, j over cols, set B[j][i] = A[i][j]. O(R*C). For square matrices you can transpose in place using swaps on the upper triangle.",
     "tale": "A photographer flips a portrait into a landscape: every pixel that was at (i, j) now lives at (j, i). Rows became columns, columns became rows.",
+    "pitfalls": [
+      "Result dimensions are swapped: `C x R`, not `R x R`.",
+      "Set `result[j][i] = A[i][j]` — swap the indices.",
+      "Matrix may be non-square, so you can't transpose in place here."
+    ],
     "solutions": [
       {
         "label": "Optimal",
@@ -3210,6 +3320,11 @@
     "story": "Two clean passes: (1) transpose in place using upper-triangle swaps; (2) reverse each row.",
     "plain": "90° clockwise rotation equals: TRANSPOSE then REVERSE each ROW. Both steps are in-place: transpose swaps the upper triangle with the lower triangle; row-reversal swaps left and right ends of each row. Done.",
     "tale": "A puzzle artist flips a square painting along its / diagonal (transpose), then mirrors each row left-to-right. Magically, the painting now hangs with what was the bottom-left now at the top-left — a 90° clockwise rotation.",
+    "pitfalls": [
+      "Clockwise = transpose THEN reverse each row; reversing first gives the wrong rotation.",
+      "In the transpose loop use `j = i+1` (upper triangle only), or you swap back to the original.",
+      "It's in-place — don't allocate a second matrix."
+    ],
     "solutions": [
       {
         "label": "Optimal — Transpose + Row Reverse (in-place)",

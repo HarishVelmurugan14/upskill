@@ -15,6 +15,11 @@
     "story": "Kadane: at each i decide — extend the running sum or restart at A[i]. Track best ever.",
     "plain": "Classic Kadane. Maintain currSum (best sum ending exactly at index i). Transition: currSum = max(A[i], currSum + A[i]). Track best = max(best, currSum). When all elements are negative, the answer is the single largest element (not 0) — initialise best to A[0] or Integer.MIN_VALUE, NOT 0.",
     "tale": "A hiker tracks elevation gain across a mountain trail. At every step she asks: 'is starting fresh from here better than carrying yesterday's losses forward?' She remembers the highest cumulative gain she ever reached.",
+    "pitfalls": [
+      "All-negative arrays break the naive version: never start `best` at 0, use `A[0]` or `Integer.MIN_VALUE` or you'll wrongly return 0.",
+      "Reset `currSum` to 0 only after updating `best`, not before, or you lose the single-element answer.",
+      "The subarray must be non-empty, so you can't just skip everything and return 0."
+    ],
     "solutions": [
       {
         "label": "Brute",
@@ -180,6 +185,11 @@
     "story": "Each range update is O(N) naïvely → O(N*Q) worst. Difference array → O(1) per update + O(N) finalisation.",
     "plain": "Apply each [L, R, P] to a difference array d: d[L-1] += P, d[R] -= P (if R < A). After all updates, prefix-sum d to get the final pot values. Total cost O(A + Q).",
     "tale": "Instead of dropping coins into every pot one by one (slow!), a clever teller posts a +P sign at the start of the range and a -P sign just after the end. At day's end, she walks down the row carrying a running total — and the total at each pot is the answer.",
+    "pitfalls": [
+      "Watch the off-by-one: `L` and `R` are 1-based, so add at `L-1` and subtract at `R` (that's `R-1 + 1`).",
+      "Guard the right marker with `if R+1 < A` or you'll write past the end of the diff array.",
+      "The updates list `B` can be empty (length 0), so don't assume there's at least one query."
+    ],
     "solutions": [
       {
         "label": "Brute",
@@ -316,6 +326,11 @@
     "story": "Water above bar i = min(maxLeft[i], maxRight[i]) - A[i] (if positive). Precompute both maxes.",
     "plain": "For each bar i, the water trapped on top equals min(highestToTheLeft, highestToTheRight) - A[i], floored at 0. Precompute leftMax[] (max of A[0..i-1]) and rightMax[] (max of A[i+1..N-1]) in two linear sweeps, then one more sweep to accumulate water.",
     "tale": "After a downpour, water collects only above bars hemmed in by taller walls on both sides. The flood height at each bar equals the shorter of the two walls. A surveyor first records the tallest wall to the left and right of every bar, then totals the puddles.",
+    "pitfalls": [
+      "Arrays with fewer than 3 bars trap nothing, so handle `N < 3` up front.",
+      "The first and last bars never hold water (no wall on one side), so loop `i` from 1 to N-2.",
+      "Only add water when `min(leftMax, rightMax) - A[i]` is positive, else you subtract a taller bar and go negative."
+    ],
     "solutions": [
       {
         "label": "Brute",
@@ -456,6 +471,11 @@
     "story": "Add from the right with a carry, like grade-school addition. Strip leading zeros first; prepend a 1 only if the carry survives the most significant digit (all 9s).",
     "plain": "The digits live in an array, most significant first. Adding 1 is school-book addition starting from the rightmost digit: digit + carry, keep the units place, push the tens place as the next carry. Start carry = 1 (the '+1'). The moment a digit + carry < 10 the carry dies and you can stop. Two corner cases matter: (1) leading zeros in the INPUT must be dropped from the OUTPUT, so find the first non-zero digit and treat the answer as starting there; (2) if the number is all 9s (e.g. 999), the carry survives past the most significant digit and you must prepend a fresh 1, giving 1000. Don't convert the whole array to a long — N can be 1e6 digits, which overflows everything.",
     "tale": "A shopkeeper tallies a long bill on a paper tape, rightmost digit first. She adds the final coin: if a column tips past 9 she writes the units and carries the 1 left, column by column. If the whole tape was 9s, she tapes a fresh '1' onto the front. And any blank zero-padding she'd scribbled on the left of the tape, she simply tears off before handing over the total.",
+    "pitfalls": [
+      "Don't turn the digits into an int or long, N can be a million digits and it overflows everything.",
+      "Leading zeros in the input must be stripped from the output, so find the first non-zero digit first.",
+      "The all-9s case (like 999) is the only time the carry survives, then you must prepend a fresh 1."
+    ],
     "solutions": [
       {
         "label": "Brute",
@@ -579,6 +599,11 @@
     "story": "Map 0 → +1, 1 → -1. Maximum-sum subarray in transformed array = best flip gain. Track L, R.",
     "plain": "Flipping a range [L, R] increases #1s by (#0s in range) - (#1s in range). Transform: 0 → +1, 1 → -1. Then the gain becomes the sum of transformed values in [L, R]. We want max subarray sum > 0. Use Kadane, tracking L and R indices on every improvement. Lexicographic-smallest tie-break is automatic if you update only on strict improvements.",
     "tale": "A printer wants the largest count of bright pixels. He can repaint exactly one stretch — swapping black↔white. He scores each candidate stretch by '#dark gained minus #bright lost' and picks the best.",
+    "pitfalls": [
+      "Map 0 to +1 and 1 to -1, getting this backwards flips the whole answer.",
+      "If the string is already all 1s the best gain stays 0, so return an empty array (the `L == -1` sentinel catches this).",
+      "The indices are 0-based inside the loop but the answer must be 1-based, so add 1 to both `L` and `R`."
+    ],
     "solutions": [
       {
         "label": "Optimal — Kadane on Transformed",
@@ -713,6 +738,11 @@
     "story": "Peel onion layers. Each layer = top row → right column → bottom row → left column. Shrink dimension by 2, recurse to inner square.",
     "plain": "Walk in clockwise spirals layer by layer. Each layer writes 4 strips of length (A-1) where A is the current layer's side length: top-edge L→R, right-edge T→B, bottom-edge R→L, left-edge B→T. Then move (i, j) inward by (+1, +1) and reduce A by 2. If a single cell remains (odd-side innermost), place the final count there.",
     "tale": "An ant walks in tightening clockwise loops on a square garden, planting one numbered marker per tile. After each loop completes, the ant steps inward and starts a smaller loop, until only the centre tile remains.",
+    "pitfalls": [
+      "Each edge walks exactly `A-1` cells, not `A`, so the corner isn't written twice.",
+      "Odd side lengths leave one center cell, so after the loop place the final count when `A == 1`.",
+      "After finishing a layer remember to step inward with `i++`, `j++` and shrink `A` by 2, not 1."
+    ],
     "solutions": [
       {
         "label": "Optimal — Layered Walk",
@@ -841,6 +871,11 @@
     "story": "Start at top-right corner. If A[r][c] == B → match. If A[r][c] > B → move LEFT (col--). If < B → move DOWN (row++). O(N+M).",
     "plain": "Use the row+column sorted property. Start at top-right (r=0, c=M-1). At every step the cell A[r][c] is the MAX of row r and the MIN of column c, so a comparison eliminates exactly one row or one column. If equal, record candidate and continue LEFT (to find lexicographically smaller position). If A[r][c] > B move LEFT; else move DOWN. Total moves ≤ N + M.",
     "tale": "A librarian standing at the top-right shelf knows: above-and-left are all smaller, below-and-right are all bigger. She compares the book at hand to the target — too big? slide left. Too small? step down. The diagonal staircase always finds the target (or runs off the grid).",
+    "pitfalls": [
+      "Start at the top-right corner, not top-left, or the greater/smaller decision won't eliminate a full row or column.",
+      "On a match keep moving left (`col--`) to find the lexicographically smaller position, don't stop early.",
+      "Use 1-based indexing in the score `(row+1)*1009 + col+1`, and return -1 (not the sentinel) when nothing is found."
+    ],
     "solutions": [
       {
         "label": "Optimal — Staircase",
@@ -958,6 +993,11 @@
     "story": "Each A[i][j] appears in (i+1)*(N-i)*(j+1)*(M-j) submatrices. Multiply and sum.",
     "plain": "Don't enumerate submatrices — count appearances. For a cell (i, j), a submatrix that contains it is defined by choosing top-row from [0..i] (i+1 choices), bottom-row from [i..N-1] (N-i choices), left-col from [0..j] (j+1 choices), right-col from [j..M-1] (M-j choices). Multiply contributions and sum.",
     "tale": "A real-estate appraiser values every rectangular plot of a square neighbourhood. Instead of pricing each plot, she asks: 'in how many plots does THIS house belong?' She multiplies each house's value by its appearance count, and sums.",
+    "pitfalls": [
+      "Cast to `long` before multiplying, the counts multiply four times and blow past int range.",
+      "The appearance count is `(i+1)*(N-i)*(j+1)*(M-j)`, mixing up which factor uses `i` vs `N-i` gives wrong contributions.",
+      "Don't try to enumerate every submatrix, count how many each cell belongs to instead."
+    ],
     "solutions": [
       {
         "label": "Optimal — Contribution",
@@ -1064,6 +1104,11 @@
     "story": "Count the 'good' elements (<= B) — call it K. The answer is K minus the most good elements any window of size K already holds, i.e. the minimum number of 'bad' elements across all size-K windows. Each bad element inside the final window needs exactly one swap.",
     "plain": "Since any two elements can be swapped, the only thing that matters is WHERE the good elements (<= B) end up. If there are K good elements, they must finish inside one contiguous block of length K. For a chosen block, every bad element (> B) currently sitting in it must be swapped out with a good element sitting outside — that's exactly (number of bad elements in the block) swaps. So the answer = the minimum number of bad elements over every window of size K. Slide a fixed window of size K across the array, maintaining the bad-count in O(1) per step. Edge case: if K == 0 or K == n, everything is already grouped → 0 swaps.",
     "tale": "You want all your close friends seated together in one row of K chairs. Strangers currently in those chairs each cost one swap to trade with a friend sitting elsewhere. You scan every possible block of K adjacent chairs and pick the one already holding the most friends — fewest strangers to evict.",
+    "pitfalls": [
+      "If `K` is 0 or equals `n` everything is already grouped, return 0 before sliding.",
+      "The window size is `K` (the count of good elements), not some fixed number, so compute `K` first.",
+      "Slide by adjusting only the element leaving and the one entering, recounting each window makes it O(N*K)."
+    ],
     "solutions": [
       {
         "label": "Brute",
@@ -1196,6 +1241,11 @@
     "story": "Each row is sorted, so 1s are right-aligned. Walk a staircase from the top-right corner: on a 1, step LEFT (this row gained a 1, remember it); on a 0, step DOWN. The 'left' pointer never resets, so total work is O(N + M).",
     "plain": "Because every row is sorted (0s then 1s), the row with more 1s has its leftmost 1 further to the left. Start at the top-right cell (row 0, last column). While you see a 1, move left and record the current row as the best so far — you only move left when a row beats the previous best's 1-count. When you hit a 0, drop down to the next row without resetting the column. Since the column index only ever decreases and the row index only ever increases, you touch at most N + M cells. Ties naturally resolve to the lower row index because we move left (update best) only on a strictly better row.",
     "tale": "Imagine inspectors checking shelves where boxes are pushed to the right. Standing at the top-right, you slide left as long as you keep finding boxes, marking each shelf that lets you go further left as the new record-holder. The moment you hit a gap, you step down a shelf — never walking back right.",
+    "pitfalls": [
+      "The column pointer must never move back right and the row pointer only moves down, resetting either kills the O(N+M) bound.",
+      "Update `best` only while you can still push `j` further left, that's what gives the lower row index on ties.",
+      "Rows are 0-based here, so return the row index directly without adding 1."
+    ],
     "solutions": [
       {
         "label": "Brute",
@@ -1323,6 +1373,11 @@
     "story": "Answer lives in [1, N+1]. Sanitise out-of-range with a sentinel; then for each value v in [1, N] mark index v-1 negative; first index with positive value → missing.",
     "plain": "Key insight: the answer is always in [1, N+1]. Anything ≤ 0 or > N+1 is irrelevant — replace them with a sentinel like (N+2). Then for every still-relevant value v = |A[i]| ≤ N, mark A[v-1] negative (use its absolute value to read the original). Finally, the first index where A[i] > 0 means (i+1) was never marked → answer = i+1. If all are negative, return N+1.",
     "tale": "A receptionist holds keys 1..N+1 to N+1 imaginary lockers. She scans every guest's ticket and, for any valid ticket v ≤ N, she dog-ears locker v. After scanning, the first locker without a dog-ear is the smallest missing number.",
+    "pitfalls": [
+      "The answer only lives in [1, N+1], so treat anything <= 0 or > N as noise (swap in a sentinel).",
+      "Always read `Math.abs(A[i])` in the marking pass, since earlier marks flipped signs.",
+      "If every slot ends up marked, the answer is N+1, don't forget that final return."
+    ],
     "solutions": [
       {
         "label": "Brute — Sort and Walk",
@@ -1469,6 +1524,11 @@
     "story": "Inputs sorted by start. Maintain a 'current' interval; for each next, if its start ≤ current.end, extend current.end; else flush current and start a new one.",
     "plain": "Because input is already sorted by start, a single pass suffices. Hold a 'current' interval = first one. For each next interval [s, e]: if s ≤ current.end, merge (current.end = max(current.end, e)); else, push current to output and set current = [s, e]. Push the final current at the end.",
     "tale": "A scheduler keeps a running 'block' on a calendar. Every new meeting either overlaps the block (extend its right edge) or starts after (close the old block, open a new one).",
+    "pitfalls": [
+      "When merging, extend with `max(current.end, next.end)`, a nested interval like [2,10] then [4,9] shouldn't shrink the end.",
+      "Don't forget to push the final `current` after the loop ends.",
+      "Decide whether touching intervals like [1,3] and [3,5] count as overlapping (`<=` vs `<`) per the spec."
+    ],
     "solutions": [
       {
         "label": "Optimal — Linear Fold",
@@ -1606,6 +1666,11 @@
     "story": "Sorted input → one pass in 3 phases: copy intervals that end before B; absorb every interval that overlaps B into a widened B = [min start, max end]; drop the merged B in once; then copy the rest.",
     "plain": "Because the set is already sorted by start, a single left-to-right pass works. Phase 1: copy intervals that end strictly before B starts (A[i].end < B.start). Phase 2: while the next interval starts at or before B's end (A[i].start ≤ B.end), it overlaps — widen B to [min(B.start, A[i].start), max(B.end, A[i].end)]. Phase 3: B is now fully merged, so push it once, then copy every remaining interval (they all start after B ends). Work on a copy of B so the input isn't mutated.",
     "tale": "A receptionist slots a new meeting B into a sorted day planner. Meetings finishing before B begins are left untouched; any meeting that bumps into B gets swallowed, stretching B's block wider; once nothing else collides, she pins the widened block down and lets the later meetings through unchanged.",
+    "pitfalls": [
+      "Copy `B` into locals before widening so you don't mutate the caller's interval.",
+      "The intervals list can be empty (size 0), so the phases must still emit just `B`.",
+      "Emit the merged `B` exactly once, between the before-group and after-group, not inside the overlap loop."
+    ],
     "solutions": [
       {
         "label": "Optimal — Three-Phase Sweep",
@@ -1721,6 +1786,11 @@
     "story": "Two pointers on a positive array: expand right adding to currSum; while currSum > B, shrink from left. After each step, update maxSum with currSum (which is ≤ B by then).",
     "plain": "Because C[i] > 0, expanding the right pointer monotonically increases currSum and shrinking from the left monotonically decreases it. So a single forward pass with a sliding window finds, for every right end, the LARGEST window ending there with sum ≤ B. Take the max of those window sums. Brute is O(N²) over all subarrays — fine for small N but pointless when O(N) is one extra pointer.",
     "tale": "Inflate a balloon by walking right; whenever it overshoots the cap, deflate from the back end until it fits, and read off the maximum legal size you ever saw.",
+    "pitfalls": [
+      "If no subarray fits (every element > B), return the initial `maxSum = 0`, don't return -1 or crash.",
+      "Sums can exceed int range (up to 1e5 elements of 1e6), so accumulate in a `long` while checking against B.",
+      "The two-pointer trick only works because all elements are positive, don't reuse it on arrays with negatives."
+    ],
     "solutions": [
       {
         "label": "Brute — All Subarrays",

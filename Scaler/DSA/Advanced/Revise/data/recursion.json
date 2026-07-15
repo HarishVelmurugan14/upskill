@@ -14,6 +14,11 @@
     "story": "Base: 0! = 1. Recursive: N! = N × (N-1)!. Linear stack depth.",
     "plain": "Two parts: BASE CASE — if A == 0, return 1 (0! is 1 by convention). RECURSIVE CASE — return A * solve(A-1). Each frame multiplies its own A by the result of the smaller subproblem. Stack depth = A+1.",
     "tale": "A stack of boxes, each labelled with a number, gets unpacked from N down to 0. The bottom box contains '1'. As you re-pack, each box multiplies its own label into the running product.",
+    "pitfalls": [
+      "Don't forget the `A == 0` base case, or you'll recurse past zero forever and blow the stack.",
+      "Return `A * solve(A-1)`, not just `solve(A-1)` — the multiply is the whole point.",
+      "For A ≥ 13 the answer overflows int; you're only safe because A ≤ 12."
+    ],
     "solutions": [
       {
         "label": "Optimal — Linear Recursion",
@@ -116,6 +121,11 @@
     "story": "Two base cases (0 → 0, 1 → 1). Recursive: f(A) = f(A-1) + f(A-2). Branching factor 2 → O(φ^N) calls.",
     "plain": "TWO base cases: A == 0 → 0, A == 1 → 1. Otherwise f(A) = f(A-1) + f(A-2). Naively exponential (~φ^N nodes in the call tree) because subtrees overlap massively — solve(A-2) is computed inside both branches. Memoisation reduces it to O(N).",
     "tale": "A genealogist asks each person 'who are your two predecessors?' until reaching the original ancestors (0 and 1). Each ancestor lookup is repeated many times — a wasteful family tree.",
+    "pitfalls": [
+      "You need TWO base cases (0 and 1) — with only one, `f(A-2)` goes negative and never stops.",
+      "The naive tree recursion recomputes the same values over and over, so it's exponential, not linear.",
+      "In the iterative version, handle `A == 0` before the loop, else you'd return `b` which is wrong."
+    ],
     "solutions": [
       {
         "label": "Brute — Tree Recursion",
@@ -247,6 +257,11 @@
     "story": "Recurse FIRST with N-1, THEN print N. Stack unwinding prints in ascending order.",
     "plain": "Trick is the ORDER: recurse first, print after. The function dives all the way to base (N==0), then unwinds — and on each unwind frame, prints its N. So you get 1, 2, 3, …, A. If you printed BEFORE recursing, you'd get A down to 1.",
     "tale": "A diver descends N rungs of a ladder; on each climb back up, he calls out the current rung number — so he calls out 1, 2, …, N as he ascends.",
+    "pitfalls": [
+      "Recurse FIRST, then print — swap the order and you get A..1 instead of 1..A.",
+      "Base case is `N == 0`; if you stop at `N == 1` you'll miss printing 1 or overshoot.",
+      "Print with a trailing space and only print the newline once, in the wrapper."
+    ],
     "solutions": [
       {
         "label": "Optimal",
@@ -365,6 +380,11 @@
     "story": "Print FIRST, THEN recurse with N-1. Top of the stack prints first — descending.",
     "plain": "Swap the order from Print 1-to-A: print N FIRST, then recurse on N-1. Each frame prints before diving deeper, so the highest values print first.",
     "tale": "A diver standing at rung N shouts 'N!' before descending one rung. He shouts N, N-1, …, 1 on the way down.",
+    "pitfalls": [
+      "Print BEFORE recursing here — putting the print after flips it to ascending 1..A.",
+      "Watch the base case `N == 0`, not `N == 1`, or the last number is off.",
+      "Newline goes once in the wrapper, not inside every recursive call."
+    ],
     "solutions": [
       {
         "label": "Optimal",
@@ -479,6 +499,11 @@
     "story": "Each frame: print N → recurse(N-1) → print N. Stack mirror produces the palindrome-like output.",
     "plain": "Each frame prints N TWICE — once before recursing (descending sweep) and once after returning (ascending sweep). The recursion descends to the base, leaving the descending half printed; then unwinds, the second print happens on the way up.",
     "tale": "A bell-ringer walks down N stairs ringing once on each step. At the bottom he turns around and rings each step again on the way up. The result echoes from N → 1 → 1 → N.",
+    "pitfalls": [
+      "You must print N both before AND after the recursive call — miss one and you lose half the output.",
+      "Same `N` variable is printed twice per frame; don't reuse a shared/global that changes between the two prints.",
+      "Base case `N == 0` returns silently; a wrong base makes it infinite or prints 0."
+    ],
     "solutions": [
       {
         "label": "Optimal",
@@ -601,6 +626,11 @@
     "story": "Two indices start, end. Base: start >= end → true. Else: A[start] == A[end] AND recurse(start+1, end-1).",
     "plain": "Use a helper f(start, end). Base: if start >= end (crossed or met), return true. Otherwise check A[start] == A[end] AND f(start+1, end-1). Stack depth N/2.",
     "tale": "Two readers stand at opposite ends of a scroll, reading inward. If their letters match at every step and they meet in the middle, the scroll is a palindrome.",
+    "pitfalls": [
+      "Base case is `start >= end` (use `>=`, not `==`) so odd-length strings with a middle char still stop.",
+      "Return the recursive result `f(start+1, end-1)`; forgetting to return it drops the rest of the check.",
+      "On a mismatch return false immediately — don't keep recursing."
+    ],
     "solutions": [
       {
         "label": "Optimal",
@@ -720,6 +750,11 @@
     "story": "Solve N: move N-1 from source→helper (using destination), move disk N from source→destination, move N-1 from helper→destination (using source). 2^N - 1 moves.",
     "plain": "Recursive reduction: to move N disks source→dest with helper, first move the top N-1 source→helper (using dest as temporary), then move disk N source→dest (1 move), then move N-1 helper→dest (using source as temporary). Minimum number of moves = 2^N - 1.",
     "tale": "An ancient monastery has three pegs and a tower of golden discs. The high priest delegates: 'apprentice, shift the top N-1 off the way; I'll move the big disc; then apprentice, finish.' The apprentices recursively delegate to smaller apprentices until they hold a single disc each.",
+    "pitfalls": [
+      "The two recursive calls swap which peg is helper vs destination — get the argument order wrong and moves are illegal.",
+      "Append the move BETWEEN the two recursive calls, not before or after both.",
+      "Output size is 2^N − 1 moves, so it grows huge fast; A is capped at 18 for a reason."
+    ],
     "solutions": [
       {
         "label": "Optimal",
@@ -834,6 +869,11 @@
     "story": "Helper f(A, N, B): base N==0 → empty list. Else, build list for first N-1; if A[N-1]==B append N-1; return.",
     "plain": "Recursion that builds the answer list. f(A, N, B) returns indices in A[0..N-1]. Base N==0: empty list. Recursive: get the list for N-1; if A[N-1] == B, append N-1 to it; return. Because we process N-1 first and append after, the list naturally comes out in ascending order.",
     "tale": "A scribe scans a scroll from left to right; every time he sees the target glyph, he stamps its index at the end of his tally — so the tally is naturally sorted.",
+    "pitfalls": [
+      "Recurse on N-1 first, then append the current index — append before recursing and the list comes out reversed.",
+      "Base case `N == 0` must return an empty list, not null, or the `.add` later crashes.",
+      "You're indexing `A[N-1]` (not `A[N]`) since N is a count, not an index — off-by-one bites here."
+    ],
     "solutions": [
       {
         "label": "Optimal",
@@ -943,6 +983,11 @@
     "story": "Helper f(A, N): base N==0 return; recurse N-1; print A[N-1].",
     "plain": "Same recursive pattern as 'Print 1 to A': recurse on N-1 FIRST, then print A[N-1]. Stack unwinding emits elements in original (left-to-right) order.",
     "tale": "A reader photocopies a stack of pages from top to bottom — but he can only see the bottom page. He recursively defers the upper pages to a helper, then once the helper is done, prints his bottom page last. Each helper does the same: defer up, print his page. The result is a clean top-to-bottom printout.",
+    "pitfalls": [
+      "Recurse on N-1 first, print `A[N-1]` after — printing before recursing reverses the array.",
+      "Print `A[N-1]`, not `A[N]`; N is the length/count, so the last real index is N-1.",
+      "Stop at `N == 0` and print the single trailing newline only in the wrapper."
+    ],
     "solutions": [
       {
         "label": "Optimal",
@@ -1057,6 +1102,11 @@
     "story": "Divide exponent in half. half = power(A, B/2). If B even: half*half. If B odd: half*half*A. O(log B).",
     "plain": "Halve the exponent at each step. half = power(A, B/2). If B is even: A^B = half * half. If odd: A^B = half * half * A. Base: B==1 → A. Reduces from O(B) multiplications to O(log B).",
     "tale": "Instead of multiplying A by itself B times, you square once and double the exponent. Like folding a paper — each fold doubles thickness, so log2(B) folds reach 2^B layers.",
+    "pitfalls": [
+      "Compute `half = power(A, B/2)` ONCE into a variable — calling `power(A, B/2)` twice makes it O(B) again.",
+      "When B is odd, don't forget the extra `* A`, since integer `B/2` drops the remainder.",
+      "Base case is `B == 1`; multiply in `long` (not int) or the result overflows before you're done."
+    ],
     "solutions": [
       {
         "label": "Brute — Linear Multiplication",
@@ -1192,6 +1242,11 @@
     "story": "Collapse the number to its digital root: keep summing digits until one digit remains; magic iff that digit is 1. Shortcut — digital root = 1 + (A−1) % 9, so a number is magic ⟺ A % 9 == 1.",
     "plain": "Write a helper sum(A): if A < 10 it's already a single digit, return it. Otherwise add up all its digits (A%10, A/=10) into totalSum, then recurse on totalSum — repeating until a single digit falls out. The number is magic when that final digit equals 1. The whole reduction is exactly the 'digital root', which has a closed form: for A ≥ 1, root = 1 + (A−1) % 9, so magic ⟺ A % 9 == 1.",
     "tale": "A courier keeps folding a long tracking number in half by summing its digits, again and again, until a single lucky digit remains. If that digit is 1, the parcel is 'magic' and jumps the queue.",
+    "pitfalls": [
+      "Base case is `A < 10` (single digit) — stop there, don't keep summing a one-digit number forever.",
+      "Recurse on the digit sum until it's one digit; comparing the first sum to 1 too early is wrong (e.g. 1234 → 10 first).",
+      "The mod-9 shortcut is `A % 9 == 1`, not `A % 9 == 0` — digital root 1 maps to remainder 1."
+    ],
     "solutions": [
       {
         "label": "Recursive Digit Sum",
@@ -1304,6 +1359,11 @@
     "story": "Walk index forward from 0. If A[i]==B return i. Else recurse with i+1. End of array → -1.",
     "plain": "Recurse from index 0 upward. Check current first; if match return index. Otherwise recurse on index+1. The first match wins because we check BEFORE recursing.",
     "tale": "A reader scans pages 0, 1, 2, … and immediately stops at the first match — never reads further.",
+    "pitfalls": [
+      "Check `A[idx] == B` BEFORE recursing so the FIRST match wins, not a later one.",
+      "Base case `idx == A.length` returns -1; miss it and you read past the array end.",
+      "Remember to return the recursive `f(idx+1)` result, or a deeper match never reaches the top."
+    ],
     "solutions": [
       {
         "label": "Optimal",
@@ -1402,6 +1462,11 @@
     "story": "Recurse forward FIRST. If deeper call found a later index, return it. Else check current.",
     "plain": "Reverse the order from First Index: recurse FIRST, then check current. f(A, B, idx) returns -1 at end; otherwise gets the answer from idx+1 first. If that returned a valid index, return it (we've found something later). Else check if A[idx]==B and return idx or -1.",
     "tale": "A scanner walks all the way to the end, then back-tracks — at each step on the return, it checks whether anything later was found; if so, it propagates that index; otherwise it checks itself.",
+    "pitfalls": [
+      "Recurse FIRST, then check — checking before recursing would give the first index, not the last.",
+      "Capture `rest = f(idx+1)` and return it when it's not -1; only check the current index if `rest == -1`.",
+      "Base case `idx == A.length` returns -1 to signal 'not found', so -1 must never be a valid index."
+    ],
     "solutions": [
       {
         "label": "Optimal",

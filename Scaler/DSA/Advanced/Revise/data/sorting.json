@@ -15,6 +15,11 @@
     "story": "Two sorted arrays → walk both with pointers P1, P2; always copy the smaller front element; drain the leftover tail. O(N+M), no sort needed.",
     "plain": "Keep a pointer into each array. Compare the current fronts A[P1] and B[P2]; copy the smaller into the result and advance that pointer. When one array runs out, copy the rest of the other. This is exactly the merge step of merge sort.",
     "tale": "Two lines of people already sorted by height merge into one line: at the front, whoever is shorter steps in next; when one line empties, the other files in as-is.",
+    "pitfalls": [
+      "Don't forget the drain loops — one array almost always has leftovers after the main loop ends.",
+      "Result size must be `N+M`; sizing it to just one array overflows.",
+      "Values reach 2*10^9, so `int` is fine for storage but not for any sum you might compute — here just copy, don't add."
+    ],
     "solutions": [
       {
         "label": "Optimal — Two-Pointer Merge",
@@ -125,6 +130,11 @@
     "story": "Count inversions as a side-effect of merge sort: when the right half's element is placed before leftovers of the left half, every remaining left element forms an inversion — add (mid+1 - P1).",
     "plain": "Brute is O(N^2). Instead, piggyback on merge sort. During the merge, when A[P2] (right) is smaller than A[P1] (left), it jumps ahead of ALL remaining left elements — that's (mid + 1 - P1) inversions at once. Sum these across every merge and take mod 1e9+7.",
     "tale": "Sorting a deck by merging two sorted halves: each time a right-hand card cuts in front of the still-waiting left-hand cards, it 'overtakes' all of them — tally those overtakes.",
+    "pitfalls": [
+      "Take `% 1e9+7` at every add, not just at the end, or the running count overflows `int`.",
+      "The inversion jump is `mid + 1 - P1`, counted only when you pick the right element — an off-by-one here silently miscounts.",
+      "Already-sorted input gives 0 inversions; reversed input gives the max, so test both."
+    ],
     "solutions": [
       {
         "label": "Optimal — Count During Merge",
@@ -212,6 +222,11 @@
     "story": "Split in half, sort each half recursively, then merge the two sorted halves with a two-pointer pass. O(N log N), stable.",
     "plain": "Recursively halve until single elements (already sorted), then merge sorted halves bottom-up. The merge copies into a temp buffer comparing fronts, then writes back into A[low..high].",
     "tale": "Keep tearing the pile in two until each scrap is one card, then zip the sorted scraps back together, pair by pair.",
+    "pitfalls": [
+      "`mid = (low+high)/2` then recurse `[low..mid]` and `[mid+1..high]` — mixing up these bounds loops forever or drops elements.",
+      "Base case is `low == high` (single element); if you write `low > high` you may never stop on odd splits.",
+      "Remember to copy `temp` back into `A[low..high]`, not into `A[0..]`."
+    ],
     "solutions": [
       {
         "label": "Merge Sort",
@@ -301,6 +316,11 @@
     "story": "Smallest number from a multiset of digits = digits in ascending order (leading zeros allowed). Sort ascending — here via merge sort since library sort is disallowed.",
     "plain": "To make the smallest number, place the smallest digits first. Since leading zeros are permitted, simply sort the digit array in ascending order. The task bans library sort, so use your own merge sort.",
     "tale": "Line up cards numbered 0-9 from lowest to highest; read left to right for the tiniest possible number.",
+    "pitfalls": [
+      "Leading zeros are allowed, so plain ascending order is the answer — don't try to move zeros to the back.",
+      "Library sort is banned; you must use your own merge sort.",
+      "Digits are only 0-9, but the array can be huge (10^5), so keep it O(N log N)."
+    ],
     "solutions": [
       {
         "label": "Merge Sort (ascending)",
@@ -335,6 +355,11 @@
     "story": "Only 3 distinct values → count how many 0s/1s/2s, then rewrite the array as that many 0s, then 1s, then 2s. O(N). (A general sort also works but is overkill.)",
     "plain": "Because values are limited to {0,1,2}, counting sort is ideal: one pass to tally frequencies of each color, then overwrite A in place with count[0] zeros, count[1] ones, count[2] twos.",
     "tale": "Sorting a tricolor flag's threads: count reds, whites, blues, then relay them back in the flag's order.",
+    "pitfalls": [
+      "Only values 0,1,2 exist — a full comparison sort works but is overkill and slower.",
+      "`freq` array is size 3; indexing it with anything outside {0,1,2} would crash.",
+      "N can be a million, so avoid per-element allocations; the counting pass is O(N)."
+    ],
     "solutions": [
       {
         "label": "Optimal — Counting (frequency)",
@@ -440,6 +465,11 @@
     "story": "Since A is a permutation of 0..N-1, a chunk can close at index i exactly when max(A[0..i]) == i — everything so far belongs to positions 0..i. Count those cut points.",
     "plain": "Scan left to right tracking the running maximum. Because the array is a permutation of 0..N-1, a prefix [0..i] is 'self-contained' (a valid chunk boundary) precisely when the largest value seen so far equals i. Each such moment lets us cut a new chunk.",
     "tale": "Books numbered 0..N-1 shelved out of order; you can seal a box only when every number small enough to belong in it has already appeared — i.e., the highest seen matches the box's right edge.",
+    "pitfalls": [
+      "This trick only works because A is a permutation of `0..N-1`; it breaks on arbitrary values.",
+      "The cut condition is `maxSoFar == i` (compare max to the index, not to the value).",
+      "A reverse-sorted array gives exactly 1 chunk — a good sanity check."
+    ],
     "solutions": [
       {
         "label": "Optimal — Prefix Max",
@@ -534,6 +564,11 @@
     "story": "Bounded values → tally each value's frequency in a count[] array, then emit values 0..max in order, each repeated count[v] times. O(N + max), no comparisons.",
     "plain": "Find the maximum value, allocate count[max+1], tally frequencies in one pass, then rebuild the sorted array by walking values 0..max and writing each as many times as it occurred. Non-comparison sort — great when the value range is small.",
     "tale": "A librarian counts how many books of each ID exist, then re-shelves by ID from smallest to largest, placing exactly the counted number of each.",
+    "pitfalls": [
+      "`count` must be size `max+1`, not `max`, or the largest value indexes out of bounds.",
+      "Values go up to 10^5, so the count array is fine, but a huge max would blow up space.",
+      "Find `max` before allocating; starting `max` at 0 is okay here since `A[i] >= 1`."
+    ],
     "solutions": [
       {
         "label": "Count Sort",
@@ -610,6 +645,11 @@
     "story": "Extract A[B..C] into a temp buffer, sort just that buffer, write it back into the same positions. Everything outside [B,C] is untouched.",
     "plain": "Copy the window A[B..C] into a temp array of length C-B+1, sort temp, then place it back into A[B..C]. The rest of A never moves.",
     "tale": "You tidy only one shelf of a bookcase: pull that shelf's books out, order them, slot them back — the other shelves stay as they were.",
+    "pitfalls": [
+      "Window size is `C-B+1`; the `i-B` offset when copying in and out is easy to get wrong.",
+      "The range `[B,C]` is inclusive on both ends — loop with `<=`, not `<`.",
+      "Everything outside `[B,C]` must stay untouched, so only write back into that window."
+    ],
     "solutions": [
       {
         "label": "Extract → Sort → Write Back",
@@ -644,6 +684,11 @@
     "story": "Sort numbers as strings with a custom comparator: a before b iff (a+b) > (b+a). Concatenate; guard the all-zeros case (return \"0\").",
     "plain": "Two numbers a, b should be ordered by which concatenation is larger: compare the strings (a+b) vs (b+a). Sort the whole array by this rule descending, then join. If the largest is \"0\", the whole array is zeros → return \"0\".",
     "tale": "Deciding who stands first for the biggest banner: pick the order that reads larger when the two placards are held side by side.",
+    "pitfalls": [
+      "Sort by comparing `a+b` vs `b+a` as strings, not by numeric value — `3` must beat `30`.",
+      "If the top element is `\"0\"`, the whole array is zeros, so return `\"0\"` not `\"000...\"`.",
+      "Values reach 2*10^9 and the result can be enormous, so build a string, never an int."
+    ],
     "solutions": [
       {
         "label": "Comparator — (a+b) vs (b+a)",
@@ -679,6 +724,11 @@
     "story": "Sort by a two-key comparator: primary = number of divisors (ascending), tie-break = value (ascending). Divisor count computed in O(sqrt(v)) per element.",
     "plain": "For each value compute its divisor count by trial division up to sqrt(v). Then sort with a comparator: fewer factors first; on a tie, smaller value first. 3 and 5 are primes (2 factors), 4 has 3 factors, so 4 goes last.",
     "tale": "Rank numbers by how 'popular' they are (how many divisors); break ties by putting the humbler (smaller) number first.",
+    "pitfalls": [
+      "Count divisors with `i*i <= n` and add 2 per pair, but only 1 when `i == n/i` (perfect square), else you double-count.",
+      "Tie-break is smaller value first, so the comparator needs both keys: factor count then value.",
+      "Recomputing `factors` inside the comparator is fine for N=10^4 but don't do it for huge N."
+    ],
     "solutions": [
       {
         "label": "Comparator by Divisor Count",
@@ -714,6 +764,11 @@
     "story": "Pick a pivot (first element), partition so smaller-or-equal sit left and greater sit right, recurse on both sides. Average O(N log N), in-place.",
     "plain": "Partition around pivot = A[first]: two pointers left/right move inward, swapping an out-of-place large-left with a small-right; finally swap the pivot into its resting spot. Recurse on the two partitions.",
     "tale": "Pick a reference height; shove everyone shorter to the left, taller to the right, then repeat within each side until fully ordered.",
+    "pitfalls": [
+      "Pivot is the first element and it's seated with `swap(first, right)` at the end — swapping with `left` instead misplaces it.",
+      "Base case `start >= end` must use `>=`, since single or empty ranges appear during recursion.",
+      "First-element pivot means an already-sorted array hits O(N^2) worst case."
+    ],
     "solutions": [
       {
         "label": "Quick Sort — First-Element Pivot",
@@ -802,6 +857,11 @@
     "story": "Lomuto partition with pivot = last element: sweep a boundary i; every element < pivot is swapped to the front region; finally swap the pivot into slot i. Return i.",
     "plain": "Take the last element as pivot. Keep a boundary index i (count of elements < pivot seen). Walk j across the array; when A[j] < pivot, swap A[i] and A[j] and grow i. At the end, swap the pivot (last) into position i — now everything left of i is < pivot, right is > pivot. Return i.",
     "tale": "A bouncer (pivot) at the door: guests shorter than the bouncer are ushered to the left; once everyone's sorted, the bouncer steps into the gap between the two groups.",
+    "pitfalls": [
+      "Pivot is the LAST element `A[N-1]`; loop `j` only to `N-2`, then swap the pivot into slot `i`.",
+      "Boundary `i` counts elements strictly `< pivot`; using `<=` would misplace equal values (though here all are distinct).",
+      "Return the final `i` after seating the pivot, not the loop counter `j`."
+    ],
     "solutions": [
       {
         "label": "Lomuto Partition (last pivot)",
@@ -895,6 +955,11 @@
     "story": "Sort ascending, then swap each adjacent pair (indices 0-1, 2-3, ...). This makes even indices peaks and gives the lexicographically smallest wave.",
     "plain": "Sort the array first (for lexicographically smallest output). Then swap elements at (0,1), (2,3), (4,5)... so each even index becomes a peak (>= its neighbours). Sorting guarantees the smallest arrangement.",
     "tale": "Line people up by height, then have each neighbouring pair swap spots so the row zig-zags up-down-up-down.",
+    "pitfalls": [
+      "You must sort first, otherwise you won't get the lexicographically smallest wave.",
+      "Swap pairs at even i (0-1, 2-3, ...); the loop guard `i < N-1` avoids touching a lone last element on odd length.",
+      "N can be 10^6, so don't do anything worse than the one sort plus a linear pass."
+    ],
     "solutions": [
       {
         "label": "Sort then Swap Pairs",
@@ -974,6 +1039,11 @@
     "story": "Sort points by squared distance x²+y² (no sqrt needed — it's monotonic), take the first B. Use long to avoid overflow.",
     "plain": "Distance ordering is preserved by squared distance, so compare x*x + y*y (avoids floating point and sqrt). Sort the points by that key ascending and return the first B. Cast to long since coordinates can be large.",
     "tale": "Rank restaurants by how far they'd be 'as the crow flies', but skip the square-root — comparing squared distances gives the same order — then take the nearest B.",
+    "pitfalls": [
+      "Compare squared distance `x*x + y*y` — no `sqrt`, which avoids floating-point error.",
+      "Cast to `long` before squaring; `int*int` can overflow for large coordinates.",
+      "You only need the first B rows; slicing past B or forgetting B are common slips."
+    ],
     "solutions": [
       {
         "label": "Comparator by Squared Distance",
@@ -1009,6 +1079,11 @@
     "story": "Comparator: primary key = tens digit (x/10)%10 ascending; tie-break = value descending. 15 and 17 share tens digit 1 → 17 first; 23 has tens 2; 8 has tens 0.",
     "plain": "Extract each number's tens digit with (x/10)%10 (0 when x<10). Sort ascending by tens digit; when two share a tens digit, put the larger value first (descending). Comparator does both keys.",
     "tale": "Group people by the second-from-right digit on their badge, lowest group first; within a group, the higher badge number stands ahead.",
+    "pitfalls": [
+      "Tens digit is `(x/10)%10`, which is 0 for single-digit numbers — don't just take `x/10`.",
+      "Same tens digit means larger value first (descending), so the tie-break is `y - x`, not `x - y`.",
+      "Values reach 10^9; `y - x` in the comparator could overflow, so use `Integer.compare` if worried."
+    ],
     "solutions": [
       {
         "label": "Comparator on (tens asc, value desc)",
@@ -1043,6 +1118,11 @@
     "story": "Two pointers from both ends: left skips 0s, right skips 1s; when left sits on a 1 and right on a 0, fix both. O(N), in place, no library sort.",
     "plain": "Only two values, so partition in place. left advances past 0s, right retreats past 1s; whenever left points at a 1 and right at a 0, set A[left]=0, A[right]=1 and move both inward. (Counting zeros then filling also works.)",
     "tale": "Line of black/white stones: sweep from both ends, and whenever a white on the left meets a black on the right, swap their colors.",
+    "pitfalls": [
+      "Library sort is banned — use the two-pointer partition (or count zeros).",
+      "Only fix a pair when left is 1 AND right is 0; otherwise just advance the pointer past the settled value.",
+      "Loop while `left < right`; going `<=` risks swapping an element with itself at the crossover."
+    ],
     "solutions": [
       {
         "label": "Two-Pointer Partition",

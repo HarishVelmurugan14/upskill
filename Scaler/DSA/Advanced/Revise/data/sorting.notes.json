@@ -17,6 +17,18 @@
     {
       "title": "4. When order is custom, write a comparator.",
       "body": "Largest-number (a+b vs b+a), factors sort, tens-digit sort, closest-points — the whole problem is defining the comparator. State the primary key and the tie-break explicitly, and cast to long when squaring/concatenating to avoid overflow."
+    },
+    {
+      "title": "5. Merge sort is stable; quick/heap are not — pick by tie-break needs.",
+      "body": "When elements carry payloads and equal keys must keep input order, you need a STABLE sort. Merge sort is stable if the merge takes from the LEFT run on ties (A[P1] <= A[P2]). Quick sort and heap sort are unstable. In Java, Arrays.sort(int[]) is a dual-pivot quicksort (unstable, irrelevant for primitives), while Arrays.sort(Object[]) / Collections.sort use TimSort (stable). If stability matters, box to objects or hand-roll a stable merge."
+    },
+    {
+      "title": "6. Quick sort's worst case comes from the pivot, not the data.",
+      "body": "A fixed pivot (first/last element) degrades to O(N^2) on already-sorted, reverse-sorted, or all-equal input because each partition peels off one element. Fixes: random pivot, median-of-three, or a 3-way partition for many duplicates. Recursion depth also becomes O(N), risking StackOverflowError; recurse on the smaller side and loop the larger to cap depth at O(log N)."
+    },
+    {
+      "title": "7. Before counting sort, pin down the value RANGE, not just N.",
+      "body": "Counting sort is O(N + K) where K is the value range and needs O(K) space. It only wins when K is comparable to N. If A[i] can reach 1e9, a count[] of size 1e9 blows memory — fall back to a comparison sort. Handle negatives / non-zero minimums by offsetting the index with (value - min)."
     }
   ],
   "keyPatterns": [
@@ -59,24 +71,83 @@
         "Tens Digit Sorting",
         "B Closest Points"
       ]
+    },
+    {
+      "name": "Dutch-flag 3-way partition",
+      "when": "Three categories or a pivot with many duplicates (<, ==, > pivot)",
+      "template": "low=0, mid=0, high=N-1\nwhile mid<=high:\n  if A[mid]<pivot: swap(low,mid); low++; mid++\n  elif A[mid]>pivot: swap(mid,high); high--   // do NOT mid++\n  else: mid++",
+      "examples": [
+        "Sort by Color (one-pass, O(1) space)",
+        "Quick sort partition with many equal keys"
+      ]
+    },
+    {
+      "name": "Overflow-safe comparator",
+      "when": "Comparator subtracts keys that can be large or negative",
+      "template": "// instead of (a,b) -> keyA - keyB  (can overflow int)\n(a,b) -> Integer.compare(keyA, keyB)   // or Long.compare for long keys",
+      "examples": [
+        "B Closest Points (Long.compare on x*x+y*y)",
+        "Any comparator where keys span the full int range"
+      ]
+    },
+    {
+      "name": "Stable sort via composite key",
+      "when": "Need a tie-break that preserves original order or a secondary field",
+      "template": "(a,b) -> primary(a)!=primary(b) ? cmpPrimary : Integer.compare(origIdx(a), origIdx(b))",
+      "examples": [
+        "Factors Sort (count asc, then value asc)",
+        "Tens Digit Sorting (tens asc, then value desc)"
+      ]
     }
   ],
   "commonMistakes": [
     {
       "title": "Seeding max/answer wrong or overflow on keys",
       "wrong": "int d = x*x + y*y;   // int overflow for large coords",
-      "right": "long d = (long)x*x + (long)y*y;"
+      "right": "long d = (long)x*x + (long)y*y;",
+      "why": "Squaring or summing large ints (coords up to 1e6, values up to 1e9) overflows int; cast to long before the arithmetic, and seed a running max from the first element, not 0, when negatives are possible."
     },
     {
       "title": "Forgetting the all-zeros / leading-zero guard",
       "wrong": "return concatenation;            // returns \"000\" for all zeros",
-      "right": "if (s[0].equals(\"0\")) return \"0\";"
+      "right": "if (s[0].equals(\"0\")) return \"0\";",
+      "why": "Concatenating sorted digits/strings without the guard returns things like \"000\" for an all-zero input; if the largest piece is \"0\", the whole answer is \"0\"."
+    },
+    {
+      "title": "Comparator returns a - b and overflows",
+      "wrong": "Arrays.sort(B, (a, b) -> a - b);   // a=2e9, b=-2e9 -> overflow, wrong order",
+      "right": "Arrays.sort(B, (a, b) -> Integer.compare(a, b));  // or Long.compare",
+      "why": "Subtraction can exceed Integer.MAX_VALUE and wrap to a negative, so the comparator reports the wrong sign. Integer.compare / Long.compare branch internally and never overflow. With A[i] up to 2e9 (Largest Number, B Closest Points), a-b is unsafe."
+    },
+    {
+      "title": "Inconsistent comparator -> 'Comparison method violates its general contract'",
+      "wrong": "(a, b) -> a.score >= b.score ? 1 : -1;   // never returns 0; not antisymmetric",
+      "right": "(a, b) -> Integer.compare(a.score, b.score);   // 0 on equal, consistent sign",
+      "why": "TimSort validates a total order. A comparator that returns nonzero for equal elements, or whose sign isn't symmetric, throws IllegalArgumentException once the input is large enough to trigger a merge. Always return 0 on equality."
+    },
+    {
+      "title": "In Dutch-flag, advancing mid after a high-swap",
+      "wrong": "else if (A[mid] > pivot) { swap(mid, high); high--; mid++; }",
+      "right": "else if (A[mid] > pivot) { swap(mid, high); high--; }  // re-inspect swapped-in value",
+      "why": "The element pulled from high into mid is unexamined and could be < or > pivot. Incrementing mid skips it, leaving the partition wrong. Only advance mid in the < and == branches."
+    },
+    {
+      "title": "Using sqrt / double for distance comparison",
+      "wrong": "double d = Math.sqrt(x*x + y*y);   // slower, float rounding can misorder near-ties",
+      "right": "long d = (long)x*x + (long)y*y;   // sqrt is monotonic -> same order",
+      "why": "sqrt is monotonic increasing, so comparing squared distances yields identical ordering — the sqrt is pure overhead, and doubles lose precision on large coordinates and can flip near-equal points. Compare exact integer squared distance."
     }
   ],
   "edgeCases": [
     "All elements equal (partition degenerates — watch <= vs < in the sweep).",
     "Already sorted or reverse sorted (quick sort worst case O(N^2) with fixed pivot).",
     "Single element or empty window (base cases in recursion / [B,C] with B==C).",
-    "Large coordinates/values — use long for squared distance and concatenations."
+    "Large coordinates/values — use long for squared distance and concatenations.",
+    "Duplicate keys with payloads — verify whether the required order is stable; merge sort keeps input order on ties only if the merge favors the left run (<=).",
+    "Counting sort with negatives or a large minimum — offset the index by (value - min); size the count array to (max - min + 1).",
+    "Counting sort when max value is huge but N is small (A[i] up to 1e9) — O(K) space is infeasible; use a comparison sort.",
+    "Quicksort on all-equal or already-sorted input with a fixed pivot — O(N^2) time and O(N) recursion depth; randomize the pivot or 3-way partition.",
+    "Comparator keys at the int boundary (values up to 2e9) — use long keys and Long.compare, never subtraction.",
+    "Odd-length wave array — the final element has no pair to swap; the loop bound i < N-1 must leave it in place."
   ]
 }

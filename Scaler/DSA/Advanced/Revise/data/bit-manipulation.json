@@ -14,6 +14,11 @@
     "story": "Loop while A != 0. Add (A & 1) to count, then right-shift A by 1. Stop when A is 0.",
     "plain": "Two approaches: (a) bit-by-bit — repeatedly test LSB with (A & 1), add to count, shift A right; (b) Brian Kernighan — repeatedly do A = A & (A - 1) which clears the lowest set bit, count iterations. Both O(bits). Kernighan runs once per SET bit (faster on sparse numbers).",
     "tale": "A coin counter inspects a stack of coins in binary slots. She peeks at the lowest slot — if a coin sits there, she increments her tally — then slides the whole stack down one slot. She stops when the stack is empty.",
+    "pitfalls": [
+      "If A could be negative, `N >> 1` keeps the sign bit and loops forever; use `>>>` instead.",
+      "Wrap the test as `(N & 1) == 1` with parens — `&` binds looser than `==`, so `N & 1 == 1` means the wrong thing.",
+      "Kernighan's `N & (N - 1)` only helps when N != 0; the `while` guard already handles the 0 case."
+    ],
     "solutions": [
       {
         "label": "Bit-by-Bit",
@@ -143,6 +148,11 @@
     "story": "XOR is associative & commutative. x ^ x = 0. Folding XOR over the array cancels all pairs, leaving the lone element.",
     "plain": "XOR has two magical properties: x ^ x = 0 and x ^ 0 = x, and it's commutative. So XOR-folding the entire array makes every duplicated value cancel itself out, leaving only the unique number. One pass, O(N), O(1) memory.",
     "tale": "Twin coins in a sealed bag cancel each other's weight perfectly. After shaking the bag, only the single lonely coin's weight remains on the scale.",
+    "pitfalls": [
+      "Start result at 0 (or A[0]) — starting anywhere else leaves a stray value XORed in.",
+      "This only works because every other number appears exactly twice; a triple would not cancel.",
+      "Values go up to INTMAX, so keep result as `int` and don't accidentally overflow into `long` math."
+    ],
     "solutions": [
       {
         "label": "Brute — HashMap Count",
@@ -289,6 +299,11 @@
     "story": "Mask = ~(1 << B). AND with A clears that bit, leaves others.",
     "plain": "Build mask = ~(1 << B). It has 0 at position B and 1 everywhere else. ANDing with A keeps every bit except position B, which becomes 0.",
     "tale": "A typist uses correction tape to blank out exactly one character — leaving every other character untouched.",
+    "pitfalls": [
+      "Remember to complement: `A & (1 << B)` clears everything else, you want `A & ~(1 << B)`.",
+      "Watch precedence — keep the parens as `~(1 << B)`, since `~` and `<<` don't group the way you'd guess.",
+      "B can be up to 30, safe for int; if it ever hit 31 you'd need `1L` to avoid touching the sign bit."
+    ],
     "solutions": [
       {
         "label": "Optimal",
@@ -382,6 +397,11 @@
     "story": "XOR with (1 << B) flips that bit, leaves others.",
     "plain": "XOR with the single-bit mask flips only the targeted bit. Because x ^ 1 = ~x and x ^ 0 = x, ANDing/XORing the mask only changes position B and leaves the rest alone.",
     "tale": "A light switch — press once: on becomes off, off becomes on. The other switches in the room stay where they are.",
+    "pitfalls": [
+      "Use XOR here, not OR — OR can only turn a bit on, it never flips a 1 back to 0.",
+      "Toggling twice cancels out (`A ^ m ^ m = A`), so don't apply the mask an extra time by mistake.",
+      "B tops out at 30 so `1 << B` is fine; a bit-31 shift would land on the sign bit."
+    ],
     "solutions": [
       {
         "label": "Optimal",
@@ -471,6 +491,11 @@
     "story": "AND with mask (1 << B); zero → bit unset (return 0), non-zero → bit set (return 1).",
     "plain": "Use AND with the single-bit mask. The result is either 0 (bit unset) or exactly (1 << B) (bit set). Compare for zero. A cleaner one-liner: return (A >> B) & 1.",
     "tale": "An inspector shines a torch on a single position. If the torch reflects, that bit is metal (set); if not, plastic (unset).",
+    "pitfalls": [
+      "Compare against the mask, not 1: `A & (1 << B)` gives `1 << B` when set, not always 1.",
+      "The shortcut `(A >> B) & 1` is cleaner, but if A were negative you'd want `>>>`.",
+      "Parenthesize the mask compare — `A & (1 << B) == (1 << B)` without parens evaluates `==` first."
+    ],
     "solutions": [
       {
         "label": "Optimal",
@@ -558,6 +583,11 @@
     "story": "Start with 0; OR with (1 << A) and (1 << B). Setting same bit twice is idempotent.",
     "plain": "OR is the natural 'set bit' operation. Start with N = 0; N |= (1 << A); N |= (1 << B). When A == B, the second OR is a no-op (1 OR 1 = 1).",
     "tale": "Two switches in an empty fuse box. Flip A on, then flip B on. If they're the same switch, flipping it twice still leaves it on.",
+    "pitfalls": [
+      "OR only turns bits on, so setting the same bit twice (A == B) is a no-op, not a doubling.",
+      "Start from 0, not some leftover value, or you'll set extra bits.",
+      "A and B go up to 30, safe for int; a 31 would push `1 << 31` onto the sign bit."
+    ],
     "solutions": [
       {
         "label": "Optimal",
@@ -664,6 +694,11 @@
     "story": "Magic numbers ↔ subsets of {5^1, 5^2, …}. The k-th subset is encoded by k's binary representation: bit i of k decides whether to include 5^(i+1).",
     "plain": "There's a bijection between positive integers k and subsets of {5^1, 5^2, …}: write k in binary, and for each bit-position i (starting at 0) that's set, include 5^(i+1). Walk the bits of A: if (A & 1) include 5^power; shift A right; power++.",
     "tale": "A jeweller orders rings by binary count. Ring #k is built from gold bands of weights 5, 25, 125, … picked according to which bits of k are set.",
+    "pitfalls": [
+      "`Math.pow` returns a double — casting to int can round wrong for big powers; watch for precision.",
+      "5^power grows fast; for larger A the magic number can overflow int, so consider `long`.",
+      "Bump `power` and shift A every loop even for a 0 bit, or the power-to-bit alignment drifts."
+    ],
     "solutions": [
       {
         "label": "Optimal — Binary Expansion of N",
@@ -758,6 +793,11 @@
     "story": "Reverse: divide A by 2 when even (free), subtract 1 when odd (one boost). Boosts = set-bit count of A.",
     "plain": "Reverse the process. From A, while A > 0: if A is even, halve it (free); if odd, subtract 1 (counts as one boost from Sam). The total subtractions equal the number of set bits in A — exactly popcount(A).",
     "tale": "Alex retraces his climb. Each time his score is even, he must have just doubled; halve it for free. Each time it's odd, his last move was a +1 from Sam — count it and shave one off.",
+    "pitfalls": [
+      "The answer is just popcount(A) — don't overthink it into simulating the doubling forward.",
+      "A can be 0; the `while (N != 0)` loop correctly returns 0 boosts, so don't special-case it wrong.",
+      "Use `(N & 1) == 1` with parens, since `&` binds looser than `==`."
+    ],
     "solutions": [
       {
         "label": "Optimal",
@@ -856,6 +896,11 @@
     "story": "Each day = unique power of 2. Total A → unique sum of distinct powers of 2 → days = popcount(A).",
     "plain": "Each day's stash is a distinct power of 2. The total A has a unique binary representation, so the number of good days equals the count of set bits in A.",
     "tale": "The cat's diary, kept in binary, lists one entry per good day. The diary has as many entries as A has 1-bits.",
+    "pitfalls": [
+      "A can be up to 2^31 - 1, so bit 30 is the top real bit; `N >> 1` on a positive int is fine here.",
+      "The answer is popcount(A) — each set bit is one good day, don't try to sum the powers.",
+      "Keep the mask test parenthesized as `(N & 1) == 1`."
+    ],
     "solutions": [
       {
         "label": "Optimal",
@@ -956,6 +1001,11 @@
     "story": "For each bit position, sum '1's across all elements. The sum mod 3 = bit of the unique number. Reconstruct result one bit at a time.",
     "plain": "XOR alone fails because triples don't cancel (x ^ x ^ x = x). Instead, count set bits at each of the 32 positions across the array; for each position, the count mod 3 is exactly the corresponding bit of the lonely number (since triples contribute 0 mod 3). Reassemble the answer.",
     "tale": "Three identical jugglers and one stranger. For each costume colour, count torches lit. Triples leave a residue of zero modulo 3. Whatever residue remains belongs to the stranger.",
+    "pitfalls": [
+      "Plain XOR fails here — `x ^ x ^ x = x`, so triples don't cancel; you must count per bit mod 3.",
+      "Loop all 32 bit positions, including bit 31, or you'll miss the sign bit of large values.",
+      "Compare `(A[j] & (1 << i)) == (1 << i)`, not `== 1`, since the masked result is `1 << i` when set."
+    ],
     "solutions": [
       {
         "label": "Optimal — Bit Counting Mod 3",
@@ -1069,6 +1119,11 @@
     "story": "XOR-fold whole array → x = a^b (the two unique numbers). x ≠ 0 so it has at least one set bit; partition array by that bit. XOR each partition → recovers a and b.",
     "plain": "XOR-fold the array → x = a XOR b, where a and b are the two uniques (all pairs cancel). Pick any set bit of x (LSB is easiest: lsb = x & -x). Partition the array into two groups: 'bit set' vs 'bit unset'. a and b fall into different groups (they differ at that bit), so XOR-folding each group cancels duplicates and yields a and b separately.",
     "tale": "Two stranger guests in a hall of twins. A scanner shines on every guest and flips a 'mystery flag' that ends up showing the XOR of just the two strangers' badges. Any flag-bit set means the strangers' badges differ there — so split the room by that bit and each subroom reveals one stranger.",
+    "pitfalls": [
+      "`xorAll` is a ^ b, never 0 (the two uniques differ), so a set bit is guaranteed — but scan all 32 bits to find it.",
+      "Any single differing bit works to split the array; you don't need the lowest one specifically.",
+      "Compare against `(1 << magicIndex)`, not 1, when testing the partition bit."
+    ],
     "solutions": [
       {
         "label": "Optimal — XOR Partition",
@@ -1175,6 +1230,11 @@
     "story": "OR = 1 means subarray contains at least one 1. Count complement: subarrays of all zeros, subtract from total.",
     "plain": "Direct count is tedious. Instead, count subarrays whose OR is 0 (entirely zeros) and subtract from N*(N+1)/2. For each maximal run of k consecutive zeros, k*(k+1)/2 subarrays sit entirely inside it.",
     "tale": "An auditor counts boxes containing at least one apple. He's lazy: he counts all boxes, then subtracts those containing only oranges (no apples).",
+    "pitfalls": [
+      "Count the complement (all-zero runs) and subtract — counting OR=1 subarrays directly is messier.",
+      "Don't forget to flush the trailing zero run after the loop, or a run ending the array is dropped.",
+      "`N*(N+1)/2` for N up to 10^4 fits in int, but if N grew you'd want `long` to avoid overflow."
+    ],
     "solutions": [
       {
         "label": "Optimal — Complement on Zero Runs",
@@ -1294,6 +1354,11 @@
     "story": "Sum of ORs = Σ over each bit b of (2^b * #subarrays where bit b appears at least once). Per bit: count zero-run subarrays as complement.",
     "plain": "Decompose: for each bit position b (0..26), count subarrays where at least one element has bit b set; multiply by 2^b; sum. For each bit, the count = totalSubarrays - subarraysWhereBitBIsAlwaysZero. The 'always zero' count comes from runs of consecutive elements where bit b is 0 (same k*(k+1)/2 trick as Subarrays with OR 1).",
     "tale": "An accountant adds revenue from 27 product columns. For each column, she counts how many monthly windows had at least one sale in that column; multiplies by column price; sums.",
+    "pitfalls": [
+      "Use `1L << i` for the weight — `1 << i` is int and would overflow near bit 30.",
+      "Take mod at each step; the running sum over 27 bits and big counts easily overflows without it.",
+      "Flush the trailing zero run for every bit, and reset `zeroCount` after each set element."
+    ],
     "solutions": [
       {
         "label": "Optimal — Per-Bit Complement",
@@ -1392,6 +1457,11 @@
     "story": "XOR all 1..N+2, XOR all A; the result is m1 ^ m2 (the two missing). Then 'Single Number III' partition recovers each.",
     "plain": "Same trick as Single Number III, but the 'universe' is implicit. Compute X = XOR(1..N+2) ^ XOR(A) — this equals m1 ^ m2 because every element in A cancels its mate in the range; only the two missing remain. Pick any set bit of X, partition both the range and the array by that bit, fold each partition. The two folds give m1 and m2.",
     "tale": "Two tickets are missing from a numbered raffle drum. The auditor XORs every ticket number 1..N+2 against every ticket in the drum — what survives is the XOR of the two absent tickets, then the partition trick recovers each.",
+    "pitfalls": [
+      "X = xorRange ^ xorArr is m1 ^ m2 and never 0, so a set bit exists — but loop all 32 bits to find it.",
+      "Partition BOTH the range 1..N+2 and the array A by the same bit; folding only one side won't work.",
+      "Compare with `(1 << p)`, not 1, and remember the range goes to N+2, not N."
+    ],
     "solutions": [
       {
         "label": "Optimal — XOR Partition (range vs array)",
