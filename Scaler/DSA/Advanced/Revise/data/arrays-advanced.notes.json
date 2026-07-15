@@ -21,6 +21,14 @@
     {
       "title": "5. Spiral / submatrix sums: layer + 2D prefix.",
       "body": "Spiral is just four bounded walks (top row, right col, bottom row, left col) in a shrinking rectangle. Submatrix sums use a 2D prefix table P[i][j] = sum of rect (0,0)→(i-1,j-1)."
+    },
+    {
+      "title": "6. 'Any-swap' problems only care about counts, not positions.",
+      "body": "When you may swap any two elements (Minimum Swaps), the arrangement is fully controllable — the only real question is WHERE the K good elements must land. Recast as: over all length-K windows, how many bad elements sit inside? The minimum is the answer, because each bad element in the target block trades 1-for-1 with a good element outside."
+    },
+    {
+      "title": "7. Monotone two pointers only work on positive arrays.",
+      "body": "The sliding-window 'expand right / shrink left' for max sum <= B (Maximum Subarray Easy) relies on all C[i] > 0: adding only grows the sum, removing only shrinks it. The instant negatives are allowed this invariant breaks (shrinking can raise the sum) and you must fall back to prefix-sum / Kadane logic."
     }
   ],
   "commonMistakes": [
@@ -59,6 +67,24 @@
       "wrong": "for r1 for c1 for r2 for c2 for i for j sum += A[i][j];",
       "right": "// 2-D prefix P[i+1][j+1]; submatrix sum = P[r2+1][c2+1] - P[r1][c2+1] - P[r2+1][c1] + P[r1][c1]",
       "why": "Six nested loops is O(R^3 C^3). Prefix-table preprocessing is O(RC), each query O(1)."
+    },
+    {
+      "title": "Minimum Swaps: counting good-outside instead of bad-inside",
+      "wrong": "int good = countGood(window); ans = min(ans, K - good);",
+      "right": "if (A[r-K] > B) bad--; if (A[r] > B) bad++; ans = Math.min(ans, bad);",
+      "why": "Both equal (bad = K - good), but people forget the window is size K (not the whole suffix) and mix window lengths. Track bad-in-window directly; short-circuit K==0 / K==n to avoid an empty or full-window off-by-one."
+    },
+    {
+      "title": "First Missing Positive: sign-marking without sanitising / abs",
+      "wrong": "for (int v : A) if (v <= N) A[v-1] *= -1;  // reads already-flipped values",
+      "right": "// pass 1: v<=0 or v>N -> N+2 sentinel\n// pass 2: val = Math.abs(A[i]); if (val <= N) A[val-1] = -Math.abs(A[val-1]);",
+      "why": "Once you start flipping signs, later A[i] may already be negative, so you must read Math.abs(A[i]) and negate via -Math.abs(...) so double-marking a repeat doesn't flip it back. Skipping the sentinel pass lets a stray 0 or huge value corrupt an index."
+    },
+    {
+      "title": "Cyclic sort: using if instead of while, or wrong guard",
+      "wrong": "for (int i=0;i<N;i++) if (A[i]>0 && A[i]<=N) swap(i, A[i]-1); // one swap only",
+      "right": "while (A[i] > 0 && A[i] <= N && A[i] != A[A[i]-1]) swap(i, A[i]-1);",
+      "why": "A single if leaves swapped-in elements unplaced. The while keeps placing until index i is settled. The guard A[i] != A[A[i]-1] (compare VALUES) prevents an infinite loop on duplicates; total swaps stay <= N."
     }
   ],
   "keyPatterns": [
@@ -66,49 +92,82 @@
       "name": "Kadane's Algorithm",
       "when": "Maximum sum contiguous subarray.",
       "template": "int best = A[0], run = A[0];\nfor (int i = 1; i < N; i++) {\n    run = Math.max(A[i], run + A[i]);\n    best = Math.max(best, run);\n}",
-      "examples": ["Max Sum Contiguous Subarray"]
+      "examples": [
+        "Max Sum Contiguous Subarray"
+      ]
     },
     {
       "name": "Difference Array",
       "when": "Many range-update queries followed by a final scan.",
       "template": "int[] diff = new int[N + 1];\nfor (int[] q : queries) { diff[q[0]]++; diff[q[1] + 1]--; }\nint run = 0;\nfor (int i = 0; i < N; i++) { run += diff[i]; final[i] = run; }",
-      "examples": ["Flip", "Continuous Sum Query"]
+      "examples": [
+        "Flip",
+        "Continuous Sum Query"
+      ]
     },
     {
       "name": "Rain Water Trapped",
       "when": "Trapping problems where each index's contribution depends on max of two sides.",
       "template": "// O(N) time, O(N) space\nint[] L = new int[N], R = new int[N];\nL[0] = A[0]; for (int i = 1; i < N; i++) L[i] = Math.max(L[i-1], A[i]);\nR[N-1] = A[N-1]; for (int i = N-2; i >= 0; i--) R[i] = Math.max(R[i+1], A[i]);\nlong water = 0;\nfor (int i = 0; i < N; i++) water += Math.min(L[i], R[i]) - A[i];",
-      "examples": ["Rain Water Trapped"]
+      "examples": [
+        "Rain Water Trapped"
+      ]
     },
     {
       "name": "Stair-Step Search (sorted matrix)",
       "when": "Matrix sorted both row-wise and column-wise.",
       "template": "int i = 0, j = cols - 1;\nwhile (i < rows && j >= 0) {\n    if (M[i][j] == target) return found;\n    if (M[i][j] > target) j--; else i++;\n}",
-      "examples": ["Search in Row-wise and Column-wise Sorted Matrix"]
+      "examples": [
+        "Search in Row-wise and Column-wise Sorted Matrix"
+      ]
     },
     {
       "name": "Spiral Order Generation",
       "when": "Print or fill matrix in spiral order, using 4 directional walks in shrinking rectangle.",
       "template": "int top = 0, bottom = R - 1, left = 0, right = C - 1, val = 1;\nwhile (top <= bottom && left <= right) {\n    for (int j = left; j <= right; j++) M[top][j] = val++; top++;\n    for (int i = top; i <= bottom; i++) M[i][right] = val++; right--;\n    if (top <= bottom) { for (int j = right; j >= left; j--) M[bottom][j] = val++; bottom--; }\n    if (left <= right) { for (int i = bottom; i >= top; i--) M[i][left] = val++; left++; }\n}",
-      "examples": ["Spiral Order Matrix II"]
+      "examples": [
+        "Spiral Order Matrix II"
+      ]
     },
     {
       "name": "2-D Prefix Sum for Submatrix Sums",
       "when": "Compute the sum of every submatrix or many submatrix-sum queries.",
       "template": "long[][] P = new long[R + 1][C + 1];\nfor (int i = 1; i <= R; i++)\n    for (int j = 1; j <= C; j++)\n        P[i][j] = A[i-1][j-1] + P[i-1][j] + P[i][j-1] - P[i-1][j-1];",
-      "examples": ["Sum of All Submatrices"]
+      "examples": [
+        "Sum of All Submatrices"
+      ]
     },
     {
       "name": "First Missing Positive (in-place hashing)",
       "when": "Find smallest missing positive integer in O(N) time, O(1) extra.",
       "template": "for (int i = 0; i < N; i++) {\n    while (A[i] > 0 && A[i] <= N && A[A[i] - 1] != A[i]) {\n        int t = A[A[i] - 1]; A[A[i] - 1] = A[i]; A[i] = t;\n    }\n}\nfor (int i = 0; i < N; i++) if (A[i] != i + 1) return i + 1;\nreturn N + 1;",
-      "examples": ["First Missing Integer"]
+      "examples": [
+        "First Missing Integer"
+      ]
     },
     {
       "name": "Merge Overlapping Intervals",
       "when": "Given a list of intervals, fold overlaps into one.",
       "template": "Arrays.sort(intervals, (a, b) -> a[0] - b[0]);\nList<int[]> out = new ArrayList<>();\nfor (int[] cur : intervals) {\n    if (out.isEmpty() || out.get(out.size() - 1)[1] < cur[0]) out.add(cur);\n    else out.get(out.size() - 1)[1] = Math.max(out.get(out.size() - 1)[1], cur[1]);\n}",
-      "examples": ["Merge Sorted Overlapping Intervals - 2"]
+      "examples": [
+        "Merge Sorted Overlapping Intervals - 2"
+      ]
+    },
+    {
+      "name": "Fixed-Window Minimum Swaps (grouping)",
+      "when": "Bring all elements satisfying a predicate together using arbitrary swaps; count minimum swaps.",
+      "template": "int K = 0; for (int x : A) if (x <= B) K++;\nif (K == 0 || K == n) return 0;\nint bad = 0; for (int i = 0; i < K; i++) if (A[i] > B) bad++;\nint ans = bad;\nfor (int r = K; r < n; r++) {\n    if (A[r - K] > B) bad--;\n    if (A[r] > B) bad++;\n    ans = Math.min(ans, bad);\n}\nreturn ans;",
+      "examples": [
+        "Minimum Swaps"
+      ]
+    },
+    {
+      "name": "Three-Phase Interval Insert",
+      "when": "Insert one interval into an already-sorted, non-overlapping set (no full re-sort needed).",
+      "template": "int i = 0, n = A.length, bs = B[0], be = B[1];\nList<int[]> res = new ArrayList<>();\nwhile (i < n && A[i][1] < bs) res.add(A[i++]);        // ends before B\nwhile (i < n && A[i][0] <= be) {                       // overlaps -> widen\n    bs = Math.min(bs, A[i][0]); be = Math.max(be, A[i][1]); i++;\n}\nres.add(new int[]{bs, be});\nwhile (i < n) res.add(A[i++]);",
+      "examples": [
+        "Merge Intervals 2 — Insert Interval"
+      ]
     }
   ],
   "edgeCases": [
@@ -121,6 +180,11 @@
     "First missing positive when array is already 1..N — answer is N+1.",
     "Merge intervals when input is empty or single interval — output is the same list.",
     "Difference array index R+1 == N — allocate N+1, not N.",
-    "Spiral with R != C — bottom/left walks must be guarded by the if checks."
+    "Spiral with R != C — bottom/left walks must be guarded by the if checks.",
+    "Minimum Swaps: K == 0 (no good elements) or K == n (all good) — return 0 without sliding.",
+    "Insert Interval: empty input set -> output is just [B]; B before/after all intervals — one while-phase copies nothing, the other copies everything.",
+    "Insert Interval: B touching two neighbours (e.g. [2,6] into [[1,3],[6,9]]) collapses BOTH into [1,9]; the widen-loop must keep consuming while A[i].start <= be.",
+    "Contribution / N^4-style product: cast to long BEFORE multiplying ((long)(i+1)*(N-i)*...); a 30x30 all-10s matrix already exceeds int.",
+    "Sorted-matrix staircase for lexicographically-smallest match: on equality keep moving LEFT (col--), prefer the lower row for duplicates — don't stop at the first hit."
   ]
 }

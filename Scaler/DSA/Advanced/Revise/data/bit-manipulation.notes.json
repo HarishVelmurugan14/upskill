@@ -25,6 +25,14 @@
     {
       "title": "6. Overflow with shifts.",
       "body": "1 << 31 is negative in int. Use 1L << i when i can reach 31. Magic-number-style problems with base-5 or base-7 also overflow int around N = 12 — use long upfront."
+    },
+    {
+      "title": "7. Building a k-bit mask? Prefer (1 << k) - 1, and watch k = 32.",
+      "body": "A contiguous low mask of k ones is (1 << k) - 1: k=4 gives 0b1111 = 15. But (1 << 32) is undefined-shift territory in Java — the shift count is taken mod 32, so 1 << 32 == 1 << 0 == 1, NOT 0. For all 32 bits use -1 (0xFFFFFFFF), and use (int)((1L << k) - 1) when k can reach 32. High-bit mask: ~((1 << k) - 1)."
+    },
+    {
+      "title": "8. Reasoning about XOR? Treat each bit column as independent addition mod 2.",
+      "body": "XOR is per-bit addition without carry. Bit i of a^b^c depends ONLY on bit i of a, b, c — never on neighbours. This independence justifies per-bit contribution counting in AND/OR/XOR-over-subarray problems: solve each of the 31 columns in isolation, then weight column i by (1 << i) and sum."
     }
   ],
   "commonMistakes": [
@@ -63,6 +71,24 @@
       "wrong": "for (int i = 0; i < N; i++) for (int j = i; j < N; j++) if (OR(i..j) == 1) ++count;",
       "right": "// Count subarrays whose OR is 0: those entirely inside runs of 0s.\n// Total subarrays = N*(N+1)/2; answer = total - sum over runs of len L of L*(L+1)/2.",
       "why": "Direct enumeration is O(N^2). Complement counting using runs of zeros is O(N)."
+    },
+    {
+      "title": "Right-shifting a possibly-negative int with >> in a per-bit loop",
+      "wrong": "for (int i = 0; i < 32; i++) c += (v >> i) & 1;  // v may be negative",
+      "right": "for (int i = 0; i < 32; i++) c += (v >>> i) & 1; // logical shift",
+      "why": ">> is arithmetic: it copies the sign bit in from the left, so for negative v the shifted value is polluted with 1s. Use >>> (zero-fill) when you want the raw bit pattern; or test with (v & (1 << i)) != 0."
+    },
+    {
+      "title": "Comparing a bit test to 1 instead of to the mask",
+      "wrong": "if ((A & (1 << i)) == 1) { ... }  // only ever true for i == 0",
+      "right": "if ((A & (1 << i)) != 0) { ... }   // or (((A >> i) & 1) == 1)",
+      "why": "A & (1 << i) yields 0 or (1 << i) — which equals 1 only when i is 0. Compare against 0 (!= 0), or shift the bit down to position 0 first."
+    },
+    {
+      "title": "Weighting a bit contribution with an int shift",
+      "wrong": "long contrib = count * (1 << i);   // 1 << i overflows int at i >= 31",
+      "right": "long contrib = count * (1L << i);  // 1L keeps the shift in 64-bit",
+      "why": "1 << i is evaluated in int first and overflows/goes negative at i = 31 before widening to long. The literal must be 1L. Widening the target variable doesn't fix an already-overflowed int expression."
     }
   ],
   "keyPatterns": [
@@ -70,49 +96,87 @@
       "name": "Single-Bit Get / Set / Clear / Toggle",
       "when": "Any problem that needs to manipulate one bit at a known position.",
       "template": "int getBit   = (x >> i) & 1;\nint setBit   = x |  (1 << i);\nint clearBit = x & ~(1 << i);\nint toggle   = x ^  (1 << i);",
-      "examples": ["Set Bit", "Unset i-th bit", "Toggle i-th bit", "Check bit"]
+      "examples": [
+        "Set Bit",
+        "Unset i-th bit",
+        "Toggle i-th bit",
+        "Check bit"
+      ]
     },
     {
       "name": "Population Count (Brian Kernighan)",
       "when": "Count set bits in an integer.",
       "template": "int count = 0;\nwhile (n != 0) {\n    n &= (n - 1);  // drops the lowest set bit\n    count++;\n}",
-      "examples": ["Number of 1 Bits"]
+      "examples": [
+        "Number of 1 Bits"
+      ]
     },
     {
       "name": "XOR-Fold Lonely Element",
       "when": "All elements appear in pairs except one.",
       "template": "int x = 0;\nfor (int v : A) x ^= v;\nreturn x;",
-      "examples": ["Single Number"]
+      "examples": [
+        "Single Number"
+      ]
     },
     {
       "name": "Per-Bit Accumulation (mod 3)",
       "when": "Every element appears 3 times except one. Same skeleton for many 'find unique via bits' variants.",
       "template": "int res = 0;\nfor (int i = 0; i < 32; i++) {\n    int c = 0;\n    for (int v : A) c += (v >> i) & 1;\n    if (c % 3 != 0) res |= (1 << i);\n}",
-      "examples": ["Single Number II"]
+      "examples": [
+        "Single Number II"
+      ]
     },
     {
       "name": "XOR Partition (two unique elements)",
       "when": "Two elements appear once, the rest in pairs. Use the XOR of all to isolate a differing bit, then partition.",
       "template": "int xor = 0; for (int v : A) xor ^= v;\nint diffBit = xor & -xor;\nint a = 0, b = 0;\nfor (int v : A) {\n    if ((v & diffBit) == 0) a ^= v; else b ^= v;\n}",
-      "examples": ["Single Number III"]
+      "examples": [
+        "Single Number III"
+      ]
     },
     {
       "name": "Base-N Magic Number",
       "when": "Encode N as a sum of distinct powers of base-K (typically K = 5 for magic numbers).",
       "template": "long ans = 0, pow = 1;\nwhile (N > 0) {\n    if ((N & 1) == 1) ans += pow;\n    pow *= 5;\n    N >>= 1;\n}",
-      "examples": ["Find nth Magic Number"]
+      "examples": [
+        "Find nth Magic Number"
+      ]
     },
     {
       "name": "Complement Counting on Runs",
       "when": "Count subarrays whose OR is at least 1 — count zero-OR ones (runs of zeros) and subtract.",
       "template": "long total = (long) N * (N + 1) / 2;\nlong zeros = 0, run = 0;\nfor (int v : A) {\n    if (v == 0) { run++; zeros += run; }\n    else run = 0;\n}\nreturn total - zeros;",
-      "examples": ["Subarrays with OR 1"]
+      "examples": [
+        "Subarrays with OR 1"
+      ]
     },
     {
       "name": "Bit-Sum Trick for Subarray OR",
       "when": "Sum over all subarrays of (OR of subarray). For each bit i, count subarrays where bit i appears at least once: contribute (1 << i) * thatCount.",
       "template": "long ans = 0;\nfor (int i = 0; i < 32; i++) {\n    long lastZero = -1, contribution = 0;\n    for (int j = 0; j < N; j++) {\n        if (((A[j] >> i) & 1) == 0) lastZero = j;\n        // subarrays ending at j containing bit i set:\n        contribution += (j - lastZero);\n    }\n    ans += (1L << i) * contribution;\n}",
-      "examples": ["Subarray OR"]
+      "examples": [
+        "Subarray OR"
+      ]
+    },
+    {
+      "name": "Isolate / Strip the Lowest Set Bit",
+      "when": "You need the value/position of the least-significant 1, or want to iterate set bits one at a time.",
+      "template": "int lowest   = n & -n;        // isolates lowest set bit\nint stripped = n & (n - 1);   // clears the lowest set bit\nint pos      = Integer.numberOfTrailingZeros(n);\nfor (int m = n; m != 0; m &= (m - 1)) { int bit = m & -m; }",
+      "examples": [
+        "Single Number III",
+        "Find Two Missing Numbers",
+        "Number of 1 Bits"
+      ]
+    },
+    {
+      "name": "Iterate All Subsets of a Mask",
+      "when": "Enumerate every submask of a bitmask (subset-sum / bitmask DP).",
+      "template": "for (int sub = mask; sub > 0; sub = (sub - 1) & mask) {\n    // sub ranges over all non-empty subsets of mask\n}\n// handle sub == 0 (empty subset) after the loop",
+      "examples": [
+        "subset enumeration",
+        "bitmask DP"
+      ]
     }
   ],
   "edgeCases": [
@@ -125,6 +189,11 @@
     "Subarray-OR with very long arrays — running contribution can exceed int even when bits don't; use long.",
     "Find-two-missing problems with sum overflow — use the XOR formulation (or use long for the sum formulation).",
     "Help-from-Sam style staircase problems — power-of-2 transitions, use 1L when N exceeds 30.",
-    "Brian-Kernighan in a tight loop — guard against n < 0 (sign bit will keep popping forever in arithmetic shift contexts)."
+    "Brian-Kernighan in a tight loop — guard against n < 0 (sign bit will keep popping forever in arithmetic shift contexts).",
+    "n & -n on n = 0 returns 0 (no lowest set bit) — guard before using it as a bit position/divisor.",
+    "n & -n on Integer.MIN_VALUE returns Integer.MIN_VALUE (only the sign bit set) — store in long if you do arithmetic with it.",
+    "Shift amounts are taken mod 32 for int (mod 64 for long): x << 32 == x, not 0.",
+    "Integer.numberOfTrailingZeros(0) and numberOfLeadingZeros(0) both return 32 — the all-zero input is the boundary case.",
+    "Submask enumeration sub = (sub-1) & mask stops at sub == 0, so the empty subset is never visited inside the loop — handle separately."
   ]
 }

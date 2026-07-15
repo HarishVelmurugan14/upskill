@@ -25,6 +25,14 @@
     {
       "title": "6. Will sums overflow int?",
       "body": "N up to 1e5 and A[i] up to 1e9 means a full sum is up to 1e14 — needs long. Promote the prefix array and the running sum to long. Cast one operand to long BEFORE the multiply, never after."
+    },
+    {
+      "title": "7. Is it a 'sum equals K' / 'count subarrays with sum K' — not a fixed length?",
+      "body": "Fixed-length problems slide a window; variable-length sum problems need either a prefix-sum + HashMap of counts (works with negatives) or a two-pointer window (only valid when all A[i] are non-negative, so the sum is monotonic as the window grows). Pick by asking 'can values be negative?' before reaching for two pointers."
+    },
+    {
+      "title": "8. Does the answer only compare within a fixed window? Then drop the division.",
+      "body": "Least-average / max-average over a fixed size B: never divide. avg = sum/B and B is constant, so the minimiser of the sum is the minimiser of the average — comparing longs avoids floating-point ties and precision bugs (Subarray with Least Average)."
     }
   ],
   "commonMistakes": [
@@ -75,6 +83,24 @@
       "wrong": "int last = -1;\nfor (int i = 0; i < N; i++) {\n    if (A[i] == min || A[i] == max) {\n        if (last != -1) best = Math.min(best, i - last + 1);\n        last = i;\n    }\n}",
       "right": "// keep SEPARATE latest positions for min and max\nint lastMin = -1, lastMax = -1, best = N;\nfor (int i = 0; i < N; i++) {\n    if (A[i] == min) { lastMin = i; if (lastMax != -1) best = Math.min(best, lastMin - lastMax + 1); }\n    if (A[i] == max) { lastMax = i; if (lastMin != -1) best = Math.min(best, lastMax - lastMin + 1); }\n}",
       "why": "A single 'last' loses track of whether you've seen the OTHER target yet. Track the two latest positions independently and pair them every time either updates."
+    },
+    {
+      "title": "Two-pointer window on an array containing negatives",
+      "wrong": "while (sum > target) sum -= A[l++];  // assumes growth is monotonic",
+      "right": "count += seen.getOrDefault(run - target, 0); // prefix-sum + HashMap",
+      "why": "Two pointers rely on 'adding an element never decreases the sum'. A negative A[i] breaks monotonicity, so shrinking/growing skips valid windows. Only use the sliding two-pointer for sum targets when all values are non-negative."
+    },
+    {
+      "title": "Reusing one N for a rectangular matrix",
+      "wrong": "for (int j = 0; j < N; j++) { ... }  // assumes A[0].length == A.length",
+      "right": "int rows = A.length, cols = A[0].length; // use both; guard rows==0",
+      "why": "Transpose and column-sum inputs can be rectangular (rows != cols). Reusing one N over-indexes or misses cells. In-place transpose/rotate is only valid on square matrices; a rectangular transpose must allocate a cols x rows result."
+    },
+    {
+      "title": "Counting pairs / subarray counts in int",
+      "wrong": "int pairs = 0; // pairs can reach ~(N/2)^2",
+      "right": "long pairs = 0;",
+      "why": "For N=1e5 the number of pairs approaches (5e4)^2 = 2.5e9, past int's ~2.1e9. The combinatorial total overflows even though individual elements are tiny."
     }
   ],
   "keyPatterns": [
@@ -82,37 +108,72 @@
       "name": "1-D Prefix Sum",
       "when": "Repeated range-sum queries on a static array, equilibrium-index problems, in-place running totals.",
       "template": "long[] prefix = new long[N];\nprefix[0] = A[0];\nfor (int i = 1; i < N; i++) {\n    prefix[i] = prefix[i-1] + A[i];\n}\n// query [L, R] in O(1):\nlong rangeSum = (L == 0) ? prefix[R] : prefix[R] - prefix[L-1];",
-      "examples": ["Range Sum Query", "Equilibrium Index", "Special Index (odd/even prefix sums)", "In-place Prefix Sum"]
+      "examples": [
+        "Range Sum Query",
+        "Equilibrium Index",
+        "Special Index (odd/even prefix sums)",
+        "In-place Prefix Sum"
+      ]
     },
     {
       "name": "Carry-Forward (left/right summary)",
       "when": "Each index needs information from both sides — max-so-far on the right, count-so-far on the left, latest position of element X, etc.",
       "template": "// Right-to-left running max example\nint maxRight = Integer.MIN_VALUE;\nfor (int i = N - 1; i >= 0; i--) {\n    if (A[i] > maxRight) {\n        // i is a leader\n    }\n    maxRight = Math.max(maxRight, A[i]);\n}",
-      "examples": ["Leaders in Array", "Best Time to Buy and Sell Stock I", "Closest MinMax", "Special Subsequences AG"]
+      "examples": [
+        "Leaders in Array",
+        "Best Time to Buy and Sell Stock I",
+        "Closest MinMax",
+        "Special Subsequences AG"
+      ]
     },
     {
       "name": "Fixed-Size Sliding Window",
       "when": "Sum / average / count over every window of length K. Compute once, then slide.",
       "template": "long sum = 0;\nfor (int i = 0; i < K; i++) {\n    sum += A[i];\n}\nlong best = sum;\nfor (int r = K; r < N; r++) {\n    sum += A[r] - A[r - K];\n    best = Math.max(best, sum);\n}",
-      "examples": ["Maximum Sum Subarray of Size K", "Subarray with Least Average", "Subarray with Given Sum and Length"]
+      "examples": [
+        "Maximum Sum Subarray of Size K",
+        "Subarray with Least Average",
+        "Subarray with Given Sum and Length"
+      ]
     },
     {
       "name": "Contribution Technique",
       "when": "Summing a quantity across every subarray. Flip the question: how many subarrays contain index i? Answer: (i+1) * (N-i).",
       "template": "long total = 0;\nfor (int i = 0; i < N; i++) {\n    total += (long) A[i] * (i + 1) * (N - i);\n}\nreturn total;",
-      "examples": ["Sum of All Subarrays", "Sum of All Submatrices (2-D variant)"]
+      "examples": [
+        "Sum of All Subarrays",
+        "Sum of All Submatrices (2-D variant)"
+      ]
     },
     {
       "name": "Pick-from-Both-Sides (rolling boundary)",
       "when": "Choose B elements from either end of the array; maximise sum. Start with all from left, then swap one left for one right at a time.",
       "template": "int sum = 0;\nfor (int i = 0; i < B; i++) sum += A[i];\nint best = sum;\nfor (int j = 0; j < B; j++) {\n    sum = sum - A[B - 1 - j] + A[N - 1 - j];\n    best = Math.max(best, sum);\n}",
-      "examples": ["Pick from Both Sides!", "Maximum Score from Card Picks (LeetCode parallel)"]
+      "examples": [
+        "Pick from Both Sides!",
+        "Maximum Score from Card Picks (LeetCode parallel)"
+      ]
     },
     {
       "name": "Matrix Row × Column Traversal",
       "when": "Column sums, diagonal walks, transpose, rotation. Pick the right loop nesting so the inner index varies fastest along the axis you're accumulating on.",
       "template": "// Column sums\nfor (int j = 0; j < cols; j++) {\n    long colSum = 0;\n    for (int i = 0; i < rows; i++) {\n        colSum += A[i][j];\n    }\n}\n// Main diagonal: A[i][i]\n// Anti-diagonal pass: index by (i + j) = constant",
-      "examples": ["Column Sum", "Main Diagonal Sum", "Anti Diagonals", "Matrix Transpose", "Rotate Matrix"]
+      "examples": [
+        "Column Sum",
+        "Main Diagonal Sum",
+        "Anti Diagonals",
+        "Matrix Transpose",
+        "Rotate Matrix"
+      ]
+    },
+    {
+      "name": "Prefix Sum + HashMap (subarrays summing to K, with negatives)",
+      "when": "Count or find subarrays with an exact target sum when values may be negative — a plain sliding window is invalid because the running sum isn't monotonic.",
+      "template": "Map<Long,Integer> seen = new HashMap<>();\nseen.put(0L, 1); // empty prefix\nlong run = 0; long count = 0;\nfor (int i = 0; i < N; i++) {\n    run += A[i];\n    count += seen.getOrDefault(run - K, 0);\n    seen.merge(run, 1, Integer::sum);\n}",
+      "examples": [
+        "Counting Subarrays (sum = K)",
+        "Subarray with Given Sum"
+      ]
     }
   ],
   "edgeCases": [
@@ -125,6 +186,11 @@
     "B = 0 → max sum is 0; the slide loop must not run.",
     "Matrix with one row or one column — transpose / rotation must still work; diagonal loops must not over-index.",
     "Empty string for AG counting — return 0 without crashing.",
-    "All maxes / all mins identical (Closest MinMax) — answer is 1 (the two values coincide on any index)."
+    "All maxes / all mins identical (Closest MinMax) — answer is 1 (the two values coincide on any index).",
+    "HashMap prefix-sum count: seed the map with prefix 0 -> 1 before the loop, or you miss every subarray that starts at index 0.",
+    "Two-pointer sum window: guard l <= r — the shrink loop can make l pass r when one element already exceeds the target.",
+    "Anti-diagonals: N=1 gives 2N-1 = 1 single-cell diagonal; a phase-2 loop starting at i=1 must not run.",
+    "Rectangular matrix transpose: output dimensions are cols x rows, not rows x rows — a square-only in-place swap corrupts data.",
+    "Least/max average by fixed window: all-negative arrays are valid — initialise bestSum from the first real window, never 0."
   ]
 }

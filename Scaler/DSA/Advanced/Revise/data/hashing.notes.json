@@ -29,6 +29,14 @@
     {
       "title": "7. Pair-count problems with duplicates need care.",
       "body": "Counting pairs (i,j) i<j with A[i]+A[j]=B: walk once, for each x add freq[B-x] to ans BEFORE putting x in map (this enforces i<j and handles duplicates: e.g. [2,2] with B=4 contributes 1 not 4)."
+    },
+    {
+      "title": "8. Encode a pair/coordinate into one long key.",
+      "body": "When you need a HashMap/HashSet keyed by a 2-tuple (i,j) with bounded ranges, avoid a wrapper object or nested map. Pack both ints into one long: key = ((long) a << 32) | (b & 0xFFFFFFFFL). The mask on b is essential — without '& 0xFFFFFFFFL' a negative b sign-extends and corrupts the high 32 bits. Faster and lower-garbage than nested maps, with a single O(1) lookup."
+    },
+    {
+      "title": "9. Reach for the right container by the question, not habit.",
+      "body": "HashSet = pure membership/distinct (no counts). HashMap = you need an associated value (count, index, sum). LinkedHashMap = deterministic insertion-order iteration. TreeMap = sorted keys / floor / ceiling. Plain HashMap gives NO order guarantee and the order can change between JVM versions, so never rely on its iteration order for the answer."
     }
   ],
   "commonMistakes": [
@@ -70,9 +78,27 @@
     },
     {
       "title": "Longest-zero-subarray storing latest index instead of earliest",
-      "wrong": "map.put(prefixSum, i);  // always overwrites \u2192 only most-recent index kept",
+      "wrong": "map.put(prefixSum, i);  // always overwrites → only most-recent index kept",
       "right": "if (!map.containsKey(prefixSum)) map.put(prefixSum, i);  // keep earliest only",
       "why": "For longest zero-sum subarray you want the EARLIEST occurrence of each prefix sum so that (currentIndex − earliestIndex) is maximised."
+    },
+    {
+      "title": "Comparing boxed Integer keys/values with == instead of .equals",
+      "wrong": "Integer a = map.get(x), b = map.get(y);\nif (a == b) { ... }   // '==' compares references; true only by luck for -128..127",
+      "right": "if (a != null && a.equals(b)) { ... }\n// or unbox: if (a != null && b != null && a.intValue() == b.intValue())",
+      "why": "Autoboxing caches Integer objects for -128..127, so == accidentally works for small values and silently breaks for values > 127. Use .equals (or compare primitive int) for Integer objects."
+    },
+    {
+      "title": "Using contains(x) on a Map when you meant containsKey(x)",
+      "wrong": "if (freq.contains(x)) { ... }   // Map has no contains(Object)",
+      "right": "if (freq.containsKey(x)) { ... }   // containsValue(v) is O(N)",
+      "why": "Set.contains checks membership; Map exposes containsKey (keys) and containsValue (values, O(N)). Confusing them checks the wrong side or fails to compile."
+    },
+    {
+      "title": "Relying on HashMap iteration order for the answer",
+      "wrong": "Map<Integer,Integer> m = new HashMap<>();\n... for (var e : m.entrySet()) out.add(e.getKey());  // order undefined",
+      "right": "Map<Integer,Integer> m = new LinkedHashMap<>();  // preserve insertion order\n// or re-scan the ORIGINAL array to impose the needed order",
+      "why": "HashMap makes no ordering promise; its layout depends on hashes/capacity and can change between JVM versions. If the expected output order is 'first appearance' or 'sorted', use LinkedHashMap/TreeMap or re-scan the source."
     }
   ],
   "keyPatterns": [
@@ -80,43 +106,84 @@
       "name": "Frequency Map (count occurrences / queries)",
       "when": "How many times does each value appear? Answer membership / count queries.",
       "template": "Map<Integer, Integer> freq = new HashMap<>();\nfor (int x : A) freq.merge(x, 1, Integer::sum);\n// Query\nint cnt = freq.getOrDefault(query, 0);",
-      "examples": ["Frequency of element query", "Count Unique Elements"]
+      "examples": [
+        "Frequency of element query",
+        "Count Unique Elements"
+      ]
     },
     {
       "name": "HashSet for distinct / duplicate / first-repeat",
       "when": "'Are there duplicates?' or 'first element to repeat as I scan left-to-right'.",
       "template": "Set<Integer> seen = new HashSet<>();\nfor (int x : A) {\n    if (!seen.add(x)) return x;  // first repeat\n}\nreturn -1;\n// Count distinct: set.size()",
-      "examples": ["Count distinct elements", "First Repeating element"]
+      "examples": [
+        "Count distinct elements",
+        "First Repeating element"
+      ]
     },
     {
       "name": "Complement Pair Search (sum == B)",
       "when": "'Does some pair sum to B?' or 'count pairs with sum B'.",
       "template": "Map<Integer, Integer> seen = new HashMap<>();\nlong pairs = 0;\nfor (int x : A) {\n    pairs += seen.getOrDefault(B - x, 0);\n    seen.merge(x, 1, Integer::sum);\n}",
-      "examples": ["Check Pair Sum", "Count Pair Sum"]
+      "examples": [
+        "Check Pair Sum",
+        "Count Pair Sum"
+      ]
     },
     {
       "name": "Complement Pair Search (difference == B)",
       "when": "'Count pairs (i,j) with |A[i] − A[j]| = B' (or signed diff).",
       "template": "Map<Integer, Integer> freq = new HashMap<>();\nfor (int x : A) freq.merge(x, 1, Integer::sum);\nlong pairs = 0;\nfor (Map.Entry<Integer, Integer> e : freq.entrySet()) {\n    int v = e.getKey();\n    pairs += (long) e.getValue() * freq.getOrDefault(v + B, 0);\n}\nif (B == 0) pairs -= sum of freq (self-pairs counted) ... or special-case.",
-      "examples": ["Count Pair Difference"]
+      "examples": [
+        "Count Pair Difference"
+      ]
     },
     {
       "name": "Prefix Sum + Map (subarray sum = K)",
       "when": "Continuous subarray with given sum (positive, negative, zero).",
       "template": "Map<Long, Integer> prefixCount = new HashMap<>();\nprefixCount.put(0L, 1);\nlong sum = 0; long count = 0;\nfor (int x : A) {\n    sum += x;\n    count += prefixCount.getOrDefault(sum - K, 0);\n    prefixCount.merge(sum, 1, Integer::sum);\n}",
-      "examples": ["Subarray with given sum", "Subarray Sum Equals K", "Sub-array with 0 sum", "Count Subarray Zero Sum", "Longest Subarray Zero Sum"]
+      "examples": [
+        "Subarray with given sum",
+        "Subarray Sum Equals K",
+        "Sub-array with 0 sum",
+        "Count Subarray Zero Sum",
+        "Longest Subarray Zero Sum"
+      ]
     },
     {
       "name": "Common-Elements with Multiplicity",
       "when": "Intersection respecting duplicates (min(countA, countB) per value).",
       "template": "Map<Integer, Integer> freqA = new HashMap<>();\nfor (int x : A) freqA.merge(x, 1, Integer::sum);\nList<Integer> out = new ArrayList<>();\nfor (int x : B) {\n    int c = freqA.getOrDefault(x, 0);\n    if (c > 0) { out.add(x); freqA.put(x, c - 1); }\n}",
-      "examples": ["Common Elements"]
+      "examples": [
+        "Common Elements"
+      ]
     },
     {
       "name": "Sliding Window with HashMap (distinct in window)",
       "when": "Maintain stats over a moving window of fixed or variable size.",
       "template": "Map<Integer, Integer> freq = new HashMap<>();\nList<Integer> ans = new ArrayList<>();\nfor (int i = 0; i < N; i++) {\n    freq.merge(A[i], 1, Integer::sum);\n    if (i >= B) {\n        int old = A[i - B];\n        int c = freq.get(old) - 1;\n        if (c == 0) freq.remove(old);\n        else freq.put(old, c);\n    }\n    if (i >= B - 1) ans.add(freq.size());\n}",
-      "examples": ["Distinct Numbers in Window"]
+      "examples": [
+        "Distinct Numbers in Window"
+      ]
+    },
+    {
+      "name": "Pair/coordinate key via long packing",
+      "when": "You need a set or map keyed by two bounded ints (grid cell, edge, composite pair) and want to avoid object keys or nested maps.",
+      "template": "Set<Long> seen = new HashSet<>();\nlong key = ((long) a << 32) | (b & 0xFFFFFFFFL);\nseen.add(key);\n// decode: int a2 = (int)(key >> 32); int b2 = (int) key;",
+      "examples": [
+        "Distinct grid cells visited",
+        "Deduplicate edges (u,v)",
+        "Group-by two-field composite key"
+      ]
+    },
+    {
+      "name": "First-seen-order output with LinkedHashMap/LinkedHashSet",
+      "when": "You must dedupe or count but emit results in the order elements first appeared.",
+      "template": "Set<Integer> seen = new LinkedHashSet<>();\nfor (int x : A) seen.add(x);\n// counting variant:\nMap<Integer,Integer> freq = new LinkedHashMap<>();\nfor (int x : A) freq.merge(x, 1, Integer::sum);",
+      "examples": [
+        "Distinct elements in original order",
+        "Ordered frequency table",
+        "LRU-style eviction"
+      ]
     }
   ],
   "edgeCases": [
@@ -129,6 +196,11 @@
     "Distinct-in-window when window size B > N → output one entry: distinct of entire array.",
     "Longest zero-sum subarray with sum reaching 0 at index i → length i+1, requires the (0, -1) sentinel in the index map.",
     "Subarray with given sum (positive ints only) — sliding window (two pointers) is simpler and O(N), no map needed.",
-    "Common elements with multiplicity — order should be insertion order of B (or A, problem-specific); confirm expected order."
+    "Common elements with multiplicity — order should be insertion order of B (or A, problem-specific); confirm expected order.",
+    "Long-key packing with negative low half: forgetting '& 0xFFFFFFFFL' on b lets a negative b sign-extend and clobber a's bits — two different pairs then collide.",
+    "Integer autobox cache boundary: two Integer keys equal to 200 satisfy .equals but fail ==, while two equal to 100 pass == by accident — test with values > 127.",
+    "Adversarial hash collisions degrade HashMap ops to O(N); Java 8+ treeifies large buckets to O(log N), but encode/randomize keys if collisions are a concern.",
+    "Order-sensitive grader: an unordered HashSet/HashMap answer may fail even when the multiset is correct — switch to LinkedHashMap or sort before comparing.",
+    "containsValue in a hot loop is O(N) per call, turning an O(N) algorithm into O(N^2); precompute or invert the map instead."
   ]
 }

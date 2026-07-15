@@ -25,6 +25,14 @@
     {
       "title": "6. Fast power: halve, don't decrement.",
       "body": "pow(a, n) = (a^(n/2))^2 (then × a if n is odd). O(log N) instead of O(N). The general 'split in halves' pattern recurs in merge sort, BS, divide-and-conquer."
+    },
+    {
+      "title": "7. Recursion depth ~ N: check constraints before recursing.",
+      "body": "Stack depth equals the recurrence chain length. Palindrome allows |A| up to 50000 and Print-1-to-A up to 10^4 — a per-element recursion there means 10^4-5*10^4 frames, near or past the JVM default. Rule: if recursion depth grows linearly with N and N >= ~10^4, prefer iteration. Depth is O(N) for linear recursion, O(N/2) for two-pointer palindrome, O(log N) for fast power — only the last is depth-safe at any N."
+    },
+    {
+      "title": "8. One contract, one owner: don't split the invariant across helper and wrapper.",
+      "body": "The wrapper (solve(int A)) should ONLY set up initial args and post-process; the invariant lives entirely in the helper. When first-index returns -1 for 'not found', last-index must use the SAME sentinel and SAME 'idx == length' base — mixing 'return 0' vs 'return -1' breaks the contract silently. Write the helper's meaning as a one-line comment and never let two functions disagree about a return value."
     }
   ],
   "commonMistakes": [
@@ -63,6 +71,24 @@
       "wrong": "void print1ToN(int i, int N) { if (i > N) return; System.out.println(i); print1ToN(i + 1, N); }",
       "right": "for (int i = 1; i <= N; i++) System.out.println(i);  // convert to iteration for large N",
       "why": "JVM does NOT do tail-call optimisation. Deep tail-recursive code overflows at ~10⁴ frames. Convert hot recursive functions to loops when N is large."
+    },
+    {
+      "title": "Linear recursion at N = 10^4-10^5 -> StackOverflowError",
+      "wrong": "boolean isPali(char[] a, int l, int r) { if (l >= r) return true; if (a[l]!=a[r]) return false; return isPali(a, l+1, r-1); }  // |A| up to 50000",
+      "right": "boolean isPali(char[] a) {\n    int l = 0, r = a.length - 1;\n    while (l < r) { if (a[l] != a[r]) return false; l++; r--; }\n    return true;\n}",
+      "why": "Recursion depth tracks N. With |A| up to 50000, a per-element recursion risks blowing the ~10^4-frame default stack. A loop keeps O(1) stack. Judge the constraint before choosing recursion."
+    },
+    {
+      "title": "Fast power: int overflow in the squaring step",
+      "wrong": "int half = power(a, n/2); return half * half;  // int * int overflows silently",
+      "right": "long half = power(a, n / 2, mod);\nlong sq = (half * half) % mod;\nreturn (n % 2 == 1) ? (sq * (a % mod)) % mod : sq;",
+      "why": "half*half exceeds int range long before the exponent is large; the product wraps to garbage. Declare intermediates as long and reduce mod after EACH multiply."
+    },
+    {
+      "title": "Rebuilding the accumulator/list at every frame",
+      "wrong": "List<Integer> collect(...) { List<Integer> list = collect(...); ... return list; }  // new list per frame",
+      "right": "void collect(int[] A, int i, int B, List<Integer> out) {\n    if (i == A.length) return;\n    if (A[i] == B) out.add(i);\n    collect(A, i + 1, B, out);\n}",
+      "why": "Allocating a fresh list (or copying an array) per frame turns an O(N) walk into O(N^2). Thread ONE mutable output through the parameter and append; ascending order still falls out for free."
     }
   ],
   "keyPatterns": [
@@ -70,37 +96,76 @@
       "name": "Factorial / Linear Recurrence",
       "when": "f(n) = n × f(n-1) or any single-arg recurrence with a clean base.",
       "template": "long factorial(int n) {\n    if (n <= 1) return 1;\n    return n * factorial(n - 1);\n}",
-      "examples": ["Find Factorial!", "Find Fibonacci - II"]
+      "examples": [
+        "Find Factorial!",
+        "Find Fibonacci - II"
+      ]
     },
     {
       "name": "Print Sequence (forward or reverse)",
       "when": "Traverse 1..N or N..1 with side effects.",
       "template": "void print1ToA(int i, int A) {\n    if (i > A) return;\n    System.out.println(i);\n    print1ToA(i + 1, A);\n}\n// Print A to 1: print BEFORE the recursive call, recurse with i - 1.",
-      "examples": ["Print 1 to A function", "Print A to 1 function", "Decreasing Increasing in one Function"]
+      "examples": [
+        "Print 1 to A function",
+        "Print A to 1 function",
+        "Decreasing Increasing in one Function"
+      ]
     },
     {
       "name": "Palindrome via Two-Pointer Recursion",
       "when": "Symmetric checks where l and r move toward each other.",
       "template": "boolean isPalin(String s, int l, int r) {\n    if (l >= r) return true;\n    if (s.charAt(l) != s.charAt(r)) return false;\n    return isPalin(s, l + 1, r - 1);\n}",
-      "examples": ["Check Palindrome using Recursion"]
+      "examples": [
+        "Check Palindrome using Recursion"
+      ]
     },
     {
       "name": "Tower of Hanoi (classic 3-peg recursion)",
       "when": "Move N disks from source to destination with one auxiliary, larger on bottom.",
       "template": "void toh(int n, char from, char to, char aux, List<int[]> moves) {\n    if (n == 0) return;\n    toh(n - 1, from, aux, to, moves);\n    moves.add(new int[]{ n, from - '0', to - '0' });\n    toh(n - 1, aux, to, from, moves);\n}",
-      "examples": ["Tower of Hanoi"]
+      "examples": [
+        "Tower of Hanoi"
+      ]
     },
     {
       "name": "Index Collector (first / last / all)",
       "when": "Walk array recursively, append matches to a result list (or short-circuit on first hit).",
       "template": "// All indices\nvoid collect(int[] A, int B, int i, List<Integer> res) {\n    if (i == A.length) return;\n    if (A[i] == B) res.add(i);\n    collect(A, B, i + 1, res);\n}\n// First index — return as soon as found\nint first(int[] A, int B, int i) {\n    if (i == A.length) return -1;\n    if (A[i] == B) return i;\n    return first(A, B, i + 1);\n}\n// Last index — recurse first, return the recursive answer if non-(-1)\nint last(int[] A, int B, int i) {\n    if (i == A.length) return -1;\n    int rest = last(A, B, i + 1);\n    if (rest != -1) return rest;\n    return (A[i] == B) ? i : -1;\n}",
-      "examples": ["All Indices Of Array", "First Index using Recursion", "Last Index using Recursion", "Print Array using Recursion"]
+      "examples": [
+        "All Indices Of Array",
+        "First Index using Recursion",
+        "Last Index using Recursion",
+        "Print Array using Recursion"
+      ]
     },
     {
       "name": "Fast Power (binary exponentiation)",
       "when": "Compute a^N mod M in O(log N).",
       "template": "long power(long a, long n, long mod) {\n    if (n == 0) return 1 % mod;\n    long half = power(a, n / 2, mod);\n    long sq = (half * half) % mod;\n    return ((n & 1) == 1) ? (sq * (a % mod)) % mod : sq;\n}",
-      "examples": ["Fast Power"]
+      "examples": [
+        "Fast Power"
+      ]
+    },
+    {
+      "name": "Index-passing over array slicing",
+      "when": "Recursing across an array/string. Never pass Arrays.copyOfRange or substring — pass the original plus a moving index/bound.",
+      "template": "// GOOD: O(1) per frame, O(N) total\nint solve(int[] A, int i) {\n    if (i == A.length) return 0;\n    return A[i] + solve(A, i + 1);\n}\n// BAD: substring/copy is O(N) per frame -> O(N^2) time",
+      "examples": [
+        "Print Array using Recursion",
+        "All Indices Of Array",
+        "First Index using Recursion",
+        "Check Palindrome"
+      ]
+    },
+    {
+      "name": "Depth-safe conversion: linear recursion to a loop",
+      "when": "The recursion is tail-shaped (nothing happens after the call) AND N is large. Java has no TCO, so rewrite mechanically.",
+      "template": "int firstIdx(int[] A, int B) {\n    for (int i = 0; i < A.length; i++)\n        if (A[i] == B) return i;\n    return -1;\n}\n// Rule: changing parameter -> loop variable, base case -> loop condition, call -> next iteration.",
+      "examples": [
+        "First Index using Recursion",
+        "Print 1 to A",
+        "Print A to 1"
+      ]
     }
   ],
   "edgeCases": [
@@ -113,6 +178,11 @@
     "Print 1-to-N for N = 0 → print nothing (base case triggers immediately).",
     "Index collector when array is empty → res stays empty, no NPE.",
     "Fast power modulus = 1 → every result is 0; the 1 % mod guard handles it.",
-    "Mod with negative intermediate (subtraction inside power-of-modular-inverse problems): apply ((x % mod) + mod) % mod."
+    "Mod with negative intermediate (subtraction inside power-of-modular-inverse problems): apply ((x % mod) + mod) % mod.",
+    "Tower of Hanoi move count is exactly 2^A - 1; for A = 18 that is 262143 rows. A = 31+ would overflow a 2^A int counter.",
+    "Digital root escape: A % 9 == 1 answers the magic-number check in O(1) with zero recursion — but the formula needs A >= 1 (dr(0)=0), so guard A == 0 if allowed.",
+    "Fast power B = 0 must return 1 before the B == 1 base, otherwise power(a, 0) recurses into power(a, 0) forever (0/2 == 0) — StackOverflowError.",
+    "Depth math: two-pointer palindrome recurses ~|A|/2 frames, but a naive char-by-char still recurses ~|A| — halving pointer movement halves the stack at |A| = 50000.",
+    "First-index vs last-index must share the same sentinel: both return -1 when absent and both base out at idx == length, or the unwind check misfires and reports a false hit."
   ]
 }
