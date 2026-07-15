@@ -1,0 +1,1136 @@
+[
+  {
+    "num": 154,
+    "id": "sort-merge-two-sorted-arrays",
+    "title": "Merge Two Sorted Arrays",
+    "subTopic": "Two-Pointer Merge",
+    "tags": [
+      "Sorting",
+      "Two Pointers",
+      "Merge"
+    ],
+    "description": "Given two sorted integer arrays A and B, merge B and A as one sorted array and return it as an output.\n\nNote: A linear time complexity is expected and you should avoid use of any library function.\n\nProblem Constraints\n-2*10^9 <= A[i], B[i] <= 2*10^9\n1 <= |A|, |B| <= 5*10^4\n\nInput Format\nFirst argument is a 1-D array A. Second argument is a 1-D array B.\n\nOutput Format\nReturn the merged sorted array.\n\nExample Input\nA = [1, 5, 8], B = [2, 3, 6]\n\nExample Output\n[1, 2, 3, 5, 6, 8]",
+    "sampleInput": "A = [1, 5, 8], B = [2, 3, 6]",
+    "sampleOutput": "[1, 2, 3, 5, 6, 8]",
+    "story": "Two sorted arrays → walk both with pointers P1, P2; always copy the smaller front element; drain the leftover tail. O(N+M), no sort needed.",
+    "plain": "Keep a pointer into each array. Compare the current fronts A[P1] and B[P2]; copy the smaller into the result and advance that pointer. When one array runs out, copy the rest of the other. This is exactly the merge step of merge sort.",
+    "tale": "Two lines of people already sorted by height merge into one line: at the front, whoever is shorter steps in next; when one line empties, the other files in as-is.",
+    "solutions": [
+      {
+        "label": "Optimal — Two-Pointer Merge",
+        "complexity": {
+          "time": "O(N + M)",
+          "space": "O(N + M) output"
+        },
+        "plain": "Compare fronts, copy the smaller, advance; then drain whichever array still has elements.",
+        "approach": [
+          "result = new int[N+M]; P1=P2=index=0.",
+          "While P1<N and P2<M: if A[P1] <= B[P2] copy A[P1], P1++ else copy B[P2], P2++; index++.",
+          "Drain remaining A (while P1<N) then remaining B (while P2<M).",
+          "Return result."
+        ],
+        "pseudocode": "while both: emit min(front); advance\ndrain A; drain B",
+        "code": "public int[] solve(final int[] A, final int[] B) {\n    int N = A.length;\n    int M = B.length;\n    int[] result = new int[N + M];\n    int P1 = 0;\n    int P2 = 0;\n    int index = 0;\n    while (P1 < N && P2 < M) {\n        if (A[P1] <= B[P2]) {\n            result[index] = A[P1];\n            P1++;\n        } else {\n            result[index] = B[P2];\n            P2++;\n        }\n        index++;\n    }\n    while (P1 < N) {\n        result[index] = A[P1];\n        P1++;\n        index++;\n    }\n    while (P2 < M) {\n        result[index] = B[P2];\n        P2++;\n        index++;\n    }\n    return result;\n}"
+      }
+    ],
+    "viz": {
+      "kind": "scripted-array",
+      "data": {
+        "A": [
+          1,
+          5,
+          8,
+          2,
+          3,
+          6
+        ],
+        "footer": "Merge [1,5,8] + [2,3,6] — first 3 cells are A, next 3 are B.",
+        "legend": [
+          "c-input",
+          "c-active",
+          "c-result"
+        ],
+        "script": [
+          {
+            "label": "SETUP",
+            "marks": {
+              "0": "c-input",
+              "1": "c-input",
+              "2": "c-input",
+              "3": "c-input",
+              "4": "c-input",
+              "5": "c-input"
+            },
+            "msg": "A=[1,5,8], B=[2,3,6]. P1→A[0]=1, P2→B[0]=2."
+          },
+          {
+            "label": "1 <= 2 → take A",
+            "marks": {
+              "0": "c-result"
+            },
+            "msg": "1 <= 2 → emit 1, P1++."
+          },
+          {
+            "label": "5 vs 2 → take B",
+            "marks": {
+              "3": "c-result"
+            },
+            "msg": "5 > 2 → emit 2, P2++."
+          },
+          {
+            "label": "5 vs 3 → take B",
+            "marks": {
+              "4": "c-result"
+            },
+            "msg": "5 > 3 → emit 3, P2++."
+          },
+          {
+            "label": "5 vs 6 → take A",
+            "marks": {
+              "1": "c-result"
+            },
+            "msg": "5 <= 6 → emit 5, P1++."
+          },
+          {
+            "label": "8 vs 6 → take B",
+            "marks": {
+              "5": "c-result"
+            },
+            "msg": "8 > 6 → emit 6, P2++. B empty."
+          },
+          {
+            "label": "drain A",
+            "marks": {
+              "2": "c-result"
+            },
+            "msg": "Emit remaining 8. Result = [1,2,3,5,6,8]."
+          }
+        ]
+      }
+    }
+  },
+  {
+    "num": 155,
+    "id": "sort-inversion-count",
+    "title": "Inversion Count in an Array",
+    "subTopic": "Merge Sort — Count While Merging",
+    "tags": [
+      "Sorting",
+      "Merge Sort",
+      "Divide & Conquer"
+    ],
+    "description": "Given an array of integers A. If i < j and A[i] > A[j], then the pair (i, j) is called an inversion of A. Find the total number of inversions of A modulo (10^9 + 7).\n\nProblem Constraints\n1 <= length of the array <= 10^5\n1 <= A[i] <= 10^9\n\nInput Format\nThe only argument given is the integer array A.\n\nOutput Format\nReturn the number of inversions of A modulo (10^9 + 7).\n\nExample Input\nInput 1: A = [1, 3, 2]\nInput 2: A = [3, 2, 1]\n\nExample Output\nOutput 1: 1\nOutput 2: 3",
+    "sampleInput": "A = [1, 3, 2]",
+    "sampleOutput": "1",
+    "story": "Count inversions as a side-effect of merge sort: when the right half's element is placed before leftovers of the left half, every remaining left element forms an inversion — add (mid+1 - P1).",
+    "plain": "Brute is O(N^2). Instead, piggyback on merge sort. During the merge, when A[P2] (right) is smaller than A[P1] (left), it jumps ahead of ALL remaining left elements — that's (mid + 1 - P1) inversions at once. Sum these across every merge and take mod 1e9+7.",
+    "tale": "Sorting a deck by merging two sorted halves: each time a right-hand card cuts in front of the still-waiting left-hand cards, it 'overtakes' all of them — tally those overtakes.",
+    "solutions": [
+      {
+        "label": "Optimal — Count During Merge",
+        "complexity": {
+          "time": "O(N log N)",
+          "space": "O(N)"
+        },
+        "plain": "Standard merge sort; whenever a right-half element is taken while left elements remain, add the count of those left elements.",
+        "approach": [
+          "Divide into halves, recurse on each (accumulate their inversions, mod 1e9+7).",
+          "Merge: when A[P1] <= A[P2] take left; else take right AND add (mid + 1 - P1) inversions.",
+          "Copy temp back; return total mod 1e9+7."
+        ],
+        "pseudocode": "inv = invLeft + invRight + invMerge\nin merge: on taking right, inv += (mid+1 - P1)",
+        "code": "public int solve(int[] A) {\n    return inversionSort(A, 0, A.length - 1);\n}\n\nprivate int inversionSort(int[] A, int low, int high) {\n    if (low == high) return 0;\n    int invCount = 0;\n    int mid = (low + high) / 2;\n    invCount = (invCount + inversionSort(A, low, mid)) % 1_000_000_007;\n    invCount = (invCount + inversionSort(A, mid + 1, high)) % 1_000_000_007;\n    invCount = (invCount + inversionMerge(A, low, mid, high)) % 1_000_000_007;\n    return invCount;\n}\n\nprivate int inversionMerge(int[] A, int low, int mid, int high) {\n    int P1 = low;\n    int P2 = mid + 1;\n    int index = 0;\n    int invCount = 0;\n    int[] temp = new int[high - low + 1];\n    while (P1 < mid + 1 && P2 < high + 1) {\n        if (A[P1] <= A[P2]) {\n            temp[index] = A[P1];\n            P1++;\n        } else {\n            invCount = (invCount + (mid + 1 - P1)) % 1_000_000_007;\n            temp[index] = A[P2];\n            P2++;\n        }\n        index++;\n    }\n    while (P1 < mid + 1) { temp[index++] = A[P1++]; }\n    while (P2 < high + 1) { temp[index++] = A[P2++]; }\n    for (int i = 0; i < temp.length; i++) A[low + i] = temp[i];\n    return invCount;\n}"
+      }
+    ],
+    "viz": {
+      "kind": "scripted-array",
+      "data": {
+        "A": [
+          3,
+          2,
+          1
+        ],
+        "footer": "Count inversions of [3,2,1] via merge sort.",
+        "legend": [
+          "c-input",
+          "c-active",
+          "c-result"
+        ],
+        "script": [
+          {
+            "label": "SETUP",
+            "marks": {
+              "0": "c-input",
+              "1": "c-input",
+              "2": "c-input"
+            },
+            "msg": "A=[3,2,1]. Inversions: (3,2),(3,1),(2,1) → expect 3."
+          },
+          {
+            "label": "merge [3] & [2]",
+            "marks": {
+              "0": "c-active",
+              "1": "c-active"
+            },
+            "msg": "2 < 3 → take right, +1 inversion (3 waiting). → [2,3]."
+          },
+          {
+            "label": "merge [2,3] & [1]",
+            "marks": {
+              "0": "c-active",
+              "1": "c-active",
+              "2": "c-active"
+            },
+            "msg": "1 < 2 → take right, +2 (2 and 3 both waiting)."
+          },
+          {
+            "label": "DONE",
+            "marks": {
+              "0": "c-result",
+              "1": "c-result",
+              "2": "c-result"
+            },
+            "msg": "Total = 1 + 2 = 3."
+          }
+        ]
+      }
+    }
+  },
+  {
+    "num": 156,
+    "id": "sort-merge-sort",
+    "title": "Merge Sort",
+    "subTopic": "Divide & Conquer",
+    "tags": [
+      "Sorting",
+      "Merge Sort",
+      "Divide & Conquer"
+    ],
+    "description": "Given an integer array A, sort the array using Merge Sort.\n\nProblem Constraints\n1 <= |A| <= 10^5\n1 <= A[i] <= 10^9\n\nInput Format\nFirst argument is an integer array A.\n\nOutput Format\nReturn the sorted array.\n\nExample Input\nA = [1, 3, 2]\n\nExample Output\n[1, 2, 3]",
+    "sampleInput": "A = [1, 3, 2]",
+    "sampleOutput": "[1, 2, 3]",
+    "story": "Split in half, sort each half recursively, then merge the two sorted halves with a two-pointer pass. O(N log N), stable.",
+    "plain": "Recursively halve until single elements (already sorted), then merge sorted halves bottom-up. The merge copies into a temp buffer comparing fronts, then writes back into A[low..high].",
+    "tale": "Keep tearing the pile in two until each scrap is one card, then zip the sorted scraps back together, pair by pair.",
+    "solutions": [
+      {
+        "label": "Merge Sort",
+        "complexity": {
+          "time": "O(N log N)",
+          "space": "O(N)"
+        },
+        "plain": "Divide [low..high] at mid, sort both sides, merge back.",
+        "approach": [
+          "Base: low == high → single element, return.",
+          "mid = (low+high)/2; recurse left and right.",
+          "Merge: two-pointer copy into temp, then write temp back into A[low..high]."
+        ],
+        "pseudocode": "mergeSort(lo, hi): if lo==hi return; mid; sort halves; merge(lo,mid,hi)",
+        "code": "public int[] solve(int[] A) {\n    return mergeSort(A, 0, A.length - 1);\n}\n\nprivate int[] mergeSort(int[] A, int low, int high) {\n    if (low == high) {\n        return A;\n    }\n    int mid = (low + high) / 2;\n    mergeSort(A, low, mid);\n    mergeSort(A, mid + 1, high);\n    merge(A, low, mid, high);\n    return A;\n}\n\nprivate int[] merge(int[] A, int low, int mid, int high) {\n    int P1 = low;\n    int P2 = mid + 1;\n    int index = 0;\n    int[] temp = new int[high - low + 1];\n    while (P1 < mid + 1 && P2 < high + 1) {\n        if (A[P1] <= A[P2]) {\n            temp[index] = A[P1];\n            P1++;\n        } else {\n            temp[index] = A[P2];\n            P2++;\n        }\n        index++;\n    }\n    while (P1 < mid + 1) { temp[index++] = A[P1++]; }\n    while (P2 < high + 1) { temp[index++] = A[P2++]; }\n    for (int i = 0; i < temp.length; i++) A[low + i] = temp[i];\n    return A;\n}"
+      }
+    ],
+    "viz": {
+      "kind": "scripted-array",
+      "data": {
+        "A": [
+          5,
+          2,
+          8,
+          1
+        ],
+        "footer": "Merge sort [5,2,8,1].",
+        "legend": [
+          "c-input",
+          "c-active",
+          "c-result"
+        ],
+        "script": [
+          {
+            "label": "SETUP",
+            "marks": {
+              "0": "c-input",
+              "1": "c-input",
+              "2": "c-input",
+              "3": "c-input"
+            },
+            "msg": "Split into [5,2] and [8,1]."
+          },
+          {
+            "label": "merge [5]&[2]",
+            "marks": {
+              "0": "c-active",
+              "1": "c-active"
+            },
+            "msg": "→ [2,5]."
+          },
+          {
+            "label": "merge [8]&[1]",
+            "marks": {
+              "2": "c-active",
+              "3": "c-active"
+            },
+            "msg": "→ [1,8]."
+          },
+          {
+            "label": "merge [2,5]&[1,8]",
+            "marks": {
+              "0": "c-result",
+              "1": "c-result",
+              "2": "c-result",
+              "3": "c-result"
+            },
+            "msg": "1,2,5,8 → sorted."
+          }
+        ]
+      }
+    }
+  },
+  {
+    "num": 157,
+    "id": "sort-smallest-number",
+    "title": "Smallest Number",
+    "subTopic": "Sort Digits Ascending",
+    "tags": [
+      "Sorting",
+      "Merge Sort",
+      "Digits"
+    ],
+    "description": "An integer is given to you in the form of an array, with each element being a separate digit. Find the smallest number (leading zeroes are allowed) that can be formed by rearranging the digits of the given number in an array. Return the smallest number in the form of an array.\n\nNote - Do not use any sorting algorithm or library's sort method.\n\nProblem Constraints\n1 <= N <= 10^5\n0 <= A[i] <= 9\n\nInput Format\nFirst argument A is an array of length N, representing digits of the number.\n\nOutput Format\nReturn the array representing the smallest possible number in form of an array.\n\nExample Input\nA = [8, 4, 0, 5]\n\nExample Output\n[0, 4, 5, 8]",
+    "sampleInput": "A = [8, 4, 0, 5]",
+    "sampleOutput": "[0, 4, 5, 8]",
+    "story": "Smallest number from a multiset of digits = digits in ascending order (leading zeros allowed). Sort ascending — here via merge sort since library sort is disallowed.",
+    "plain": "To make the smallest number, place the smallest digits first. Since leading zeros are permitted, simply sort the digit array in ascending order. The task bans library sort, so use your own merge sort.",
+    "tale": "Line up cards numbered 0-9 from lowest to highest; read left to right for the tiniest possible number.",
+    "solutions": [
+      {
+        "label": "Merge Sort (ascending)",
+        "complexity": {
+          "time": "O(N log N)",
+          "space": "O(N)"
+        },
+        "plain": "Sort digits ascending with a hand-written merge sort.",
+        "approach": [
+          "Run merge sort on the digit array.",
+          "Ascending order gives the smallest arrangement (leading zeros allowed).",
+          "Return the sorted array."
+        ],
+        "pseudocode": "return mergeSort(A, 0, N-1)  // ascending",
+        "code": "public int[] smallestNumber(int[] A) {\n    return mergeSort(A, 0, A.length - 1);\n}\n\nprivate int[] mergeSort(int[] A, int low, int high) {\n    if (low == high) return A;\n    int mid = (low + high) / 2;\n    mergeSort(A, low, mid);\n    mergeSort(A, mid + 1, high);\n    merge(A, low, mid, high);\n    return A;\n}\n\nprivate int[] merge(int[] A, int low, int mid, int high) {\n    int P1 = low, P2 = mid + 1, index = 0;\n    int[] temp = new int[high - low + 1];\n    while (P1 < mid + 1 && P2 < high + 1) {\n        if (A[P1] <= A[P2]) temp[index] = A[P1++];\n        else temp[index] = A[P2++];\n        index++;\n    }\n    while (P1 < mid + 1) temp[index++] = A[P1++];\n    while (P2 < high + 1) temp[index++] = A[P2++];\n    for (int i = 0; i < temp.length; i++) A[low + i] = temp[i];\n    return A;\n}"
+      }
+    ]
+  },
+  {
+    "num": 158,
+    "id": "sort-by-color",
+    "title": "Sort by Color",
+    "subTopic": "Counting / 3-Way Partition",
+    "tags": [
+      "Sorting",
+      "Counting Sort",
+      "Dutch Flag"
+    ],
+    "description": "Given an array with N objects colored red, white, or blue, sort them so that objects of the same color are adjacent, with the colors in the order red, white, and blue.\n\nWe will represent the colors as:\nred -> 0\nwhite -> 1\nblue -> 2\n\nNote: Using the library sort function is not allowed.\n\nProblem Constraints\n1 <= N <= 1000000\n0 <= A[i] <= 2\n\nInput Format\nFirst and only argument of input contains an integer array A.\n\nOutput Format\nReturn an integer array in asked order.\n\nExample Input\nA = [0, 1, 2, 0, 1, 2]\n\nExample Output\n[0, 0, 1, 1, 2, 2]",
+    "sampleInput": "A = [0, 1, 2, 0, 1, 2]",
+    "sampleOutput": "[0, 0, 1, 1, 2, 2]",
+    "story": "Only 3 distinct values → count how many 0s/1s/2s, then rewrite the array as that many 0s, then 1s, then 2s. O(N). (A general sort also works but is overkill.)",
+    "plain": "Because values are limited to {0,1,2}, counting sort is ideal: one pass to tally frequencies of each color, then overwrite A in place with count[0] zeros, count[1] ones, count[2] twos.",
+    "tale": "Sorting a tricolor flag's threads: count reds, whites, blues, then relay them back in the flag's order.",
+    "solutions": [
+      {
+        "label": "Optimal — Counting (frequency)",
+        "complexity": {
+          "time": "O(N)",
+          "space": "O(1)"
+        },
+        "plain": "Count each color, then rebuild the array in color order.",
+        "approach": [
+          "freq[3]; one pass: freq[A[i]]++.",
+          "Rewrite A: for val=0,1,2 write freq[val] copies of val.",
+          "Return A."
+        ],
+        "pseudocode": "count 0/1/2; rewrite A with counts",
+        "code": "public int[] sortColors(int[] A) {\n    int N = A.length;\n    int[] freq = new int[3];\n    for (int i = 0; i < N; i++) {\n        int x = A[i];\n        int y = freq[x];\n        freq[x] = y + 1;\n    }\n    int index = 0;\n    int val = 0;\n    for (int x : freq) {\n        while (x > 0) {\n            A[index] = val;\n            x--;\n            index++;\n        }\n        val++;\n    }\n    return A;\n}"
+      },
+      {
+        "label": "Alternative — Merge Sort",
+        "complexity": {
+          "time": "O(N log N)",
+          "space": "O(N)"
+        },
+        "plain": "A general comparison sort also produces the order; slower but reuses merge sort.",
+        "approach": [
+          "Run merge sort on A.",
+          "Values 0<1<2 sort into the required order."
+        ],
+        "pseudocode": "return mergeSort(A, 0, N-1)",
+        "code": "public int[] sortColors(int[] A) {\n    return mergeSort(A, 0, A.length - 1);\n}\n\nprivate int[] mergeSort(int[] A, int low, int high) {\n    if (low == high) return A;\n    int mid = (low + high) / 2;\n    mergeSort(A, low, mid);\n    mergeSort(A, mid + 1, high);\n    merge(A, low, mid, high);\n    return A;\n}\n\nprivate int[] merge(int[] A, int low, int mid, int high) {\n    int P1 = low, P2 = mid + 1, index = 0;\n    int[] temp = new int[high - low + 1];\n    while (P1 < mid + 1 && P2 < high + 1) {\n        if (A[P1] <= A[P2]) temp[index] = A[P1++];\n        else temp[index] = A[P2++];\n        index++;\n    }\n    while (P1 < mid + 1) temp[index++] = A[P1++];\n    while (P2 < high + 1) temp[index++] = A[P2++];\n    for (int i = 0; i < temp.length; i++) A[low + i] = temp[i];\n    return A;\n}"
+      }
+    ],
+    "viz": {
+      "kind": "scripted-array",
+      "data": {
+        "A": [
+          0,
+          1,
+          2,
+          0,
+          1,
+          2
+        ],
+        "footer": "Counting sort on {0,1,2}.",
+        "legend": [
+          "c-input",
+          "c-active",
+          "c-result"
+        ],
+        "script": [
+          {
+            "label": "SETUP",
+            "marks": {
+              "0": "c-input",
+              "1": "c-input",
+              "2": "c-input",
+              "3": "c-input",
+              "4": "c-input",
+              "5": "c-input"
+            },
+            "msg": "Count: 0→2, 1→2, 2→2."
+          },
+          {
+            "label": "write 0s",
+            "marks": {
+              "0": "c-result",
+              "1": "c-result"
+            },
+            "msg": "Write two 0s."
+          },
+          {
+            "label": "write 1s",
+            "marks": {
+              "2": "c-result",
+              "3": "c-result"
+            },
+            "msg": "Write two 1s."
+          },
+          {
+            "label": "write 2s",
+            "marks": {
+              "4": "c-result",
+              "5": "c-result"
+            },
+            "msg": "Write two 2s → [0,0,1,1,2,2]."
+          }
+        ]
+      }
+    }
+  },
+  {
+    "num": 159,
+    "id": "sort-max-chunks",
+    "title": "Max Chunks To Make Sorted",
+    "subTopic": "Prefix-Max Greedy",
+    "tags": [
+      "Sorting",
+      "Greedy",
+      "Prefix Max"
+    ],
+    "description": "Given an array of integers A of size N that is a permutation of [0, 1, 2, ..., (N-1)], if we split the array into some number of \"chunks\" (partitions), and individually sort each chunk. After concatenating them in order of splitting, the result equals the sorted array. What is the most number of chunks we could have made?\n\nProblem Constraints\n1 <= N <= 100000\n0 <= A[i] < N\n\nInput Format\nThe only argument given is the integer array A.\n\nOutput Format\nReturn the maximum number of chunks that we could have made.\n\nExample Input\nInput 1: A = [1, 0, 2, 3, 4]\nInput 2: A = [4, 3, 2, 1, 0]\n\nExample Output\nOutput 1: 4\nOutput 2: 1",
+    "sampleInput": "A = [1, 0, 2, 3, 4]",
+    "sampleOutput": "4",
+    "story": "Since A is a permutation of 0..N-1, a chunk can close at index i exactly when max(A[0..i]) == i — everything so far belongs to positions 0..i. Count those cut points.",
+    "plain": "Scan left to right tracking the running maximum. Because the array is a permutation of 0..N-1, a prefix [0..i] is 'self-contained' (a valid chunk boundary) precisely when the largest value seen so far equals i. Each such moment lets us cut a new chunk.",
+    "tale": "Books numbered 0..N-1 shelved out of order; you can seal a box only when every number small enough to belong in it has already appeared — i.e., the highest seen matches the box's right edge.",
+    "solutions": [
+      {
+        "label": "Optimal — Prefix Max",
+        "complexity": {
+          "time": "O(N)",
+          "space": "O(1)"
+        },
+        "plain": "Cut a chunk each time the running max equals the current index.",
+        "approach": [
+          "maxSoFar = 0, chunks = 0.",
+          "For i in 0..N-1: maxSoFar = max(maxSoFar, A[i]); if maxSoFar == i chunks++.",
+          "Return chunks."
+        ],
+        "pseudocode": "if max(A[0..i]) == i: chunks++",
+        "code": "public int solve(int[] A) {\n    int maxSoFar = 0;\n    int chunks = 0;\n    for (int i = 0; i < A.length; i++) {\n        maxSoFar = Math.max(maxSoFar, A[i]);\n        if (maxSoFar == i) {\n            chunks++;\n        }\n    }\n    return chunks;\n}"
+      }
+    ],
+    "viz": {
+      "kind": "scripted-array",
+      "data": {
+        "A": [
+          1,
+          0,
+          2,
+          3,
+          4
+        ],
+        "footer": "Cut when prefix-max == index.",
+        "legend": [
+          "c-input",
+          "c-active",
+          "c-result"
+        ],
+        "script": [
+          {
+            "label": "SETUP",
+            "marks": {
+              "0": "c-input",
+              "1": "c-input",
+              "2": "c-input",
+              "3": "c-input",
+              "4": "c-input"
+            },
+            "msg": "A=[1,0,2,3,4], permutation of 0..4."
+          },
+          {
+            "label": "i=0: max=1 != 0",
+            "marks": {
+              "0": "c-active"
+            },
+            "msg": "No cut."
+          },
+          {
+            "label": "i=1: max=1 == 1",
+            "marks": {
+              "0": "c-result",
+              "1": "c-result"
+            },
+            "msg": "Cut! chunk [1,0]."
+          },
+          {
+            "label": "i=2: max=2 == 2",
+            "marks": {
+              "2": "c-result"
+            },
+            "msg": "Cut! chunk [2]."
+          },
+          {
+            "label": "i=3,4: cut each",
+            "marks": {
+              "3": "c-result",
+              "4": "c-result"
+            },
+            "msg": "Cut [3], cut [4]. Total = 4."
+          }
+        ]
+      }
+    }
+  },
+  {
+    "num": 160,
+    "id": "sort-count-sort",
+    "title": "Count Sort",
+    "subTopic": "Frequency Bucketing",
+    "tags": [
+      "Sorting",
+      "Counting Sort"
+    ],
+    "description": "Given an array A. Sort this array using Count Sort Algorithm and return the sorted array.\n\nProblem Constraints\n1 <= |A| <= 10^5\n1 <= A[i] <= 10^5\n\nInput Format\nThe first argument is an integer array A.\n\nOutput Format\nReturn an integer array that is the sorted array A.\n\nExample Input\nA = [1, 3, 1]\n\nExample Output\n[1, 1, 3]",
+    "sampleInput": "A = [1, 3, 1]",
+    "sampleOutput": "[1, 1, 3]",
+    "story": "Bounded values → tally each value's frequency in a count[] array, then emit values 0..max in order, each repeated count[v] times. O(N + max), no comparisons.",
+    "plain": "Find the maximum value, allocate count[max+1], tally frequencies in one pass, then rebuild the sorted array by walking values 0..max and writing each as many times as it occurred. Non-comparison sort — great when the value range is small.",
+    "tale": "A librarian counts how many books of each ID exist, then re-shelves by ID from smallest to largest, placing exactly the counted number of each.",
+    "solutions": [
+      {
+        "label": "Count Sort",
+        "complexity": {
+          "time": "O(N + max)",
+          "space": "O(max)"
+        },
+        "plain": "Tally frequencies then emit values in order.",
+        "approach": [
+          "max = maximum of A.",
+          "count[max+1]; for each x: count[x]++.",
+          "Walk i=0..max: while count[i]>0 append i, count[i]--.",
+          "Return the rebuilt array."
+        ],
+        "pseudocode": "count[x]++ for all x\nfor i in 0..max: emit i, count[i] times",
+        "code": "public int[] solve(int[] A) {\n    int n = A.length;\n    // Find maximum value\n    int max = 0;\n    for (int x : A) {\n        if (x > max) {\n            max = x;\n        }\n    }\n    // Count frequency\n    int[] count = new int[max + 1];\n    for (int x : A) {\n        count[x]++;\n    }\n    // Build sorted array\n    int[] result = new int[n];\n    int index = 0;\n    for (int i = 0; i <= max; i++) {\n        while (count[i] > 0) {\n            result[index++] = i;\n            count[i]--;\n        }\n    }\n    return result;\n}"
+      }
+    ],
+    "viz": {
+      "kind": "scripted-array",
+      "data": {
+        "A": [
+          1,
+          3,
+          1
+        ],
+        "footer": "Count sort: tally then emit.",
+        "legend": [
+          "c-input",
+          "c-active",
+          "c-result"
+        ],
+        "script": [
+          {
+            "label": "SETUP",
+            "marks": {
+              "0": "c-input",
+              "1": "c-input",
+              "2": "c-input"
+            },
+            "msg": "A=[1,3,1]. count[1]=2, count[3]=1."
+          },
+          {
+            "label": "emit 1 twice",
+            "marks": {
+              "0": "c-result",
+              "1": "c-result"
+            },
+            "msg": "Write 1, 1."
+          },
+          {
+            "label": "emit 3 once",
+            "marks": {
+              "2": "c-result"
+            },
+            "msg": "Write 3 → [1,1,3]."
+          }
+        ]
+      }
+    }
+  },
+  {
+    "num": 161,
+    "id": "sort-subarray-lr",
+    "title": "Sort Subarray with Left and Right Index",
+    "subTopic": "Partial Sort",
+    "tags": [
+      "Sorting",
+      "Subarray"
+    ],
+    "description": "You are given an array A of integers of length N and two indices, B and C. Your task is to sort the subarray [B, C] within the given array. The rest of the array should remain unchanged.\n\nProblem Constraints\n1 <= N <= 10^5\n0 <= A[i] <= 10^9\n0 <= B <= C <= N - 1\n\nInput Format\nFirst argument is the array A of length N. The next two arguments are the integers B and C.\n\nOutput Format\nReturn the array after sorting the [B, C] subarray.\n\nExample Input\nA = [5, 2, 4, 1, 3], B = 1, C = 3\n\nExample Output\n[5, 1, 2, 4, 3]",
+    "sampleInput": "A = [5, 2, 4, 1, 3], B = 1, C = 3",
+    "sampleOutput": "[5, 1, 2, 4, 3]",
+    "story": "Extract A[B..C] into a temp buffer, sort just that buffer, write it back into the same positions. Everything outside [B,C] is untouched.",
+    "plain": "Copy the window A[B..C] into a temp array of length C-B+1, sort temp, then place it back into A[B..C]. The rest of A never moves.",
+    "tale": "You tidy only one shelf of a bookcase: pull that shelf's books out, order them, slot them back — the other shelves stay as they were.",
+    "solutions": [
+      {
+        "label": "Extract → Sort → Write Back",
+        "complexity": {
+          "time": "O(N + K log K)",
+          "space": "O(K), K = C-B+1"
+        },
+        "plain": "Sort only the window; leave the rest.",
+        "approach": [
+          "temp = copy of A[B..C].",
+          "Sort temp.",
+          "Copy temp back into A[B..C]; return A."
+        ],
+        "pseudocode": "temp = A[B..C]; sort(temp); A[B..C] = temp",
+        "code": "public int[] sortSubarray(int[] A, int B, int C) {\n    // Extract subarray\n    int[] temp = new int[C - B + 1];\n    for (int i = B; i <= C; i++) {\n        temp[i - B] = A[i];\n    }\n    // Sort the subarray\n    Arrays.sort(temp);\n    // Put back sorted elements\n    for (int i = B; i <= C; i++) {\n        A[i] = temp[i - B];\n    }\n    return A;\n}"
+      }
+    ]
+  },
+  {
+    "num": 162,
+    "id": "sort-largest-number",
+    "title": "Largest Number",
+    "subTopic": "Comparator (a+b vs b+a)",
+    "tags": [
+      "Sorting",
+      "Comparator",
+      "Greedy"
+    ],
+    "description": "Given an array A of non-negative integers, arrange them such that they form the largest number.\n\nNote: The result may be very large, so you need to return a string instead of an integer.\n\nProblem Constraints\n1 <= len(A) <= 100000\n0 <= A[i] <= 2*10^9\n\nInput Format\nThe first argument is an array of integers.\n\nOutput Format\nReturn a string representing the largest number.\n\nExample Input\nInput 1: A = [3, 30, 34, 5, 9]\n\nExample Output\nOutput 1: \"9534330\"",
+    "sampleInput": "A = [3, 30, 34, 5, 9]",
+    "sampleOutput": "\"9534330\"",
+    "story": "Sort numbers as strings with a custom comparator: a before b iff (a+b) > (b+a). Concatenate; guard the all-zeros case (return \"0\").",
+    "plain": "Two numbers a, b should be ordered by which concatenation is larger: compare the strings (a+b) vs (b+a). Sort the whole array by this rule descending, then join. If the largest is \"0\", the whole array is zeros → return \"0\".",
+    "tale": "Deciding who stands first for the biggest banner: pick the order that reads larger when the two placards are held side by side.",
+    "solutions": [
+      {
+        "label": "Comparator — (a+b) vs (b+a)",
+        "complexity": {
+          "time": "O(N log N · L)",
+          "space": "O(N)"
+        },
+        "plain": "Sort string forms so that a precedes b when a+b > b+a; join; handle leading zeros.",
+        "approach": [
+          "Convert each number to a string.",
+          "Sort with comparator: (b+a).compareTo(a+b) — descending by concatenation.",
+          "If first is \"0\" return \"0\"; else concatenate all and return."
+        ],
+        "pseudocode": "sort(s, (a,b) -> (b+a).compareTo(a+b))\nif s[0]==\"0\": return \"0\"\njoin(s)",
+        "code": "public String largestNumber(int[] A) {\n    int n = A.length;\n    String[] s = new String[n];\n    for (int i = 0; i < n; i++) s[i] = String.valueOf(A[i]);\n    Arrays.sort(s, (a, b) -> (b + a).compareTo(a + b));\n    if (s[0].equals(\"0\")) return \"0\";\n    StringBuilder sb = new StringBuilder();\n    for (String x : s) sb.append(x);\n    return sb.toString();\n}",
+        "story": "Reference solution — this problem was marked Solved but the code wasn't captured in the screenshot, so this is the canonical comparator approach."
+      }
+    ]
+  },
+  {
+    "num": 163,
+    "id": "sort-factors",
+    "title": "Factors Sort",
+    "subTopic": "Comparator by Divisor Count",
+    "tags": [
+      "Sorting",
+      "Comparator",
+      "Divisors"
+    ],
+    "description": "You are given an array A of N elements. Sort the given array in increasing order of number of distinct factors of each element, i.e., element having the least number of factors should be the first to be displayed and the number having highest number of factors should be the last one. If 2 elements have same number of factors, then number with less value should come first.\n\nNote: You cannot use any extra space.\n\nProblem Constraints\n1 <= N <= 10^4\n1 <= A[i] <= 10^4\n\nInput Format\nFirst argument A is an array of integers.\n\nOutput Format\nReturn an array of integers.\n\nExample Input\nA = [3, 4, 5]\n\nExample Output\n[3, 5, 4]",
+    "sampleInput": "A = [3, 4, 5]",
+    "sampleOutput": "[3, 5, 4]",
+    "story": "Sort by a two-key comparator: primary = number of divisors (ascending), tie-break = value (ascending). Divisor count computed in O(sqrt(v)) per element.",
+    "plain": "For each value compute its divisor count by trial division up to sqrt(v). Then sort with a comparator: fewer factors first; on a tie, smaller value first. 3 and 5 are primes (2 factors), 4 has 3 factors, so 4 goes last.",
+    "tale": "Rank numbers by how 'popular' they are (how many divisors); break ties by putting the humbler (smaller) number first.",
+    "solutions": [
+      {
+        "label": "Comparator by Divisor Count",
+        "complexity": {
+          "time": "O(N (log N + sqrt(maxA)))",
+          "space": "O(N)"
+        },
+        "plain": "Precompute factor counts, then sort by (count, value).",
+        "approach": [
+          "factors(v): count divisors via i*i<=v, add 2 (or 1 if perfect square).",
+          "Sort with comparator: if factor counts differ, fewer first; else smaller value first.",
+          "Return the reordered array."
+        ],
+        "pseudocode": "sort(B, (x,y) -> f(x)!=f(y) ? f(x)-f(y) : x-y)",
+        "code": "public int[] solve(int[] A) {\n    Integer[] B = new Integer[A.length];\n    for (int i = 0; i < A.length; i++) B[i] = A[i];\n    Arrays.sort(B, (x, y) -> {\n        int fx = factors(x), fy = factors(y);\n        if (fx != fy) return fx - fy;\n        return x - y;\n    });\n    int[] res = new int[A.length];\n    for (int i = 0; i < A.length; i++) res[i] = B[i];\n    return res;\n}\n\nprivate int factors(int n) {\n    int c = 0;\n    for (int i = 1; (long) i * i <= n; i++) {\n        if (n % i == 0) {\n            c += (i == n / i) ? 1 : 2;\n        }\n    }\n    return c;\n}",
+        "story": "Reference solution — this problem was Unsolved in the screenshot. Note: the statement says 'no extra space', but a comparator sort in Java needs boxing/aux arrays; the intended in-place approach is a custom merge/quick sort keyed on factor count — the comparator version here is the clearest correct implementation."
+      }
+    ]
+  },
+  {
+    "num": 164,
+    "id": "sort-quick-sort",
+    "title": "Quick Sort",
+    "subTopic": "Partition (First Pivot)",
+    "tags": [
+      "Sorting",
+      "Quick Sort",
+      "Divide & Conquer"
+    ],
+    "description": "Given an integer array A, sort the array using Quick Sort.\n\nProblem Constraints\n1 <= |A| <= 10^5\n1 <= A[i] <= 10^9\n\nInput Format\nFirst argument is an integer array A.\n\nOutput Format\nReturn the sorted array.\n\nExample Input\nA = [5, 2, 8, 1]\n\nExample Output\n[1, 2, 5, 8]",
+    "sampleInput": "A = [5, 2, 8, 1]",
+    "sampleOutput": "[1, 2, 5, 8]",
+    "story": "Pick a pivot (first element), partition so smaller-or-equal sit left and greater sit right, recurse on both sides. Average O(N log N), in-place.",
+    "plain": "Partition around pivot = A[first]: two pointers left/right move inward, swapping an out-of-place large-left with a small-right; finally swap the pivot into its resting spot. Recurse on the two partitions.",
+    "tale": "Pick a reference height; shove everyone shorter to the left, taller to the right, then repeat within each side until fully ordered.",
+    "solutions": [
+      {
+        "label": "Quick Sort — First-Element Pivot",
+        "complexity": {
+          "time": "O(N log N) avg, O(N^2) worst",
+          "space": "O(log N) stack"
+        },
+        "plain": "Partition around the first element, then recurse on each side.",
+        "approach": [
+          "quickSort(start,end): if start>=end return.",
+          "index = pivotPartition(start,end); recurse [start,index-1] and [index+1,end].",
+          "pivotPartition: pivot=A[first]; left=first+1,right=last; advance left while <=pivot, retreat right while >pivot, else swap; finally swap(first,right); return right."
+        ],
+        "pseudocode": "qs(s,e): p=partition(s,e); qs(s,p-1); qs(p+1,e)",
+        "code": "public int[] solve(int[] A) {\n    quickSort(A, 0, A.length - 1);\n    return A;\n}\n\nprivate static void swap(int[] arr, int i, int j) {\n    int temp = arr[i];\n    arr[i] = arr[j];\n    arr[j] = temp;\n}\n\npublic void quickSort(int[] A, int start, int end) {\n    if (start >= end) {\n        return;\n    }\n    int index = pivotPartition(A, start, end);\n    quickSort(A, start, index - 1);\n    quickSort(A, index + 1, end);\n}\n\npublic int pivotPartition(int[] A, int first, int last) {\n    int pivot = A[first];\n    int left = first + 1;\n    int right = last;\n    while (left <= right) {\n        if (A[left] <= pivot) {\n            left++;\n        } else if (A[right] > pivot) {\n            right--;\n        } else {\n            swap(A, left, right);\n        }\n    }\n    swap(A, first, right);\n    return right;\n}"
+      }
+    ],
+    "viz": {
+      "kind": "scripted-array",
+      "data": {
+        "A": [
+          5,
+          2,
+          8,
+          1
+        ],
+        "footer": "Quick sort, pivot = first element.",
+        "legend": [
+          "c-input",
+          "c-active",
+          "c-result"
+        ],
+        "script": [
+          {
+            "label": "SETUP",
+            "marks": {
+              "0": "c-active",
+              "1": "c-input",
+              "2": "c-input",
+              "3": "c-input"
+            },
+            "msg": "pivot = A[0] = 5. left=1, right=3."
+          },
+          {
+            "label": "partition",
+            "marks": {
+              "1": "c-input",
+              "3": "c-input"
+            },
+            "msg": "2<=5 left++; 8>5 right--; place pivot between <=5 and >5."
+          },
+          {
+            "label": "pivot to place",
+            "marks": {
+              "1": "c-result"
+            },
+            "msg": "After partition 5 sits at its sorted index; recurse both sides."
+          },
+          {
+            "label": "DONE",
+            "marks": {
+              "0": "c-result",
+              "1": "c-result",
+              "2": "c-result",
+              "3": "c-result"
+            },
+            "msg": "[1,2,5,8]."
+          }
+        ]
+      }
+    }
+  },
+  {
+    "num": 165,
+    "id": "sort-partition-index",
+    "title": "Partition Index",
+    "subTopic": "Lomuto Partition",
+    "tags": [
+      "Sorting",
+      "Partition",
+      "Two Pointers"
+    ],
+    "description": "Given an integer array A of length N, considering the last element as pivot p, rearrange the elements such that for all i:\n- if A[i] < p then it should be present on left side of the partition\n- if A[i] > p then it should be present on right side of the partition\n\nRearrange the given array as well as return the partition index.\n\nNote: All elements are distinct.\n\nProblem Constraints\n1 <= N <= 10^5\n1 <= A[i] <= 10^9\n\nInput Format\nThe only input argument is the given vector A.\n\nOutput Format\nReturn the partition index (and rearrange A in place).\n\nExample Input\nA = [3, 1, 4, 2] (pivot = 2)\n\nExample Output\nPartition index = 1, A becomes [1, 2, 4, 3] (1 < 2 on left, 4 & 3 > 2 on right).",
+    "sampleInput": "A = [3, 1, 4, 2] (pivot = A[last] = 2)",
+    "sampleOutput": "1",
+    "story": "Lomuto partition with pivot = last element: sweep a boundary i; every element < pivot is swapped to the front region; finally swap the pivot into slot i. Return i.",
+    "plain": "Take the last element as pivot. Keep a boundary index i (count of elements < pivot seen). Walk j across the array; when A[j] < pivot, swap A[i] and A[j] and grow i. At the end, swap the pivot (last) into position i — now everything left of i is < pivot, right is > pivot. Return i.",
+    "tale": "A bouncer (pivot) at the door: guests shorter than the bouncer are ushered to the left; once everyone's sorted, the bouncer steps into the gap between the two groups.",
+    "solutions": [
+      {
+        "label": "Lomuto Partition (last pivot)",
+        "complexity": {
+          "time": "O(N)",
+          "space": "O(1)"
+        },
+        "plain": "Sweep, pushing elements smaller than the pivot to the front, then seat the pivot.",
+        "approach": [
+          "pivot = A[N-1]; boundary i = 0.",
+          "For j = 0..N-2: if A[j] < pivot, swap(A[i], A[j]); i++.",
+          "swap(A[i], A[N-1]) to place pivot; return i."
+        ],
+        "pseudocode": "for j in 0..N-2: if A[j]<pivot: swap(i,j); i++\nswap(i, N-1); return i",
+        "code": "public int partition(int[] A) {\n    int n = A.length;\n    int pivot = A[n - 1];\n    int i = 0;                    // boundary: A[0..i-1] < pivot\n    for (int j = 0; j < n - 1; j++) {\n        if (A[j] < pivot) {\n            swap(A, i, j);\n            i++;\n        }\n    }\n    swap(A, i, n - 1);            // seat the pivot\n    return i;                     // partition index\n}\n\nprivate static void swap(int[] arr, int i, int j) {\n    int temp = arr[i];\n    arr[i] = arr[j];\n    arr[j] = temp;\n}",
+        "story": "Reference solution — this problem was 'Attempted' (partial code) in the screenshot; this is a clean, correct Lomuto partition using the last element as pivot."
+      }
+    ],
+    "viz": {
+      "kind": "scripted-array",
+      "data": {
+        "A": [
+          3,
+          1,
+          4,
+          2
+        ],
+        "footer": "Lomuto partition, pivot = last = 2.",
+        "legend": [
+          "c-input",
+          "c-active",
+          "c-result"
+        ],
+        "script": [
+          {
+            "label": "SETUP",
+            "marks": {
+              "0": "c-input",
+              "1": "c-input",
+              "2": "c-input",
+              "3": "c-active"
+            },
+            "msg": "pivot = A[3] = 2. boundary i=0."
+          },
+          {
+            "label": "j=0: 3<2? no",
+            "marks": {
+              "0": "c-input"
+            },
+            "msg": "skip."
+          },
+          {
+            "label": "j=1: 1<2? yes",
+            "marks": {
+              "0": "c-result"
+            },
+            "msg": "swap A[0],A[1] → [1,3,4,2]; i=1."
+          },
+          {
+            "label": "j=2: 4<2? no",
+            "marks": {
+              "2": "c-input"
+            },
+            "msg": "skip."
+          },
+          {
+            "label": "seat pivot",
+            "marks": {
+              "1": "c-result",
+              "3": "c-result"
+            },
+            "msg": "swap A[1],A[3] → [1,2,4,3]. Return index 1."
+          }
+        ]
+      }
+    }
+  },
+  {
+    "num": 166,
+    "id": "sort-wave-array",
+    "title": "Wave Array",
+    "subTopic": "Sort + Swap Adjacent Pairs",
+    "tags": [
+      "Sorting",
+      "Comparator",
+      "Arrays"
+    ],
+    "description": "Given an array of integers A, sort the array into a wave-like array and return it. In other words, arrange the elements into a sequence such that a1 >= a2 <= a3 >= a4 <= a5 .....\n\nNOTE: If multiple answers are possible, return the lexicographically smallest one.\n\nProblem Constraints\n1 <= len(A) <= 10^6\n0 <= A[i] <= 10^6\n\nInput Format\nThe first argument is an integer array A.\n\nOutput Format\nReturn an array arranged in the sequence as described.\n\nExample Input\nA = [1, 2, 3, 4]\n\nExample Output\n[2, 1, 4, 3]",
+    "sampleInput": "A = [1, 2, 3, 4]",
+    "sampleOutput": "[2, 1, 4, 3]",
+    "story": "Sort ascending, then swap each adjacent pair (indices 0-1, 2-3, ...). This makes even indices peaks and gives the lexicographically smallest wave.",
+    "plain": "Sort the array first (for lexicographically smallest output). Then swap elements at (0,1), (2,3), (4,5)... so each even index becomes a peak (>= its neighbours). Sorting guarantees the smallest arrangement.",
+    "tale": "Line people up by height, then have each neighbouring pair swap spots so the row zig-zags up-down-up-down.",
+    "solutions": [
+      {
+        "label": "Sort then Swap Pairs",
+        "complexity": {
+          "time": "O(N log N)",
+          "space": "O(1)"
+        },
+        "plain": "Sort ascending, swap each adjacent pair.",
+        "approach": [
+          "Sort A ascending (lexicographically smallest base).",
+          "For i = 0,2,4,... swap A[i] and A[i+1].",
+          "Return A."
+        ],
+        "pseudocode": "sort(A); for i in 0,2,4..: swap(A[i], A[i+1])",
+        "code": "public int[] wave(int[] A) {\n    return waveSort(A);\n}\n\npublic static int[] waveSort(int[] A) {\n    Arrays.sort(A); // Step 1: sort for lexicographic minimality\n    // Step 2: swap each adjacent pair (peaks at even indices)\n    for (int i = 0; i < A.length - 1; i += 2) {\n        int temp = A[i];\n        A[i] = A[i + 1];\n        A[i + 1] = temp;\n    }\n    return A;\n}"
+      }
+    ],
+    "viz": {
+      "kind": "scripted-array",
+      "data": {
+        "A": [
+          1,
+          2,
+          3,
+          4
+        ],
+        "footer": "Wave: sort then swap pairs.",
+        "legend": [
+          "c-input",
+          "c-active",
+          "c-result"
+        ],
+        "script": [
+          {
+            "label": "SETUP (sorted)",
+            "marks": {
+              "0": "c-input",
+              "1": "c-input",
+              "2": "c-input",
+              "3": "c-input"
+            },
+            "msg": "Sorted = [1,2,3,4]."
+          },
+          {
+            "label": "swap (0,1)",
+            "marks": {
+              "0": "c-result",
+              "1": "c-result"
+            },
+            "msg": "→ [2,1,3,4]."
+          },
+          {
+            "label": "swap (2,3)",
+            "marks": {
+              "2": "c-result",
+              "3": "c-result"
+            },
+            "msg": "→ [2,1,4,3]. 2>=1<=4>=3."
+          }
+        ]
+      }
+    }
+  },
+  {
+    "num": 167,
+    "id": "sort-b-closest-points",
+    "title": "B Closest Points to Origin",
+    "subTopic": "Comparator by Distance²",
+    "tags": [
+      "Sorting",
+      "Comparator",
+      "Geometry"
+    ],
+    "description": "You are developing a feature for Zomato that helps users find the nearest restaurants to their current location. Given a list of restaurant locations A (each represented by its x and y coordinates), and an integer B representing the number of closest restaurants to the user (assumed at the origin (0,0)), return the B closest points.\n\nThe distance between two points is the Euclidean distance. You may return the answer in any order; the answer is guaranteed to be unique (except for the order).\n\nNOTE: Euclidean distance between P1(x1, y1) and P2(x2, y2) is sqrt((x1-x2)^2 + (y1-y2)^2).\n\nProblem Constraints\n1 <= B <= len(A)\n\nInput Format\nFirst argument A is a 2D array of points [x, y]. Second argument is integer B.\n\nOutput Format\nReturn a 2D array of the B closest points to the origin.\n\nExample Input\nA = [[1,3],[-2,2]], B = 1\n\nExample Output\n[[-2,2]]",
+    "sampleInput": "A = [[1,3],[-2,2]], B = 1",
+    "sampleOutput": "[[-2,2]]",
+    "story": "Sort points by squared distance x²+y² (no sqrt needed — it's monotonic), take the first B. Use long to avoid overflow.",
+    "plain": "Distance ordering is preserved by squared distance, so compare x*x + y*y (avoids floating point and sqrt). Sort the points by that key ascending and return the first B. Cast to long since coordinates can be large.",
+    "tale": "Rank restaurants by how far they'd be 'as the crow flies', but skip the square-root — comparing squared distances gives the same order — then take the nearest B.",
+    "solutions": [
+      {
+        "label": "Comparator by Squared Distance",
+        "complexity": {
+          "time": "O(N log N)",
+          "space": "O(B) output"
+        },
+        "plain": "Sort by x²+y², slice first B.",
+        "approach": [
+          "Sort A by comparator on (long)x*x + (long)y*y ascending.",
+          "Copy the first B rows into the result.",
+          "Return result."
+        ],
+        "pseudocode": "sort(A, by x*x+y*y); return A[0..B-1]",
+        "code": "public int[][] solve(int[][] A, int B) {\n    Arrays.sort(A, (p, q) ->\n        Long.compare((long) p[0] * p[0] + (long) p[1] * p[1],\n                     (long) q[0] * q[0] + (long) q[1] * q[1]));\n    int[][] res = new int[B][2];\n    for (int i = 0; i < B; i++) res[i] = A[i];\n    return res;\n}",
+        "story": "Reference solution — this problem was Unsolved in the screenshot. (A heap of size B gives O(N log B) if you want to avoid sorting the whole array.)"
+      }
+    ]
+  },
+  {
+    "num": 168,
+    "id": "sort-tens-digit",
+    "title": "Tens Digit Sorting",
+    "subTopic": "Comparator by Tens Digit",
+    "tags": [
+      "Sorting",
+      "Comparator",
+      "Digits"
+    ],
+    "description": "Given an array A of N integers. Sort the array in increasing order of the value at the tens place digit of every number.\n- If a number has no tens digit, we can assume value to be 0.\n- If 2 numbers have same tens digit, in that case number with max value will come first.\n- Solution should be based on comparator.\n\nProblem Constraints\n1 <= N <= 10^5\n1 <= A[i] <= 10^9\n\nInput Format\nFirst argument A is an array of integers.\n\nOutput Format\nReturn the array after sorting.\n\nExample Input\nA = [15, 23, 8, 17]\n\nExample Output\n[17, 15, 23, 8]",
+    "sampleInput": "A = [15, 23, 8, 17]",
+    "sampleOutput": "[17, 15, 23, 8]",
+    "story": "Comparator: primary key = tens digit (x/10)%10 ascending; tie-break = value descending. 15 and 17 share tens digit 1 → 17 first; 23 has tens 2; 8 has tens 0.",
+    "plain": "Extract each number's tens digit with (x/10)%10 (0 when x<10). Sort ascending by tens digit; when two share a tens digit, put the larger value first (descending). Comparator does both keys.",
+    "tale": "Group people by the second-from-right digit on their badge, lowest group first; within a group, the higher badge number stands ahead.",
+    "solutions": [
+      {
+        "label": "Comparator on (tens asc, value desc)",
+        "complexity": {
+          "time": "O(N log N)",
+          "space": "O(N)"
+        },
+        "plain": "Two-key comparator: tens digit ascending, value descending on ties.",
+        "approach": [
+          "tens(x) = (x / 10) % 10.",
+          "Sort: if tens differ, smaller tens first; else larger value first.",
+          "Return reordered array."
+        ],
+        "pseudocode": "sort(B, (x,y) -> tens(x)!=tens(y) ? tens(x)-tens(y) : y-x)",
+        "code": "public int[] solve(int[] A) {\n    Integer[] B = new Integer[A.length];\n    for (int i = 0; i < A.length; i++) B[i] = A[i];\n    Arrays.sort(B, (x, y) -> {\n        int tx = (x / 10) % 10;\n        int ty = (y / 10) % 10;\n        if (tx != ty) return tx - ty;   // tens digit ascending\n        return y - x;                    // same tens: larger value first\n    });\n    int[] res = new int[A.length];\n    for (int i = 0; i < A.length; i++) res[i] = B[i];\n    return res;\n}",
+        "story": "Reference solution — this problem was Unsolved in the screenshot; it is the intended comparator approach."
+      }
+    ]
+  },
+  {
+    "num": 169,
+    "id": "sort-01",
+    "title": "Sort 01",
+    "subTopic": "Two-Pointer Partition",
+    "tags": [
+      "Sorting",
+      "Two Pointers"
+    ],
+    "description": "Given an array A of 0s and 1s of length N. Sort this array.\n\nNote - Do not use any sorting algorithm or library's sort method.\n\nProblem Constraints\n1 <= N <= 10^5\n0 <= A[i] <= 1\n\nInput Format\nFirst argument A is an array of length N.\n\nOutput Format\nReturn the sorted array.\n\nExample Input\nA = [0, 0, 1, 0, 1, 1, 0]\n\nExample Output\n[0, 0, 0, 0, 1, 1, 1]",
+    "sampleInput": "A = [0, 0, 1, 0, 1, 1, 0]",
+    "sampleOutput": "[0, 0, 0, 0, 1, 1, 1]",
+    "story": "Two pointers from both ends: left skips 0s, right skips 1s; when left sits on a 1 and right on a 0, fix both. O(N), in place, no library sort.",
+    "plain": "Only two values, so partition in place. left advances past 0s, right retreats past 1s; whenever left points at a 1 and right at a 0, set A[left]=0, A[right]=1 and move both inward. (Counting zeros then filling also works.)",
+    "tale": "Line of black/white stones: sweep from both ends, and whenever a white on the left meets a black on the right, swap their colors.",
+    "solutions": [
+      {
+        "label": "Two-Pointer Partition",
+        "complexity": {
+          "time": "O(N)",
+          "space": "O(1)"
+        },
+        "plain": "Converge two pointers, fixing a 1-on-left / 0-on-right pair each step.",
+        "approach": [
+          "left=0, right=N-1.",
+          "While left<right: if A[left]==0 left++; else if A[right]==1 right--; else A[left]=0,A[right]=1,left++,right--.",
+          "Return A."
+        ],
+        "pseudocode": "while left<right: skip 0s at left, 1s at right, else fix pair",
+        "code": "public int[] sort01(int[] A) {\n    int left = 0, right = A.length - 1;\n    while (left < right) {\n        if (A[left] == 0) {\n            left++;\n        } else if (A[right] == 1) {\n            right--;\n        } else {\n            A[left] = 0;\n            A[right] = 1;\n            left++;\n            right--;\n        }\n    }\n    return A;\n}",
+        "story": "Reference solution — this problem was Unsolved in the screenshot; this is the standard no-library-sort two-pointer approach (counting 0s and overwriting is an equally valid O(N) method)."
+      }
+    ],
+    "viz": {
+      "kind": "scripted-array",
+      "data": {
+        "A": [
+          0,
+          0,
+          1,
+          0,
+          1,
+          1,
+          0
+        ],
+        "footer": "Sort 0s and 1s with two pointers.",
+        "legend": [
+          "c-input",
+          "c-active",
+          "c-result"
+        ],
+        "script": [
+          {
+            "label": "SETUP",
+            "marks": {
+              "0": "c-input",
+              "1": "c-input",
+              "2": "c-input",
+              "3": "c-input",
+              "4": "c-input",
+              "5": "c-input",
+              "6": "c-input"
+            },
+            "msg": "left=0, right=6."
+          },
+          {
+            "label": "skip 0s at left",
+            "marks": {
+              "0": "c-result",
+              "1": "c-result"
+            },
+            "msg": "A[0],A[1]=0 → left→2."
+          },
+          {
+            "label": "left=2 is 1, right=6 is 0",
+            "marks": {
+              "2": "c-active",
+              "6": "c-active"
+            },
+            "msg": "Fix: A[2]=0, A[6]=1; left→3, right→5."
+          },
+          {
+            "label": "continue",
+            "marks": {
+              "3": "c-result"
+            },
+            "msg": "A[3]=0 → left→4; A[5]=1,A[4]=1 → right→3. Done."
+          },
+          {
+            "label": "DONE",
+            "marks": {
+              "0": "c-result",
+              "1": "c-result",
+              "2": "c-result",
+              "3": "c-result",
+              "4": "c-result",
+              "5": "c-result",
+              "6": "c-result"
+            },
+            "msg": "[0,0,0,0,1,1,1]."
+          }
+        ]
+      }
+    }
+  }
+]

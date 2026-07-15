@@ -1,5 +1,5 @@
 {
-  "nextNum": 154,
+  "nextNum": 170,
   "topics": [
     {
       "name": "Arrays",
@@ -12,6 +12,12 @@
       "section": "Section 1",
       "file": "arrays-advanced.json",
       "notesFile": "arrays-advanced.notes.json"
+    },
+    {
+      "name": "Sorting",
+      "section": "Section 1",
+      "file": "sorting.json",
+      "notesFile": "sorting.notes.json"
     },
     {
       "name": "Bit Manipulation",

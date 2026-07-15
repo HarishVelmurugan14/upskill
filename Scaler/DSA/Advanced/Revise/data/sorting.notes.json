@@ -1,0 +1,82 @@
+{
+  "topic": "Sorting",
+  "summary": "Sorting is about ordering, but the interview value is the machinery around it: the merge step (two-pointer combine of sorted runs), partitioning (split around a pivot), counting (bucket by value when the range is small), and comparators (define 'order' for anything). Master the merge and partition routines and most sorting problems are variations — inversion counting, wave arrays, closest points, custom-key sorts.",
+  "thoughtProcess": [
+    {
+      "title": "1. Ask: is the value range small?",
+      "body": "If values fit a small range (colors 0-2, digits, bounded ints), a counting/bucket sort is O(N + range) and beats comparison sorts. Reach for it before merge/quick."
+    },
+    {
+      "title": "2. Reach for the merge step as a Swiss-army knife.",
+      "body": "Merging two sorted runs with two pointers underlies merge sort, 'merge two sorted arrays', and inversion counting (count left-leftovers when a right element is taken). If a problem smells like 'combine sorted things' or 'count out-of-order pairs', think merge."
+    },
+    {
+      "title": "3. Partition when you need a pivot boundary.",
+      "body": "Quick sort, partition-index, and Dutch-flag all rearrange around a pivot/value. Keep a boundary pointer and sweep. Watch the pivot placement and the <= vs < tie rules."
+    },
+    {
+      "title": "4. When order is custom, write a comparator.",
+      "body": "Largest-number (a+b vs b+a), factors sort, tens-digit sort, closest-points — the whole problem is defining the comparator. State the primary key and the tie-break explicitly, and cast to long when squaring/concatenating to avoid overflow."
+    }
+  ],
+  "keyPatterns": [
+    {
+      "name": "Two-pointer merge",
+      "when": "Combine two sorted runs / count inversions",
+      "template": "P1=lo, P2=mid+1\nwhile both: take smaller front; on taking right, inv += (mid+1 - P1)\ndrain leftovers",
+      "examples": [
+        "Merge Two Sorted Arrays",
+        "Inversion Count",
+        "Merge Sort"
+      ]
+    },
+    {
+      "name": "Counting / bucket",
+      "when": "Values in a small bounded range",
+      "template": "count[v]++ for all v\nemit v, count[v] times, v ascending",
+      "examples": [
+        "Count Sort",
+        "Sort by Color",
+        "Sort 01"
+      ]
+    },
+    {
+      "name": "Partition around pivot",
+      "when": "Quick sort / place pivot / 2-way split",
+      "template": "boundary i=0\nfor j: if A[j]<pivot swap(i,j), i++\nswap pivot into i",
+      "examples": [
+        "Quick Sort",
+        "Partition Index"
+      ]
+    },
+    {
+      "name": "Custom comparator",
+      "when": "Order defined by a derived key",
+      "template": "sort(B, (x,y) -> key(x)!=key(y) ? key(x)-key(y) : tieBreak)",
+      "examples": [
+        "Largest Number",
+        "Factors Sort",
+        "Tens Digit Sorting",
+        "B Closest Points"
+      ]
+    }
+  ],
+  "commonMistakes": [
+    {
+      "title": "Seeding max/answer wrong or overflow on keys",
+      "wrong": "int d = x*x + y*y;   // int overflow for large coords",
+      "right": "long d = (long)x*x + (long)y*y;"
+    },
+    {
+      "title": "Forgetting the all-zeros / leading-zero guard",
+      "wrong": "return concatenation;            // returns \"000\" for all zeros",
+      "right": "if (s[0].equals(\"0\")) return \"0\";"
+    }
+  ],
+  "edgeCases": [
+    "All elements equal (partition degenerates — watch <= vs < in the sweep).",
+    "Already sorted or reverse sorted (quick sort worst case O(N^2) with fixed pivot).",
+    "Single element or empty window (base cases in recursion / [B,C] with B==C).",
+    "Large coordinates/values — use long for squared distance and concatenations."
+  ]
+}
