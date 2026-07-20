@@ -17,6 +17,17 @@
     "story": "Numbers pile up, operators combine the top two. Stack becomes a calculator that never forgets order.",
     "plain": "Reverse Polish Notation means operators come after operands. When you see a number, push it on the stack. When you see an operator, pop two numbers, apply the operator, and push the result back. The final number left on the stack is your answer. It's like doing math backwards, but the stack remembers everything for you.",
     "tale": "Imagine a tower of blocks in a dark room. You can only feel the top block. Someone calls out instructions: 'two', 'one', 'plus', 'three', 'multiply'. When you hear a number, you place a new block labeled with that number on top. When you hear 'plus' or 'multiply', you grab the top two blocks, perform the operation on their labels, and replace them with a single new block showing the result. At the end, only one block remains, glowing with the final answer. The darkness forced you to work one step at a time, but the tower never forgot what came before.",
+    "howToThink": [
+      "Operators come after their operands, and each operator needs the two most recent values -> stack.",
+      "Number? push it. Operator? pop two, apply, push the result back.",
+      "Order matters: the first pop is `b`, the second is `a`, so compute `a op b`.",
+      "One value left at the end is your answer."
+    ],
+    "pitfalls": [
+      "Popping order is reversed: second pop is the left operand, first pop is the right.",
+      "For `-` and `/`, `a op b` and `b op a` differ, so don't swap them.",
+      "Don't forget to push the computed result back before moving on."
+    ],
     "solutions": [
       {
         "label": "Optimal",
@@ -122,6 +133,17 @@
     "story": "Every opening bracket pushes onto the stack, every closing bracket must match the top. The stack is the memory of what's still open.",
     "plain": "Walk through the string character by character. When you see an opening bracket (like '{', '[', or '('), push it onto the stack. When you see a closing bracket, check if the stack's top matches. If it matches, pop and continue. If it doesn't match or the stack is empty, the string is unbalanced. At the end, the stack must be empty for the parentheses to be balanced.",
     "tale": "Imagine you are a doorman at a grand ballroom with three types of doors—curly, square, and round. As guests arrive, each opens one door type and you place a card for it on your desk. When a guest leaves, they must exit through the matching door, and you remove that card. If someone tries to leave through the wrong door type, or if your desk still has cards when the night ends, the building is in chaos. But if every entry has a matching exit and your desk is clear, the ballroom was perfectly balanced.",
+    "howToThink": [
+      "Matching and nesting of brackets -> stack.",
+      "Opening bracket pushes; closing bracket must match whatever is on top.",
+      "The key check: on a closing bracket, is the stack empty (nothing to match) or does the top mismatch?",
+      "Balanced only if the stack is empty at the very end."
+    ],
+    "pitfalls": [
+      "Check `isEmpty()` before popping on a closing bracket, else you crash.",
+      "Leftover opening brackets in the stack at the end mean unbalanced -> return 0.",
+      "Match the exact type: `(` with `)`, `{` with `}`, not just any close."
+    ],
     "solutions": [
       {
         "label": "Optimal",
@@ -232,6 +254,17 @@
     "story": "Two stacks move together. One holds values, the other holds the current minimum. Both grow and shrink in sync.",
     "plain": "Use two stacks: one for actual values, one for tracking minimums. When you push a value, also push the smaller of that value or the current minimum onto the min stack. When you pop, pop from both stacks. To get the minimum, just peek at the min stack. Both stacks stay the same size, so all operations are O(1).",
     "tale": "Imagine two towers built side by side. The left tower holds the actual numbers people give you. The right tower is your memory of 'what is the smallest number I've seen so far at each level'. Every time someone adds a number to the left, you look at the right tower's top—if the new number is smaller, you place it on the right tower too. Otherwise, you duplicate the right tower's top. When someone removes from the left, you also remove from the right. This way, the right tower always remembers the answer to 'what is the minimum right now?'",
+    "howToThink": [
+      "Need the minimum in O(1), so you can't scan on every getMin -> store it alongside.",
+      "Keep a second stack that mirrors the main one and holds the running minimum.",
+      "On push, the new min is `min(value, current min)`; both stacks grow and shrink together.",
+      "getMin is just peeking the min stack's top."
+    ],
+    "pitfalls": [
+      "Push to both stacks on every push and pop from both on every pop, or they drift out of sync.",
+      "Handle empty stack: getMin and top return -1, pop does nothing.",
+      "The new min is `min(val, minStack.peek())`, not just `val`."
+    ],
     "solutions": [
       {
         "label": "Optimal",
@@ -339,6 +372,17 @@
     "story": "Push everything until you hit a closing bracket. Then unwind—if you never saw an operator, those brackets were useless.",
     "plain": "Scan the expression left to right, pushing every character onto a stack. When you hit a closing parenthesis, pop characters until you reach the matching opening parenthesis. If you popped at least one operator (+, -, *, /) during that process, the brackets were necessary. If you didn't pop any operator, the brackets were redundant. Return 1 if redundant brackets are found, 0 otherwise.",
     "tale": "Imagine you are a clerk reading a scroll of instructions. Each symbol goes into a box. When you see a closing parenthesis, you empty the box back to the matching opening parenthesis, counting what you see. If you empty the box and never saw a plus, minus, multiply, or divide sign, those parentheses held nothing but a naked value—they were decorative,not functional. Sound the alarm. But if you saw at least one operator, those parentheses were doing real work.",
+    "howToThink": [
+      "Detecting useless nested brackets -> push everything, then unwind on a closing bracket.",
+      "On `)`, pop back to the matching `(` and watch whether any operator went by.",
+      "The realization: brackets wrapping a value with no operator inside do nothing -> redundant.",
+      "No operator seen while unwinding means return 1."
+    ],
+    "pitfalls": [
+      "Remember to pop the `(` itself after unwinding, not just the contents.",
+      "Track `hasOp` across the whole unwind, not just the last popped char.",
+      "Any single operator inside makes the brackets useful, so don't flag those."
+    ],
     "solutions": [
       {
         "label": "Optimal",
@@ -446,6 +490,18 @@
     "story": "For each bar, find how far left and right it can extend as the shortest. Width × height = area. Stack finds boundaries in linear time.",
     "plain": "For each bar at index i, we need to find the maximum width rectangle where that bar is the shortest. To do this, find the nearest smaller bar to the left and right. The width is the distance between those boundaries. Use a monotonic stack to compute nearest smaller elements in O(N) time for both directions, then calculate area for each bar and return the maximum.",
     "tale": "Imagine a city skyline where each building can expand its footprint left and right until it hits a shorter building. A tower at height 5 looks left and right: 'How far can I stretch before I meet someone shorter than me?' The answer is the widest rectangle I can claim. You walk the skyline twice with a memory tablet (the stack), once left-to-right recording 'who is your left boundary?', once right-to-left recording 'who is your right boundary?' Then each tower multiplies its height by its width and proclaims its area. The loudest voice wins.",
+    "howToThink": [
+      "'How far can each bar extend as the shortest one' -> nearest smaller element -> monotonic stack.",
+      "For each bar find the nearest smaller bar on the left and on the right; those are the walls.",
+      "Store INDICES so width = `nextSmaller[i] - prevSmaller[i] - 1`.",
+      "Each bar is the shortest of some rectangle; take the max of height x width."
+    ],
+    "pitfalls": [
+      "Boundaries are `prevSmaller = -1` and `nextSmaller = N`, not 0 and N-1.",
+      "Width subtracts 1 (`next - prev - 1`) to exclude the two walls.",
+      "Store indices, not heights, or you can't compute width.",
+      "Use `>=` when popping equal heights so you don't double count."
+    ],
     "solutions": [
       {
         "label": "Optimal",
@@ -627,6 +683,17 @@
     "story": "Maintain a stack of increasing values. When you see a new value, pop all larger ones—they'll never be nearest smaller for anyone. The remaining top is your answer.",
     "plain": "Scan the array left to right. Keep a stack that holds values in increasing order. For each element, pop stack elements that are greater than or equal to the current element (they can't be the nearest smaller for this element). If the stack is empty after popping, there's no smaller element to the left, so record -1. Otherwise, the stack top is the nearest smaller. Then push the current element onto the stack.",
     "tale": "You walk through a line of guards, each with a height. You're looking for each guard's 'protector'—the nearest shorter guard to their left. You carry a list (the stack) of guards you've seen so far, sorted shortest to tallest. When you meet a new guard, you remove anyone from your list who is taller or equal height—they're blocked by this new guard and will never protect anyone ahead. The shortest person left on your list is the protector. If the list is empty, this guard has no protector. Add the new guard to your list and continue.",
+    "howToThink": [
+      "'Nearest smaller element to the left' is the textbook monotonic-stack signal.",
+      "Keep the stack increasing; a taller-or-equal value on top can never be anyone's nearest smaller.",
+      "Pop everything `>=` the current value; whatever remains on top is the answer (or -1 if empty).",
+      "Each element is pushed and popped once -> O(N)."
+    ],
+    "pitfalls": [
+      "Guard with `isEmpty()` before `peek()`; the stack can empty out mid-pop.",
+      "Pop on `>=`, not just `>`, so equal values don't get reported as smaller.",
+      "Push the current value after recording its answer, not before."
+    ],
     "solutions": [
       {
         "label": "Optimal",
@@ -767,6 +834,17 @@
     "story": "Stack eliminates consecutive duplicates. Push if different from top, pop if same. What remains is the cleansed string.",
     "plain": "Scan the string left to right. Maintain a stack of characters. For each character, if the stack is empty or the top is different, push the character. If the top matches the current character, pop (they cancel out). After processing all characters, pop the stack into a string to get the result. The stack automatically removes all consecutive identical pairs.",
     "tale": "Imagine you're stacking letter tiles on a table. Each time you pick a new tile, you compare it to the top of your stack. If they're the same letter, you throw both away—they annihilate like matter and antimatter. If they're different, you place the new tile on the stack. By the time you finish, only tiles that survived the annihilation remain, forming the final word.",
+    "howToThink": [
+      "Removing adjacent equal pairs, repeatedly -> the last kept char is what matters -> stack.",
+      "If the top equals the current char, they cancel -> pop; otherwise push.",
+      "The realization: a stack collapses chained pairs in one pass, no rescanning needed.",
+      "Whatever survives on the stack is the answer."
+    ],
+    "pitfalls": [
+      "Check `isEmpty()` before peeking the top.",
+      "When a pair matches you pop only (don't also push the current char).",
+      "Build the result in the right order: stack pops give reverse, so prepend or reverse."
+    ],
     "solutions": [
       {
         "label": "Optimal",
@@ -887,6 +965,17 @@
     "story": "Forward pass pushes new player to stack. Back pass (0) pops current, reveals previous. Stack tracks possession chain.",
     "plain": "Start with the initial player B on the stack. Process each pass in array C. If C[i] is a player ID (not 0), it's a forward pass—push that player ID onto the stack. If C[i] is 0, it's a back pass—pop the stack to remove the current player, and the new top is who now has the ball. After all A passes, return the top of the stack (current ball holder).",
     "tale": "Imagine a chain of football players passing a ball. You keep a notebook (the stack) listing who currently holds the ball and who passed to them. When player X passes forward to player Y, you write Y's name on a new page on top. When someone shouts 'back pass!', you tear off the top page—the ball returns to the player whose name is now visible. After all passes, the top page shows the final ball holder.",
+    "howToThink": [
+      "Back-pass returns the ball to whoever gave it -> undo/history behavior -> stack.",
+      "Forward pass to an id -> push it; back pass (0) -> pop and the new top holds the ball.",
+      "The realization: the stack is the chain of possession, top = current holder.",
+      "Answer is the top after all passes."
+    ],
+    "pitfalls": [
+      "Push the starting player B first so a back pass has something beneath it.",
+      "On a back pass, pop then read the new top; don't return the popped value.",
+      "A pass value of 0 means back, any other value is a forward pass id."
+    ],
     "solutions": [
       {
         "label": "Optimal",
@@ -986,6 +1075,17 @@
     "story": "Track cumulative sign for each variable through nested brackets. Two expressions are identical if all variables have the same effective sign.",
     "plain": "Walk through each expression and track the effective sign of each variable (a-z) considering nested brackets. Use a stack to remember the cumulative sign at each bracket level. When you enter a bracket, push the inherited sign. When you exit, pop. Record each variable's final sign. Compare sign arrays—if identical, the expressions are equivalent.",
     "tale": "Imagine two scribes writing equations in different handwriting. You decode each scribe's work by walking through their symbols with a memory tablet (the stack). The tablet remembers 'am I in a positive or negative context?' When a bracket opens, you write down the new context. When it closes, you erase that layer. Each letter gets stamped with its final sign. If both scribes' stamps match for all 26 letters, their equations say the same thing, just differently dressed.",
+    "howToThink": [
+      "Compare expressions with nested +/- brackets -> what matters is each variable's effective sign.",
+      "Track the cumulative sign through nesting -> push the inherited sign on `(`, pop on `)`.",
+      "Each variable's sign is `stack top x current sign`; record it in a 26-slot array.",
+      "Two expressions match if their sign arrays are identical."
+    ],
+    "pitfalls": [
+      "On `(`, push `top x currentSign` and reset currentSign to +1 inside.",
+      "Seed the stack with +1 so the outermost context is positive.",
+      "Compare all 26 slots; a variable absent from one side has sign 0."
+    ],
     "solutions": [
       {
         "label": "Optimal",
@@ -1117,6 +1217,18 @@
     "story": "Operands go straight to output. Operators wait on a stack, popped by higher precedence. Brackets create walls that operators can't cross.",
     "plain": "Scan the infix expression left to right. Operands (letters/digits) go directly to the output. When you see an operator, pop from the stack all operators with greater or equal precedence and append them to output, then push the current operator. Opening brackets push as walls. Closing brackets pop everything until the matching opening bracket. After scanning, pop remaining operators. The result is the postfix expression.",
     "tale": "Imagine a conveyor belt carrying symbols. Operands slide straight into the output box. Operators wait in a tower (the stack), but only if they're stronger than the one on top—weaker operators must wait for their turn and get ejected first. Parentheses are magic doors: opening doors create a sealed room where operators hide, and closing doors flush everyone out of that room. By the end, the tower is empty and the output box holds the reordered expression.",
+    "howToThink": [
+      "Reordering by operator precedence -> operators wait on a stack until something forces them out.",
+      "Operands go straight to output; operators pop everything of `>=` precedence first, then push.",
+      "`(` is a wall you push; `)` flushes operators until the matching `(`.",
+      "At the end, drain the stack into the output."
+    ],
+    "pitfalls": [
+      "Use `>=`, not `>`, so equal-precedence left-associative operators pop correctly.",
+      "Never pop past a `(` when handling an operator; it's a wall.",
+      "Discard the `(` after flushing on `)`; don't append it to output.",
+      "Drain any operators still on the stack after the scan finishes."
+    ],
     "solutions": [
       {
         "label": "Optimal",
@@ -1229,6 +1341,18 @@
     "story": "Each element contributes as MAX in some subarrays and MIN in others. Count both contributions using monotonic stacks.",
     "plain": "For each element, count how many subarrays have it as the maximum (it contributes positively) and how many have it as the minimum (it contributes negatively). Use four arrays computed via monotonic stacks: prevSmaller, nextSmaller (to count MIN contributions), prevGreater, nextGreater (to count MAX contributions). For element i, its contribution = A[i] × (count as MAX) - A[i] × (count as MIN). Sum all contributions modulo 10⁹+7.",
     "tale": "Imagine each number in the array is a village elder with a height. You ask each elder: 'In how many village gatherings are you the tallest?' and 'In how many are you the shortest?' The answer depends on how far left and right they can see before hitting someone taller or shorter. You use four compass readings (the stacks) to find these boundaries quickly. Each elder's pride (positive contribution) minus their humility (negative contribution) is tallied. The sum of all egos is the answer.",
+    "howToThink": [
+      "Sum over all subarrays -> don't enumerate; count each element's contribution -> monotonic stacks.",
+      "An element counts as max in some subarrays and min in others; find both boundary spans.",
+      "Need four arrays: prevGreater/nextGreater (for max) and prevSmaller/nextSmaller (for min).",
+      "Contribution = `A[i] x (countAsMax - countAsMin)`, summed mod 1e9+7."
+    ],
+    "pitfalls": [
+      "Cast spans to `long` before multiplying; `(i-prev)*(next-i)` overflows int.",
+      "Apply modulo each step and normalize negatives with `(sum % MOD + MOD) % MOD`.",
+      "Use consistent strict/non-strict comparisons so subarrays aren't double counted.",
+      "Boundaries are -1 on the left and N on the right, not 0 and N-1."
+    ],
     "solutions": [
       {
         "label": "Optimal",
@@ -1367,6 +1491,17 @@
     "story": "Treat each row as the base of a histogram. Heights = consecutive 1s above. Run largest rectangle in histogram for each row.",
     "plain": "Convert the matrix into histograms row by row. For each row, compute a height array where height[j] is the number of consecutive 1s from the current row upwards in column j. If the current cell is 0, height[j] resets to 0. For each row's height array, apply the largest rectangle in histogram algorithm using stacks. Track the maximum area across all rows.",
     "tale": "Imagine a city where each row is a street level, and buildings are columns of stacked ones. You walk down the city, floor by floor. At each floor, you measure how tall each column of ones has grown from the ground to this floor. If a zero appears, that column crumbles to zero height. On each floor, you run the 'largest rectangle in histogram' spell to find the widest rooftop rectangle of buildings at that level. The best rooftop across all floors is your answer.",
+    "howToThink": [
+      "Largest rectangle of 1s -> reduce each row to a histogram and reuse the histogram solution.",
+      "height[j] = consecutive 1s ending at this row; a 0 resets that column to 0.",
+      "Run largest-rectangle-in-histogram on each row's heights and keep the max.",
+      "Don't reinvent the area logic; the histogram routine is the workhorse."
+    ],
+    "pitfalls": [
+      "A 0 must reset `height[j] = 0`, not just skip the increment.",
+      "Carry the height array across rows; rebuild it fresh only via the +1/reset rule.",
+      "Same histogram traps apply: -1/N boundaries and `next - prev - 1` width."
+    ],
     "solutions": [
       {
         "label": "Optimal",
@@ -1490,6 +1625,17 @@
     "story": "Scan right to left with a monotonic decreasing stack. Pop smaller or equal elements—they're blocked. The remaining top is the next greater.",
     "plain": "Traverse the array from right to left. Maintain a stack that holds values in decreasing order. For each element, pop stack values that are less than or equal to the current element (they can't be next greater). If the stack is empty, no greater element exists (record -1). Otherwise, the stack top is the next greater. Push the current element onto the stack. This ensures each element is processed once, giving O(N) time.",
     "tale": "Imagine you're walking backwards through a line of sentries, each with a height. For each sentry, you ask: 'Who is the next taller sentry ahead of me?' You keep a memory list (the stack) of sentries ahead, sorted tallest at bottom. When you meet a new sentry, you discard anyone on your list who is shorter or equal—this new sentry blocks them. Whoever remains on top of your list is the next taller. If the list is empty, no one ahead is taller. Add the new sentry to your list and step back.",
+    "howToThink": [
+      "'Next greater element to the right' -> monotonic stack, scanned right to left.",
+      "Keep the stack decreasing; a value `<=` the current one can never be its next greater.",
+      "Pop everything `<=` the current value; the remaining top is the answer (or -1 if empty).",
+      "Storing values is enough here since you only need the value, not the distance."
+    ],
+    "pitfalls": [
+      "Scan right to left so candidates ahead are already on the stack.",
+      "Pop on `<=`, so an equal value isn't mistaken for greater.",
+      "Guard `isEmpty()` before peek; the stack empties when nothing greater exists."
+    ],
     "solutions": [
       {
         "label": "Optimal",
@@ -1633,6 +1779,17 @@
     "story": "Transfer elements from input to sorted stack. If top of sorted is larger, move it back temporarily. Repeat until input is empty.",
     "plain": "Use two stacks: input (original) and sorted (auxiliary). While input is not empty, pop an element. If sorted is empty or sorted's top is less than or equal to the element, push the element onto sorted. Otherwise, pop elements from sorted back to input until you find the right position, then push the element onto sorted. After all elements are transferred, sorted holds the elements in ascending order (smallest at bottom, largest at top). Convert to array.",
     "tale": "Imagine you have two towers of blocks. The left tower (input) is messy. The right tower (sorted) will be perfectly stacked, smallest at bottom. You take the top block from the left. If the right tower's top is smaller or empty, place your block on it. But if the right tower's top is bigger, you must temporarily move those bigger blocks back to the left until you find where your block fits. This dance continues until the left tower is empty and the right tower is sorted.",
+    "howToThink": [
+      "Sort a stack with only another stack -> insertion sort driven by transfers.",
+      "Keep the auxiliary stack sorted (smallest at bottom); insert each input element in place.",
+      "If the sorted top is bigger than the element, move those bigger ones back to input first.",
+      "The realization: temporarily shuttling elements back is how you 'insert' into the middle."
+    ],
+    "pitfalls": [
+      "Count the elements you moved back and restore them, or they get stranded in input.",
+      "Guard `isEmpty()` before peeking the sorted stack.",
+      "Sorted stack has largest on top; pop into the array from index N-1 down to get ascending."
+    ],
     "solutions": [
       {
         "label": "Optimal",

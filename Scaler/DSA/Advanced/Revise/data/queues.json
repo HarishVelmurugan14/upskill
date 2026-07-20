@@ -18,6 +18,17 @@
     "story": "Walk down the beach with a window. Keep the max of the window alive at the front of a deque — evict smaller elements from the back as you slide.",
     "plain": "You need to find the maximum element in every window of size B as you slide across the array. Use a deque (double-ended queue) to store indices of array elements in decreasing order of their values. For each new element, remove all smaller elements from the back (they can never be the max now), then add the new element. The front of the deque always holds the index of the maximum element in the current window.",
     "tale": "An ice cream vendor stands at the start of a long boardwalk divided into sections, each marked by the number of customers waiting. The vendor carries a magic notebook that remembers the busiest section in view. As the vendor slides down one section at a time, pushing a window frame that spans exactly three sections, the notebook is clever: whenever a new section enters the frame, it crosses out all older sections that are less busy than the newcomer — they can never be the answer anymore. The section written at the top of the page is always the busiest one visible through the frame.",
+    "howToThink": [
+      "\"Max of every window of size B\" is the tell: don't re-scan each window, use a monotonic deque.",
+      "Keep the deque decreasing; a bigger new element makes all smaller ones behind it useless, so drop them from the back.",
+      "The front is always the current window's max. Store indices, not values, so you can tell when the front ages out.",
+      "Each index enters and leaves the deque once, so the whole sweep is O(N)."
+    ],
+    "pitfalls": [
+      "Store indices, not values, or you can't check if the front left the window.",
+      "Use `>=` when evicting from the back so equal values don't pile up.",
+      "After recording the answer, drop the front if it equals `i - B + 1` (about to leave)."
+    ],
     "solutions": [
       {
         "label": "Optimal",
@@ -178,6 +189,17 @@
     "story": "Two stacks: inputStack (fresh arrivals) and outputStack (ready to serve). Push goes to input. Pop/peek from output; if output is empty, flip the entire input stack into it.",
     "plain": "Use two stacks: one for pushing (input), one for popping (output). When you push, add to the input stack. When you pop or peek, take from the output stack. If the output stack is empty, transfer everything from the input stack to the output stack — this reverses the order, making FIFO work. Each element moves at most twice (once into input, once into output), so push/pop are amortized O(1).",
     "tale": "Imagine a restaurant kitchen with two counters. The left counter (inputStack) is where fresh orders arrive and pile up. The right counter (outputStack) is where the chef picks up orders to serve, always taking from the top. When the chef's counter is empty, a helper grabs the entire pile from the left counter and flips it onto the right counter. This flip reverses the order — so the oldest order, which was at the bottom of the left pile, is now on top of the right pile, ready to be served first. The restaurant serves customers in the order they arrived, using only these two counters and the rule: 'only touch the top of each pile.'",
+    "howToThink": [
+      "You need FIFO but only have LIFO stacks; one stack reversed becomes a queue.",
+      "Split into two stacks: input takes pushes, output serves pops and peeks.",
+      "When output is empty, dump the whole input stack into it once; that flip turns oldest-at-bottom into oldest-on-top.",
+      "Transfer only when output is empty (lazy), so each element moves at most twice, giving amortized O(1)."
+    ],
+    "pitfalls": [
+      "Never transfer on every pop; only refill output when it is empty, or you lose the amortization.",
+      "Push always goes to input, never straight to output.",
+      "`empty()` must check both stacks, not just one."
+    ],
     "solutions": [
       {
         "label": "Optimal",
@@ -286,6 +308,17 @@
     "story": "BFS tree where each node spawns three children by appending 1, 2, or 3. Queue holds the frontier — generate level by level.",
     "plain": "Think of it as a tree where the root is empty, and each node has three children formed by appending 1, 2, or 3 to the parent. Use a queue to explore this tree level by level (BFS). Start with seeds 1, 2, 3 in the queue. For each number you pop, that's the next answer — then generate its three children (number*10+1, number*10+2, number*10+3) and push them to the queue. Stop after A numbers.",
     "tale": "A magician stands before three doors marked 1, 2, and 3. Behind each door is a hallway with three more doors, labeled by appending another digit — door 1 leads to 11, 12, 13; door 2 leads to 21, 22, 23; and so on. The magician opens doors one at a time, always choosing the smallest unexplored number. Each time a door opens, the magician writes the number on a scroll, then places the three child doors in a queue at the back of the line. The queue ensures the numbers are discovered in ascending order. After A doors, the scroll is complete.",
+    "howToThink": [
+      "\"First A numbers in ascending order\" hints at exploring an implicit tree level by level, which is BFS.",
+      "Each number spawns three children by appending 1, 2, 3 (`num*10 + d`); the queue's FIFO order keeps them sorted.",
+      "Seed the queue with 1, 2, 3. Each dequeue is the next answer; then enqueue its three children.",
+      "Smaller numbers are dequeued first, so their children are enqueued earlier, keeping output ascending for free."
+    ],
+    "pitfalls": [
+      "Use `long` for queue values; `num*10 + d` can overflow int even when the answers fit.",
+      "Enqueue children in 1, 2, 3 order, or the ascending guarantee breaks.",
+      "Stop after A dequeues; the queue still holds unused numbers."
+    ],
     "solutions": [
       {
         "label": "Optimal",
@@ -407,6 +440,17 @@
     "story": "Queue holds candidates for unique letters. HashMap tracks frequencies. After each new letter, clean the queue front until you find a unique one.",
     "plain": "Process the string character by character. Use a HashMap to track the frequency of each character, and a deque to maintain the order of characters as they first appear. For each character, increment its frequency in the map and add it to the deque if it's the first occurrence. Then, remove characters from the front of the deque while their frequency is greater than 1 (they're no longer unique). After each character, the front of the deque holds the first non-repeating character, or the deque is empty (output '#').",
     "tale": "A teacher stands before a classroom with a whiteboard and a queue of name cards. When a student calls out a letter, the teacher first checks a ledger (HashMap) to see if it's been said before. If it's new, the teacher writes the student's name card on the queue wall. Then the teacher glances at the front of the queue — the oldest name still there. If that student has spoken more than once (ledger says so), the teacher erases their name card. The teacher keeps erasing until finding a student who has spoken exactly once. That student's letter goes on the board. If no such student exists, the teacher writes '#'. The board grows one character at a time, always showing the first unique letter in the stream so far.",
+    "howToThink": [
+      "\"First non-repeating so far, after each character\" is a stream query, so pair a deque of candidates with a frequency map.",
+      "Add a char to the deque only the first time you see it; the deque holds the order of first appearances.",
+      "After each char, clean the front: drop any whose count is now > 1 since it can never be the answer again.",
+      "The cleaned front is the answer; if the deque is empty, output '#'."
+    ],
+    "pitfalls": [
+      "Add to the deque only on first occurrence, never on repeats, or duplicates break the front cleaning.",
+      "Clean the front with a `while` loop, not a single `if`; several may need removing.",
+      "Check empty before peeking the front; output '#' when it is."
+    ],
     "solutions": [
       {
         "label": "Optimal",
@@ -533,6 +577,17 @@
     "story": "Two deques: one tracks the max (decreasing order), one tracks the min (increasing order). Slide both together, summing min+max at each window.",
     "plain": "For every subarray of size B, you need the minimum and maximum element, then sum them all up. Use two deques simultaneously: one maintains indices of elements in decreasing order (for max), the other in increasing order (for min). As you slide the window, maintain both deques by removing stale indices and elements that can't be min/max. For each fully-formed window, add the max (front of maxDeque) and min (front of minDeque) to the result.",
     "tale": "A watchman patrols a long wall with B towers visible at a time. Two scribes follow: one records the tallest tower in view (using a magic slate that erases shorter towers whenever a taller one appears), the other records the shortest tower (erasing taller ones when a shorter appears). At each step, the watchman reads both slates, adds the tallest + shortest heights, and steps forward. The slates update automatically as towers enter and leave the view. After the patrol, the watchman has the total sum of all (max + min) pairs.",
+    "howToThink": [
+      "You need both min and max of every window of size B, so run two monotonic deques in parallel.",
+      "maxDeque stays decreasing (front = max); minDeque stays increasing (front = min); same slide logic, opposite comparison.",
+      "For each window add `A[maxDeque.front()] + A[minDeque.front()]` to the running sum.",
+      "Each element enters and leaves each deque once, so it is O(N) despite tracking two extremes."
+    ],
+    "pitfalls": [
+      "Take the modulo after each addition, not just at the end, or the sum overflows.",
+      "Values can be negative; add `MOD` before the final `% MOD` so the result isn't negative.",
+      "Keep the two eviction comparisons opposite (`<=` for max deque back, `>=` for min deque back) and drop stale fronts from both."
+    ],
     "solutions": [
       {
         "label": "Optimal",

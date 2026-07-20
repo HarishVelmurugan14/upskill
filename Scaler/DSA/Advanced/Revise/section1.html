@@ -1,72 +1,85 @@
 <!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>DSA revision — physical copy</title><style>
+/* ==== monochrome / xerox palette: pure black text, gray fills, solid borders ==== */
 * { box-sizing: border-box; }
 body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-  color: #1a1a1a; line-height: 1.42; margin: 0; font-size: 12px; background: #e9e9e6; }
+  color: #000; line-height: 1.42; margin: 0; font-size: 12px; background: #d9d9d9; }
 .page-wrap { margin: 0; padding: 0; }
-h1 { font-size: 22px; font-weight: 600; margin: 2px 0; }
-h2 { font-size: 18px; font-weight: 600; margin: 2px 0; }
-.kicker { font-size: 11px; letter-spacing: .05em; color: #888; text-transform: uppercase; }
+h1, h2 { color: #000; }
+h1 { font-size: 22px; font-weight: 700; margin: 2px 0; }
+h2 { font-size: 18px; font-weight: 700; margin: 2px 0; }
+.kicker { font-size: 11px; letter-spacing: .05em; color: #000; text-transform: uppercase; font-weight: 600; }
 pre.code { font-family: "SF Mono", ui-monospace, Menlo, Consolas, monospace; font-size: 10.5px;
-  line-height: 1.4; background: #f6f6f4; border: .5px solid #ddd; border-radius: 6px;
-  padding: 7px 10px; white-space: pre-wrap; overflow-wrap: anywhere; margin: 4px 0; }
-.block-label { font-size: 11px; letter-spacing: .04em; color: #777; margin: 0 0 5px; }
-.block-label.accent { color: #185fa5; } .block-label.warn { color: #854f0b; }
-.block-label.danger { color: #a32d2d; } .block-label.good { color: #0f6e56; }
-.lead { font-weight: 600; }
+  line-height: 1.4; background: #ededed; border: 1px solid #555; border-radius: 5px;
+  padding: 7px 10px; white-space: pre-wrap; overflow-wrap: anywhere; margin: 4px 0; color: #000; }
+.block-label { font-size: 11px; letter-spacing: .05em; color: #000; margin: 0 0 5px; font-weight: 700;
+  text-transform: uppercase; }
+.block-label.accent, .block-label.warn, .block-label.danger, .block-label.good { color: #000; }
+.lead { font-weight: 700; }
 
 /* cover */
 .cover { display: flex; flex-direction: column; justify-content: center; height: 100%; }
-.cover h1 { font-size: 32px; } .cover .sub { color: #666; margin: 6px 0 22px; }
-.toc-title { font-size: 12px; letter-spacing: .05em; text-transform: uppercase; color: #888; margin-bottom: 6px; }
-.toc { border-top: .5px solid #ccc; padding-top: 12px; }
+.cover h1 { font-size: 32px; } .cover .sub { color: #222; margin: 6px 0 22px; }
+.toc-title { font-size: 12px; letter-spacing: .05em; text-transform: uppercase; color: #000; margin-bottom: 6px; font-weight: 700; }
+.toc { border-top: 2px solid #000; padding-top: 12px; }
 .toc-row { display: flex; align-items: baseline; gap: 10px; padding: 6px 0;
-  border-bottom: .5px solid #eee; }
-.toc-row .tname { font-weight: 500; } .toc-row .sec { color: #999; font-size: 11px; }
-.toc-row .tcount { color: #999; font-size: 11px; }
-.toc-row .pageno { margin-left: auto; color: #444; text-decoration: none;
+  border-bottom: 1px solid #999; }
+.toc-row .tname { font-weight: 700; color: #000; } .toc-row .sec { color: #333; font-size: 11px; }
+.toc-row .tcount { color: #333; font-size: 11px; }
+.toc-row .pageno { margin-left: auto; color: #000; text-decoration: none; font-weight: 700;
   font-variant-numeric: tabular-nums; }
 .toc-row .pageno::after { content: "p. " target-counter(attr(href url), page); }
 
 /* opener */
-.opener .topic-head { border-bottom: 2px solid #999; padding-bottom: 8px; margin-bottom: 14px; }
-.counts { color: #666; font-size: 12px; }
+.opener .topic-head { border-bottom: 3px solid #000; padding-bottom: 8px; margin-bottom: 14px; }
+.counts { color: #222; font-size: 12px; }
 .pattern, .formula { margin-bottom: 14px; break-inside: avoid; }
-.pattern-name, .formula-name { font-weight: 600; font-size: 14px; }
-.when { color: #555; font-size: 12.5px; margin: 2px 0; } .when .lead { color: #185fa5; }
-.when-list { margin: 4px 0 0; padding-left: 18px; color: #555; font-size: 12px; }
-.example { font-size: 12.5px; color: #444; margin: 5px 0; }
-.note { font-size: 12px; color: #777; font-style: italic; margin: 4px 0 0; }
-.formula-body .var { color: #185fa5; } .formula-body .op { color: #a32d2d; }
-.formula-body .com { color: #888; font-style: italic; } .formula-body .num { color: #0f6e56; }
+.pattern-name, .formula-name { font-weight: 700; font-size: 14px; color: #000; }
+.when { color: #111; font-size: 12.5px; margin: 2px 0; } .when .lead { color: #000; }
+.when-list { margin: 4px 0 0; padding-left: 18px; color: #111; font-size: 12px; }
+.example { font-size: 12.5px; color: #000; margin: 5px 0; }
+.note { font-size: 12px; color: #333; font-style: italic; margin: 4px 0 0; }
+.formula-body .var { color: #000; font-weight: 700; } .formula-body .op { color: #000; font-weight: 700; }
+.formula-body .com { color: #555; font-style: italic; } .formula-body .num { color: #000; }
 
 /* problem card */
 .problem { }
 .p-head { display: flex; justify-content: space-between; align-items: baseline;
-  border-bottom: 2px solid #999; padding-bottom: 6px; margin-bottom: 9px; }
-.subtopic { font-size: 12px; color: #666; text-align: right; max-width: 40%; }
-.tags { margin-bottom: 12px; } .tag { display: inline-block; font-size: 10.5px; background: #e6f1fb;
-  color: #0c447c; padding: 2px 9px; border-radius: 10px; margin: 0 4px 4px 0; }
-.desc { white-space: normal; }
+  border-bottom: 3px solid #000; padding-bottom: 6px; margin-bottom: 9px; }
+.subtopic { font-size: 12px; color: #222; text-align: right; max-width: 40%; }
+.tags { margin-bottom: 12px; } .tag { display: inline-block; font-size: 10.5px; background: #e6e6e6;
+  color: #000; padding: 2px 9px; border-radius: 10px; margin: 0 4px 4px 0; border: 1px solid #666; }
+.desc { white-space: normal; color: #000; }
 .io { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin: 12px 0; break-inside: avoid; }
-.io-box { background: #f6f6f4; border-radius: 6px; padding: 7px 11px; }
-.io-label { font-size: 10.5px; color: #888; margin-bottom: 3px; }
-.io-box pre { margin: 0; font-family: "SF Mono", ui-monospace, Menlo, monospace; font-size: 11.5px; white-space: pre-wrap; }
-.plain { border-left: 3px solid #85b7eb; padding-left: 11px; margin: 8px 0; }
-.plain p { margin: 0; color: #444; }
-.crack { background: #e6f1fb; border-radius: 8px; padding: 8px 11px; margin: 8px 0; break-inside: avoid; }
-.crack .insight { margin: 0 0 6px; font-size: 12px; }
+.io-box { background: #ededed; border: 1px solid #666; border-radius: 5px; padding: 7px 11px; }
+.io-label { font-size: 10.5px; color: #000; margin-bottom: 3px; font-weight: 700; text-transform: uppercase; letter-spacing: .04em; }
+.io-box pre { margin: 0; font-family: "SF Mono", ui-monospace, Menlo, monospace; font-size: 11.5px; white-space: pre-wrap; color: #000; }
+.plain { border-left: 4px solid #000; padding-left: 11px; margin: 8px 0; }
+.plain p { margin: 0; color: #000; }
+.crack { background: #eaeaea; border: 1px solid #888; border-left: 4px solid #000; border-radius: 0 6px 6px 0; padding: 8px 11px; margin: 8px 0; break-inside: avoid; }
+.crack .insight { margin: 0 0 6px; font-size: 12px; color: #000; }
+.crack ul { margin: 0; padding-left: 18px; color: #000; }
+.crack ul li { margin: 2px 0; }
+/* section-2 thought-process opener */
+.tp-item { margin-bottom: 10px; break-inside: avoid; }
+.tp-q { font-weight: 700; font-size: 13px; color: #000; }
+.tp-b { margin: 2px 0 0; color: #111; font-size: 12.5px; }
+/* section-2 pseudocode block + complexity line */
+.proceed { margin: 8px 0; break-inside: avoid; }
+.proceed-head { display: flex; justify-content: space-between; align-items: baseline; }
+.cxline { font-size: 12px; color: #111; margin: 8px 0; }
+.cxline b { color: #000; }
 .leap { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; font-size: 11.5px; }
-.leap .chip { background: #fff; border-radius: 5px; padding: 2px 8px; color: #555; }
-.leap .chip.good { color: #0f6e56; } .leap .arrow { color: #888; }
-.sol { border-top: .5px solid #eee; padding-top: 7px; margin-top: 7px; break-inside: avoid; }
+.leap .chip { background: #fff; border: 1px solid #666; border-radius: 5px; padding: 2px 8px; color: #000; }
+.leap .chip.good { color: #000; border-color: #000; font-weight: 600; } .leap .arrow { color: #000; }
+.sol { border-top: 1px solid #999; padding-top: 7px; margin-top: 7px; break-inside: avoid; }
 .sol-head { display: flex; justify-content: space-between; align-items: baseline; }
-.sol-label { font-weight: 600; font-size: 12.5px; } .sol.optimal .sol-label { color: #0f6e56; }
-.star { color: #0f6e56; } .cx { font-family: "SF Mono", monospace; font-size: 11px; color: #666; }
-.steps { margin: 4px 0; padding-left: 20px; color: #444; }
-.watch { background: #fcebeb; border-radius: 8px; padding: 8px 11px; margin: 8px 0; break-inside: avoid; }
-.watch ul { margin: 0; padding-left: 18px; color: #7a2020; }
+.sol-label { font-weight: 700; font-size: 12.5px; color: #000; } .sol.optimal .sol-label { color: #000; }
+.star { color: #000; } .cx { font-family: "SF Mono", monospace; font-size: 11px; color: #222; }
+.steps { margin: 4px 0; padding-left: 20px; color: #000; }
+.watch { background: #e3e3e3; border: 1.5px solid #000; border-radius: 6px; padding: 8px 11px; margin: 8px 0; break-inside: avoid; }
+.watch ul { margin: 0; padding-left: 18px; color: #000; }
 .answer { margin-top: 8px; }
-.answer pre.code { background: #f6f6f4; break-inside: avoid; }
+.answer pre.code { background: #ededed; break-inside: avoid; }
 
 /* ---- paged media (Paged.js): page numbers + running topic header ---- */
 @page {
@@ -75,12 +88,12 @@ pre.code { font-family: "SF Mono", ui-monospace, Menlo, Consolas, monospace; fon
   @bottom-center {
     content: counter(page);
     font-family: -apple-system, BlinkMacSystemFont, sans-serif;
-    font-size: 9px; color: #999;
+    font-size: 10px; color: #000; font-weight: 600;
   }
   @top-right {
     content: string(topictitle);
     font-family: -apple-system, BlinkMacSystemFont, sans-serif;
-    font-size: 9px; color: #bbb; letter-spacing: .04em;
+    font-size: 9px; color: #333; letter-spacing: .04em;
   }
 }
 @page :first { @bottom-center { content: none; } @top-right { content: none; } }
@@ -92,7 +105,7 @@ pre.code { font-family: "SF Mono", ui-monospace, Menlo, Consolas, monospace; fon
 .pagedjs_page { background: #fff; box-shadow: 0 1px 5px rgba(0,0,0,.18); margin: 10px auto; }
 * { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
 @media print { body { background: #fff; } .pagedjs_page { box-shadow: none; margin: 0; } }
-</style></head><body><div class="page-wrap"><section class="cover"><h1>DSA revision — physical copy</h1><div class="sub">Scaler Advanced · Section 0 &amp; 1 · 102 problems · generated 2026-07-15</div><div class="toc-title">Contents</div><div class="toc"><div class="toc-row"><span class="tname">Arrays</span><span class="sec">Section 0</span><span class="tcount">23 problems</span><a class="pageno" href="#topic-arrays"></a></div><div class="toc-row"><span class="tname">Arrays Advanced</span><span class="sec">Section 1</span><span class="tcount">14 problems</span><a class="pageno" href="#topic-arrays-advanced"></a></div><div class="toc-row"><span class="tname">Sorting</span><span class="sec">Section 1</span><span class="tcount">16 problems</span><a class="pageno" href="#topic-sorting"></a></div><div class="toc-row"><span class="tname">Bit Manipulation</span><span class="sec">Section 1</span><span class="tcount">14 problems</span><a class="pageno" href="#topic-bit-manipulation"></a></div><div class="toc-row"><span class="tname">Recursion</span><span class="sec">Section 1</span><span class="tcount">13 problems</span><a class="pageno" href="#topic-recursion"></a></div><div class="toc-row"><span class="tname">Maths</span><span class="sec">Section 1</span><span class="tcount">8 problems</span><a class="pageno" href="#topic-maths"></a></div><div class="toc-row"><span class="tname">Hashing</span><span class="sec">Section 1</span><span class="tcount">14 problems</span><a class="pageno" href="#topic-hashing"></a></div></div></section><section class="opener" id="topic-arrays" data-topic="Arrays"><div class="topic-head"><div class="kicker">SECTION 0 · ARRAYS</div><h1>Key patterns</h1><div class="counts">7 patterns · 23 problems</div></div><div class="block-label accent">key patterns</div><div class="pattern"><div class="pattern-name">1. 1-D Prefix Sum</div><div class="when"><span class="lead">when:</span> Repeated range-sum queries on a static array, equilibrium-index problems, in-place running totals.</div><pre class="code">long[] prefix = new long[N];
+</style></head><body><div class="page-wrap"><section class="cover"><h1>DSA revision — physical copy</h1><div class="sub">Scaler Advanced · Section 0 &amp; 1 · 104 problems · generated 2026-07-15</div><div class="toc-title">Contents</div><div class="toc"><div class="toc-row"><span class="tname">Arrays</span><span class="sec">Section 0</span><span class="tcount">23 problems</span><a class="pageno" href="#topic-arrays"></a></div><div class="toc-row"><span class="tname">Arrays Advanced</span><span class="sec">Section 1</span><span class="tcount">14 problems</span><a class="pageno" href="#topic-arrays-advanced"></a></div><div class="toc-row"><span class="tname">Sorting</span><span class="sec">Section 1</span><span class="tcount">16 problems</span><a class="pageno" href="#topic-sorting"></a></div><div class="toc-row"><span class="tname">Bit Manipulation</span><span class="sec">Section 1</span><span class="tcount">16 problems</span><a class="pageno" href="#topic-bit-manipulation"></a></div><div class="toc-row"><span class="tname">Recursion</span><span class="sec">Section 1</span><span class="tcount">13 problems</span><a class="pageno" href="#topic-recursion"></a></div><div class="toc-row"><span class="tname">Maths</span><span class="sec">Section 1</span><span class="tcount">8 problems</span><a class="pageno" href="#topic-maths"></a></div><div class="toc-row"><span class="tname">Hashing</span><span class="sec">Section 1</span><span class="tcount">14 problems</span><a class="pageno" href="#topic-hashing"></a></div></div></section><section class="opener" id="topic-arrays" data-topic="Arrays"><div class="topic-head"><div class="kicker">SECTION 0 · ARRAYS</div><h1>Key patterns</h1><div class="counts">7 patterns · 23 problems</div></div><div class="block-label accent">key patterns</div><div class="pattern"><div class="pattern-name">1. 1-D Prefix Sum</div><div class="when"><span class="lead">when:</span> Repeated range-sum queries on a static array, equilibrium-index problems, in-place running totals.</div><pre class="code">long[] prefix = new long[N];
 prefix[0] = A[0];
 for (int i = 1; i &lt; N; i++) {
     prefix[i] = prefix[i-1] + A[i];
@@ -1257,7 +1270,7 @@ public static int[] waveSort(int[] A) {
         }
     }
     return A;
-}</pre></div></section><section class="opener" id="topic-bit-manipulation" data-topic="Bit Manipulation"><div class="topic-head"><div class="kicker">SECTION 1 · BIT MANIPULATION</div><h1>Key patterns &amp; formulas</h1><div class="counts">10 patterns · 4 formulas · 14 problems</div></div><div class="block-label accent">key patterns</div><div class="pattern"><div class="pattern-name">1. Single-Bit Get / Set / Clear / Toggle</div><div class="when"><span class="lead">when:</span> Any problem that needs to manipulate one bit at a known position.</div><pre class="code">int getBit   = (x &gt;&gt; i) &amp; 1;
+}</pre></div></section><section class="opener" id="topic-bit-manipulation" data-topic="Bit Manipulation"><div class="topic-head"><div class="kicker">SECTION 1 · BIT MANIPULATION</div><h1>Key patterns &amp; formulas</h1><div class="counts">10 patterns · 4 formulas · 16 problems</div></div><div class="block-label accent">key patterns</div><div class="pattern"><div class="pattern-name">1. Single-Bit Get / Set / Clear / Toggle</div><div class="when"><span class="lead">when:</span> Any problem that needs to manipulate one bit at a known position.</div><pre class="code">int getBit   = (x &gt;&gt; i) &amp; 1;
 int setBit   = x |  (1 &lt;&lt; i);
 int clearBit = x &amp; ~(1 &lt;&lt; i);
 int toggle   = x ^  (1 &lt;&lt; i);</pre></div><div class="pattern"><div class="pattern-name">2. Population Count (Brian Kernighan)</div><div class="when"><span class="lead">when:</span> Count set bits in an integer.</div><pre class="code">int count = 0;
@@ -1488,6 +1501,55 @@ private int setBit(int N, int i) {
     B[0] = Math.min(num1, num2);
     B[1] = Math.max(num1, num2);
     return B;
+}</pre></div></section><section class="problem" data-topic="Bit Manipulation"><div class="p-head"><div><div class="kicker">Bit Manipulation · #170</div><h2>Min XOR value</h2></div><div class="subtopic">Sort → Adjacent Pairs</div></div><div class="tags"><span class="tag">Bit Manipulation</span><span class="tag">Sorting</span><span class="tag">XOR</span></div><p class="desc">Given an integer array A of N integers, find the pair of integers in the array which have minimum XOR value. Report the minimum XOR value.<br><br>Problem Constraints<br>2 &lt;= length of the array &lt;= 100000<br>0 &lt;= A[i] &lt;= 10^9</p><div class="io"><div class="io-box"><div class="io-label">sample input</div><pre>A = [0, 2, 5, 7]</pre></div><div class="io-box"><div class="io-label">sample output</div><pre>2</pre></div></div><div class="plain"><div class="block-label">in plain english</div><p>Brute-forcing all pairs is O(N^2). Key fact: the minimum-XOR pair is always adjacent after sorting, because for sorted a &lt;= b &lt;= c the middle b shares at least as many high bits with each neighbour as the neighbours do with each other, so a^c can never beat both a^b and b^c. Sort A, then scan adjacent pairs tracking the minimum.</p></div><div class="crack"><div class="block-label accent">how to crack it</div><p class="insight"><span class="lead">key insight:</span> Two numbers XOR to a small value only when they share a long leading-bit prefix — and the most-similar numbers sit next to each other once sorted. So sort, then take the min XOR over ADJACENT pairs only: O(N log N) instead of O(N^2).</p></div><div class="solutions"><div class="sol optimal"><div class="sol-head"><span class="sol-label"><span class="star">★</span> Optimal — Sort then Adjacent XOR</span><span class="cx">time O(N log N) · space O(1)</span></div><ol class="steps"><li>Sort A ascending.</li><li>Initialise minXor = A[0] ^ A[1].</li><li>Slide a size-2 window (start,end): for each adjacent pair, minXor = min(minXor, A[start]^A[end]); early-exit if it reaches 0.</li><li>Return minXor.</li></ol></div></div><div class="watch"><div class="block-label danger">watch out</div><ul><li>Don&#x27;t compare all pairs (O(N^2) TLE at N=1e5) — only adjacent pairs after sorting.</li><li>XOR of two ints up to 1e9 fits in int, but if you accumulate/sum XORs use long.</li><li>Duplicates give XOR 0, the global minimum — you can early-exit when minXor hits 0.</li></ul></div><div class="answer"><div class="block-label good">answer — optimal code (java)</div><pre class="code">public int findMinXor(int[] A) {
+    Arrays.sort(A);
+    int minXor = A[0] ^ A[1];
+    int start = 1;
+    int end = 2;
+    int n = A.length;
+    while (end &lt; n) {
+        int currentXor = A[start] ^ A[end];
+        if (currentXor &lt; minXor) {
+            minXor = currentXor;
+            if (minXor == 0) {
+                break;
+            }
+        }
+        start++;
+        end++;
+    }
+    return minXor;
+}</pre></div></section><section class="problem" data-topic="Bit Manipulation"><div class="p-head"><div><div class="kicker">Bit Manipulation · #171</div><h2>Strange Equality</h2></div><div class="subtopic">XOR-equals-Sum ⇔ No Common Bits</div></div><div class="tags"><span class="tag">Bit Manipulation</span><span class="tag">XOR</span><span class="tag">Masks</span></div><p class="desc">Given an integer A. Two numbers, X and Y, are defined as follows:<br>- X is the greatest number smaller than A such that the XOR sum of X and A is the same as the sum of X and A.<br>- Y is the smallest number greater than A, such that the XOR sum of Y and A is the same as the sum of Y and A.<br><br>Find and return the XOR of X and Y.<br><br>NOTE 1: XOR of X and Y is defined as X ^ Y where &#x27;^&#x27; is the BITWISE XOR operator.<br>NOTE 2: Your code will be run against a maximum of 100000 Test Cases.<br><br>Problem Constraints<br>1 &lt;= A &lt;= 10^9</p><div class="io"><div class="io-box"><div class="io-label">sample input</div><pre>A = 5</pre></div><div class="io-box"><div class="io-label">sample output</div><pre>10</pre></div></div><div class="plain"><div class="block-label">in plain english</div><p>Addition equals XOR only when there are no carries, i.e. the two operands share no set bit (X &amp; A == 0). To get the GREATEST X &lt; A with X &amp; A == 0, take the complement of A restricted to A&#x27;s bit-length — set exactly the bits A leaves unset below its MSB. To get the SMALLEST Y &gt; A with Y &amp; A == 0, use the first bit position beyond A&#x27;s highest set bit: Y = 1 &lt;&lt; numberOfBits(A). Return X ^ Y.</p></div><div class="crack"><div class="block-label accent">how to crack it</div><p class="insight"><span class="lead">key insight:</span> The whole trick is one identity: X + A == X ^ A exactly when X &amp; A == 0 (no shared set bits → no carries). So X = flip every bit of A within its bit-length (the largest value &lt; A with no overlap), and Y = 1 &lt;&lt; (bit-length of A) (the next power of two above A&#x27;s top bit, the smallest value &gt; A with no overlap). Answer = X ^ Y.</p></div><div class="solutions"><div class="sol optimal"><div class="sol-head"><span class="sol-label"><span class="star">★</span> Optimal — Complement Below MSB, Next Bit Above</span><span class="cx">time O(log A) · space O(1)</span></div><ol class="steps"><li>numberOfBits = floor(log2(A)) + 1; Y = 1 &lt;&lt; numberOfBits (smallest number &gt; A sharing no bit with A).</li><li>Build X from A: for each bit i in [0, numberOfBits): if A has bit i set, unset it in X; else set it. This yields the greatest X &lt; A with X &amp; A == 0.</li><li>Return X ^ Y.</li></ol></div></div><div class="watch"><div class="block-label danger">watch out</div><ul><li>The identity is a + b == a ^ b  ⇔  a &amp; b == 0 (equivalently no carry). Memorise it — it unlocks the whole problem.</li><li>checkIfIthBitIsSet must compare to the mask, not to 1: (num &amp; (1&lt;&lt;pos)) == (1&lt;&lt;pos), NOT == 1 (that only works for pos 0).</li><li>numberOfBits(A) = floor(log2(A)) + 1; guard A limits so 1 &lt;&lt; numberOfBits doesn&#x27;t need more than 31 bits (A &lt;= 1e9 → up to 30 bits, safe in int).</li></ul></div><div class="answer"><div class="block-label good">answer — optimal code (java)</div><pre class="code">public int solve(int A) {
+    int X = A;
+
+    int numberOfBits = numberOfBits(A);
+    int Y = 1 &lt;&lt; numberOfBits;
+
+    for (int i = 0; i &lt; numberOfBits; i++) {
+        if (checkIfIthBitIsSet(A, i)) {
+            X = unSetIthBit(X, i);
+        } else {
+            X = setIthBit(X, i);
+        }
+    }
+
+    return X ^ Y;
+}
+
+private boolean checkIfIthBitIsSet(int num, int pos) {
+    return (num &amp; (1 &lt;&lt; pos)) == 1 &lt;&lt; pos;
+}
+
+private int setIthBit(int num, int pos) {
+    return num | (1 &lt;&lt; pos);
+}
+
+private int unSetIthBit(int num, int pos) {
+    return num &amp; ~(1 &lt;&lt; pos);
+}
+
+private int numberOfBits(int num) {
+    return (int) ((Math.log(num) / Math.log(2)) + 1);
 }</pre></div></section><section class="opener" id="topic-recursion" data-topic="Recursion"><div class="topic-head"><div class="kicker">SECTION 1 · RECURSION</div><h1>Key patterns</h1><div class="counts">8 patterns · 13 problems</div></div><div class="block-label accent">key patterns</div><div class="pattern"><div class="pattern-name">1. Factorial / Linear Recurrence</div><div class="when"><span class="lead">when:</span> f(n) = n × f(n-1) or any single-arg recurrence with a clean base.</div><pre class="code">long factorial(int n) {
     if (n &lt;= 1) return 1;
     return n * factorial(n - 1);

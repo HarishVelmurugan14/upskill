@@ -14,6 +14,17 @@
     "sampleInput": "A = [5, 7, 7, 8, 8, 10]\nB = 8",
     "sampleOutput": "[3, 4]",
     "story": "Two binary searches, same shape. Once you hit the target, don't celebrate — keep walking left to find the first occurrence, then run a second BS walking right to find the last.",
+    "howToThink": [
+      "Sorted input + 'first and last position' screams binary search, not a linear scan.",
+      "Equal copies sit in one block, so you just need its two edges.",
+      "Run the same search twice: one biased left for the first index, one biased right for the last.",
+      "The trick is the 'equal' branch: don't stop on a hit, keep shrinking toward the edge you want."
+    ],
+    "pitfalls": [
+      "Don't return on the first match — that gives some middle index, not an edge.",
+      "Empty array must return `[-1, -1]` before the loop runs.",
+      "If `first` stays -1, B is absent — return `[-1, -1]`, don't trust `last`."
+    ],
     "solutions": [
       {
         "label": "Brute",
@@ -251,6 +262,17 @@
     "sampleInput": "A = [1, 3, 5, 6]\nB = 5",
     "sampleOutput": "2",
     "story": "This IS lower_bound dressed in interview clothes. Keep an ans = N sentinel — it auto-handles the 'insert at end' case.",
+    "howToThink": [
+      "'Find where it fits to stay sorted' is the lower_bound signal — binary search, not a scan.",
+      "Reframe it as 'smallest index where `A[i] >= B`' — that boundary is your answer.",
+      "On a hit-or-bigger, store the candidate and keep searching left for an earlier one.",
+      "A sentinel `res = N` quietly handles 'everything is smaller, insert at end'."
+    ],
+    "pitfalls": [
+      "Forget the `res = N` sentinel and the 'larger than all' case breaks.",
+      "Don't return -1 when absent — the insert position is a real index, not 'not found'.",
+      "On `A[mid] > B` you must pull `high = mid - 1`, else you miss an earlier slot."
+    ],
     "solutions": [
       {
         "label": "Brute",
@@ -444,6 +466,17 @@
     "sampleInput": "A = [1, 1, 2, 2, 3, 3, 4, 5, 5]",
     "sampleOutput": "4",
     "story": "Before the unique element, pairs sit at (even, odd). After it, they shift to (odd, even). Binary search hunts for where the pattern breaks.",
+    "howToThink": [
+      "O(log N) on a sorted array with pairs = binary search, even though there's no target.",
+      "The clue is index parity: before the loner, pairs start at even indices; after it, they shift.",
+      "So the question becomes 'is the pattern still intact at mid?' — that's your monotonic predicate.",
+      "Check which neighbour matches, then use even/odd of the pair start to pick a side."
+    ],
+    "pitfalls": [
+      "Handle N==1 and both edges first, or `A[mid+1]` / `A[mid-1]` reads out of bounds.",
+      "Search the interior only: `low = 1, high = N - 2`.",
+      "Get the even/odd direction backwards and you walk away from the loner."
+    ],
     "solutions": [
       {
         "label": "Brute",
@@ -677,6 +710,17 @@
     "story": "If you're standing on a slope, walk uphill. That direction must contain a peak. Binary search just walks uphill twice as fast.",
     "plain": "You're standing somewhere on the array. Look at the value to your left and the value to your right. Whichever side goes UP — walk that way. Keep doing this and you must reach a peak, because the array can't climb forever. Binary search lets you take giant uphill steps instead of one-by-one.",
     "tale": "A blindfolded hiker is dropped onto a strange mountain. He cannot see the summit. But at every step, his fingertips can feel whether the slope tilts up or down beside his feet. So he makes a vow: 'I will always step toward the rising ground.' The mountain is mischievous — it has hidden valleys and false flats — but it has exactly one peak. As long as the hiker keeps choosing the rising side, the mountain itself is funnelling him to the summit. He doesn't need to see. He just needs to trust the slope.",
+    "howToThink": [
+      "'Rises then falls, find the top' is a unimodal shape — binary search on the slope.",
+      "You don't need the array sorted; you just need to know which way is uphill.",
+      "If `A[mid]` beats both neighbours you're done; otherwise climb toward the taller side.",
+      "The rising side always hides a peak, so move there."
+    ],
+    "pitfalls": [
+      "Pre-check N==1 and both corners so `mid-1` / `mid+1` never go out of bounds.",
+      "Restrict the loop to `low = 1, high = N - 2`.",
+      "Always move toward the increasing neighbour, or you drift off the peak."
+    ],
     "solutions": [
       {
         "label": "Brute",
@@ -870,6 +914,17 @@
     "sampleInput": "A = [[1, 3, 5, 7],\n     [10, 11, 16, 20],\n     [23, 30, 34, 50]]\nB = 30",
     "sampleOutput": "1",
     "story": "Pretend the matrix is one long sorted array of length N*M. Binary search on that virtual array. Convert index → (row, col) on the fly: row = idx / M, col = idx % M.",
+    "howToThink": [
+      "Rows sorted and each row starts after the previous ends = the matrix is one big sorted list.",
+      "That global sort is the binary-search signal — flatten it, don't scan row by row.",
+      "Treat indices `0 .. N*M-1` as a 1D array over the grid.",
+      "Map `mid` back with `r = mid / M`, `c = mid % M` and compare as usual."
+    ],
+    "pitfalls": [
+      "Mixing up `/ M` vs `% M` for row/col sends you to the wrong cell.",
+      "`N*M` can overflow int for a big matrix — mind the product.",
+      "Return 0 (absent), not -1, when the loop exits — the problem wants a 0/1 flag."
+    ],
     "solutions": [
       {
         "label": "Optimal",
@@ -995,6 +1050,17 @@
     "sampleInput": "A = 3, B = 2\nC = [[7, 3], [2, 1], [4, 9]]",
     "sampleOutput": "1",
     "story": "Sort each row, then for every element pick its closest neighbour in the next row using lower_bound. Track the smallest |diff| globally.",
+    "howToThink": [
+      "'Closest element across two rows' is a lower_bound job once each row is sorted.",
+      "Sort every row first — that unlocks binary search per lookup.",
+      "For each value, lower_bound in the next row gives the closest element that's `>=` it.",
+      "The closest smaller one sits right before it, so check both `lb` and `lb-1`."
+    ],
+    "pitfalls": [
+      "Guard the bounds: only use `lb` if `lb < B`, only use `lb-1` if `lb > 0`.",
+      "Forget to sort the rows and the lower_bound is meaningless.",
+      "Start `ans` at a large sentinel so the first real diff always wins."
+    ],
     "solutions": [
       {
         "label": "Optimal",
@@ -1116,6 +1182,17 @@
     "sampleInput": "A = 20",
     "sampleOutput": "5",
     "story": "h·(h+1)/2 ≤ A. Either solve the quadratic, binary search on h, or just walk one stair at a time. All three work.",
+    "howToThink": [
+      "'Max h such that 1+2+...+h <= A' is binary search on the answer, not a formula hunt.",
+      "The sum `h*(h+1)/2` grows monotonically in h — that's the predicate that flips once.",
+      "Search for the largest feasible h: on success store it and try bigger.",
+      "Bound high near `sqrt(2A)` so you don't waste iterations."
+    ],
+    "pitfalls": [
+      "`mid*(mid+1)` overflows int — use `long` for low, high, mid.",
+      "This maximizes, so on success go right (`low = mid + 1`), not left.",
+      "Store the answer on every success; the loop-exit values aren't reliable."
+    ],
     "solutions": [
       {
         "label": "Brute (greedy walk)",
@@ -1241,6 +1318,17 @@
     "sampleInput": "A = 11",
     "sampleOutput": "3",
     "story": "Largest x with x·x ≤ A. Standard BS on answer. The only trap is integer overflow when squaring mid.",
+    "howToThink": [
+      "No Math.sqrt + 'floor of a root' = binary search on the answer.",
+      "`mid*mid <= A` is monotonic in mid — the classic flip point.",
+      "Search for the largest mid whose square still fits, storing it each time.",
+      "high can start at `A/2` — the root is never bigger for A >= 4."
+    ],
+    "pitfalls": [
+      "`mid * mid` overflows int for A up to 1e9 — compute it as `long`.",
+      "Handle A==0 (return 0) before the loop.",
+      "This maximizes, so on `mid*mid <= A` go right (`low = mid + 1`)."
+    ],
     "solutions": [
       {
         "label": "Brute",
@@ -1369,6 +1457,17 @@
     "sampleInput": "A = [4, 5, 6, 7, 0, 1, 2]\nB = 0",
     "sampleOutput": "4",
     "story": "First find the rotation pivot with BS (smallest element). Then you know which sorted half contains B and run a normal BS on that half.",
+    "howToThink": [
+      "Sorted-but-rotated + O(log N) means binary search, but the global order is broken.",
+      "Restore order by first finding the pivot (index of the smallest element) with its own BS.",
+      "Then one half `[0..pivot-1]` and the other `[pivot..N-1]` are each cleanly sorted.",
+      "Compare B against `A[0]` to decide which sorted half to search."
+    ],
+    "pitfalls": [
+      "Don't run plain BS on the whole rotated array — the sorted invariant doesn't hold.",
+      "Rotation = 0 (no rotation) must still work without special-casing.",
+      "Off-by-one when picking the half bounds around the pivot."
+    ],
     "solutions": [
       {
         "label": "Brute",
@@ -1589,6 +1688,17 @@
     "sampleInput": "A = [1, 2, 7, 9, 11, 13]\nB = [1, 3, 4, 5, 8, 10]",
     "sampleOutput": "6",
     "story": "Don't merge. Binary search a partition on the smaller array such that everything on the left of both arrays ≤ everything on the right. The median falls out of the four boundary values.",
+    "howToThink": [
+      "O(log(min(M,N))) is the giveaway — you binary-search a partition, never merge.",
+      "Cut both arrays so the left halves together hold exactly half the elements.",
+      "A cut is valid when every left value <= every right value across the two arrays.",
+      "Binary search the cut on the smaller array; the other cut is fixed by the count."
+    ],
+    "pitfalls": [
+      "Always binary-search the smaller array, or high can go out of range.",
+      "Use `-infinity` / `+infinity` sentinels at the edges so empty sides compare correctly.",
+      "Shift the cut the right way: `maxLeftX > minRightY` means move left (`high = pX - 1`)."
+    ],
     "solutions": [
       {
         "label": "Brute — merge and pick",
@@ -1734,6 +1844,17 @@
     "story": "Don't sort the matrix. Guess a value v, count how many elements ≤ v across all rows (each row uses BS). The smallest v with count > N*M/2 is the median.",
     "plain": "The matrix has N rows and M columns, every row sorted but the columns are not. The median is the middle value once you imagine all N*M numbers laid out in sorted order. Instead of actually merging or sorting, you binary search the value itself. For each candidate value v, you ask 'how many numbers in the whole matrix are ≤ v?' — and because each row is sorted, you answer that with one binary search per row. The smallest v whose count crosses (N*M)/2 is the median.",
     "tale": "In a high tower lived a king whose treasury was stacked in N rows of M coins each. Every row was sorted by weight, but the rows themselves were stacked in no order. The king demanded the median coin — the one in the exact middle — but forbade his clerks from emptying the chests onto the floor. A clever clerk proposed a game: 'Name any weight v, and I will tell you, in a single sweep, how many coins are no heavier than v — because each row is sorted, I only need to feel where v fits in that row.' The king began guessing weights. Too few coins below? Guess heavier. Too many? Guess lighter. With each guess he halved the range of possible weights, and his clerk's sweeps grew faster. In a handful of guesses the king had cornered the exact weight where the count first crossed the halfway mark — and that was the median coin, found without ever disturbing the stacks.",
+    "howToThink": [
+      "Rows sorted independently and 'no extra memory' rules out merging — binary search the value range.",
+      "You can't index the median directly, but you can count elements `<= mid` fast.",
+      "Count is monotonic in mid, so search for the smallest value with enough elements below it.",
+      "Sum lower_bound over each row to get that count in O(N log M)."
+    ],
+    "pitfalls": [
+      "Search the value range (`0 .. 1e9`), not indices.",
+      "Get the `count > medPos` comparison direction right, or you converge off the median.",
+      "Store `ans = mid` on the 'not enough' branch so the answer survives loop exit."
+    ],
     "solutions": [
       {
         "label": "Brute — flatten and sort",
@@ -1897,6 +2018,17 @@
     "sampleInput": "A = [3, 1, 2, 2, 1]\nB = 3",
     "sampleOutput": "[4, 2]",
     "story": "Sort first. For each value A[i] as the target, BS the largest window ending at i that can be raised to A[i] using ≤ B ops. Use a prefix sum to compute the cost in O(1).",
+    "howToThink": [
+      "Sort, then 'how many can I raise to A[i] within budget B' is binary search per target.",
+      "Sorting makes the cheapest elements to lift the ones just below the target — contiguous.",
+      "A prefix sum turns 'cost to raise cnt elements to A[i]' into O(1).",
+      "Cost rises monotonically with cnt, so binary-search the largest affordable count."
+    ],
+    "pitfalls": [
+      "Sums and `A[i] * cnt` overflow int — use `long` for prefix and cost.",
+      "Prefer the smaller value on ties, so only overwrite when strictly better (`mx > ans[0]`).",
+      "Off-by-one in the prefix window `prefix[i+1] - prefix[i-cnt+1]`."
+    ],
     "solutions": [
       {
         "label": "Optimal",
@@ -2063,6 +2195,17 @@
     "sampleInput": "A = 4, B = 2, C = 3",
     "sampleOutput": "6",
     "story": "Binary search the value. Count of magical numbers ≤ x = x/B + x/C − x/LCM(B,C). Smallest x with count ≥ A is the answer.",
+    "howToThink": [
+      "'Ath smallest number with a divisibility property' = binary search on the answer value.",
+      "Count of magical numbers `<= mid` is `mid/B + mid/C - mid/lcm` (inclusion-exclusion).",
+      "That count is monotonic in mid, so search for the smallest mid with count `>= A`.",
+      "You need `lcm = B*C / gcd(B,C)` to avoid double-counting."
+    ],
+    "pitfalls": [
+      "`B*C` and `A*min(B,C)` overflow int — everything must be `long`.",
+      "Take the modulo only at the very end, not during the search.",
+      "Don't forget the `- mid/lcm` term or numbers divisible by both get counted twice."
+    ],
     "solutions": [
       {
         "label": "Optimal",
@@ -2180,6 +2323,17 @@
     "sampleInput": "A = [2, 4, 3, 2]\nB = 3",
     "sampleOutput": "9",
     "story": "Sort A. Binary search the sum value. For each candidate, count triplets with sum < it (two-pointer in O(N²)). Smallest value with count ≥ B is the answer.",
+    "howToThink": [
+      "'Bth smallest sum' over many triplets = binary search on the sum value plus counting.",
+      "You can't list all triplets, but you can count how many have sum below a guess.",
+      "Sort first, then a two-pointer counts triplets `< mid` in O(N^2).",
+      "Count is monotonic in mid, so search for the sum where the count crosses B."
+    ],
+    "pitfalls": [
+      "Sort A first or the two-pointer count is wrong.",
+      "Watch the count direction: `count >= B` shrinks high, else record ans and go right.",
+      "Bound the range with `3*min` and `3*max` (sum of three smallest / largest)."
+    ],
     "solutions": [
       {
         "label": "Optimal",
@@ -2322,6 +2476,17 @@
     "sampleInput": "C = [3, 5, 1, 7, 8, 2, 5, 3]\nA = 3, B = 2",
     "sampleOutput": "32",
     "story": "Binary search the max work any single painter does. Greedily check: walk left→right, start a new painter whenever the current load would exceed mid. If painters used ≤ A, mid is feasible.",
+    "howToThink": [
+      "'Minimize the maximum time' with contiguous groups is textbook binary search on the answer.",
+      "Guess a time limit; feasibility 'can A painters finish within this time?' is monotonic.",
+      "Write a clean greedy check that counts painters needed for a given limit.",
+      "On feasible, store it and try smaller — you want the minimum feasible time."
+    ],
+    "pitfalls": [
+      "Bounds matter: `low = max(board)` (one board can't be split), `high = sum`.",
+      "`sum` and `result * B` overflow int — use `long`, apply MOD at the end.",
+      "This minimizes, so on feasible go left (`high = mid - 1`)."
+    ],
     "solutions": [
       {
         "label": "Optimal",
@@ -2434,6 +2599,17 @@
     "story": "Binary search the minimum distance. For each guess d, greedily place cows: first at A[0], each next at first stall ≥ lastPlaced + d. If B cows fit, try larger d.",
     "plain": "You have a row of stalls along a line and a herd of angry cows. You want every pair of cows to be as far apart as possible — specifically, you want the SMALLEST gap to be as big as you can make it. Guess a gap d. Walk the stalls left to right placing a cow each time you've travelled at least d from the last cow. If you can fit all B cows, the gap is achievable — try a bigger one. If not, shrink it. Binary search finds the largest d that still works.",
     "tale": "In a long stable, a farmer keeps B cows who despise each other. Put any two close and they kick the wood until it splinters. The farmer has stalls at uneven positions and one question: how far apart can I FORCE them to be, in the worst pair? He plays a game with himself. 'Could I keep them 13 paces apart?' He walks the stalls, dropping a cow only when 13 paces have passed since the last. If all B cows find a home, he smiles — maybe 14 would work too. If they don't fit, he tries 12. The farmer is doing binary search on the cows' patience.",
+    "howToThink": [
+      "'Maximize the minimum distance' is the maximize-the-minimum binary-search-on-answer pattern.",
+      "Sort the stalls so positions are monotonic and gaps make sense.",
+      "Guess a gap d; 'can I place all B cows at least d apart?' is a greedy monotonic check.",
+      "On success, store d and try a bigger gap."
+    ],
+    "pitfalls": [
+      "Sort the positions first, or the greedy placement is meaningless.",
+      "This maximizes, so on canPlace go right (`low = mid + 1`), not left.",
+      "Search space is the distance (`1 .. A[N-1]-A[0]`), not stall indices."
+    ],
     "solutions": [
       {
         "label": "Optimal",
@@ -2552,6 +2728,17 @@
     "sampleInput": "books = [12, 34, 67, 90]\nB = 2",
     "sampleOutput": "113",
     "story": "Same skeleton as painter's. low = largest single book (a student must read at least that), high = sum. Minimize on success.",
+    "howToThink": [
+      "'Minimize the max pages per student' with contiguous books is minimize-the-maximum BS on answer.",
+      "Guess a page limit; 'can B students each stay under it?' is a monotonic greedy check.",
+      "On feasible, store it and try a smaller limit.",
+      "Feasibility only makes sense when there are at least as many books as students."
+    ],
+    "pitfalls": [
+      "Return -1 up front when `students > books.length` (infeasible).",
+      "`low = max(single book)` (one student must read the biggest whole book), `high = sum`.",
+      "This minimizes, so on feasible go left (`high = mid - 1`)."
+    ],
     "solutions": [
       {
         "label": "Optimal",
@@ -2672,6 +2859,17 @@
     "sampleInput": "A = [5, 17, 100, 11]\nB = 130",
     "sampleOutput": "3",
     "story": "Binary search K. Predicate uses a sliding window of length K — if any window's sum exceeds B, K is too big.",
+    "howToThink": [
+      "'Max K such that no window of size K exceeds B' is binary search on the answer K.",
+      "If size K is safe, every smaller size is too — that monotonicity is what BS needs.",
+      "Check a candidate K with a sliding-window sum in O(N).",
+      "On all-windows-ok, store K and try a bigger window."
+    ],
+    "pitfalls": [
+      "Handle K==0 as trivially true so the loop terminates.",
+      "Window sums can overflow int — accumulate in `long`.",
+      "This maximizes K, so on ok go right (`low = mid + 1`)."
+    ],
     "solutions": [
       {
         "label": "Optimal",

@@ -102,7 +102,9 @@ window.FORMULAS_DATA = {
         "Turning a brute O(N²) all-pairs scan into O(N log N) sort + linear sweep",
         "Any \"closest two values\" argument that rides on shared high bits"
       ],
-      "usedIn": [],
+      "usedIn": [
+        "bm-min-xor-value"
+      ],
       "note": "Why adjacent suffices: for sorted a ≤ b ≤ c, the middle b shares at least as many <strong>leading bits</strong> with each neighbor as the neighbors share with each other, so a^c can never be strictly smaller than both a^b and b^c — the minimum can't \"jump over\" b. Hence only neighbouring pairs can win."
     },
     {

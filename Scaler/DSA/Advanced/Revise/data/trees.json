@@ -17,6 +17,16 @@
     "story": "Inorder walks left-subtree first, then visits root, then right-subtree. For a BST, inorder gives sorted ascending order.",
     "plain": "Inorder means you first visit the entire left subtree recursively, then process the current node, then visit the entire right subtree. It's called 'inorder' because in a Binary Search Tree, this produces values in sorted order. You accumulate results in a list as you visit nodes.",
     "tale": "Imagine you're walking through an art gallery arranged as a tree. The rule is: always explore every room to your left before admiring the current painting, then every room to your right. So you walk all the way left until you hit a wall, admire the leftmost painting, backtrack one room, admire that painting, then explore the right side. When you're done, you've seen every painting in perfect left-to-right order, the way they were meant to be viewed.",
+    "howToThink": [
+      "\"Return values in this order\" from a tree → pick a DFS traversal; here the order is left, node, right.",
+      "The only choice is where you touch the node relative to its children — inorder means process it between the two recursive calls.",
+      "Remember inorder on a BST spits out sorted values; that's why it shows up everywhere."
+    ],
+    "pitfalls": [
+      "Base case is the null node — return before touching `node.val`.",
+      "Add the current value between the left and right calls, not before or after both.",
+      "Pass the result list down (or collect a returned list) so all nodes append to the same one."
+    ],
     "solutions": [
       {
         "label": "Optimal",
@@ -115,6 +125,16 @@
     "story": "Preorder visits the root first, then left subtree, then right. It's the order you'd write if you were copying the tree structure top-down.",
     "plain": "Preorder means you process the current node immediately, then recursively visit the entire left subtree, then the right subtree. The name 'preorder' means 'root comes before (pre) the children'. You accumulate values in a list as you visit each node.",
     "tale": "You're a scout mapping a cave system. At every junction, you immediately mark the current room on your map before exploring deeper. You always explore the left tunnel first, marking every room you find. When the left tunnel ends, you backtrack and explore the right tunnel, again marking each room as soon as you enter it. Your map fills in the exact order you discovered rooms — root first, then everything to the left, then everything to the right.",
+    "howToThink": [
+      "You need node values in a set order → DFS, and the name tells you the order.",
+      "\"Pre\" = root comes before children, so record the node first, then recurse left, then right.",
+      "Same skeleton as inorder/postorder; only the line where you touch the node moves."
+    ],
+    "pitfalls": [
+      "Null node is the base case; return immediately.",
+      "Record `node.val` before both recursive calls, not after.",
+      "Keep left before right or the order flips."
+    ],
     "solutions": [
       {
         "label": "Optimal",
@@ -212,6 +232,16 @@
     "story": "Walk every root-to-leaf path accumulating sum. At each leaf, check if the running sum equals target. Return 1 if any path works.",
     "plain": "You want to find if there exists any path from root to leaf where the node values sum to a target. You use DFS to explore all paths. At each node, add its value to a running sum. When you reach a leaf (no children), check if the running sum equals the target. If any path works, return true. If all paths fail, return false.",
     "tale": "Imagine you're a hiker climbing a mountain network. At each junction, you add the elevation change to your total climb. Some trails end at a peak, others at a valley. You're looking for any trail that ends at a peak with a total climb of exactly 22 meters. You explore every trail recursively — at each junction you go left first, then right. When you hit a dead end (a leaf), you check your total. If it matches 22, you've found the path. If not, you backtrack and try another trail.",
+    "howToThink": [
+      "\"Root-to-leaf path summing to a target\" → DFS while carrying a running sum down the path.",
+      "This is top-down: pass the accumulated sum as a parameter, don't try to bubble it up.",
+      "The check happens only at a leaf — that's where a full path ends."
+    ],
+    "pitfalls": [
+      "Only compare the sum to the target at a leaf (no left and no right child), not at every node.",
+      "A null node isn't a leaf — return false for null so a one-child node doesn't fake a leaf.",
+      "Add `node.val` to the sum before the leaf check, and combine subtrees with OR (any path works)."
+    ],
     "solutions": [
       {
         "label": "Optimal",
@@ -311,6 +341,16 @@
     "story": "Compute every subtree sum. Store in map. If total sum is even and half-sum exists in map, return 1.",
     "plain": "To partition a tree into two equal-sum parts, you need to find a subtree whose sum is exactly half the total tree sum. Compute subtree sums bottom-up using post-order traversal. Store each subtree sum in a hash map. After computing the total sum, check if it's even. If yes, check if the map contains totalSum/2. If yes, cutting that subtree creates two equal parts.",
     "tale": "Imagine a kingdom where each village (node) has treasure. You're tasked with splitting the kingdom fairly by cutting one road. You walk through every village bottom-up, tallying treasure in each region. You write down every region's total in a ledger. At the end, you know the kingdom's total wealth. If it's an odd number, no fair split exists. If even, you check your ledger: does any region have exactly half the treasure? If yes, cut the road to that region — both sides now have equal wealth.",
+    "howToThink": [
+      "Cutting one edge splits off a subtree, so ask: does some subtree sum to exactly half the whole tree?",
+      "Subtree sums are a classic bottom-up job — postorder returns each subtree's total to its parent.",
+      "Store every subtree sum, then just check if total/2 was ever seen."
+    ],
+    "pitfalls": [
+      "Total sum must be even first, or half isn't an integer.",
+      "Don't count the whole-tree sum itself as a match — the root's own entry isn't a valid cut.",
+      "Node values can be large; sums may overflow `int`, so use a wider type."
+    ],
     "solutions": [
       {
         "label": "Optimal",
@@ -415,6 +455,16 @@
     "story": "Postorder visits children before parent. Used for deletion (delete children first, then parent) and bottom-up computations.",
     "plain": "Postorder means you visit the left subtree first, then the right subtree, then the current node. The name 'postorder' means the root comes after (post) the children. This is useful when you need to process children before their parent, like when deleting a tree or computing subtree properties.",
     "tale": "You're an archaeologist excavating a buried city. The rule is: you must fully explore and document every tunnel before you can document the chamber you're in. So you go left as far as you can, documenting the deepest rooms first. Then you backtrack and explore right, again documenting deepest first. Only after all tunnels are mapped do you write down the current room. Your map fills from leaves to root.",
+    "howToThink": [
+      "Ordered node dump again → DFS; \"post\" means the root comes after its children.",
+      "Recurse left, recurse right, then record the node last.",
+      "This order is what you want when a node needs its children handled first (deletion, subtree sums)."
+    ],
+    "pitfalls": [
+      "Return on null before doing anything.",
+      "Add `node.val` after both recursive calls, not between them.",
+      "Left recurses before right to keep the order correct."
+    ],
     "solutions": [
       {
         "label": "Optimal",
@@ -507,6 +557,16 @@
     "story": "Post-order traversal returns subtree sum if valid, -1 if broken. Parent checks if leftSum + rightSum equals its value. One mismatch bubbles -1 up the entire chain.",
     "plain": "A Sum Tree means every node's value equals the sum of its left and right subtrees. You validate this bottom-up using post-order recursion. At each node, recursively get the left and right subtree sums. If either is -1 (invalid), bubble -1 up. If they sum to the node's value, return the total sum of the subtree (left + right + node). If they don't match, return -1. Leaves are always valid and return their own value.",
     "tale": "Imagine you're an auditor checking if every warehouse's inventory matches the sum of its two sub-warehouses. You start at the deepest sub-warehouses (leaves) — they're always correct because they have no children. As you climb up, you ask each warehouse: does your inventory equal the sum of your left and right sub-warehouses? If yes, you record the total inventory for that entire branch (left + right + current). If no, you mark the entire tree as broken and stop. One bad warehouse ruins the whole chain.",
+    "howToThink": [
+      "Every node must equal the sum of its subtrees → compute subtree sums bottom-up with postorder.",
+      "Ask what each node returns to its parent: its total subtree sum, or a signal that something below failed.",
+      "Use one sentinel (like -1) to mean \"invalid\" and let it bubble all the way up."
+    ],
+    "pitfalls": [
+      "Handle null as 0 and a leaf as its own value — a leaf is always a valid sum tree.",
+      "If either child already returned the invalid sentinel, return it too without re-checking.",
+      "Return `leftSum + rightSum + node.val` on success, not just the node's value."
+    ],
     "solutions": [
       {
         "label": "Optimal",
@@ -610,6 +670,16 @@
     "story": "BFS with a queue. Process all nodes at one level before moving to the next. Track level size to group nodes into separate lists.",
     "plain": "Level order means you visit nodes level by level, left to right. Use a queue and BFS (breadth-first search). Start by adding the root to the queue. For each level, count how many nodes are in the queue (that's the level size). Dequeue that many nodes, add them to the current level's list, and enqueue their children. Repeat until the queue is empty. The key is tracking the level size before processing it.",
     "tale": "You're photographing a family reunion where people stand in rows by generation. You take one photo per generation. You start with the grandparents (root), then their children (next level), then grandchildren. You use a waiting line (queue). For each photo, you count how many people are in line, photograph exactly that many, then ask their children to join the line. You never mix generations in a single photo because you count before you shoot.",
+    "howToThink": [
+      "\"Level by level, left to right\" → BFS with a queue, not recursion.",
+      "To group by level, snapshot the queue size before the inner loop and process exactly that many nodes.",
+      "Each node you pop enqueues its children, filling the next level."
+    ],
+    "pitfalls": [
+      "Capture `levelSize` before the loop — the queue grows as you add children.",
+      "Only enqueue non-null children so you don't dequeue null later.",
+      "Start one level's list fresh each outer iteration and push it into the result."
+    ],
     "solutions": [
       {
         "label": "Optimal",
@@ -710,6 +780,16 @@
     "story": "Postorder's last element is the root. Find it in inorder to split left/right subtrees. Recurse with updated ranges. Track indices carefully.",
     "plain": "Postorder's last element is always the root. Find that root in the inorder array — everything to its left is the left subtree, everything to its right is the right subtree. Recursively build left and right subtrees by adjusting start/end indices in both arrays. Use index arithmetic to map inorder ranges to postorder ranges. The number of elements in the left subtree determines where to split the postorder array.",
     "tale": "You're an archaeologist reconstructing a building from two lists: the order rooms were built (postorder) and the order they appear left-to-right (inorder). The last room built is always the central hall (root). You find the central hall in the layout list — everything left of it is the west wing, everything right is the east wing. You recursively rebuild each wing using the same logic: the last-built room in that wing's build list is that wing's center.",
+    "howToThink": [
+      "Given two traversals, one names the root and inorder splits left from right.",
+      "Postorder's LAST element is the root; find it in inorder to get the left-subtree size.",
+      "Recurse with index ranges — carefully carve the postorder range using that left size."
+    ],
+    "pitfalls": [
+      "Base case is `start > end`; an empty range means a null child.",
+      "Split the postorder range by the left-subtree size, not blindly — off-by-one here breaks the tree.",
+      "Locating the root in inorder each call is what makes it O(N²); a value→index map would speed it up."
+    ],
     "solutions": [
       {
         "label": "Optimal",
@@ -819,6 +899,16 @@
     "story": "Post-order: compute left and right heights. If either child is unbalanced (-2), bubble -2 up. If height difference > 1, return -2. Else return max height + 1.",
     "plain": "A tree is balanced if at every node, the left and right subtree heights differ by at most 1. Use post-order recursion to compute heights bottom-up. At each node, get the left and right subtree heights. If either is -2 (unbalanced sentinel), return -2. If their absolute difference exceeds 1, return -2. Otherwise, return the max of the two heights plus 1. The main function checks if the result is -2.",
     "tale": "You're a structural engineer inspecting a tower made of blocks. The tower is safe if at every junction, the left and right branches differ in height by at most 1 block. You start at the bottom, measuring each branch's height. As you climb, you check each junction: if the left and right differ by more than 1, you mark the whole tower as unsafe (-2) and stop. If a subtower below was already unsafe, that mark bubbles up. Only if all junctions pass do you report the total height.",
+    "howToThink": [
+      "\"Heights differ by at most 1 at every node\" → compute height bottom-up and check balance on the way up.",
+      "Don't recompute height separately (that's O(N²)); return height and let an invalid signal bubble up.",
+      "Ask what each node returns: its height, or a sentinel meaning \"already unbalanced below\"."
+    ],
+    "pitfalls": [
+      "Pick a consistent null height (here -1) and use it everywhere.",
+      "Short-circuit: if a child returned the unbalanced sentinel, return it immediately.",
+      "Check `|leftHeight - rightHeight| > 1` before returning the real height."
+    ],
     "solutions": [
       {
         "label": "Optimal",
@@ -904,6 +994,16 @@
     "story": "Level-order BFS. For each level, add the first node visited to the result. Track a flag per level to ensure only the leftmost is added.",
     "plain": "Left view means the leftmost visible node at each level. Use BFS with level tracking. Process nodes level by level. For each level, maintain a flag to record only the first node encountered (leftmost). As you dequeue nodes, if the flag shows you haven't added a leftmost node yet for this level, add the current node and set the flag. Continue processing the level, enqueuing children, but don't add more nodes to the result for this level.",
     "tale": "You're a photographer standing to the left of a tree. You take one photo per level, capturing only the leftmost node you can see. You use a queue to visit nodes level by level. At each level, you mark the first node you see as the 'leftmost' and snap a photo. Even if you see more nodes at that level as you move right, you don't take more photos — one per level is enough. You move down to the next level and repeat.",
+    "howToThink": [
+      "\"Leftmost visible node per level\" → BFS level by level.",
+      "The first node you pop in each level is the leftmost — grab it and skip the rest of that level.",
+      "A flag or an `i == 0` check marks that first node."
+    ],
+    "pitfalls": [
+      "Snapshot the level size before the inner loop.",
+      "Record only the first node of each level, not every node.",
+      "Enqueue children left-then-right so \"first popped\" really is the leftmost."
+    ],
     "solutions": [
       {
         "label": "Optimal",
@@ -997,6 +1097,16 @@
     "story": "Preorder's first element is the root. Find it in inorder to split left/right subtrees. Recurse with updated ranges. Similar to postorder version but root comes first.",
     "plain": "Preorder's first element is always the root. Find that root in the inorder array — everything to its left is the left subtree, everything to its right is the right subtree. Recursively build left and right subtrees by adjusting start/end indices in both arrays. The number of elements in the left subtree (from inorder) tells you where to split the preorder array. Left subtree uses preorder[pre_s+1..r] and inorder[in_s..index-1]. Right subtree uses preorder[r+1..pre_e] and inorder[index+1..in_e].",
     "tale": "You're a detective reconstructing a crime scene from two witness accounts. Witness 1 (preorder) describes the order the rooms were entered (root first). Witness 2 (inorder) describes the left-to-right layout of rooms. The first room entered is always the main hall (root). You find the main hall in the layout list — everything left is the west wing, everything right is the east wing. You count the west wing rooms to figure out how many 'entered-first' entries belong to that wing. Recurse on each wing.",
+    "howToThink": [
+      "Two traversals → one gives the root, inorder gives the left/right split.",
+      "Preorder's FIRST element is the root; find it in inorder to size the left subtree.",
+      "Recurse over index ranges, slicing preorder by the left-subtree size."
+    ],
+    "pitfalls": [
+      "Base case is `start > end` → return null.",
+      "Left subtree in preorder is the `leftSize` elements right after the root; get that boundary right.",
+      "Re-scanning inorder for the root every call makes it O(N²); a value→index map avoids that."
+    ],
     "solutions": [
       {
         "label": "Optimal",
@@ -1100,6 +1210,16 @@
     "story": "BFS but write everything down, including the gaps.",
     "plain": "Serialize means convert the tree structure into a flat array that can be stored or transmitted. Use level-order traversal with a queue. For each node you pop, write its value to the output array, then enqueue its left and right children. If a child is null, enqueue null anyway so you can write -1 to mark the gap. Stop when the queue is empty.",
     "tale": "Imagine you are a scribe chronicling a royal family tree. You stand at the palace gates and call out the king's name first. Then you write down his two children — left prince, right prince — even if one throne is empty (you write 'vacant' for empty thrones). Then you move to the next generation, calling each person's name and recording their children. By the end, your scroll is a single line of names and gaps, but anyone reading it can rebuild the entire tree exactly as it stood, generation by generation.",
+    "howToThink": [
+      "Flattening a tree into an array that can rebuild it → BFS, recording structure as you go.",
+      "The trick: to preserve shape, you must record null children too, marked as -1.",
+      "So enqueue children even when they're null, and emit -1 when you pop one."
+    ],
+    "pitfalls": [
+      "Enqueue null children — skipping them loses the tree's shape.",
+      "When you pop a null, write -1 and continue without enqueuing anything.",
+      "Node values here are non-negative, so -1 is a safe null marker."
+    ],
     "solutions": [
       {
         "label": "Optimal",
@@ -1208,6 +1328,16 @@
     "story": "Read the array in pairs. The first number is a parent, the next two are its children.",
     "plain": "Deserialize is the reverse of serialize: rebuild the tree from the flat array. Use a queue and an index pointer. Create the root from A[0]. Enqueue it. While the queue is not empty and index < array length, pop a node. Read the next two values from the array: left child (index i) and right child (index i+1). If a value is -1, that child is null. Otherwise, create the child node, attach it, and enqueue it. Advance the index by 2.",
     "tale": "You are a gardener with a scroll listing tree nodes level by level, gaps marked 'vacant'. You read the first name and plant a seed — that's the root. Then you look at the scroll: the next two names are its children. You plant them (or leave soil empty for vacants) and tie them to the root. Now you pick the leftmost planted sapling and repeat: read its two children from the scroll, plant, tie. Move to the next sapling in line. By the time you reach the end of the scroll, the tree stands exactly as it was when the scribe recorded it.",
+    "howToThink": [
+      "Rebuilding from a level-order array → mirror the BFS that created it.",
+      "Keep a queue of nodes needing children and an index walking the array.",
+      "Each popped node consumes the next two array slots as its left and right child."
+    ],
+    "pitfalls": [
+      "-1 means no child — don't create a node or enqueue for it.",
+      "Advance the array index for both children even when a slot is -1.",
+      "Only enqueue a child after you actually create it, or the pairing drifts."
+    ],
     "solutions": [
       {
         "label": "Optimal",
@@ -1357,6 +1487,16 @@
     "story": "Level-order traversal, but only remember the last node of each level.",
     "plain": "Do a level-order BFS with a queue. For each level, process all nodes in that level (track the level size). The last node you process in each level is the rightmost visible node from the right side — add its value to the result. Repeat until the tree is fully traversed.",
     "tale": "Imagine standing at the right edge of a forest where the trees are planted in neat rows, each row slightly behind the last. You can only see the rightmost tree in each row because the others are hidden behind it. You walk forward row by row, noting down the rightmost tree each time. When you reach the back of the forest, your list is complete: the right-side silhouette of the entire grove.",
+    "howToThink": [
+      "\"Rightmost visible node per level\" → BFS level by level.",
+      "The LAST node popped in each level is the one seen from the right.",
+      "Check `i == levelSize - 1` to catch that last node."
+    ],
+    "pitfalls": [
+      "Snapshot the level size before the loop so \"last\" is well-defined.",
+      "Add only the last node of each level to the result.",
+      "Handle a null root up front by returning an empty list."
+    ],
     "solutions": [
       {
         "label": "Optimal",
@@ -1462,6 +1602,16 @@
     "story": "Every node must satisfy: left subtree < node < right subtree. Pass min/max bounds down.",
     "plain": "A BST is valid if every node's value falls within a valid range determined by its ancestors. For the root, the range is (-∞, +∞). When you go left, the max becomes the current node's value. When you go right, the min becomes the current node's value. Recursively check both subtrees with updated ranges. If any node violates its range, return false.",
     "tale": "Imagine a kingdom where every noble has a strict rank, and their children must follow suit: left heirs must be of lower rank, right heirs of higher rank. A royal inspector visits each noble with a scroll listing the allowed rank range inherited from ancestors. At each stop, she checks if the noble's rank fits within the scroll's bounds. If not, the kingdom is in chaos. She updates the scroll and passes it down to the children. If she reaches the end of the family tree without finding a violator, the kingdom is orderly — a true BST.",
+    "howToThink": [
+      "BST validity is a GLOBAL rule, not just parent-vs-child — a node must fit between all its ancestors.",
+      "Pass a (min, max) window down: going left tightens the max, going right tightens the min.",
+      "That's the top-down param pattern — the bounds carry the ancestor constraints."
+    ],
+    "pitfalls": [
+      "Check against inherited min/max, not just the immediate children's values.",
+      "Comparisons are strict (`<=`/`>=`) since equal values break BST order.",
+      "Use bounds wide enough (e.g. long) so extreme node values don't false-trip the check."
+    ],
     "solutions": [
       {
         "label": "Optimal",
@@ -1554,6 +1704,16 @@
     "story": "Pick the middle as root. Left half becomes left subtree, right half becomes right subtree. Recursion balances automatically.",
     "plain": "To create a balanced BST from a sorted array, pick the middle element as the root (this ensures balance). Recursively build the left subtree from the left half of the array and the right subtree from the right half. The in-order traversal of the resulting tree will match the original sorted array, and the tree will be balanced because each split divides the array evenly.",
     "tale": "Imagine a librarian arranging books on shelves. She has a sorted list of titles and wants to build a retrieval tree so that finding any book takes roughly the same time. She picks the middle book as the root — this splits the collection into two equal halves. She repeats: middle of the left half becomes the left child, middle of the right half becomes the right child. By always splitting down the middle, the tree never leans to one side, keeping search times fast and balanced.",
+    "howToThink": [
+      "\"Sorted array → balanced BST\" → the middle element must be the root to keep both sides even.",
+      "Recurse: left half builds the left subtree, right half builds the right.",
+      "Inorder of the result gives back the array, which is why picking the mid works."
+    ],
+    "pitfalls": [
+      "Base case is `left > right` → null child.",
+      "Recurse on `[left, mid-1]` and `[mid+1, right]` — exclude mid so it isn't reused.",
+      "Compute mid as `left + (right-left)/2` to keep balance and dodge overflow."
+    ],
     "solutions": [
       {
         "label": "Optimal",
@@ -1703,6 +1863,16 @@
     "story": "Find the node. If it has two children, replace it with its inorder predecessor (rightmost of left subtree), then delete that predecessor.",
     "plain": "To delete a node from a BST: first find it using BST search. If it's a leaf, just remove it. If it has one child, replace it with that child. If it has two children, find its inorder predecessor (the rightmost node in the left subtree), copy its value to the current node, then recursively delete the predecessor. This preserves BST order.",
     "tale": "A noble must be removed from the family tree. If they have no heirs, their branch simply ends. If they have one heir, that heir takes their place. If they have two heirs — left and right — the protocol is: find the highest-ranked person in the left branch (the rightmost), promote them to the vacant seat, then remove their old position. The tree reorganizes, and the BST order is preserved.",
+    "howToThink": [
+      "First find the node by BST search, then handle deletion by how many children it has.",
+      "Leaf or one child is easy — return the other child up so the parent relinks.",
+      "Two children: copy in the inorder predecessor (rightmost of the left subtree), then delete that predecessor."
+    ],
+    "pitfalls": [
+      "Reassign `root.left`/`root.right` to the recursive result so the parent's link updates.",
+      "Inorder predecessor is the RIGHTMOST node of the left subtree, not just the left child.",
+      "The no-left-child case already covers leaves — return the right child (possibly null)."
+    ],
     "solutions": [
       {
         "label": "Optimal",
@@ -1807,6 +1977,16 @@
     "story": "If target < root, go left. If target > root, go right. If equal, found. Else not found.",
     "plain": "BST search is binary search on a tree. Start at the root. If the target equals the current node's value, return true. If target is less, recurse left (all larger values are to the right, so we can ignore them). If target is greater, recurse right. If you reach null, the target doesn't exist.",
     "tale": "You are looking for a specific book in a library where shelves are organized left-to-right by ascending ID. You start at the middle shelf. If your book's ID matches, you're done. If your book's ID is smaller, you know it must be to the left, so you walk left and repeat. If larger, walk right. If you reach the end of a shelf (null), the book isn't in the library.",
+    "howToThink": [
+      "\"Does value B exist in a BST\" → this is binary search on a tree.",
+      "Compare with the node: go left if B is smaller, right if larger — the ordering prunes half each step.",
+      "Hitting null means it isn't there."
+    ],
+    "pitfalls": [
+      "Null node → return not-found (0).",
+      "Compare directions correctly: smaller goes left, larger goes right.",
+      "Return the recursive call's result; don't drop it on the floor."
+    ],
     "solutions": [
       {
         "label": "Optimal",
@@ -1903,6 +2083,16 @@
     "story": "Inorder traversal gives sorted array. Two-pointer or HashSet can find the pair.",
     "plain": "Convert the BST to a sorted array using inorder traversal (left-root-right). Then apply the two-sum algorithm: use two pointers (left and right) on the sorted array. If sum == target, return 1. If sum < target, move left pointer right. If sum > target, move right pointer left. Alternatively, use a HashSet: traverse the tree and for each node, check if (B - node.val) exists in the set.",
     "tale": "You are in a library where books are shelved by ID in ascending order (that's the BST). You need two books whose IDs sum to a specific total. First, you walk through the library from left to right, writing down all IDs in order — now you have a sorted list. Then you use two fingers: one at the start, one at the end. If their sum is too small, move the left finger right. If too large, move the right finger left. When the sum matches, you've found the pair.",
+    "howToThink": [
+      "\"Two nodes summing to B\" is the classic two-sum, just sourced from a tree.",
+      "Simplest: walk the tree once and, for each node, check if `B - node.val` was already seen in a set.",
+      "Alternatively inorder gives a sorted array, then two pointers — but the hash-set pass is one traversal."
+    ],
+    "pitfalls": [
+      "Check the set BEFORE adding the current value, or a node could pair with itself.",
+      "Any traversal order works for the hash-set version — the BST property isn't even needed.",
+      "The set can hold up to N values, so this is O(N) extra space."
+    ],
     "solutions": [
       {
         "label": "Inorder + Two Pointers",
@@ -2044,6 +2234,16 @@
     "story": "Each internal node has exactly one child. Check if the sequence can form a valid BST with this constraint.",
     "plain": "In a BST where every internal node has exactly one child, the child is either always left (smaller) or always right (larger). For preorder, we process parent before child. So, for each element, all elements after it should be either all smaller (left-skewed) or all larger (right-skewed) until we hit a leaf or the end. Check if the sequence satisfies this: for each index, the remaining elements should form a monotonically increasing or decreasing subsequence consistent with BST property.",
     "tale": "Imagine a family tree where every parent has exactly one heir — either a younger sibling's child or an older one, but never both. A genealogist has a list of names in the order they were crowned (preorder). She checks: after each name, do all subsequent names follow a single direction — either all younger ranks or all older ranks? If the list zigzags (younger, then older, then younger again) without leaves in between, the tree is impossible. If the list is consistent, the tree is valid.",
+    "howToThink": [
+      "Every internal node has one child, so from any point the rest of the preorder is entirely on one side.",
+      "After each element, all remaining values must be all-smaller or all-larger than it.",
+      "Track the allowed range (an upper and lower bound) as you scan; each step tightens it."
+    ],
+    "pitfalls": [
+      "The constraint is about all following elements, not just the next one.",
+      "A stack/bounds approach gets O(N); the naive nested check is O(N²).",
+      "Once you commit to a direction from a node, a value on the other side means invalid."
+    ],
     "solutions": [
       {
         "label": "Optimal",
@@ -2159,6 +2359,16 @@
     "story": "Use BST property to prune branches. If node < B, go right only. If node > C, go left only. Else count and explore both.",
     "plain": "To count nodes in range [B, C] in a BST, do a DFS. At each node, check if its value is in [B, C]. If yes, count it and explore both children. If node.val < B, all left children are also < B, so only explore right subtree. If node.val > C, all right children are also > C, so only explore left subtree. This prunes unnecessary branches using the BST property.",
     "tale": "A census taker is counting citizens in a certain age range [B, C]. The kingdom is organized as a BST by age. She starts at the capital (root). If the ruler's age is in range, she counts them and sends scouts to both provinces. If the ruler is too young (< B), she knows the left province (younger ages) is irrelevant, so she only checks the right. If the ruler is too old (> C), she skips the right and checks only the left. By pruning branches this way, she avoids visiting the entire kingdom.",
+    "howToThink": [
+      "Counting nodes in `[B, C]` in a BST → DFS, but use the ordering to skip whole subtrees.",
+      "If `node.val < B`, the entire left subtree is too small — only go right (and vice versa).",
+      "When the node is inside the range, count it and explore both sides."
+    ],
+    "pitfalls": [
+      "Null node returns 0.",
+      "Prune correctly: below B go right only, above C go left only — pruning the wrong side loses nodes.",
+      "Range is inclusive, so count nodes equal to B or C."
+    ],
     "solutions": [
       {
         "label": "Optimal",

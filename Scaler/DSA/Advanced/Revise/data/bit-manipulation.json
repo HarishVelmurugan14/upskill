@@ -1560,5 +1560,149 @@
         ]
       }
     }
+  },
+  {
+    "num": 170,
+    "id": "bm-min-xor-value",
+    "title": "Min XOR value",
+    "subTopic": "Sort → Adjacent Pairs",
+    "tags": [
+      "Bit Manipulation",
+      "Sorting",
+      "XOR"
+    ],
+    "description": "Given an integer array A of N integers, find the pair of integers in the array which have minimum XOR value. Report the minimum XOR value.\n\nProblem Constraints\n2 <= length of the array <= 100000\n0 <= A[i] <= 10^9\n\nInput Format\nFirst and only argument of input contains an integer array A.\n\nOutput Format\nReturn a single integer denoting minimum xor value.\n\nExample Input\nInput 1: A = [0, 2, 5, 7]\nInput 2: A = [0, 4, 7, 9]\n\nExample Output\nOutput 1: 2\nOutput 2: 3",
+    "sampleInput": "A = [0, 2, 5, 7]",
+    "sampleOutput": "2",
+    "story": "Two numbers XOR to a small value only when they share a long leading-bit prefix — and the most-similar numbers sit next to each other once sorted. So sort, then take the min XOR over ADJACENT pairs only: O(N log N) instead of O(N^2).",
+    "plain": "Brute-forcing all pairs is O(N^2). Key fact: the minimum-XOR pair is always adjacent after sorting, because for sorted a <= b <= c the middle b shares at least as many high bits with each neighbour as the neighbours do with each other, so a^c can never beat both a^b and b^c. Sort A, then scan adjacent pairs tracking the minimum.",
+    "tale": "Line people up by height; the two most alike are always standing shoulder to shoulder — no need to compare across the whole room.",
+    "pitfalls": [
+      "Don't compare all pairs (O(N^2) TLE at N=1e5) — only adjacent pairs after sorting.",
+      "XOR of two ints up to 1e9 fits in int, but if you accumulate/sum XORs use long.",
+      "Duplicates give XOR 0, the global minimum — you can early-exit when minXor hits 0."
+    ],
+    "solutions": [
+      {
+        "label": "Optimal — Sort then Adjacent XOR",
+        "complexity": {
+          "time": "O(N log N)",
+          "space": "O(1)"
+        },
+        "plain": "Sort, then the answer is the smallest XOR among neighbouring elements.",
+        "approach": [
+          "Sort A ascending.",
+          "Initialise minXor = A[0] ^ A[1].",
+          "Slide a size-2 window (start,end): for each adjacent pair, minXor = min(minXor, A[start]^A[end]); early-exit if it reaches 0.",
+          "Return minXor."
+        ],
+        "pseudocode": "sort(A)\nmin = A[0]^A[1]\nfor i in 1..N-2: min = Math.min(min, A[i]^A[i+1])\nreturn min",
+        "story": "Correctness rests on the leading-bit argument: the minimum can't 'jump over' an intermediate sorted value.",
+        "code": "public int findMinXor(int[] A) {\n    Arrays.sort(A);\n    int minXor = A[0] ^ A[1];\n    int start = 1;\n    int end = 2;\n    int n = A.length;\n    while (end < n) {\n        int currentXor = A[start] ^ A[end];\n        if (currentXor < minXor) {\n            minXor = currentXor;\n            if (minXor == 0) {\n                break;\n            }\n        }\n        start++;\n        end++;\n    }\n    return minXor;\n}"
+      }
+    ],
+    "viz": {
+      "kind": "scripted-array",
+      "data": {
+        "A": [
+          0,
+          2,
+          5,
+          7
+        ],
+        "footer": "Min XOR = min over adjacent pairs after sorting.",
+        "legend": [
+          "c-input",
+          "c-active",
+          "c-result"
+        ],
+        "script": [
+          {
+            "label": "SETUP (sorted)",
+            "marks": {
+              "0": "c-input",
+              "1": "c-input",
+              "2": "c-input",
+              "3": "c-input"
+            },
+            "msg": "Sorted A = [0,2,5,7]. Only adjacent pairs matter."
+          },
+          {
+            "label": "0 ^ 2 = 2",
+            "marks": {
+              "0": "c-active",
+              "1": "c-active"
+            },
+            "msg": "minXor = 2."
+          },
+          {
+            "label": "2 ^ 5 = 7",
+            "marks": {
+              "1": "c-active",
+              "2": "c-active"
+            },
+            "msg": "7 > 2 → keep 2."
+          },
+          {
+            "label": "5 ^ 7 = 2",
+            "marks": {
+              "2": "c-active",
+              "3": "c-active"
+            },
+            "msg": "2 is not < 2 → keep 2."
+          },
+          {
+            "label": "DONE",
+            "marks": {
+              "0": "c-result",
+              "1": "c-result",
+              "2": "c-result",
+              "3": "c-result"
+            },
+            "msg": "Answer = 2. (No skipped pair beats it: 0^5=5, 0^7=7, 2^7=5.)"
+          }
+        ]
+      }
+    }
+  },
+  {
+    "num": 171,
+    "id": "bm-strange-equality",
+    "title": "Strange Equality",
+    "subTopic": "XOR-equals-Sum ⇔ No Common Bits",
+    "tags": [
+      "Bit Manipulation",
+      "XOR",
+      "Masks"
+    ],
+    "description": "Given an integer A. Two numbers, X and Y, are defined as follows:\n- X is the greatest number smaller than A such that the XOR sum of X and A is the same as the sum of X and A.\n- Y is the smallest number greater than A, such that the XOR sum of Y and A is the same as the sum of Y and A.\n\nFind and return the XOR of X and Y.\n\nNOTE 1: XOR of X and Y is defined as X ^ Y where '^' is the BITWISE XOR operator.\nNOTE 2: Your code will be run against a maximum of 100000 Test Cases.\n\nProblem Constraints\n1 <= A <= 10^9\n\nInput Format\nFirst and only argument is an integer A.\n\nOutput Format\nReturn an integer denoting the XOR of X and Y.\n\nExample Input\nInput 1: A = 5\n\nExample Output\nOutput 1: 10",
+    "sampleInput": "A = 5",
+    "sampleOutput": "10",
+    "story": "The whole trick is one identity: X + A == X ^ A exactly when X & A == 0 (no shared set bits → no carries). So X = flip every bit of A within its bit-length (the largest value < A with no overlap), and Y = 1 << (bit-length of A) (the next power of two above A's top bit, the smallest value > A with no overlap). Answer = X ^ Y.",
+    "plain": "Addition equals XOR only when there are no carries, i.e. the two operands share no set bit (X & A == 0). To get the GREATEST X < A with X & A == 0, take the complement of A restricted to A's bit-length — set exactly the bits A leaves unset below its MSB. To get the SMALLEST Y > A with Y & A == 0, use the first bit position beyond A's highest set bit: Y = 1 << numberOfBits(A). Return X ^ Y.",
+    "tale": "Two dancers can only 'add cleanly' if they never step on the same tile (no shared 1-bits). X fills every empty tile below A's top; Y takes the first fresh tile just above it.",
+    "pitfalls": [
+      "The identity is a + b == a ^ b  ⇔  a & b == 0 (equivalently no carry). Memorise it — it unlocks the whole problem.",
+      "checkIfIthBitIsSet must compare to the mask, not to 1: (num & (1<<pos)) == (1<<pos), NOT == 1 (that only works for pos 0).",
+      "numberOfBits(A) = floor(log2(A)) + 1; guard A limits so 1 << numberOfBits doesn't need more than 31 bits (A <= 1e9 → up to 30 bits, safe in int)."
+    ],
+    "solutions": [
+      {
+        "label": "Optimal — Complement Below MSB, Next Bit Above",
+        "complexity": {
+          "time": "O(log A)",
+          "space": "O(1)"
+        },
+        "plain": "X = A with every bit flipped inside its bit-length; Y = 1 << numberOfBits(A). Return X ^ Y.",
+        "approach": [
+          "numberOfBits = floor(log2(A)) + 1; Y = 1 << numberOfBits (smallest number > A sharing no bit with A).",
+          "Build X from A: for each bit i in [0, numberOfBits): if A has bit i set, unset it in X; else set it. This yields the greatest X < A with X & A == 0.",
+          "Return X ^ Y."
+        ],
+        "pseudocode": "nb = floor(log2(A)) + 1\nY = 1 << nb\nX = A; for i in 0..nb-1: X = A.bit(i)? unset(X,i) : set(X,i)\nreturn X ^ Y",
+        "story": "Rests on: X + A == X ^ A  iff  X & A == 0. X is the in-length complement, Y is the next higher power of two.",
+        "code": "public int solve(int A) {\n    int X = A;\n\n    int numberOfBits = numberOfBits(A);\n    int Y = 1 << numberOfBits;\n\n    for (int i = 0; i < numberOfBits; i++) {\n        if (checkIfIthBitIsSet(A, i)) {\n            X = unSetIthBit(X, i);\n        } else {\n            X = setIthBit(X, i);\n        }\n    }\n\n    return X ^ Y;\n}\n\nprivate boolean checkIfIthBitIsSet(int num, int pos) {\n    return (num & (1 << pos)) == 1 << pos;\n}\n\nprivate int setIthBit(int num, int pos) {\n    return num | (1 << pos);\n}\n\nprivate int unSetIthBit(int num, int pos) {\n    return num & ~(1 << pos);\n}\n\nprivate int numberOfBits(int num) {\n    return (int) ((Math.log(num) / Math.log(2)) + 1);\n}"
+      }
+    ]
   }
 ]
