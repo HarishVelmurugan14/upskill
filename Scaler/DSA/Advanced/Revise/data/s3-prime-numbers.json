@@ -1,0 +1,145 @@
+[
+  {
+    "num": 179,
+    "id": "s3-prime-find-all-primes",
+    "title": "Find All Primes",
+    "subTopic": "Sieve / primality test",
+    "tags": [
+      "Maths",
+      "Prime Numbers",
+      "Sieve"
+    ],
+    "description": "Given an integer A. Find the list of all prime numbers in the range [1, A].\n\nProblem Constraints\n1 <= A <= 10^6\n\nInput Format\nOnly argument A is an integer.\n\nOutput Format\nReturn a sorted array of prime number in the range [1, A].\n\nExample Input\nInput 1:\nA = 7\nInput 2:\nA = 12\n\nExample Output\nOutput 1:\n[2, 3, 5, 7]\nOutput 2:\n[2, 3, 5, 7, 11]\n\nExample Explanation\nFor Input 1:\nThe prime numbers from 1 to 7 are 2, 3, 5 and 7.\nFor Input 2:\nThe prime numbers from 1 to 12 are 2, 3, 5, 7 and 11.",
+    "sampleInput": "A = 7",
+    "sampleOutput": "[2, 3, 5, 7]",
+    "story": "List every prime up to A. The clean way to crack it is the Sieve of Eratosthenes: mark all multiples of each prime as composite, then collect what stays unmarked.",
+    "plain": "Mark 0 and 1 as non-prime, then for each i from 2, if i is prime record it and cross out all its multiples. Collecting the unmarked numbers gives the sorted prime list.",
+    "tale": "Cross out every second number after 2, every third after 3, and so on. Whatever survives the crossing-out is prime.",
+    "solutions": [
+      {
+        "label": "User solution — sieve with primality check",
+        "complexity": {
+          "time": "O(A * sqrt(A))",
+          "space": "O(A)"
+        },
+        "plain": "For each i, test primality via sqrt trip counting, add to list if prime, and mark multiples in the boolean array.",
+        "approach": [
+          "Make an array sized A+1 and mark index 0 and 1 as not prime.",
+          "For each i from 2 to A, if not already marked and isPrimeNumber(i) is true, add i to the result list.",
+          "Mark multiples of i.",
+          "Copy the list into an int array and return it."
+        ],
+        "pseudocode": "for i in 2..A:\n  if not marked[i] and isPrime(i): list.add(i)\n  for j = 2i; j<=A; j+=i: marked[j]=true\nreturn list as array",
+        "code": "public class Solution {\n    public int[] solve(int A) {\n        int[] primeArray = new int[A + 1];\n        List<Integer> list = new ArrayList<>();\n        primeArray[0] = 1;\n        primeArray[1] = 1;\n        for (int i = 2; i <= A; i++) {\n            if (primeArray[i] != 1 && isPrimeNumber(i)) {\n                primeArray[i] = 0;\n                list.add(i);\n            }\n            for (int j = 2 * i; j <= A; j = j + i) {\n                primeArray[j] = 1;   // mark multiples composite (was primeArray[i] — a bug)\n            }\n        }\n        int[] res = new int[list.size()];\n        int index = 0;\n        for (int x : list) {\n            res[index] = x;\n            index++;\n        }\n        return res;\n    }\n\n    public boolean isPrimeNumber(int A) {\n        int count = 0;\n        for (int i = 1; i <= Math.sqrt(A); i++) {\n            if (A % i == 0) {\n                count++; // First factor\n                if (i != A / i) {\n                    // Pair factor\n                    count++;\n                }\n            }\n        }\n        if (count == 2) {\n            return true;\n        }\n        return false;\n    }\n}",
+        "story": "Note: the original submission wrote primeArray[i] inside the inner loop (dead sieve line); corrected to primeArray[j]."
+      }
+    ]
+  },
+  {
+    "num": 180,
+    "id": "s3-prime-prime-sum",
+    "title": "Prime Sum",
+    "subTopic": "Goldbach / primality test",
+    "tags": [
+      "Maths",
+      "Prime Numbers",
+      "Goldbach's conjecture"
+    ],
+    "description": "Given an even number A (greater than 2), return two prime numbers whose sum will be equal to the given number.\nIf there is more than one solution possible, return the lexicographically smaller solution.\nIf [a, b] is one solution with a <= b, and [c,d] is another solution with c <= d, then\n[a, b] < [c, d], If a < c OR a==c AND b < d.\nNOTE: A solution will always exist. Read Goldbach's conjecture.\n\nProblem Constraints\n4 <= A <= 2*10^7\n\nInput Format\nFirst and only argument of input is an even number A.\n\nOutput Format\nReturn a integer array of size 2 containing primes whose sum will be equal to given number.\n\nExample Input\nInput 1:\n4\n\nExample Output\nOutput 1:\n[2, 2]\n\nExample Explanation\nThere is only 1 solution for A = 4.",
+    "sampleInput": "4",
+    "sampleOutput": "[2, 2]",
+    "story": "Split an even number into two primes (Goldbach). To crack it and get the lexicographically smallest pair, scan i from the small side and return the first i where both i and A-i are prime.",
+    "plain": "Handle A=4 as [2,2]. Then loop i over odd values from 3 up to A/2; the first i where both i and A-i are prime gives the smallest pair. Scanning upward guarantees lexicographic minimality.",
+    "tale": "Try the smallest prime first as one half; the first time its partner (A minus it) is also prime, you have the earliest matching pair.",
+    "solutions": [
+      {
+        "label": "User solution — scan primes from small side",
+        "complexity": {
+          "time": "O(A * sqrt(A))",
+          "space": "O(1)"
+        },
+        "plain": "Special-case 4, then check each odd i and its complement A-i for primality, returning the first valid pair.",
+        "approach": [
+          "If A == 4, return {2, 2}.",
+          "Loop i from 3 to A/2 stepping by 2.",
+          "If both i and A-i are prime, return {i, A-i}.",
+          "Return null otherwise (never reached by constraints)."
+        ],
+        "pseudocode": "if A==4: return [2,2]\nfor i=3; i<=A/2; i+=2:\n  if isPrime(i) and isPrime(A-i): return [i, A-i]",
+        "code": "public class Solution {\n    public int[] primesum(int A) {\n        if(A == 4) return new int[]{2,2};\n        for(int i = 3; i <= A/2; i = i+2){\n            if(isPrimeNumber(i) && isPrimeNumber(A-i)){\n                return new int[]{i, A-i};\n            }\n        }\n        return null;\n    }\n\n    public boolean isPrimeNumber(int A) {\n        int count = 0;\n        for (int i = 1; i <= Math.sqrt(A); i++) {\n            if (A % i == 0) {\n                count++; // First factor\n                if (i != A / i) {\n                    // Pair factor\n                    count++;\n                }\n            }\n        }\n        if (count == 2) {\n            return true;\n        }\n        return false;\n    }\n}"
+      }
+    ]
+  },
+  {
+    "num": 181,
+    "id": "s3-prime-count-of-divisors",
+    "title": "Count of divisors",
+    "subTopic": "Divisor counting / sieve",
+    "tags": [
+      "Maths",
+      "Divisors",
+      "Sieve"
+    ],
+    "description": "Given an array of integers A, find and return the count of divisors of each element of the array.\nNOTE: The order of the resultant array should be the same as the input array.\n\nProblem Constraints\n1 <= length of the array <= 100000\n1 <= A[i] <= 10^6\n\nInput Format\nThe only argument given is the integer array A.\n\nOutput Format\nReturn the count of divisors of each element of the array in the form of an array.\n\nExample Input\nInput 1:\nA = [2, 3, 4, 5]\nInput 2:\nA = [8, 9, 10]\n\nExample Output\nOutput 1:\n[2, 2, 3, 2]\nOutput 2:\n[4, 3, 4]\n\nExample Explanation\nExplanation 1:\nThe number of divisors of 2 : [1, 2], 3 : [1, 3], 4 : [1, 2, 4], 5 : [1, 5]\nSo the count will be [2, 2, 3, 2].",
+    "sampleInput": "A = [2, 3, 4, 5]",
+    "sampleOutput": "[2, 2, 3, 2]",
+    "story": "For each number in the array, count its divisors. To crack it fast across many queries, precompute a divisor-count sieve up to the max value, then answer each element in O(1).",
+    "plain": "Build a divisor-count array with a sieve: for every d from 1 to max, add 1 to every multiple of d. Then look up the count for each A[i]. Alternatively, count divisors of each element in O(sqrt(A[i])).",
+    "tale": "Every number d ticks a mark on all its multiples; at the end each slot holds how many numbers divide into it.",
+    "solutions": [
+      {
+        "label": "Optimal — divisor-count sieve",
+        "complexity": {
+          "time": "O(M log M + N)",
+          "space": "O(M)"
+        },
+        "plain": "Find max value M, run a sieve adding 1 to divCount[multiple] for every divisor d, then map each A[i] to divCount[A[i]].",
+        "approach": [
+          "Find M = max value in A.",
+          "Create divCount of size M+1.",
+          "For d = 1..M, for each multiple j = d, 2d, ...: divCount[j]++.",
+          "Build result where res[i] = divCount[A[i]].",
+          "Return res."
+        ],
+        "pseudocode": "M = max(A)\nfor d in 1..M:\n  for j = d; j<=M; j+=d: divCount[j]++\nfor i: res[i] = divCount[A[i]]\nreturn res",
+        "code": "public class Solution {\n    public int[] solve(int[] A) {\n        int max = 0;\n        for (int x : A) max = Math.max(max, x);\n        int[] divCount = new int[max + 1];\n        for (int d = 1; d <= max; d++) {\n            for (int j = d; j <= max; j += d) {\n                divCount[j]++;\n            }\n        }\n        int[] res = new int[A.length];\n        for (int i = 0; i < A.length; i++) {\n            res[i] = divCount[A[i]];\n        }\n        return res;\n    }\n}",
+        "story": "Reference solution — Unsolved in the screenshot, code not captured."
+      }
+    ]
+  },
+  {
+    "num": 182,
+    "id": "s3-prime-lucky-numbers",
+    "title": "Lucky Numbers",
+    "subTopic": "Sieve of Eratosthenes",
+    "tags": [
+      "Prime Numbers",
+      "Sieve of Eratosthenes"
+    ],
+    "description": "A lucky number is a number that has exactly 2 distinct prime divisors.\nYou are given a number A, and you need to determine the count of lucky numbers between the range 1 to A (both inclusive).\n\nProblem Constraints:\n1 <= A <= 50000\n\nInput Format:\nThe first and only argument is an integer A.\n\nOutput Format:\nReturn an integer i.e the count of lucky numbers between 1 and A, both inclusive.",
+    "sampleInput": "A = 8\n\nA = 12",
+    "sampleOutput": "1\n3",
+    "story": "Count numbers up to A that have exactly two different prime factors. A modified sieve lets us tally, for every number, how many distinct primes divide it.",
+    "plain": "Use a sieve: keep a count array. For each prime p, walk through all its multiples and add 1 to their distinct-prime count. At the end, count how many numbers from 1 to A have a count of exactly 2.",
+    "tale": "Like stamping each locker with the initials of every prime that owns a share; lucky lockers are the ones carrying exactly two distinct stamps.",
+    "solutions": [
+      {
+        "label": "Distinct-prime-factor sieve",
+        "complexity": {
+          "time": "O(A log log A)",
+          "space": "O(A)"
+        },
+        "plain": "Sieve to count distinct prime factors of every number up to A, then count those equal to 2.",
+        "approach": [
+          "Create an int array cnt of size A+1 initialised to 0.",
+          "For i from 2 to A, if cnt[i] is 0 then i is prime; for every multiple j of i, increment cnt[j].",
+          "After the sieve, count how many indices from 1 to A have cnt equal to 2.",
+          "Return that count."
+        ],
+        "pseudocode": "cnt = int[A+1]\nfor i in 2..A:\n  if cnt[i]==0:            # i is prime\n    for j = i; j<=A; j+=i: cnt[j]++\nans = number of x in 1..A with cnt[x]==2\nreturn ans",
+        "code": "public class Solution {\n    public int solve(int A) {\n        int[] cnt = new int[A + 1];\n        for (int i = 2; i <= A; i++) {\n            if (cnt[i] == 0) {\n                for (int j = i; j <= A; j += i) {\n                    cnt[j]++;\n                }\n            }\n        }\n        int ans = 0;\n        for (int x = 1; x <= A; x++) {\n            if (cnt[x] == 2) {\n                ans++;\n            }\n        }\n        return ans;\n    }\n}",
+        "story": "Canonical reference solution; the editor was left empty (Unsolved)."
+      }
+    ]
+  }
+]

@@ -73,10 +73,10 @@
       "why": "Direct enumeration is O(N^2). Complement counting using runs of zeros is O(N)."
     },
     {
-      "title": "Right-shifting a possibly-negative int with >> in a per-bit loop",
-      "wrong": "for (int i = 0; i < 32; i++) c += (v >> i) & 1;  // v may be negative",
-      "right": "for (int i = 0; i < 32; i++) c += (v >>> i) & 1; // logical shift",
-      "why": ">> is arithmetic: it copies the sign bit in from the left, so for negative v the shifted value is polluted with 1s. Use >>> (zero-fill) when you want the raw bit pattern; or test with (v & (1 << i)) != 0."
+      "title": "Unmasked arithmetic shift driving a loop",
+      "wrong": "while (n != 0) { c += n & 1; n >>= 1; }   // never ends for n < 0",
+      "right": "for (int i = 0; i < 32; i++) c += (n >>> i) & 1;   // or loop exactly 32 times",
+      "why": "(v >> i) & 1 is actually SAFE — the & 1 discards the sign-extended high bits, so it equals bit i for any v. The real hazard is an unmasked arithmetic shift used as the loop value: for negative n, >> keeps shifting in 1s and n >>= 1 never reaches 0. Use >>> or a fixed 32 iterations."
     },
     {
       "title": "Comparing a bit test to 1 instead of to the mask",
@@ -154,7 +154,7 @@
     {
       "name": "Bit-Sum Trick for Subarray OR",
       "when": "Sum over all subarrays of (OR of subarray). For each bit i, count subarrays where bit i appears at least once: contribute (1 << i) * thatCount.",
-      "template": "long ans = 0;\nfor (int i = 0; i < 32; i++) {\n    long lastZero = -1, contribution = 0;\n    for (int j = 0; j < N; j++) {\n        if (((A[j] >> i) & 1) == 0) lastZero = j;\n        // subarrays ending at j containing bit i set:\n        contribution += (j - lastZero);\n    }\n    ans += (1L << i) * contribution;\n}",
+      "template": "int lastSet = -1;\nfor (int j = 0; j < N; j++) {\n  if (((A[j] >> i) & 1) == 1) lastSet = j;\n  contribution += (lastSet + 1);   // subarrays ending at j whose OR has bit i set\n}",
       "examples": [
         "Subarray OR"
       ]
@@ -189,7 +189,7 @@
     "Subarray-OR with very long arrays — running contribution can exceed int even when bits don't; use long.",
     "Find-two-missing problems with sum overflow — use the XOR formulation (or use long for the sum formulation).",
     "Help-from-Sam style staircase problems — power-of-2 transitions, use 1L when N exceeds 30.",
-    "Brian-Kernighan in a tight loop — guard against n < 0 (sign bit will keep popping forever in arithmetic shift contexts).",
+    "Popcount via arithmetic shift (while(n!=0){c+=n&1; n>>=1;}) loops forever for n < 0 — use >>> or loop 32 times. (Brian-Kernighan's n &= (n-1) is fine: it clears one set bit per step and ends in <= 32 iterations, no guard needed.)",
     "n & -n on n = 0 returns 0 (no lowest set bit) — guard before using it as a bit position/divisor.",
     "n & -n on Integer.MIN_VALUE returns Integer.MIN_VALUE (only the sign bit set) — store in long if you do arithmetic with it.",
     "Shift amounts are taken mod 32 for int (mod 64 for long): x << 32 == x, not 0.",

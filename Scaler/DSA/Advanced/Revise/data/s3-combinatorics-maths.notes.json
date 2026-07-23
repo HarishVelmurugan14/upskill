@@ -1,0 +1,67 @@
+{
+  "topic": "Combinatorics & Maths",
+  "summary": "Number-theory and counting problems: nCr under a modulus, Pascal's triangle, digit counting, and base conversions (Excel columns are base-26). The recurring traps are integer overflow and doing division under a modulus. Build combinations with Pascal's recurrence or factorials + modular inverse; count by place value; treat Excel columns as 1-indexed base-26 with no zero digit.",
+  "thoughtProcess": [
+    {
+      "title": "Is the answer under a modulus? Then never divide — multiply by the modular inverse.",
+      "body": "a/b % m is NOT (a%m)/(b%m). Under a prime modulus, divide by b == multiply by b^(m-2) (Fermat). For nCr%p either precompute factorials + inverse factorials, or build Pascal's triangle where every step is only addition (no division needed)."
+    },
+    {
+      "title": "Excel columns are base-26 but 1-indexed (A=1..Z=26), with no zero.",
+      "body": "Converting number->title, subtract 1 each step: c = (n-1)%26 -> letter, n=(n-1)/26. Title->number is plain Horner base-26: n = n*26 + (ch-'A'+1). Forgetting the -1 shifts every letter."
+    },
+    {
+      "title": "Counting 'how many X in [1..N]'? Count per place / per block, don't enumerate.",
+      "body": "Number of Digit One, Consecutive Numbers Sum, permutation rank — all count contributions by digit position or by factor, in O(log N) or O(sqrt N), never by looping to N (which TLEs at N=1e9)."
+    }
+  ],
+  "keyPatterns": [
+    {
+      "name": "nCr % p via Pascal (addition only)",
+      "when": "Small n (<= a few thousand); avoids modular inverse",
+      "template": "C[0][0]=1\nfor i: C[i][0]=1; for j in 1..i: C[i][j] = (C[i-1][j-1] + C[i-1][j]) % p",
+      "examples": [
+        "Compute nCr % m",
+        "Pascal Triangle"
+      ]
+    },
+    {
+      "name": "Base-26 (Excel column) conversion",
+      "when": "Map column number <-> title",
+      "template": "title: while n>0: n--; sb.append('A'+n%26); n/=26; reverse\nnumber: for ch: n = n*26 + (ch-'A'+1)",
+      "examples": [
+        "Excel Column Title",
+        "Excel Column Number"
+      ]
+    },
+    {
+      "name": "Digit / place-value counting",
+      "when": "Count a property over [1..N] without iterating",
+      "template": "for place = 1,10,100..: derive count from high/cur/low digits",
+      "examples": [
+        "Number of Digit One",
+        "Sorted Permutation Rank"
+      ]
+    }
+  ],
+  "commonMistakes": [
+    {
+      "title": "Dividing under a modulus",
+      "wrong": "ans = (nFact / (rFact * (n-r)Fact)) % p;",
+      "right": "ans = nFact % p * modpow(rFact, p-2, p) % p * modpow((n-r)Fact, p-2, p) % p;",
+      "why": "Integer division loses the remainder and is invalid under a modulus. Use the modular inverse (Fermat, p prime) or Pascal's addition-only recurrence."
+    },
+    {
+      "title": "int overflow in factorial / products",
+      "wrong": "int f = 1; for k: f *= k;",
+      "right": "long f = 1; for k: f = f * k % MOD;",
+      "why": "21! overflows even long; a*b for a,b ~1e9 overflows int. Use long and reduce % MOD after every multiply."
+    }
+  ],
+  "edgeCases": [
+    "nCr with r > n -> 0; r == 0 or r == n -> 1 (guard before indexing factorial arrays).",
+    "Excel Column Title: the -1 before %/ is what makes 26 -> 'Z' and 27 -> 'AA'; without it you get 'A@' style bugs.",
+    "Use long for the place multiplier loop in Number of Digit One: i*10 and high*i overflow int at the top powers of ten (10^9), even though 10^9 itself fits in int.",
+    "Intermediate values need long: k*(k-1)/2 and the remainder in consecutive-sum, and factorial products (smaller*fact) in permutation-rank. The final counts themselves fit in int."
+  ]
+}

@@ -1,0 +1,351 @@
+[
+  {
+    "num": 193,
+    "id": "s3-bt-permutations",
+    "title": "Permutations",
+    "subTopic": "Backtracking",
+    "tags": [
+      "Backtracking",
+      "Permutations"
+    ],
+    "description": "Given an integer array A of size N denoting collection of numbers, return all possible permutations.\nNOTE:\n- No two entries in the permutation sequence should be the same.\n- For the purpose of this problem, assume that all the numbers in the collection are unique.\n- Return the answer in any order.\n\nWARNING: DO NOT USE LIBRARY FUNCTION FOR GENERATING PERMUTATIONS.\nExample : next_permutations in C++ / itertools.permutations in python.\nIf you do, we will disqualify your submission retroactively and give you penalty points.\n\nProblem Constraints\n1 <= N <= 9\n\nInput Format\nOnly argument is an integer array A of size N.\n\nOutput Format\nReturn a 2-D array denoting all possible permutation of the array.\n\nExample Input\nA = [1, 2, 3]\n\nExample Output\n[ [1, 2, 3]\n  [1, 3, 2]\n  [2, 1, 3]\n  [2, 3, 1]\n  [3, 1, 2]\n  [3, 2, 1] ]\n\nExample Explanation\nAll the possible permutation of array [1, 2, 3].",
+    "sampleInput": "A = [1, 2, 3]",
+    "sampleOutput": "[ [1, 2, 3], [1, 3, 2], [2, 1, 3], [2, 3, 1], [3, 1, 2], [3, 2, 1] ]",
+    "story": "Build permutations by fixing one position at a time. Swap each remaining element into the current position, recurse for the next position, then swap back to restore the array. When the position reaches the end, record a copy. To crack it: swap-based backtracking with restore after each recursive call.",
+    "plain": "Backtracking: for each index, swap every candidate into place, recurse deeper, then undo the swap. Record a copy when a full permutation is built.",
+    "tale": "Like arranging guests in chairs one seat at a time: try each remaining guest in the seat, seat the rest, then stand them back up to try the next.",
+    "solutions": [
+      {
+        "label": "Swap-based backtracking",
+        "complexity": {
+          "time": "O(N * N!)",
+          "space": "O(N) recursion (plus output)"
+        },
+        "plain": "Fix positions left to right; at each position swap in each unused element, recurse, then swap back.",
+        "approach": [
+          "At index start, if start == N record a clone of A.",
+          "For i from start to N-1, swap A[start] and A[i].",
+          "Recurse with start+1.",
+          "Swap back to restore the array before the next iteration.",
+          "Collect all clones into the 2-D result."
+        ],
+        "pseudocode": "backtrack(A, start):\n  if start == N: add copy of A; return\n  for i in start..N-1:\n    swap(A[start], A[i])\n    backtrack(A, start+1)\n    swap(A[start], A[i])",
+        "code": "public class Solution {\n    public int[][] permute(int[] A) {\n        List<int[]> result = new ArrayList<>();\n        backtrack(A, 0, result);\n        int[][] ans = new int[result.size()][A.length];\n        for (int i = 0; i < result.size(); i++) ans[i] = result.get(i);\n        return ans;\n    }\n\n    private void backtrack(int[] A, int start, List<int[]> result) {\n        if (start == A.length) {\n            result.add(A.clone());\n            return;\n        }\n        for (int i = start; i < A.length; i++) {\n            swap(A, start, i);\n            backtrack(A, start + 1, result);\n            swap(A, start, i);\n        }\n    }\n\n    private void swap(int[] A, int i, int j) {\n        int t = A[i]; A[i] = A[j]; A[j] = t;\n    }\n}",
+        "story": "Reference solution: the problem was marked Solved but the editor only showed the empty function stub, so this is the canonical swap-based backtracking."
+      }
+    ]
+  },
+  {
+    "num": 194,
+    "id": "s3-bt-generate-all-parentheses-ii",
+    "title": "Generate all Parentheses II",
+    "subTopic": "Backtracking",
+    "tags": [
+      "Backtracking",
+      "Strings"
+    ],
+    "description": "Given an integer A pairs of parentheses, write a function to generate all combinations of well-formed parentheses of length 2*A.\n\nProblem Constraints\n1 <= A <= 10\n\nInput Format\nFirst and only argument is integer A.\n\nOutput Format\nReturn a sorted list of all possible parenthesis.\n\nExample Input\nInput 1:\nA = 3\nInput 2:\nA = 1\n\nExample Output\nOutput 1:\n[ \"((()))\", \"(()())\", \"(())()\", \"()(())\", \"()()()\" ]\nOutput 2:\n[ \"()\" ]\n\nExample Explanation\nExplanation 1:\nAll paranthesis are given in the output list.\nExplanation 2:\nAll paranthesis are given in the output list.",
+    "sampleInput": "A = 3",
+    "sampleOutput": "[ \"((()))\", \"(()())\", \"(())()\", \"()(())\", \"()()()\" ]",
+    "story": "Build the string character by character, tracking how many open and close parentheses have been used. You may add '(' while open count is below A, and you may add ')' only while close count is below open count (so it never becomes invalid). When both reach A, the string is complete. Adding '(' before ')' at each step naturally produces the sorted order. To crack it: backtrack with two counters and the two validity rules.",
+    "plain": "Backtracking with counts of open and close brackets: add '(' if openCount < A, add ')' if closeCount < openCount, record when both equal A.",
+    "tale": "Like stacking and unstacking plates: you can only put a plate down (close) if there's one already up (open) to match it.",
+    "solutions": [
+      {
+        "label": "Backtracking with open/close counts",
+        "complexity": {
+          "time": "O(4^A / sqrt(A)) (Catalan)",
+          "space": "O(A) recursion"
+        },
+        "plain": "Grow the pattern; allow '(' while open < A and ')' while close < open; collect completed patterns.",
+        "approach": [
+          "Recurse carrying currentPattern, openCount, closedCount.",
+          "If openCount == A and closedCount == A, add the pattern to results.",
+          "If openCount < A, recurse adding '('.",
+          "If closedCount < openCount, recurse adding ')'.",
+          "Copy the result list into a String array to return."
+        ],
+        "pseudocode": "bt(pattern, open, close):\n  if open==A and close==A: res.add(pattern); return\n  if open<A: bt(pattern+'(', open+1, close)\n  if close<open: bt(pattern+')', open, close+1)",
+        "code": "public class Solution {\n    public String[] generateParenthesis(int A) {\n        List<String> res = new ArrayList<>();\n        backTracking(A, \"\", 0, 0, res);\n        String[] st = new String[res.size()];\n        int index =0;\n        for(String x : res){\n            st[index] = x;\n            index++;\n        }\n        return st;\n    }\n\n    public List<String> backTracking(int n, String currentPattern, int openParanthesisCount, int closedParanthesisCount, List<String> result){\n        if(openParanthesisCount == n && closedParanthesisCount == n){\n            result.add(currentPattern);\n            return result;\n        }\n\n        if(openParanthesisCount < n){\n            backTracking(n, currentPattern + \"(\", openParanthesisCount+1, closedParanthesisCount, result);\n        }\n\n        if(closedParanthesisCount < openParanthesisCount){\n            backTracking(n, currentPattern + \")\", openParanthesisCount, closedParanthesisCount+1, result);\n        }\n        return result;\n    }\n}"
+      }
+    ]
+  },
+  {
+    "num": 195,
+    "id": "s3-bt-generate-subsets",
+    "title": "Generate Subsets",
+    "subTopic": "Backtracking",
+    "tags": [
+      "Backtracking",
+      "Subsets"
+    ],
+    "description": "Given a set of distinct integers A, return all possible subsets that can be formed from the elements of array A.\n\nProblem Constraints\n1 <= |A| <= 16\nINT_MIN <= A[i] <= INT_MAX\nArray A is given in increasing order.\nAll elements of array A are distinct.\n\nInput Format\nFirst and only argument of input contains a single integer array A.\n\nOutput Format\nReturn a vector of vectors denoting the answer in any order.\n\nExample Input\nInput 1:\nA = [1]\nInput 2:\nA = [1, 2, 3]\n\nExample Output\nOutput 1:\n[\n  []\n  [1]\n]\nOutput 2:\n[\n  []\n  [1]\n  [1, 2]\n  ...\n]",
+    "sampleInput": "A = [1, 2, 3]",
+    "sampleOutput": "[ [], [1], [1, 2], [1, 2, 3], [1, 3], [2], [2, 3], [3] ]",
+    "story": "For each element decide include or exclude, recursing through indices. When the index passes the end, record a copy of the current subset. Take/not-take at each index generates all 2^n subsets. To crack it: include the element and recurse, then remove it and recurse (the two branches).",
+    "plain": "Backtracking with an include/exclude choice per element. At each index add the element and recurse, then remove it and recurse; snapshot the subset at the base case.",
+    "tale": "Like packing for a trip going down a checklist: for each item you either put it in the bag or leave it out, and every combination of choices is a subset.",
+    "solutions": [
+      {
+        "label": "Take / not-take DFS",
+        "complexity": {
+          "time": "O(2^n * n)",
+          "space": "O(n) recursion (plus output)"
+        },
+        "plain": "DFS over indices; at each index branch into include and exclude; record the current list when index reaches N.",
+        "approach": [
+          "At index, if index >= N add a copy of currentList to the answer and return.",
+          "Add nums[index] to currentList and recurse with index+1 (take).",
+          "Remove nums[index] from currentList and recurse with index+1 (not-take).",
+          "Return the accumulated answer."
+        ],
+        "pseudocode": "dfs(index, cur):\n  if index >= N: all.add(copy(cur)); return\n  cur.add(nums[index]); dfs(index+1, cur)\n  cur.remove(nums[index]); dfs(index+1, cur)",
+        "code": "class Solution {\n    public ArrayList<ArrayList<Integer>> subsets(ArrayList<Integer> A) {\n        ArrayList<ArrayList<Integer>> res = new ArrayList<>();\n        dfs(A.size(), A, 0, new ArrayList<Integer>(), res);\n        return res;\n    }\n\n    private ArrayList<ArrayList<Integer>> dfs(int N, ArrayList<Integer> nums, int index, ArrayList<Integer> currentList, ArrayList<ArrayList<Integer>> all){\n        if(index >= N){\n            all.add(new ArrayList<>(currentList)); // VERY IMPORTANT\n            return all;\n        }\n\n        currentList.add(nums.get(index));\n        dfs(N, nums, index+1, currentList, all);\n        currentList.remove(Integer.valueOf(nums.get(index)));\n        dfs(N, nums, index+1, currentList, all);\n\n        return all;\n    }\n}"
+      }
+    ]
+  },
+  {
+    "num": 196,
+    "id": "s3-bt-letter-phone",
+    "title": "Letter Phone",
+    "subTopic": "Backtracking (combinations)",
+    "tags": [
+      "Backtracking",
+      "Combinations"
+    ],
+    "description": "Given a digit string A, return all possible letter combinations that the number could represent.\nA mapping of digit to letters (just like on the telephone buttons) is given below.\n2 -> abc\n3 -> def\n4 -> ghi\n5 -> jkl\n6 -> mno\n7 -> pqrs\n8 -> tuv\n9 -> wxyz\nThe digit 0 maps to 0 itself. The digit 1 maps to 1 itself.\nNOTE: Make sure the returned strings are lexicographically sorted.\n\nProblem Constraints:\n1 <= |A| <= 10\n\nInput Format:\nThe only argument is a digit string A.\n\nOutput Format:\nReturn a string array denoting the possible letter combinations.",
+    "sampleInput": "A = \"23\"\nA = \"012\"",
+    "sampleOutput": "[\"ad\", \"ae\", \"af\", \"bd\", \"be\", \"bf\", \"cd\", \"ce\", \"cf\"]\n[\"01a\", \"01b\", \"01c\"]",
+    "story": "Each digit can become one of a few letters. We build every combination by choosing a letter for each digit in turn. How to crack it: recurse digit by digit, appending one candidate letter and backtracking. Since we scan digits left to right and each digit's letters are already in alphabetical order, the results come out lexicographically sorted for free.",
+    "plain": "Backtracking: for the current digit, try each of its mapped letters, recurse to the next digit, then undo.",
+    "tale": "Like spinning a set of dials where each dial has a few letters; you write down every combination the dials can spell.",
+    "solutions": [
+      {
+        "label": "Backtracking",
+        "complexity": {
+          "time": "O(4^n * n)",
+          "space": "O(n) recursion depth"
+        },
+        "plain": "Map each digit to its letters, then recurse choosing one letter per digit and collecting full strings.",
+        "approach": [
+          "Build a mapping from digit to its letters (0 and 1 map to themselves).",
+          "Recurse over the index of A; at each index loop through that digit's letters.",
+          "Append a letter, recurse to the next index, then remove it (backtrack).",
+          "When index reaches the end, record the built string."
+        ],
+        "pseudocode": "solve(idx, cur):\n  if idx == len(A): add cur; return\n  for ch in map[A[idx]]:\n    solve(idx+1, cur+ch)",
+        "code": "public class Solution {\n    public String[] letterCombinations(String A) {\n        String[] map = {\"0\", \"1\", \"abc\", \"def\", \"ghi\", \"jkl\", \"mno\", \"pqrs\", \"tuv\", \"wxyz\"};\n        List<String> res = new ArrayList<>();\n        StringBuilder cur = new StringBuilder();\n        solve(A, 0, map, cur, res);\n        return res.toArray(new String[0]);\n    }\n    private void solve(String A, int idx, String[] map, StringBuilder cur, List<String> res) {\n        if (idx == A.length()) {\n            res.add(cur.toString());\n            return;\n        }\n        String letters = map[A.charAt(idx) - '0'];\n        for (int i = 0; i < letters.length(); i++) {\n            cur.append(letters.charAt(i));\n            solve(A, idx + 1, map, cur, res);\n            cur.deleteCharAt(cur.length() - 1);\n        }\n    }\n}",
+        "story": "Reference solution: the editor only had the empty stub, so this is a canonical backtracking approach. Iterating digits left to right with alphabetically ordered letters guarantees sorted output without an extra sort."
+      }
+    ]
+  },
+  {
+    "num": 197,
+    "id": "s3-bt-kth-symbol-easy",
+    "title": "Kth Symbol - Easy",
+    "subTopic": "Recursion",
+    "tags": [
+      "Backtracking",
+      "Recursion"
+    ],
+    "description": "On the first row, we write a 0. Now in every subsequent row, we look at the previous row and replace each occurrence of 0 with 01, and each occurrence of 1 with 10.\nGiven row number A and index B, return the Bth indexed symbol in row A. (The values of B are 0-indexed.)\n\nProblem Constraints:\n1 <= A <= 20\n0 <= B < 2^(A-1)\n\nInput Format:\nFirst argument is an integer A.\nSecond argument is an integer B.\n\nOutput Format:\nReturn an integer denoting the Bth indexed symbol in row A.",
+    "sampleInput": "A = 3, B = 0\nA = 4, B = 4",
+    "sampleOutput": "0\n1",
+    "story": "Each row is generated from the one above: a 0 becomes 01 and a 1 becomes 10. So the symbol at index B in row A depends on the symbol at index B/2 in row A-1. How to crack it: recurse up one row, look at the parent symbol, and flip it only when B is odd (the second half of the 2-symbol expansion).",
+    "plain": "Recursion: the parent of index B is index B/2 in the previous row; if B is even keep the parent's value, if odd flip it.",
+    "tale": "Like a family tree where each parent produces two children 0->(0,1) and 1->(1,0); to know a child you ask the parent and check if you are the left or right child.",
+    "solutions": [
+      {
+        "label": "Recursion on parent index",
+        "complexity": {
+          "time": "O(A)",
+          "space": "O(A) recursion depth"
+        },
+        "plain": "Walk up the rows: value at (A,B) equals value at (A-1, B/2), flipped when B is odd.",
+        "approach": [
+          "Base case: row 1 always holds 0.",
+          "Compute the parent symbol at (A-1, B/2).",
+          "If B is even, return the parent as is.",
+          "If B is odd, return 1 minus the parent (the flipped half)."
+        ],
+        "pseudocode": "solve(A, B):\n  if A == 1: return 0\n  parent = solve(A-1, B/2)\n  return parent if B even else 1-parent",
+        "code": "public class Solution {\n    public int solve(int A, int B) {\n        if (A == 1) return 0;\n        int parent = solve(A - 1, B / 2);\n        if (B % 2 == 0) return parent;\n        else return 1 - parent;\n    }\n}",
+        "story": "Reference solution: the problem was marked Solved but the editor showed only the empty stub, so this is a canonical recursion approach reconstructed from the statement."
+      }
+    ]
+  },
+  {
+    "num": 198,
+    "id": "s3-bt-print-paths-in-staircase",
+    "title": "Print paths in Staircase",
+    "subTopic": "Backtracking",
+    "tags": [
+      "Backtracking"
+    ],
+    "description": "You are climbing a staircase and it takes A steps to reach the top.\nEach time you can either climb 1 or 2 steps. In how many distinct ways can you climb to the top?\nYou need to return all the distinct ways to climb to the top in lexicographical order.\n\nProblem Constraints:\n2 <= A <= 25\n\nInput Format:\nThe first and the only argument contains an integer A, the number of steps.\n\nOutput Format:\nReturn a 2-D Integer Array, which denotes all the unique valid paths to reach the top.\n\nExample Explanation:\nExplanation 1: Distinct ways to reach top: 1 + 1, 2.",
+    "sampleInput": "A = 2\nA = 3",
+    "sampleOutput": "[ [1, 1], [2] ]\n[ [1, 1, 1], [1, 2], [2, 1] ]",
+    "story": "We want every ordered combination of 1s and 2s that adds up to A. How to crack it: recurse on the remaining steps, always trying a 1 before a 2 so the paths come out lexicographically sorted, and record a path each time the remaining count hits zero.",
+    "plain": "Backtracking: from the remaining steps, first add a 1 and recurse, then add a 2 and recurse; collect a path when remaining reaches 0.",
+    "tale": "Like listing every way to tile a strip of length A with tiles of size 1 and 2, always placing the smaller tile first so the list stays in order.",
+    "solutions": [
+      {
+        "label": "Backtracking (1 before 2)",
+        "complexity": {
+          "time": "O(2^A)",
+          "space": "O(A) recursion depth"
+        },
+        "plain": "Recurse over the remaining steps; try 1 first then 2 so results are sorted, and save the path at 0.",
+        "approach": [
+          "Track the remaining steps and the current path.",
+          "If remaining is 0, add a copy of the path to the answer.",
+          "If remaining >= 1, append 1, recurse with remaining-1, then remove it.",
+          "If remaining >= 2, append 2, recurse with remaining-2, then remove it.",
+          "Convert the list of paths to a 2-D int array."
+        ],
+        "pseudocode": "solve(rem, cur):\n  if rem == 0: add cur; return\n  if rem >= 1: solve(rem-1, cur+[1])\n  if rem >= 2: solve(rem-2, cur+[2])",
+        "code": "public class Solution {\n    public int[][] WaysToClimb(int A) {\n        List<List<Integer>> res = new ArrayList<>();\n        solve(A, new ArrayList<>(), res);\n        int[][] ans = new int[res.size()][];\n        for (int i = 0; i < res.size(); i++) {\n            List<Integer> path = res.get(i);\n            ans[i] = new int[path.size()];\n            for (int j = 0; j < path.size(); j++) ans[i][j] = path.get(j);\n        }\n        return ans;\n    }\n    private void solve(int rem, List<Integer> cur, List<List<Integer>> res) {\n        if (rem == 0) {\n            res.add(new ArrayList<>(cur));\n            return;\n        }\n        if (rem >= 1) {\n            cur.add(1);\n            solve(rem - 1, cur, res);\n            cur.remove(cur.size() - 1);\n        }\n        if (rem >= 2) {\n            cur.add(2);\n            solve(rem - 2, cur, res);\n            cur.remove(cur.size() - 1);\n        }\n    }\n}",
+        "story": "Reference solution: the editor held only the empty stub, so this is a canonical backtracking approach. Trying the 1-step branch before the 2-step branch yields lexicographically sorted paths."
+      }
+    ]
+  },
+  {
+    "num": 199,
+    "id": "s3-bt-shortest-path-in-a-binary-maze-with-hurdles",
+    "title": "Shortest path in a Binary Maze with Hurdles",
+    "subTopic": "BFS on grid",
+    "tags": [
+      "Backtracking",
+      "BFS"
+    ],
+    "description": "Given an MxN matrix where each element can either be 0 or 1. We need to find the length of shortest path between a given source cell to a destination cell.\nA cell with value 0 denotes that it's a hurdle. The path can only be created out of the cells with values 1.\nIf NO path exists then print -1.\n\n- The matrix A is given as input of size M x N.\n- The coordinates of Source cell are given by B, C.\n- The coordinates of Destination cell are given by D, E.\n\nProblem Constraints:\n1 <= N , M <= 8\n0 <= A[i][j] <= 1\n0 <= B, C < N\n0 <= D, E < M\nA[B][C] == A[D][E] == 1\n\nInput Format:\nFirst Argument is a 2-D Integer Array denotes the matrix A, of size MxN.\nSecond Argument is an Integer B, denoting the Source Row Index.\nThird Argument is an Integer C, denoting the Source Column Index.\nFourth Argument is an Integer D, denoting the Destination Row Index.\nFifth Argument is an Integer E, denoting the Destination Column Index.\n\nOutput Format:\nOutput a single integer denoting the length of the minimum distance from Source to destination.",
+    "sampleInput": "A = [[1, 1, 0, 0],\n     [0, 1, 1, 0],\n     [0, 0, 1, 1],\n     ...]",
+    "sampleOutput": "(length of the shortest path; -1 if none)",
+    "story": "The maze has open cells (1) and hurdles (0), and we want the fewest moves from source to destination. How to crack it: because every step costs the same, a breadth-first search from the source expands cells layer by layer, so the first time we reach the destination we have the shortest distance.",
+    "plain": "BFS from the source, moving to adjacent cells that are 1 and unvisited; return the level at which the destination is first reached, else -1.",
+    "tale": "Like ripples spreading out from where a stone drops in water; the ripple reaches each open spot by the shortest route first.",
+    "solutions": [
+      {
+        "label": "BFS (level order)",
+        "complexity": {
+          "time": "O(M*N)",
+          "space": "O(M*N)"
+        },
+        "plain": "Do a breadth-first search treating each open cell as a node; the distance when the destination is popped is the answer.",
+        "approach": [
+          "Start a queue with the source cell and distance 0; mark it visited.",
+          "Pop a cell; if it is the destination, return its distance.",
+          "For each of the 4 neighbours that are in bounds, valued 1, and unvisited, mark visited and enqueue with distance+1.",
+          "If the queue empties without reaching the destination, return -1."
+        ],
+        "pseudocode": "bfs(src):\n  q = [(src, 0)]; visited[src] = true\n  while q:\n    (cell, d) = q.pop()\n    if cell == dest: return d\n    for nb in neighbours(cell):\n      if valid and A[nb]==1 and not visited: enqueue (nb, d+1)\n  return -1",
+        "code": "public class Solution {\n    public int FindShortestPath(int[][] A, int B, int C, int D, int E) {\n        int m = A.length, n = A[0].length;\n        boolean[][] visited = new boolean[m][n];\n        int[][] dirs = {{-1, 0}, {1, 0}, {0, -1}, {0, 1}};\n        Queue<int[]> q = new LinkedList<>();\n        q.add(new int[]{B, C, 0});\n        visited[B][C] = true;\n        while (!q.isEmpty()) {\n            int[] cur = q.poll();\n            int r = cur[0], c = cur[1], dist = cur[2];\n            if (r == D && c == E) return dist;\n            for (int[] dir : dirs) {\n                int nr = r + dir[0], nc = c + dir[1];\n                if (nr >= 0 && nr < m && nc >= 0 && nc < n && !visited[nr][nc] && A[nr][nc] == 1) {\n                    visited[nr][nc] = true;\n                    q.add(new int[]{nr, nc, dist + 1});\n                }\n            }\n        }\n        return -1;\n    }\n}",
+        "story": "Reference solution: the editor held only the empty stub, so this is a canonical BFS approach. Uniform step cost makes BFS give the shortest path directly."
+      }
+    ]
+  },
+  {
+    "num": 200,
+    "id": "s3-bt-print-all-maze-paths",
+    "title": "Print All Maze Paths",
+    "subTopic": "Backtracking",
+    "tags": [
+      "Backtracking"
+    ],
+    "description": "You are given the dimensions of a rectangular board of size A x B. You need to print all the possible paths from top-left corner to bottom-right corner of the board.\nYou can only move down (denoted by 'D') or right (denoted by 'R') at any point in time.\nNOTE: You need to return all the paths in Lexicographically sorted order. A lexicographic order is an arrangement of characters in alphabetical order.\n\nProblem Constraints:\n1 <= A, B <= 8\n\nInput Format:\nFirst Argument is an Integer A, which denotes the Row Index.\nSecond Argument is an Integer B, which denotes the Column Index.\n\nOutput Format:\nReturn a String Array, which denotes all the possible paths in separate lines. The paths should be returned in the Lexicographical order.",
+    "sampleInput": "A = 3, B = 2\nA = 1, B = 2",
+    "sampleOutput": "DDR DRD RDD\nR",
+    "story": "From the top-left of an A x B grid we walk to the bottom-right using only Down and Right moves, and list every route. How to crack it: recurse position by position, always trying Down (D) before Right (R) so the strings come out alphabetically sorted, and record the string when we land on the bottom-right cell.",
+    "plain": "Backtracking: at each cell try moving Down first then Right, appending the move letter; record the path when you reach the bottom-right corner.",
+    "tale": "Like tracing every staircase route across a grid where you may only go down or right, writing down each route in alphabetical order.",
+    "solutions": [
+      {
+        "label": "Backtracking (D before R)",
+        "complexity": {
+          "time": "O(2^(A+B))",
+          "space": "O(A+B) recursion depth"
+        },
+        "plain": "Recurse from (0,0); go Down when a row remains and Right when a column remains, recording the move string at the corner.",
+        "approach": [
+          "Track the current row r, column c, and the path built so far.",
+          "If (r, c) is the bottom-right cell, add the path string.",
+          "If r < A-1, append 'D', recurse to (r+1, c), then remove it.",
+          "If c < B-1, append 'R', recurse to (r, c+1), then remove it.",
+          "Trying D before R keeps output lexicographically sorted."
+        ],
+        "pseudocode": "solve(r, c, path):\n  if r == A-1 and c == B-1: add path; return\n  if r < A-1: solve(r+1, c, path+'D')\n  if c < B-1: solve(r, c+1, path+'R')",
+        "code": "public class Solution {\n    public String[] PrintAllPaths(int A, int B) {\n        List<String> res = new ArrayList<>();\n        solve(0, 0, A, B, new StringBuilder(), res);\n        return res.toArray(new String[0]);\n    }\n    private void solve(int r, int c, int A, int B, StringBuilder path, List<String> res) {\n        if (r == A - 1 && c == B - 1) {\n            res.add(path.toString());\n            return;\n        }\n        if (r < A - 1) {\n            path.append('D');\n            solve(r + 1, c, A, B, path, res);\n            path.deleteCharAt(path.length() - 1);\n        }\n        if (c < B - 1) {\n            path.append('R');\n            solve(r, c + 1, A, B, path, res);\n            path.deleteCharAt(path.length() - 1);\n        }\n    }\n}",
+        "story": "Reference solution: the editor held only the empty stub, so this is a canonical backtracking approach. Because 'D' comes before 'R' alphabetically, taking the Down branch first yields sorted paths."
+      }
+    ]
+  },
+  {
+    "num": 201,
+    "id": "s3-bt-kth-symbol-hard",
+    "title": "Kth Symbol - Hard",
+    "subTopic": "Bit manipulation / recursion",
+    "tags": [
+      "Backtracking",
+      "Bit Manipulation"
+    ],
+    "description": "On the first row, we write a 0. Now in every subsequent row, we look at the previous row and replace each occurrence of 0 with 01, and each occurrence of 1 with 10.\nGiven row number A and index B, return the Bth indexed symbol in row A. (The values of B are 0-indexed.)\n\nProblem Constraints:\n1 <= A <= 10^5\n0 <= B <= min(2^(A-1) - 1, 10^18)\n\nInput Format:\nFirst argument is an integer A.\nSecond argument is an integer B.\n\nOutput Format:\nReturn an integer denoting the Bth indexed symbol in row A.",
+    "sampleInput": "A = 3, B = 0\nA = 4, B = 4",
+    "sampleOutput": "0\n1",
+    "story": "Same generation rule as the easy version (0 -> 01, 1 -> 10), but B can be huge, so recursion up to A rows is wasteful. How to crack it: the symbol at index B equals the parity of the number of set bits in B. Each step from parent to child flips the value exactly when the child index is odd, and following the chain up shows the answer is simply the count of 1-bits in B taken mod 2.",
+    "plain": "The answer is the number of 1 bits in B modulo 2 (0 if even, 1 if odd).",
+    "tale": "Like folding a paper: each crease flips the pattern, and the final side you see depends only on how many folds (set bits) landed odd.",
+    "solutions": [
+      {
+        "label": "Popcount parity",
+        "complexity": {
+          "time": "O(1) (bit count)",
+          "space": "O(1)"
+        },
+        "plain": "Return the parity of the count of set bits in B.",
+        "approach": [
+          "Observe each descent from row to row flips the value only when the index at that level is odd.",
+          "The total number of flips equals the number of 1 bits in B.",
+          "Return that bit count mod 2."
+        ],
+        "pseudocode": "return popcount(B) % 2",
+        "code": "public class Solution {\n    public int solve(int A, long B) {\n        return Long.bitCount(B) % 2 == 0 ? 0 : 1;\n    }\n}",
+        "story": "Reference solution: the editor held only the empty stub, so this is a canonical O(1) approach. The recursive parent-flip rule collapses to the parity of set bits in B, avoiding deep recursion for large A."
+      }
+    ]
+  },
+  {
+    "num": 202,
+    "id": "s3-bt-subset-sum-equal-to-k",
+    "title": "Subset Sum equal to K",
+    "subTopic": "Backtracking (include/exclude)",
+    "tags": [
+      "Backtracking",
+      "Subsets"
+    ],
+    "description": "Given an integer array A of size N.\nYou are also given an integer B, you need to find whether their exist a subset in A whose sum equal B.\nIf there exist a subset then return 1 else return 0.\nNote: Sum of elements of an empty subset is 0.\n\nProblem Constraints:\n1 <= N <= 17\n-10^9 <= A[i] <= 10^9\n-10^9 <= B <= 10^9\n\nInput Format:\nFirst argument is an integer array A.\nSecond argument is an integer B.\n\nOutput Format:\nReturn 1 if there exist a subset with sum B else return 0.",
+    "sampleInput": "A = [3, 34, -3, 12, 5, 2]\nB = 9\nA = [-8, 34, 4, 0, -5, -2]\nB = -20",
+    "sampleOutput": "1\n0",
+    "story": "We check whether any subset of A adds up exactly to B, and negatives are allowed so we cannot prune by size alone. How to crack it: with N at most 17 we can try every subset by an include/exclude recursion, subtracting the chosen element from the target and asking if the rest can reach zero.",
+    "plain": "Backtracking: for each element decide to include it (subtract from target) or skip it; success when all elements are considered and target is 0.",
+    "tale": "Like deciding for each item in a bag whether to take it, checking if any selection hits the exact target weight.",
+    "solutions": [
+      {
+        "label": "Include / exclude recursion",
+        "complexity": {
+          "time": "O(2^N)",
+          "space": "O(N) recursion depth"
+        },
+        "plain": "Recurse over indices, branching on taking or not taking each element, and check if the remaining target becomes 0.",
+        "approach": [
+          "At index idx with remaining target, if idx reached the end return whether target is 0.",
+          "Branch 1: include A[idx], recurse with target - A[idx].",
+          "Branch 2: exclude A[idx], recurse with the same target.",
+          "Return true if either branch succeeds; convert to 1/0."
+        ],
+        "pseudocode": "solve(idx, target):\n  if idx == N: return target == 0\n  return solve(idx+1, target-A[idx]) or solve(idx+1, target)",
+        "code": "public class Solution {\n    public int SubsetSum(int[] A, int B) {\n        return solve(A, 0, B) ? 1 : 0;\n    }\n    private boolean solve(int[] A, int idx, long target) {\n        if (idx == A.length) return target == 0;\n        if (solve(A, idx + 1, target - A[idx])) return true;\n        if (solve(A, idx + 1, target)) return true;\n        return false;\n    }\n}",
+        "story": "Reference solution: the editor held only the empty stub, so this is a canonical include/exclude backtracking approach. Because values may be negative, a full 2^N search is used; N <= 17 keeps it feasible."
+      }
+    ]
+  }
+]

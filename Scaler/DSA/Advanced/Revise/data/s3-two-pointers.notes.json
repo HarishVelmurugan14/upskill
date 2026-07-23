@@ -1,0 +1,67 @@
+{
+  "topic": "Two Pointers",
+  "summary": "On a sorted array, two converging pointers answer pair/triple questions in O(N) after the O(N log N) sort — pair-sum, pair-difference, 3-sum, closest pair, container-with-most-water. On a non-negative array, two same-direction pointers form a sliding window for subarray-sum / longest-run problems. The invariant to protect: moving a pointer changes the quantity monotonically.",
+  "thoughtProcess": [
+    {
+      "title": "Sorted array + 'find a pair/triple' -> opposite-end pointers.",
+      "body": "l=0, r=N-1. If sum too small move l right, too big move r left. Each element visited once -> O(N). Sort first if not sorted."
+    },
+    {
+      "title": "Non-negative values + 'subarray sum / longest window' -> same-direction window.",
+      "body": "Expand right to grow the sum, shrink left when it exceeds the target. Only valid when values are non-negative (so growth is monotonic); with negatives use prefix-sum + hashmap."
+    },
+    {
+      "title": "3-sum / 3-pointers = fix one, two-pointer the rest.",
+      "body": "Sort, fix index i, run a two-pointer scan on (i+1 .. N-1). Skip duplicates on i and on the moving pointers to avoid repeat triples."
+    }
+  ],
+  "keyPatterns": [
+    {
+      "name": "Opposite-end pointers (sorted)",
+      "when": "Pair with target sum/difference, container water, closest pair",
+      "template": "l=0, r=N-1\nwhile l<r: cur=f(A[l],A[r]); update; if cur<target l++ else r--",
+      "examples": [
+        "3 Sum",
+        "Container With Most Water",
+        "Closest pair from sorted arrays"
+      ]
+    },
+    {
+      "name": "Fixed-anchor + two pointer",
+      "when": "3-sum / count triples",
+      "template": "sort; for i: l=i+1,r=N-1; move l/r by comparison; skip dups",
+      "examples": [
+        "3 Sum"
+      ]
+    },
+    {
+      "name": "Sliding window (non-negative)",
+      "when": "Longest run / subarray with sum condition",
+      "template": "l=0; for r: add A[r]; while(invalid) remove A[l++]; track best",
+      "examples": [
+        "Subarray with given sum",
+        "Max Continuous Series of 1s"
+      ]
+    }
+  ],
+  "commonMistakes": [
+    {
+      "title": "Two-pointer on an array with negatives",
+      "wrong": "while(sum>target) sum-=A[l++];",
+      "right": "use prefix-sum + hashmap when values can be negative",
+      "why": "The window invariant assumes adding grows the sum and removing shrinks it; a negative element breaks monotonicity and skips valid windows."
+    },
+    {
+      "title": "3-sum returning duplicate triples",
+      "wrong": "no skip on equal values",
+      "right": "while(l<r && A[l]==A[l-1]) l++; (and same for i, r)",
+      "why": "Without skipping equal neighbours you emit the same triple many times."
+    }
+  ],
+  "edgeCases": [
+    "Empty or single-element array — the l<r loop simply never runs; make sure that returns the right base answer.",
+    "All-equal array in 3-sum — duplicate-skipping must still allow the one valid triple.",
+    "Pair sum/difference: overflow — A[l]+A[r] with values up to 1e9 needs long.",
+    "Difference problems: decide up front whether pairs are ordered and whether a value can pair with itself."
+  ]
+}

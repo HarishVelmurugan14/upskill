@@ -58,7 +58,7 @@
       "title": "Enumerating subarrays to sum a quantity",
       "wrong": "for (int i = 0; i < N; i++) {\n    for (int j = i; j < N; j++) {\n        for (int k = i; k <= j; k++) {\n            total += A[k];\n        }\n    }\n}",
       "right": "// contribution: A[i] appears in (i+1) * (N-i) subarrays\nlong total = 0;\nfor (int i = 0; i < N; i++) {\n    total += (long) A[i] * (i + 1) * (N - i);\n}",
-      "why": "O(N^3) → O(N). The cast to long must be on A[i] BEFORE the first multiply, otherwise (i+1)*(N-i) overflows int silently for N around 5e4."
+      "why": "The product (i+1)*(N-i) stays within int until about N ~= 92,700; beyond that it silently overflows. Cast A[i] (or the product) to long so large arrays don't wrap."
     },
     {
       "title": "Mutating A in place when the caller doesn't expect it",

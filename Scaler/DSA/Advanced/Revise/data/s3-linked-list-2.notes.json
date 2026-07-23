@@ -1,0 +1,79 @@
+{
+  "topic": "Linked List 2",
+  "summary": "Pointer-surgery problems. Two tools solve most of them: a dummy head (so inserting/deleting the first node needs no special case) and the fast/slow pointer (middle, cycle detection, palindrome, nth-from-end). Merge-sort is the O(N log N) way to sort a list; LRU cache pairs a HashMap with a doubly linked list for O(1) get/put.",
+  "thoughtProcess": [
+    {
+      "title": "Editing near the head? Use a dummy node.",
+      "body": "dummy.next = head; work with a 'prev' pointer starting at dummy; return dummy.next. This removes the special case for changing the first element."
+    },
+    {
+      "title": "Middle / cycle / palindrome / nth-from-end -> fast & slow pointers.",
+      "body": "slow moves 1, fast moves 2. When fast hits the end, slow is at the middle. If fast ever meets slow, there is a cycle (Floyd)."
+    },
+    {
+      "title": "Always cache node.next before you rewire it.",
+      "body": "Reversing or reordering overwrites next; save it in a temp first or you lose the rest of the list."
+    }
+  ],
+  "keyPatterns": [
+    {
+      "name": "Dummy head",
+      "when": "Insert/delete/partition where the head may change",
+      "template": "ListNode dummy=new ListNode(0); dummy.next=head; ListNode prev=dummy; ... return dummy.next;",
+      "examples": [
+        "Partition List",
+        "Remove Loop from Linked List",
+        "Add Two Numbers as Lists"
+      ]
+    },
+    {
+      "name": "Fast & slow pointers",
+      "when": "Middle, cycle, palindrome, reorder",
+      "template": "slow=head; fast=head; while(fast!=null && fast.next!=null){slow=slow.next; fast=fast.next.next;}",
+      "examples": [
+        "Middle element of linked list",
+        "Palindrome List",
+        "Reorder List",
+        "Remove Loop from Linked List"
+      ]
+    },
+    {
+      "name": "Merge two sorted lists",
+      "when": "Sort a list (merge sort) / combine",
+      "template": "walk both with a dummy tail, attach the smaller head each step, append the leftover",
+      "examples": [
+        "Merge Two Sorted Lists",
+        "Sort List",
+        "Flatten a linked list"
+      ]
+    },
+    {
+      "name": "HashMap + doubly linked list",
+      "when": "O(1) LRU get/put",
+      "template": "map key->node; DLL orders by recency; on access move node to front; evict from tail when full",
+      "examples": [
+        "LRU Cache"
+      ]
+    }
+  ],
+  "commonMistakes": [
+    {
+      "title": "Losing the rest of the list while rewiring",
+      "wrong": "cur.next = prev; cur = cur.next; // cur.next already changed",
+      "right": "ListNode nxt = cur.next; cur.next = prev; prev = cur; cur = nxt;",
+      "why": "Once you set cur.next you can't reach the old successor — cache it first."
+    },
+    {
+      "title": "Missing null / single-node checks",
+      "wrong": "while(fast.next.next) ...",
+      "right": "while(fast != null && fast.next != null) ...",
+      "why": "Dereferencing next on a null or last node throws NullPointerException; guard both fast and fast.next."
+    }
+  ],
+  "edgeCases": [
+    "Empty list (head == null) and single node — most routines should return immediately.",
+    "Even vs odd length changes which node fast/slow lands on for 'middle' — pick the convention the problem wants.",
+    "Cycle present: a naive traversal loops forever; detect with Floyd before length/print operations.",
+    "Add-two-numbers: carry can remain after both lists end — append a final node when carry != 0."
+  ]
+}

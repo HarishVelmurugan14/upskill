@@ -1,0 +1,58 @@
+{
+  "topic": "Prime Numbers",
+  "summary": "Sieve-based primality and divisor problems. The Sieve of Eratosthenes precomputes all primes up to N in O(N log log N); divisor counts come from trial division up to sqrt(n). Watch the classic sieve bugs: start crossing at i*i, cast i*i to long, and remember 0 and 1 are not prime.",
+  "thoughtProcess": [
+    {
+      "title": "Need primality for many numbers up to N? Sieve once, then O(1) lookups.",
+      "body": "One boolean[] sieve of size N+1 answers every 'is x prime' in O(1). Per-number trial division (O(sqrt x) each) only wins for a few queries or very large single values."
+    },
+    {
+      "title": "Counting divisors? Loop to sqrt(n) and add divisors in pairs.",
+      "body": "For each i with i*i <= n and n%i==0, i and n/i are both divisors (count 2, or 1 when i == n/i for a perfect square)."
+    },
+    {
+      "title": "'Sum of two primes' / Goldbach-style: sieve, then scan p and check N-p.",
+      "body": "For each prime p <= N/2, if (N-p) is also prime you have a pair; sieve makes both checks O(1)."
+    }
+  ],
+  "keyPatterns": [
+    {
+      "name": "Sieve of Eratosthenes",
+      "when": "All primes / prime flags up to N (N <= ~1e7)",
+      "template": "boolean[] comp = new boolean[N+1];\nfor (int i=2; (long)i*i<=N; i++) if(!comp[i])\n  for (long j=(long)i*i; j<=N; j+=i) comp[(int)j]=true;",
+      "examples": [
+        "Find All Primes",
+        "Prime Sum",
+        "Lucky Numbers"
+      ]
+    },
+    {
+      "name": "Divisor count in O(sqrt n)",
+      "when": "Count/lists divisors of a single number",
+      "template": "int c=0; for(int i=1;(long)i*i<=n;i++) if(n%i==0) c += (i==n/i)?1:2;",
+      "examples": [
+        "Count of divisors"
+      ]
+    }
+  ],
+  "commonMistakes": [
+    {
+      "title": "Sieve inner loop starts at 2*i, or i*i in int",
+      "wrong": "for j=2*i.. ; int j=i*i",
+      "right": "for (long j=(long)i*i; j<=N; j+=i)",
+      "why": "Multiples below i*i are already crossed by smaller primes; and i*i overflows int near N=1e9, wrapping negative."
+    },
+    {
+      "title": "Treating 0 or 1 as prime",
+      "wrong": "for(i=0..) if(!comp[i]) prime",
+      "right": "start the prime scan at i=2; comp[0]=comp[1]=true conceptually",
+      "why": "0 and 1 are not prime; including them corrupts prime lists and Goldbach checks."
+    }
+  ],
+  "edgeCases": [
+    "Sieve array must be size N+1 so index N is valid; the outer loop only needs i*i <= N.",
+    "n < 2 has no primes and 0 divisors-of-interest — guard tiny inputs.",
+    "Perfect squares: count the sqrt divisor once, not twice.",
+    "Very large single n with no upper bound: use O(sqrt n) trial division, not a sieve (memory)."
+  ]
+}

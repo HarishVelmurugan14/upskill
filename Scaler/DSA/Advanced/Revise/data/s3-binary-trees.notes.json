@@ -1,0 +1,88 @@
+{
+  "topic": "Binary Trees",
+  "summary": "Tree recursion plus BST structure. Most answers come from a recursion that returns something upward (height, sum, subtree info); BSTs add the key fact that an inorder traversal is sorted. Special tools here: Morris traversal for O(1) space, BFS with a horizontal-distance key for top/vertical views, and the two-bounds trick for BST validity and LCA.",
+  "thoughtProcess": [
+    {
+      "title": "Decide what each recursive call RETURNS, then compose the parent's answer.",
+      "body": "Height returns 1+max(childHeights); diameter tracks the best left+right while returning height; sum returns node+left+right. Nail the return contract first."
+    },
+    {
+      "title": "BST? Inorder is sorted — lean on it.",
+      "body": "Kth-smallest = kth inorder node; validate/recover BST by checking the inorder is increasing; range and search prune by comparing to node.val."
+    },
+    {
+      "title": "Views (top/vertical) = BFS carrying a horizontal distance (hd).",
+      "body": "Root hd=0, left child hd-1, right hd+1. Group nodes by hd; top view keeps the first node seen per hd, vertical order keeps all (top to bottom)."
+    }
+  ],
+  "keyPatterns": [
+    {
+      "name": "Return-value recursion",
+      "when": "Height, diameter, sum, balanced-check",
+      "template": "int h(node){ if(!node) return 0; int L=h(node.left),R=h(node.right); best=max(best,L+R); return 1+max(L,R);}",
+      "examples": [
+        "Diameter of binary tree",
+        "Path Sum",
+        "Identical Binary Trees",
+        "Invert the Binary Tree"
+      ]
+    },
+    {
+      "name": "BST inorder",
+      "when": "Kth smallest, validate, recover, common nodes",
+      "template": "inorder(node): inorder(left); visit(node); inorder(right)  // yields sorted order",
+      "examples": [
+        "Kth Smallest Element In BST",
+        "Recover Binary Search Tree",
+        "Common Nodes in Two BST"
+      ]
+    },
+    {
+      "name": "LCA by node values / bounds",
+      "when": "Lowest common ancestor",
+      "template": "BST: walk down, go left if both < node, right if both > node, else current is LCA.\nGeneral tree: recurse; node where left and right both find a target is the LCA.",
+      "examples": [
+        "LCA in BST",
+        "Least Common Ancestor",
+        "Distance between Nodes of BST"
+      ]
+    },
+    {
+      "name": "BFS with horizontal distance",
+      "when": "Top view / vertical order",
+      "template": "queue of (node,hd); map hd->nodes; root hd=0, left hd-1, right hd+1",
+      "examples": [
+        "Top View of Binary tree",
+        "Vertical Order traversal"
+      ]
+    },
+    {
+      "name": "Morris traversal",
+      "when": "Inorder in O(1) extra space (no stack/recursion)",
+      "template": "thread each node's inorder predecessor to it; unthread on the second visit",
+      "examples": [
+        "Morris Inorder Traversal"
+      ]
+    }
+  ],
+  "commonMistakes": [
+    {
+      "title": "BST validity checked against parent only, not ancestors",
+      "wrong": "return node.val>node.left.val && node.val<node.right.val;",
+      "right": "boolean valid(node,long lo,long hi){ if(node==null)return true; if(node.val<=lo||node.val>=hi)return false; ... }",
+      "why": "A node must respect ALL ancestor bounds, not just its immediate children; carry (lo,hi) down and use long to dodge Integer.MIN/MAX edge values."
+    },
+    {
+      "title": "Morris traversal that never removes the thread",
+      "wrong": "create thread; recurse",
+      "right": "on revisiting a threaded predecessor, set pred.right=null before visiting",
+      "why": "Leaving threads in place corrupts the tree into a cycle; you must unthread on the second encounter."
+    }
+  ],
+  "edgeCases": [
+    "Empty tree (root == null) and single node — base cases for every recursion.",
+    "Skewed tree (all-left or all-right) makes recursion depth O(N) — deep trees risk stack overflow.",
+    "BST bounds: a node holding Integer.MIN_VALUE/MAX_VALUE fails int-range checks — use long sentinels.",
+    "LCA where one node is an ancestor of the other, or a node isn't present — define the expected behaviour."
+  ]
+}

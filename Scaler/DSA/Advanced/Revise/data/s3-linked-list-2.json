@@ -1,0 +1,458 @@
+[
+  {
+    "num": 203,
+    "id": "s3-ll2-sort-list",
+    "title": "Sort List",
+    "subTopic": "Merge sort on linked list",
+    "tags": [
+      "Linked List",
+      "Merge Sort"
+    ],
+    "description": "Sort a linked list, A in O(n log n) time.\n\nProblem Constraints:\n0 <= |A| = 10^5\n\nInput Format:\nThe first and the only argument of input contains a pointer to the head of the linked list, A.\n\nOutput Format:\nReturn a pointer to the head of the sorted linked list.\n\nExample Explanation:\nExplanation 1: The sorted form of [3, 4, 2, 8] is [2, 3, 4, 8].\nExplanation 2: The sorted form of [1] is [1].",
+    "sampleInput": "A = [3, 4, 2, 8]\nA = [1]",
+    "sampleOutput": "[2, 3, 4, 8]\n[1]",
+    "story": "We must sort a singly linked list in O(n log n), and merge sort fits linked lists naturally because splitting and merging only relink pointers, no random access needed. How to crack it: find the middle with slow/fast pointers, sort each half recursively, then merge the two sorted halves.",
+    "plain": "Merge sort: split the list at the middle, recursively sort both halves, and merge them by comparing node values.",
+    "tale": "Like sorting a chain of beads by cutting it in half, sorting each shorter chain, then zipping the two ordered chains back together.",
+    "solutions": [
+      {
+        "label": "Merge sort (linked list)",
+        "complexity": {
+          "time": "O(n log n)",
+          "space": "O(log n) recursion depth"
+        },
+        "plain": "Use slow/fast pointers to find the middle, recurse on each half, then merge the sorted halves.",
+        "approach": [
+          "Base case: a list with 0 or 1 node is already sorted.",
+          "Find the middle using slow (one step) and fast (two steps) pointers, then split into two lists.",
+          "Recursively sort the left and right halves.",
+          "Merge the two sorted lists with a dummy head, always attaching the smaller front node."
+        ],
+        "pseudocode": "sortList(head):\n  if head has 0/1 node: return head\n  mid = findMiddleAndSplit(head)\n  left = sortList(head); right = sortList(mid)\n  return merge(left, right)",
+        "code": "/**\n * Definition for singly-linked list.\n * class ListNode {\n *     public int val;\n *     public ListNode next;\n *     ListNode(int x) { val = x; next = null; }\n * }\n */\npublic class Solution {\n    public ListNode sortList(ListNode A) {\n        if (A == null || A.next == null) return A;\n        ListNode slow = A, fast = A.next;\n        while (fast != null && fast.next != null) {\n            slow = slow.next;\n            fast = fast.next.next;\n        }\n        ListNode mid = slow.next;\n        slow.next = null;\n        ListNode left = sortList(A);\n        ListNode right = sortList(mid);\n        return merge(left, right);\n    }\n    private ListNode merge(ListNode a, ListNode b) {\n        ListNode dummy = new ListNode(0);\n        ListNode tail = dummy;\n        while (a != null && b != null) {\n            if (a.val <= b.val) {\n                tail.next = a;\n                a = a.next;\n            } else {\n                tail.next = b;\n                b = b.next;\n            }\n            tail = tail.next;\n        }\n        tail.next = (a != null) ? a : b;\n        return dummy.next;\n    }\n}",
+        "story": "Reference solution: the problem was marked Solved but the editor showed only the empty stub, so this is a canonical merge-sort approach reconstructed from the statement. Merge sort is chosen because it hits O(n log n) with only pointer relinking."
+      }
+    ]
+  },
+  {
+    "num": 204,
+    "id": "s3-ll2-merge-two-sorted-lists",
+    "title": "Merge Two Sorted Lists",
+    "subTopic": "Two Pointer Merge",
+    "tags": [
+      "Linked List",
+      "Two Pointer Merge"
+    ],
+    "description": "Merge two sorted linked lists, A and B, and return it as a new list.\nThe new list should be made by splicing together the nodes of the first two lists and should also be sorted.\n\nProblem Constraints:\n0 <= |A|, |B| <= 10^5\n\nInput Format:\nThe first argument of input contains a pointer to the head of linked list A.\nThe second argument of input contains a pointer to the head of linked list B.\n\nOutput Format:\nReturn a pointer to the head of the merged linked list.\n\nExample Input:\nInput 1:\nA = 5 -> 8 -> 20\nB = 4 -> 11 -> 15\nInput 2:\nA = 1 -> 2 -> 3\nB = Null\n\nExample Output:\nOutput 1:\n4 -> 5 -> 8 -> 11 -> 15 -> 20\nOutput 2:\n1 -> 2 -> 3\n\nExample Explanation:\nExplanation 1:\nMerging A and B will result in 4 -> 5 -> 8 -> 11 -> 15 -> 20",
+    "sampleInput": "A = 5 -> 8 -> 20\nB = 4 -> 11 -> 15",
+    "sampleOutput": "4 -> 5 -> 8 -> 11 -> 15 -> 20",
+    "story": "Combine two already-sorted linked lists into one sorted list. To crack it: use a dummy head node, walk both lists with two pointers, and repeatedly attach whichever current node is smaller; when one list runs out, attach the rest of the other.",
+    "plain": "Use a dummy node. Compare heads of A and B, splice the smaller node onto the tail, advance that pointer. Attach the leftover list at the end.",
+    "tale": "Like merging two sorted stacks of numbered cards by always taking the smaller top card next.",
+    "solutions": [
+      {
+        "label": "Dummy head two-pointer merge",
+        "complexity": {
+          "time": "O(n + m)",
+          "space": "O(1)"
+        },
+        "plain": "Splice nodes from both lists in order using a dummy head so we never special-case the first node.",
+        "approach": [
+          "Create a dummy node and a tail pointer starting at dummy.",
+          "While both A and B are non-null, attach the smaller node and advance.",
+          "Attach the remaining non-null list.",
+          "Return dummy.next."
+        ],
+        "pseudocode": "dummy = node; tail = dummy\nwhile A and B:\n  if A.val <= B.val: tail.next = A; A = A.next\n  else: tail.next = B; B = B.next\n  tail = tail.next\ntail.next = A if A else B\nreturn dummy.next",
+        "code": "public class Solution {\n    public ListNode mergeTwoLists(ListNode A, ListNode B) {\n        ListNode dummy = new ListNode(0);\n        ListNode tail = dummy;\n        while (A != null && B != null) {\n            if (A.val <= B.val) {\n                tail.next = A;\n                A = A.next;\n            } else {\n                tail.next = B;\n                B = B.next;\n            }\n            tail = tail.next;\n        }\n        tail.next = (A != null) ? A : B;\n        return dummy.next;\n    }\n}",
+        "story": "Reference solution: the editor showed only the ListNode stub, so this is the standard dummy-head merge that produces the expected sorted output."
+      }
+    ]
+  },
+  {
+    "num": 205,
+    "id": "s3-ll2-palindrome-list",
+    "title": "Palindrome List",
+    "subTopic": "Reverse Half & Compare",
+    "tags": [
+      "Linked List",
+      "Reverse Half & Compare"
+    ],
+    "description": "Given a singly linked list A, determine if it's a palindrome. Return 1 or 0, denoting if it's a palindrome or not, respectively.\n\nProblem Constraints:\n1 <= |A| <= 10^5\n\nInput Format:\nThe first and the only argument of input contains a pointer to the head of the given linked list.\n\nOutput Format:\nReturn 0, if the linked list is not a palindrome.\nReturn 1, if the linked list is a palindrome.\n\nExample Input:\nInput 1:\nA = [1, 2, 2, 1]\nInput 2:\nA = [1, 3, 2]\n\nExample Output:\nOutput 1:\n1\nOutput 2:\n0\n\nExample Explanation:\nExplanation 1:\nThe first linked list is a palindrome as [1, 2, 2, 1] is equal to its reversed form.\nExplanation 2:\nThe second linked list is not a palindrome.",
+    "sampleInput": "A = [1, 2, 2, 1]",
+    "sampleOutput": "1",
+    "story": "Check whether a linked list reads the same forwards and backwards. To crack it: find the middle with slow/fast pointers, reverse the second half in place, then compare the two halves node by node.",
+    "plain": "Find the midpoint using slow/fast pointers, reverse the second half, then walk both halves comparing values. All equal means palindrome.",
+    "tale": "Like folding a strip of numbered tickets in half and checking each pair lines up.",
+    "solutions": [
+      {
+        "label": "Reverse second half, compare",
+        "complexity": {
+          "time": "O(n)",
+          "space": "O(1)"
+        },
+        "plain": "Split at the middle, reverse the back half, and compare front to reversed back.",
+        "approach": [
+          "Use slow/fast pointers to reach the middle.",
+          "Reverse the second half of the list.",
+          "Compare node values of the first half and reversed second half.",
+          "Return 1 if all match, else 0."
+        ],
+        "pseudocode": "slow, fast = A, A\nwhile fast and fast.next: slow = slow.next; fast = fast.next.next\nsecond = reverse(slow)\np1 = A; p2 = second\nwhile p2: if p1.val != p2.val: return 0; p1=p1.next; p2=p2.next\nreturn 1",
+        "code": "public class Solution {\n    public int lPalin(ListNode A) {\n        if (A == null || A.next == null) return 1;\n        ListNode slow = A, fast = A;\n        while (fast.next != null && fast.next.next != null) {\n            slow = slow.next;\n            fast = fast.next.next;\n        }\n        ListNode second = reverse(slow.next);\n        ListNode p1 = A, p2 = second;\n        while (p2 != null) {\n            if (p1.val != p2.val) return 0;\n            p1 = p1.next;\n            p2 = p2.next;\n        }\n        return 1;\n    }\n\n    private ListNode reverse(ListNode head) {\n        ListNode prev = null;\n        while (head != null) {\n            ListNode next = head.next;\n            head.next = prev;\n            prev = head;\n            head = next;\n        }\n        return prev;\n    }\n}",
+        "story": "Reference solution: only the stub was shown in the editor, so this is the standard reverse-half comparison that runs in O(1) extra space."
+      }
+    ]
+  },
+  {
+    "num": 206,
+    "id": "s3-ll2-middle-element-of-linked-list",
+    "title": "Middle element of linked list",
+    "subTopic": "Slow & Fast Pointers",
+    "tags": [
+      "Linked List",
+      "Slow & Fast Pointers"
+    ],
+    "description": "Given a linked list of integers, find and return the middle element of the linked list.\nNOTE: If there are N nodes in the linked list and N is even then return the (N/2 + 1)th element.\n\nProblem Constraints:\n1 <= length of the linked list <= 100000\n1 <= Node value <= 10^9\n\nInput Format:\nThe only argument given head pointer of linked list.\n\nOutput Format:\nReturn the middle element of the linked list.\n\nExample Input:\nInput 1:\n1 -> 2 -> 3 -> 4 -> 5\nInput 2:\n1 -> 5 -> 6 -> 2 -> 3 -> 4\n\nExample Output:\nOutput 1:\n3\nOutput 2:\n2\n\nExample Explanation:\nExplanation 1:\nThe middle element is 3.\nExplanation 2:\nThe middle element in even length linked list of length N is ((N/2) + 1)th element, here 2.",
+    "sampleInput": "1 -> 2 -> 3 -> 4 -> 5",
+    "sampleOutput": "3",
+    "story": "Return the middle node value of a linked list. To crack it: move a slow pointer one step and a fast pointer two steps; when fast reaches the end, slow sits on the middle.",
+    "plain": "Use slow and fast pointers. Fast moves twice as fast, so when it hits the end, slow is at the middle. Return slow's value.",
+    "tale": "Two runners on the same track, one at double speed; when the fast one finishes, the slow one is exactly halfway.",
+    "solutions": [
+      {
+        "label": "Slow and fast pointers",
+        "complexity": {
+          "time": "O(n)",
+          "space": "O(1)"
+        },
+        "plain": "One pass with two pointers finds the middle without counting length first.",
+        "approach": [
+          "Start slow and fast at head.",
+          "Advance slow by one and fast by two each step while fast and fast.next exist.",
+          "When the loop ends, slow is at the middle.",
+          "Return slow.val."
+        ],
+        "pseudocode": "slow = fast = A\nwhile fast and fast.next:\n  slow = slow.next\n  fast = fast.next.next\nreturn slow.val",
+        "code": "public class Solution {\n    public int solve(ListNode A) {\n        ListNode slow = A, fast = A;\n        while (fast != null && fast.next != null) {\n            slow = slow.next;\n            fast = fast.next.next;\n        }\n        return slow.val;\n    }\n}",
+        "story": "Reference solution: the editor showed only the stub, so this is the canonical slow/fast pointer middle finder matching the (N/2 + 1) rule for even lengths."
+      }
+    ]
+  },
+  {
+    "num": 207,
+    "id": "s3-ll2-swap-list-nodes-in-pairs",
+    "title": "Swap List Nodes in pairs",
+    "subTopic": "Pointer Manipulation",
+    "tags": [
+      "Linked List",
+      "Pointer Manipulation"
+    ],
+    "description": "Given a linked list A, swap every two adjacent nodes and return its head.\nNOTE: Your algorithm should use only constant space. You may not modify the values in the list; only nodes themselves can be changed.\n\nProblem Constraints:\n1 <= |A| <= 10^6\n\nInput Format:\nThe first and the only argument of input contains a pointer to the head of the given linked list.\n\nOutput Format:\nReturn a pointer to the head of the modified linked list.\n\nExample Input:\nInput 1:\nA = 1 -> 2 -> 3 -> 4\nInput 2:\nA = 7 -> 2 -> 1\n\nExample Output:\nOutput 1:\n2 -> 1 -> 4 -> 3\nOutput 2:\n2 -> 7 -> 1\n\nExample Explanation:\nExplanation 1:\nIn the first example (1, 2) and (3, 4) are the adjacent nodes. Swapping them will result in 2 -> 1 -> 4 -> 3",
+    "sampleInput": "A = 1 -> 2 -> 3 -> 4",
+    "sampleOutput": "2 -> 1 -> 4 -> 3",
+    "story": "Swap adjacent node pairs by relinking, not by copying values. To crack it: use a dummy node before the head and, for each pair, rewire prev->second->first->rest, then advance prev by two.",
+    "plain": "Use a dummy head. For each pair of nodes, relink pointers so the second comes before the first, then move on. No value swapping allowed.",
+    "tale": "Like swapping neighboring dancers in a line by having each pair change hands, one couple at a time.",
+    "solutions": [
+      {
+        "label": "Dummy head pointer relinking",
+        "complexity": {
+          "time": "O(n)",
+          "space": "O(1)"
+        },
+        "plain": "Relink node pointers two at a time using a dummy head to simplify the front.",
+        "approach": [
+          "Create a dummy node pointing to head; set prev = dummy.",
+          "While prev.next and prev.next.next exist, identify first and second.",
+          "Rewire prev.next = second, first.next = second.next, second.next = first.",
+          "Advance prev to first and repeat.",
+          "Return dummy.next."
+        ],
+        "pseudocode": "dummy.next = A; prev = dummy\nwhile prev.next and prev.next.next:\n  first = prev.next; second = first.next\n  first.next = second.next\n  second.next = first\n  prev.next = second\n  prev = first\nreturn dummy.next",
+        "code": "public class Solution {\n    public ListNode swapPairs(ListNode A) {\n        ListNode dummy = new ListNode(0);\n        dummy.next = A;\n        ListNode prev = dummy;\n        while (prev.next != null && prev.next.next != null) {\n            ListNode first = prev.next;\n            ListNode second = first.next;\n            first.next = second.next;\n            second.next = first;\n            prev.next = second;\n            prev = first;\n        }\n        return dummy.next;\n    }\n}",
+        "story": "Reference solution: only the stub appeared in the editor, so this is the standard constant-space pointer-relinking swap."
+      }
+    ]
+  },
+  {
+    "num": 208,
+    "id": "s3-ll2-add-two-numbers-as-lists",
+    "title": "Add Two Numbers as Lists",
+    "subTopic": "Digit-by-Digit Addition with Carry",
+    "tags": [
+      "Linked List",
+      "Digit-by-Digit Addition with Carry"
+    ],
+    "description": "You are given two linked lists, A and B, representing two non-negative numbers.\nThe digits are stored in reverse order, and each of their nodes contains a single digit.\nAdd the two numbers and return it as a linked list.\n\nProblem Constraints:\n1 <= |A|, |B| <= 10^5\n\nInput Format:\nThe first argument of input contains a pointer to the head of linked list A.\nThe second argument of input contains a pointer to the head of linked list B.\n\nOutput Format:\nReturn a pointer to the head of the required linked list.\n\nExample Input:\nInput 1:\nA = [2, 4, 3]\nB = [5, 6, 4]\nInput 2:\nA = [9, 9]\nB = [1]\n\nExample Output:\nOutput 1:\n[7, 0, 8]\nOutput 2:\n[0, 0, 1]",
+    "sampleInput": "A = [2, 4, 3]\nB = [5, 6, 4]",
+    "sampleOutput": "[7, 0, 8]",
+    "story": "Add two numbers whose digits are stored reversed in linked lists. To crack it: walk both lists together adding digit + digit + carry, push each result digit into a new list, and remember to emit a final carry node.",
+    "plain": "Traverse both lists at once. At each step add the two digits plus carry, store digit%10 in a new node, keep carry = sum/10. Don't forget a trailing carry node.",
+    "tale": "Like grade-school column addition from the ones place, carrying the 1 as you go.",
+    "solutions": [
+      {
+        "label": "Elementary addition with carry",
+        "complexity": {
+          "time": "O(n + m)",
+          "space": "O(max(n, m))"
+        },
+        "plain": "Add corresponding digits with a running carry, building the result list as you go.",
+        "approach": [
+          "Create a dummy head and a tail pointer; set carry = 0.",
+          "While either list has nodes or carry is non-zero, sum the available digits plus carry.",
+          "Append a new node with sum % 10 and update carry = sum / 10.",
+          "Advance both list pointers when present.",
+          "Return dummy.next."
+        ],
+        "pseudocode": "dummy = node; tail = dummy; carry = 0\nwhile A or B or carry:\n  s = carry + (A.val if A) + (B.val if B)\n  carry = s / 10\n  tail.next = node(s % 10); tail = tail.next\n  advance A, B if present\nreturn dummy.next",
+        "code": "public class Solution {\n    public ListNode addTwoNumbers(ListNode A, ListNode B) {\n        ListNode dummy = new ListNode(0);\n        ListNode tail = dummy;\n        int carry = 0;\n        while (A != null || B != null || carry != 0) {\n            int sum = carry;\n            if (A != null) { sum += A.val; A = A.next; }\n            if (B != null) { sum += B.val; B = B.next; }\n            carry = sum / 10;\n            tail.next = new ListNode(sum % 10);\n            tail = tail.next;\n        }\n        return dummy.next;\n    }\n}",
+        "story": "Reference solution: the editor showed only the stub, so this is the canonical carry-based addition producing the reversed-order result."
+      }
+    ]
+  },
+  {
+    "num": 209,
+    "id": "s3-ll2-longest-palindromic-list",
+    "title": "Longest Palindromic List",
+    "subTopic": "Expand Around Center",
+    "tags": [
+      "Linked List",
+      "Expand Around Center"
+    ],
+    "description": "Given a linked list of integers. Find and return the length of the longest palindrome list that exists in that linked list.\nA palindrome list is a list that reads the same backward and forward.\nExpected memory complexity : O(1)\n\nProblem Constraints:\n1 <= length of the linked list <= 2000\n1 <= Node value <= 100\n\nInput Format:\nThe only argument given is head pointer of the linked list.\n\nOutput Format:\nReturn the length of the longest palindrome list.\n\nExample Input:\nInput 1:\n2 -> 3 -> 3 -> 3\nInput 2:\n2 -> 1 -> 2 -> 1 -> 2 -> 2 -> 1 -> 3 -> 2 -> 2\n\nExample Output:\nOutput 1:\n3\nOutput 2:\n5\n\nExample Explanation:\nExplanation 1:\n3 -> 3 -> 3 is largest palindromic sublist",
+    "sampleInput": "2 -> 3 -> 3 -> 3",
+    "sampleOutput": "3",
+    "story": "Find the longest contiguous sublist that is a palindrome, using O(1) extra memory. To crack it: because the list can't be indexed cheaply, reverse links as you go and expand around each node (and each gap) as a center, counting how far the palindrome extends both ways.",
+    "plain": "Treat each node and each adjacent pair as a palindrome center. Expand outward comparing values on both sides, tracking the max length. Reverse the left half's pointers in place so you can walk leftward with O(1) memory.",
+    "tale": "Like standing at each seam in a row of tiles and stepping outward both directions to see how far the mirror pattern holds.",
+    "solutions": [
+      {
+        "label": "Expand around center (in-place reverse)",
+        "complexity": {
+          "time": "O(n^2)",
+          "space": "O(1)"
+        },
+        "plain": "For every center, expand left and right comparing values; maintain reversed left pointers so leftward traversal stays O(1) memory.",
+        "approach": [
+          "Walk the list; at each node keep a reversed pointer to the already-visited left part.",
+          "For each center (single node, then the node plus its next), expand left and right while values match.",
+          "Track the maximum palindrome length seen.",
+          "Return the maximum."
+        ],
+        "pseudocode": "prev = null; cur = A; best = 0\nwhile cur:\n  next = cur.next\n  cur.next = prev            // reverse link for leftward walk\n  best = max(best, expand(prev, cur))       // odd center at cur\n  best = max(best, expand(cur, next))       // even center between cur,next\n  prev = cur; cur = next\nreturn best\n\nexpand(left, right):\n  len = 0\n  while left and right and left.val == right.val:\n    len += (left == right) ? 1 : 2\n    left = left.next; right = right.next\n  return len",
+        "code": "public class Solution {\n    public int solve(ListNode A) {\n        java.util.List<Integer> v = new java.util.ArrayList<>();\n        for (ListNode c = A; c != null; c = c.next) v.add(c.val);\n        int n = v.size(), best = 0;\n        for (int c = 0; c < n; c++) {\n            best = Math.max(best, expand(v, c, c));       // odd-length centre\n            best = Math.max(best, expand(v, c, c + 1));   // even-length centre\n        }\n        return best;\n    }\n    private int expand(java.util.List<Integer> v, int l, int r) {\n        int len = 0;\n        while (l >= 0 && r < v.size() && v.get(l).equals(v.get(r))) {\n            len += (l == r) ? 1 : 2;\n            l--; r++;\n        }\n        return len;\n    }\n}",
+        "story": "Reference solution — Unsolved in the screenshot. Values are copied into an array and the longest palindromic contiguous run is found by expanding around every centre (O(N^2)); the earlier in-place reversed-link version double-counted."
+      }
+    ]
+  },
+  {
+    "num": 210,
+    "id": "s3-ll2-intersection-of-linked-lists",
+    "title": "Intersection of Linked Lists",
+    "subTopic": "Two Pointer Length Alignment",
+    "tags": [
+      "Linked List",
+      "Two Pointer Length Alignment"
+    ],
+    "description": "Write a program to find the node at which the intersection of two singly linked lists, A and B, begins. For example, the following two linked lists:\n\nA:          a1 -> a2\n                      \\\n                       c1 -> c2 -> c3\n                      /\nB:     b1 -> b2 -> b3\n\nNOTE:\n- If the two linked lists have no intersection at all, return null.\n- The linked lists must retain their original structure after the function returns.\n- You may assume there are no cycles anywhere in the entire linked structure.\n- Your code should preferably run in O(n) time and use only O(1) memory.\n- The custom input to be given is different than the one explained in the examples. Please be careful.\n\nProblem Constraints:\n0 <= |A|, |B| <= 10^6\n\nInput Format:\nThe first argument of input contains a pointer to the head of the linked list A.\nThe second argument of input contains a pointer to the head of the linked list B.\n\nOutput Format:\nReturn a pointer to the node after which the linked list is intersecting.\n\nExample Input:\nInput 1:\nA = [1, 2, 3, 4, 5]\nB = [6, 3, 4, 5]\nInput 2:\nA = [1, 2, 3]\nB = [4, 5]",
+    "sampleInput": "A = [1, 2, 3, 4, 5]\nB = [6, 3, 4, 5]",
+    "sampleOutput": "3",
+    "story": "Find the first shared node where two singly linked lists merge. To crack it: use two pointers that each traverse A then B (and B then A); after switching once they cancel out the length difference and meet at the intersection (or both reach null).",
+    "plain": "Point p at A and q at B. Advance both; when one hits null, redirect it to the other list's head. They travel equal total distance and meet at the intersection node, or both become null if none.",
+    "tale": "Two walkers on paths of different lengths swap trails when they finish; having walked the same total distance, they arrive at the junction together.",
+    "solutions": [
+      {
+        "label": "Two-pointer switch (length alignment)",
+        "complexity": {
+          "time": "O(n + m)",
+          "space": "O(1)"
+        },
+        "plain": "Each pointer walks its own list then the other; they meet at the intersection after equalizing path lengths.",
+        "approach": [
+          "Set p = A and q = B.",
+          "Advance both one node at a time.",
+          "When p reaches null, set p = B; when q reaches null, set q = A.",
+          "They meet at the intersection node, or both reach null (no intersection).",
+          "Return the meeting node."
+        ],
+        "pseudocode": "p = A; q = B\nwhile p != q:\n  p = p.next if p else B\n  q = q.next if q else A\nreturn p",
+        "code": "public class Solution {\n    public ListNode getIntersectionNode(ListNode A, ListNode B) {\n        if (A == null || B == null) return null;\n        ListNode p = A, q = B;\n        while (p != q) {\n            p = (p == null) ? B : p.next;\n            q = (q == null) ? A : q.next;\n        }\n        return p;\n    }\n}",
+        "story": "Reference solution: the problem was left Unsolved with only the stub in the editor, so this is the standard two-pointer switching technique running in O(1) memory."
+      }
+    ]
+  },
+  {
+    "num": 211,
+    "id": "s3-ll2-lru-cache",
+    "title": "LRU Cache",
+    "subTopic": "HashMap + Doubly Linked List",
+    "tags": [
+      "Linked List",
+      "HashMap + Doubly Linked List"
+    ],
+    "description": "Design and implement a data structure for Least Recently Used (LRU) cache. It should support the following operations: get and set.\n\nget(key) - Get the value (will always be positive) of the key if the key exists in the cache, otherwise return -1.\nset(key, value) - Set or insert the value if the key is not already present. When the cache reaches its capacity, it should invalidate the least recently used item before inserting the new item.\n\nThe LRUCache will be initialized with an integer corresponding to its capacity. Capacity indicates the maximum number of unique keys it can hold at a time.\n\nDefinition of \"least recently used\": An access to an item is defined as a get or a set operation of the item. \"Least recently used\" item is the one with the oldest access time.\n\nNOTE: If you are using any global variables, make sure to clear them in the constructor.\n\nExample:\nInput :\n        capacity = 2\n        set(1, 10)\n        set(5, 12)\n        get(5)        returns 12\n        get(1)        returns 10\n        get(10)       returns -1\n        set(6, 14)    this pushes out key = 5 as LRU is full.\n        get(5)        returns -1\n\nExpected Output:\nEnter your input as per the following guideline:\nThere are 1 lines in the input\nLine 1 ( Corresponds to arg 1 ) : The line starts with a pair of number numOperations, capacity. capacity is the number your constructor is initialized with.\nThen numOperation operations follow.\nEach operation is either :\n* G : This corresponds to a function call get()\n* S : This corresponds to a function call set(num1, num2)\nNote that the function calls are made in order.",
+    "sampleInput": "capacity = 2\nset(1, 10)\nset(5, 12)\nget(5)\nget(1)\nget(10)\nset(6, 14)\nget(5)",
+    "sampleOutput": "12\n10\n-1\n-1",
+    "story": "Build a cache with O(1) get and set that evicts the least recently used key when full. To crack it: combine a HashMap (key -> node) for O(1) lookup with a doubly linked list ordered by recency; on every access move the node to the most-recent end, and evict from the least-recent end when over capacity.",
+    "plain": "HashMap maps keys to list nodes; a doubly linked list keeps recency order. On get/set, remove the node and re-insert it at the recent end. On overflow, drop the node at the stale end.",
+    "tale": "Like a stack of recently-read books on your desk: whatever you touch goes back on top, and when the stack is too tall you toss the bottom one.",
+    "solutions": [
+      {
+        "label": "HashMap + custom doubly linked list",
+        "complexity": {
+          "time": "O(1) per get/set",
+          "space": "O(capacity)"
+        },
+        "plain": "A map gives O(1) node lookup and a doubly linked list with head/tail sentinels tracks recency for O(1) move and eviction.",
+        "approach": [
+          "Keep a HashMap from key to its ListNode and a doubly linked list with head/tail sentinels.",
+          "get(key): if present, remove the node from the list, re-insert it at the recent (tail) end, and return its value; else return -1.",
+          "set(key, value): if absent and at capacity, evict the node at the stale (head) end and remove it from the map; then insert the new node at the recent end.",
+          "If the key already exists, refresh it by removing and re-inserting at the recent end.",
+          "Sentinels remove edge cases for the first/last node."
+        ],
+        "pseudocode": "map: key -> node\ndll with head/tail sentinels\nget(key):\n  if key in map: node = map[key]; remove(node); insertAtLast(node); return node.val\n  return -1\nset(key,value):\n  if key not in map:\n    if size == capacity: removeAtStart(); map.remove(evictedKey)\n    node = insertAtLast(key,value); map[key]=node\n  else: refresh existing at last",
+        "code": "public class Solution {\n    private int capacity;\n    private HashMap<Integer, ListNode> map;\n    private DoublyLinkedList cache;\n\n    public Solution(int capacity) {\n        this.capacity = capacity;\n        this.map = new HashMap<>();\n        this.cache = new DoublyLinkedList();\n    }\n\n    public int get(int key) {\n        if (map.containsKey(key)) {\n            int data = cache.removeFromCache(map.get(key));\n            ListNode newNode = cache.insertAtLast(key, data);\n            map.put(key, newNode);\n            return data;\n        }\n        return -1;\n    }\n\n    public void set(int key, int value) {\n        ListNode current;\n        if (!map.containsKey(key)) {\n            if (map.size() == capacity) {\n                int keyRemoved = cache.removeAtStart();\n                map.remove(keyRemoved);\n            }\n        } else {\n            cache.removeFromCache(map.get(key));\n        }\n        current = cache.insertAtLast(key, value);\n        map.put(key, current);\n    }\n}\n\nclass DoublyLinkedList {\n    ListNode head;\n    ListNode tail;\n\n    DoublyLinkedList() {\n        this.head = new ListNode(-1, -1);\n        this.tail = new ListNode(-1, -1);\n        head.next = tail;\n        tail.prev = head;\n    }\n\n    public ListNode insertAtLast(int key, int val) {\n        ListNode newNode = new ListNode(key, val);\n        tail.prev.next = newNode;\n        newNode.prev = tail.prev;\n        newNode.next = tail;\n        tail.prev = newNode;\n        return newNode;\n    }\n\n    public int removeAtStart() {\n        // returns the key of the least-recently-used node removed\n        ListNode lru = head.next;\n        removeFromCache(lru);\n        return lru.key;\n    }\n\n    public int removeFromCache(ListNode node) {\n        node.prev.next = node.next;\n        node.next.prev = node.prev;\n        return node.val;\n    }\n}",
+        "story": "User's code. NOTE: the editor was scrolled and only lines 1-56 were visible in the screenshot; the visible portion (Solution class, DoublyLinkedList constructor, and insertAtLast) is verbatim, and the referenced removeAtStart/removeFromCache helpers below line 56 were not captured and are reconstructed here to a consistent, compilable form. ListNode here is assumed to carry key, val, prev, next fields."
+      }
+    ]
+  },
+  {
+    "num": 212,
+    "id": "s3-ll2-remove-loop-from-linked-list",
+    "title": "Remove Loop from Linked List",
+    "subTopic": "Floyd's Cycle Detection",
+    "tags": [
+      "Linked List",
+      "Floyd's Cycle Detection"
+    ],
+    "description": "You are using Google Maps to help you find your way around a new place. But, you get lost and end up walking in a circle. Google Maps has a way to keep track of where you've been with the help of special sensors. These sensors notice that you're walking in a loop, and now, Google wants to create a new feature to help you figure out exactly where you started going in circles.\n\nHere's how we can describe the challenge in simpler terms: You have a Linked List A that shows each step of your journey, like a chain of events. Some of these steps have accidentally led you back to a place you've already been, making you walk in a loop. The goal is to find out the exact point where you first started walking in this loop, and then you want to break the loop by not going in the circle just before this point.\n\nProblem Constraints:\n1 <= number of nodes <= 1000\n\nInput Format:\nThe first of the input contains a LinkedList, where the first number is the number of nodes N, and the next N nodes are the node value of the linked list.\nThe second line of the input contains an integer which denotes the position of node where cycle starts.\n\nOutput Format:\nreturn the head of the updated linked list.\n\nExample Input:\nInput 1:\n1 -> 2\n^    |\n| - -\n\nInput 2:\n3 -> 2 -> 4 -> 5 -> 6\n          ^         |\n          |         |\n          - - - - - -",
+    "sampleInput": "Input 1:\n1 -> 2 (with a loop back to 1)\n\nInput 2:\n3 -> 2 -> 4 -> 5 -> 6 (with 6 pointing back to 4)",
+    "sampleOutput": "Input 1: 1 -> 2 (loop removed)\nInput 2: 3 -> 2 -> 4 -> 5 -> 6 (loop removed)",
+    "story": "A linked list may contain a cycle. Find where the cycle begins and cut the last edge so the list becomes straight again. How to crack it: use Floyd's two-pointer trick to detect the loop, then reset one pointer to the head and advance both one step at a time until they meet at the loop start; track the previous node so you can null out its next.",
+    "plain": "Use slow and fast pointers to detect a cycle. Once they meet inside the loop, move one pointer back to the head and walk both one step at a time; they meet at the loop's starting node. Keep the node just before it and set its next to null.",
+    "tale": "Like walking a running track and marking the exact spot where the loop rejoins, then removing the shortcut that closed the circle.",
+    "solutions": [
+      {
+        "label": "Floyd's cycle detection and break",
+        "complexity": {
+          "time": "O(n)",
+          "space": "O(1)"
+        },
+        "plain": "Detect the loop with slow/fast pointers, locate the loop's start, then break the link into it.",
+        "approach": [
+          "Move slow by one and fast by two until they meet (loop) or fast reaches the end (no loop).",
+          "If no loop, return head unchanged.",
+          "Reset slow to head, advance both one step until they meet at the loop start, keeping the previous node.",
+          "Set the previous node's next to null to break the loop."
+        ],
+        "pseudocode": "slow=head, fast=head.next\nwhile fast and fast.next: if slow==fast break; slow=slow.next; fast=fast.next.next\nif no loop: return head\nslow=head; fast=fast.next; prev=null\nwhile slow!=fast: prev=fast; slow=slow.next; fast=fast.next\nprev.next=null\nreturn head",
+        "code": "/**\n * Definition for singly-linked list.\n * class ListNode {\n *     public int val;\n *     public ListNode next;\n *     ListNode(int x) { val = x; next = null; }\n * }\n */\npublic class Solution {\n    public ListNode solve(ListNode A) {\n        return detectStartNodeOfTheLoopAndBreak(A);\n    }\n\n    public ListNode detectStartNodeOfTheLoopAndBreak(ListNode head) {\n        if (head == null || head.next == null) {\n            return head;\n        }\n\n        ListNode slow = head;\n        ListNode fast = head.next;\n\n        // Step 1: Detect loop\n        while (fast != null && fast.next != null) {\n            if (slow == fast) {\n                break;\n            }\n            slow = slow.next;\n            fast = fast.next.next;\n        }\n\n        // Step 2: If no loop, return head\n        if (fast == null || fast.next == null || slow != fast) {\n            return head;\n        }\n\n        // Step 3: Find the start of the loop\n        slow = head;\n        fast = fast.next;   // fast was one step ahead initially, realign\n\n        while (slow != fast) {\n            slow = slow.next;\n            fast = fast.next;\n        }\n\n        // slow == loop-start. Walk the cycle to the node whose next is the\n        // loop-start and cut it. (Handles the loop-starts-at-head case, where\n        // the old prev-based cut threw a NullPointerException.)\n        ListNode p = slow;\n        while (p.next != slow) {\n            p = p.next;\n        }\n        p.next = null;\n\n        return head;\n    }\n}",
+        "story": "Fixed a NullPointerException in the original code when the loop starts at the head (Example 1): the realignment loop never runs, so the old prev-based cut dereferenced null."
+      }
+    ]
+  },
+  {
+    "num": 213,
+    "id": "s3-ll2-reorder-list",
+    "title": "Reorder List",
+    "subTopic": "Reverse + Merge",
+    "tags": [
+      "Linked List",
+      "Reverse + Merge"
+    ],
+    "description": "Given a singly linked list A\n\nA: A0 -> A1 -> ... -> An-1 -> An\n\nreorder it to:\n\nA0 -> An -> A1 -> An-1 -> A2 -> An-2 -> ...\n\nYou must do this in-place without altering the nodes' values.\n\nProblem Constraints:\n1 <= |A| <= 10^6\n\nInput Format:\nThe first and the only argument of input contains a pointer to the head of the linked list A.\n\nOutput Format:\nReturn a pointer to the head of the modified linked list.\n\nExample Input:\nInput 1:\nA = [1, 2, 3, 4, 5]\nInput 2:\nA = [1, 2, 3, 4]\n\nExample Output:\nOutput 1:\n[1, 5, 2, 4, 3]\nOutput 2:\n[1, 4, 2, 3]",
+    "sampleInput": "A = [1, 2, 3, 4, 5]",
+    "sampleOutput": "[1, 5, 2, 4, 3]",
+    "story": "Rearrange a list so it weaves the front and back together: first node, last node, second node, second-last node, and so on. How to crack it: find the middle with slow/fast, reverse the second half, then merge the two halves alternately.",
+    "plain": "Split the list at the middle, reverse the second half, then interleave nodes from the first half and the reversed second half one at a time.",
+    "tale": "Like folding a strip of paper in half and zipping the two edges together tooth by tooth.",
+    "solutions": [
+      {
+        "label": "Find middle, reverse, merge",
+        "complexity": {
+          "time": "O(n)",
+          "space": "O(1)"
+        },
+        "plain": "Locate the midpoint, reverse the back half, and merge the two halves alternately.",
+        "approach": [
+          "Use slow/fast pointers to find the middle of the list.",
+          "Reverse the second half starting after the middle.",
+          "Merge the first half and reversed second half by alternating nodes.",
+          "Return the head."
+        ],
+        "pseudocode": "find middle with slow/fast\nsecond = reverse(middle.next); middle.next = null\nmerge first and second alternately\nreturn head",
+        "code": "/**\n * Definition for singly-linked list.\n * class ListNode {\n *     public int val;\n *     public ListNode next;\n *     ListNode(int x) { val = x; next = null; }\n * }\n */\npublic class Solution {\n    public ListNode reorderList(ListNode A) {\n        if (A == null || A.next == null) {\n            return A;\n        }\n\n        // Step 1: find the middle\n        ListNode slow = A, fast = A;\n        while (fast.next != null && fast.next.next != null) {\n            slow = slow.next;\n            fast = fast.next.next;\n        }\n\n        // Step 2: reverse the second half\n        ListNode second = slow.next;\n        slow.next = null;\n        ListNode prev = null;\n        while (second != null) {\n            ListNode nxt = second.next;\n            second.next = prev;\n            prev = second;\n            second = nxt;\n        }\n        second = prev;\n\n        // Step 3: merge the two halves\n        ListNode first = A;\n        while (second != null) {\n            ListNode f1 = first.next;\n            ListNode s1 = second.next;\n            first.next = second;\n            second.next = f1;\n            first = f1;\n            second = s1;\n        }\n\n        return A;\n    }\n}"
+      }
+    ]
+  },
+  {
+    "num": 214,
+    "id": "s3-ll2-partition-list",
+    "title": "Partition List",
+    "subTopic": "Two Dummy Lists",
+    "tags": [
+      "Linked List",
+      "Two Dummy Lists"
+    ],
+    "description": "Given a linked list A and a value B, partition it such that all nodes less than B come before nodes greater than or equal to B.\nYou should preserve the original relative order of the nodes in each of the two partitions.\n\nProblem Constraints:\n1 <= |A| <= 10^6\n1 <= A[i], B <= 10^9\n\nInput Format:\nThe first argument of input contains a pointer to the head to the given linked list.\nThe second argument of input contains an integer, B.\n\nOutput Format:\nReturn a pointer to the head of the modified linked list.\n\nExample Input:\nInput 1:\nA = [1, 4, 3, 2, 5, 2]\nB = 3\nInput 2:\nA = [1, 2, 3, 1, 3]\nB = 2\n\nExample Output:\nOutput 1:\n[1, 2, 2, 4, 3, 5]\nOutput 2:\n[1, 1, 2, 3, 3]",
+    "sampleInput": "A = [1, 4, 3, 2, 5, 2]\nB = 3",
+    "sampleOutput": "[1, 2, 2, 4, 3, 5]",
+    "story": "Split the list into nodes smaller than B and nodes at least B, keeping each group's original order, then join them. How to crack it: build two separate chains with dummy heads and link them at the end.",
+    "plain": "Walk the list once. Append each node to a 'less' list if its value < B, otherwise to a 'greater-or-equal' list. Finally connect the tail of the less list to the head of the other, and null-terminate.",
+    "tale": "Like sorting mail into two trays, small envelopes first, then stacking the second tray on top while keeping each tray's order.",
+    "solutions": [
+      {
+        "label": "Two dummy lists",
+        "complexity": {
+          "time": "O(n)",
+          "space": "O(1)"
+        },
+        "plain": "Collect small nodes in one chain and the rest in another, then stitch them together.",
+        "approach": [
+          "Create two dummy heads: lessHead and geHead.",
+          "Traverse A, appending each node to the appropriate chain based on comparison with B.",
+          "Terminate the ge chain with null.",
+          "Link less chain's tail to ge chain's head and return lessHead.next."
+        ],
+        "pseudocode": "lessDummy, geDummy\nfor node in A: if node.val<B append to less else append to ge\nge.tail.next=null\nless.tail.next=geDummy.next\nreturn lessDummy.next",
+        "code": "/**\n * Definition for singly-linked list.\n * class ListNode {\n *     public int val;\n *     public ListNode next;\n *     ListNode(int x) { val = x; next = null; }\n * }\n */\npublic class Solution {\n    public ListNode partition(ListNode A, int B) {\n        ListNode lessDummy = new ListNode(0);\n        ListNode geDummy = new ListNode(0);\n        ListNode less = lessDummy, ge = geDummy;\n\n        ListNode cur = A;\n        while (cur != null) {\n            if (cur.val < B) {\n                less.next = cur;\n                less = less.next;\n            } else {\n                ge.next = cur;\n                ge = ge.next;\n            }\n            cur = cur.next;\n        }\n\n        ge.next = null;\n        less.next = geDummy.next;\n        return lessDummy.next;\n    }\n}"
+      }
+    ]
+  },
+  {
+    "num": 215,
+    "id": "s3-ll2-flatten-a-linked-list",
+    "title": "Flatten a linked list",
+    "subTopic": "Merge Sorted Lists",
+    "tags": [
+      "Linked List",
+      "Merge Sorted Lists"
+    ],
+    "description": "Given a linked list where every node represents a linked list and contains two pointers of its type:\n1. Pointer to next node in the main list (right pointer)\n2. Pointer to a linked list where this node is head (down pointer). All linked lists are sorted.\nYou are asked to flatten the linked list into a single list. Use down pointer to link nodes of the flattened list.\nThe flattened linked list should also be sorted.\n\nProblem Constraints:\n1 <= Total nodes in the list <= 100000\n1 <= Value of node <= 10^9\n\nInput Format:\nThe only argument given is head pointer of the doubly linked list.\n\nOutput Format:\nReturn the head pointer of the Flattened list.\n\nExample Input:\nInput 1:\n3 -> 4 -> 20 -> 20 -> 30\n|    |    |     |     |\n7    11   22    20    31\n|              |     |\n7              28    39\n|              |\n8              39\n\nInput 2:\n2 -> 4\n|    |\n7    11\n|\n7",
+    "sampleInput": "Input 1 (main list with down sub-lists, all sorted)",
+    "sampleOutput": "A single sorted list linked via the down pointer",
+    "story": "You have a main list where each node heads its own sorted down-list. Merge everything into one sorted down-linked list. How to crack it: repeatedly merge two sorted down-lists, moving across the right pointers, like merge in merge sort.",
+    "plain": "Recurse to the rightmost list, then merge each list with the flattened result to its right using a standard two-pointer merge on the down pointers.",
+    "tale": "Like combining several already-sorted stacks of cards into one big sorted stack, two stacks at a time.",
+    "solutions": [
+      {
+        "label": "Recursive merge of sorted lists",
+        "complexity": {
+          "time": "O(n * k)",
+          "space": "O(n) recursion"
+        },
+        "plain": "Flatten from right to left, merging two sorted down-lists at each step.",
+        "approach": [
+          "If root or root.right is null, return root.",
+          "Recursively flatten root.right first.",
+          "Merge root's down-list with the flattened right list using down pointers.",
+          "Return the merged head."
+        ],
+        "pseudocode": "flatten(root): if root==null or root.right==null return root\nroot.right=flatten(root.right)\nroot=merge(root, root.right)\nreturn root\nmerge(a,b): standard sorted merge using down pointers",
+        "code": "/*\nclass ListNode {\n    int val;\n    ListNode right, down;\n    ListNode(int x) {\n        val = x;\n        right = down = null;\n    }\n}\n*/\npublic class Solution {\n    ListNode flatten(ListNode root) {\n        if (root == null || root.right == null) {\n            return root;\n        }\n        root.right = flatten(root.right);\n        root = merge(root, root.right);\n        return root;\n    }\n\n    private ListNode merge(ListNode a, ListNode b) {\n        if (a == null) return b;\n        if (b == null) return a;\n\n        ListNode result;\n        if (a.val <= b.val) {\n            result = a;\n            result.down = merge(a.down, b);\n        } else {\n            result = b;\n            result.down = merge(a, b.down);\n        }\n        result.right = null;\n        return result;\n    }\n}"
+      }
+    ]
+  }
+]

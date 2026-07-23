@@ -1,0 +1,253 @@
+[
+  {
+    "num": 172,
+    "id": "s3-math-compute-ncr-m",
+    "title": "Compute nCr % m",
+    "subTopic": "Modular combinatorics",
+    "tags": [
+      "Maths",
+      "Combinatorics",
+      "Modular arithmetic",
+      "Modular inverse"
+    ],
+    "description": "Given three integers A, B, and C, where A represents n, B represents r, and C represents m, find and return the value of nCr % m where nCr % m = (n!/((n-r)!*r!)) % m.\nx! means factorial of x i.e. x! = 1 * 2 * 3 ... * x.\n\nProblem Constraints\n1 <= A * B <= 10^6\n1 <= B <= A\n1 <= C <= 10^6\n\nInput Format\nThe first argument given is integer A (= n).\nThe second argument given is integer B (= r).\nThe third argument given is integer C (= m).\n\nOutput Format\nReturn the value of nCr % m.\n\nExample Input\nInput 1:\nA = 5\nB = 2\nC = 13\nInput 2:\nA = 6\nB = 2\nC = 13\n\nExample Output\nOutput 1:\n10\nOutput 2:\n2",
+    "sampleInput": "A = 5\nB = 2\nC = 13",
+    "sampleOutput": "10",
+    "story": "Compute C(n,r) mod m. You cannot just divide under a modulus, so build Pascal's triangle mod m (or use modular inverse when m is prime). To crack it: fill a 2D DP where C[i][j] = C[i-1][j-1] + C[i-1][j], all taken mod m.",
+    "plain": "Division does not distribute over modulo, so the naive factorial/(factorial*factorial) then mod is wrong. Use Pascal's rule: nCr = (n-1)C(r-1) + (n-1)Cr, and take mod m at every addition. This avoids any division entirely.",
+    "tale": "Like building a pyramid of blocks where each block is the sum of the two above it, but you only keep the last digit that fits in your pocket (mod m).",
+    "solutions": [
+      {
+        "label": "Optimal — Pascal's triangle DP (no division)",
+        "complexity": {
+          "time": "O(A*B)",
+          "space": "O(A*B)"
+        },
+        "plain": "Fill an (n+1) x (r+1) table using Pascal's rule, taking mod m after each addition. Answer is dp[n][r].",
+        "approach": [
+          "Create dp[n+1][r+1].",
+          "For every i, dp[i][0] = 1 (C(i,0) = 1).",
+          "For j from 1..min(i,r): dp[i][j] = (dp[i-1][j-1] + dp[i-1][j]) % m.",
+          "Return dp[n][r]."
+        ],
+        "pseudocode": "for i in 0..n:\n  dp[i][0] = 1 % m\n  for j in 1..min(i,r):\n    dp[i][j] = (dp[i-1][j-1] + dp[i-1][j]) % m\nreturn dp[n][r]",
+        "code": "public class Solution {\n    public int solve(int A, int B, int C) {\n        int n = A, r = B, m = C;\n        long[][] dp = new long[n + 1][r + 1];\n        for (int i = 0; i <= n; i++) {\n            dp[i][0] = 1 % m;\n            for (int j = 1; j <= Math.min(i, r); j++) {\n                dp[i][j] = (dp[i - 1][j - 1] + dp[i - 1][j]) % m;\n            }\n        }\n        return (int) dp[n][r];\n    }\n}",
+        "story": "Reference solution — Attempted in the screenshot, code not captured. The user's editor showed a factorial-then-divide-then-mod attempt, which is incorrect because integer division under modulo does not work and factorials overflow."
+      }
+    ]
+  },
+  {
+    "num": 173,
+    "id": "s3-math-number-of-digit-one",
+    "title": "Number of Digit One",
+    "subTopic": "Digit counting",
+    "tags": [
+      "Maths",
+      "Digit DP",
+      "Counting"
+    ],
+    "description": "Given an integer A, find and return the total number of digit 1 appearing in all non-negative integers less than or equal to A.\n\nProblem Constraints\n0 <= A <= 10^9\n\nInput Format\nThe only argument given is the integer A.\n\nOutput Format\nReturn the total number of digit 1 appearing in all non-negative integers less than or equal to A.\n\nExample Input\nInput 1:\nA = 10\nInput 2:\nA = 11\n\nExample Output\nOutput 1:\n2\nOutput 2:\n4\n\nExample Explanation\nExplanation 1:\nDigit 1 appears in 1 and 10 only and appears one time in each. So the answer is 2.\nExplanation 2:\nDigit 1 appears in 1 (1 time), 10 (1 time) and 11 (2 times) only. So the answer is 4.",
+    "sampleInput": "A = 11",
+    "sampleOutput": "4",
+    "story": "Count how many times the digit 1 shows up across 0..A. To crack it, count the 1s contributed at each place value (ones, tens, hundreds...) with a closed formula instead of iterating over every number.",
+    "plain": "For each place value i (1, 10, 100, ...), the count of 1s at that position is determined by the higher digits, the current digit, and the lower digits. Sum this over all positions to get the total.",
+    "tale": "Instead of reading every number and tallying 1s, you ask column by column: how often does a 1 sit in this column across all numbers up to A?",
+    "solutions": [
+      {
+        "label": "Optimal — per-digit place-value counting",
+        "complexity": {
+          "time": "O(log A)",
+          "space": "O(1)"
+        },
+        "plain": "Iterate over each power of ten i. For each, add high*i, plus a correction based on whether the current digit is 0, 1, or >=2.",
+        "approach": [
+          "Loop i = 1, 10, 100, ... up to A.",
+          "Let high = A / (i*10), cur = (A / i) % 10, low = A % i.",
+          "If cur == 0, add high * i.",
+          "If cur == 1, add high * i + low + 1.",
+          "If cur >= 2, add (high + 1) * i.",
+          "Return the accumulated count."
+        ],
+        "pseudocode": "count = 0\nfor i = 1; i <= A; i *= 10:\n  high = A/(i*10); cur = (A/i)%10; low = A%i\n  if cur==0: count += high*i\n  elif cur==1: count += high*i + low + 1\n  else: count += (high+1)*i\nreturn count",
+        "code": "public class Solution {\n    public int solve(int A) {\n        long count = 0;\n        for (long i = 1; i <= A; i *= 10) {\n            long high = A / (i * 10);\n            long cur = (A / i) % 10;\n            long low = A % i;\n            if (cur == 0) {\n                count += high * i;\n            } else if (cur == 1) {\n                count += high * i + low + 1;\n            } else {\n                count += (high + 1) * i;\n            }\n        }\n        return (int) count;\n    }\n}",
+        "story": "Reference solution — Unsolved in the screenshot, code not captured."
+      }
+    ]
+  },
+  {
+    "num": 174,
+    "id": "s3-math-consecutive-numbers-sum",
+    "title": "Consecutive Numbers Sum",
+    "subTopic": "Number theory / arithmetic series",
+    "tags": [
+      "Maths",
+      "Number theory",
+      "Arithmetic series"
+    ],
+    "description": "Given a positive integer A.\nReturn the number of ways it can be written as a sum of consecutive positive integers.\n\nProblem Constraints\n1 <= A <= 10^9\n\nInput Format\nThe first and the only argument of input contains an integer, A.\n\nOutput Format\nReturn an integer, representing the answer as described in the problem statement.\n\nExample Input\nInput 1:\nA = 5\nInput 2:\nA = 15\n\nExample Output\nOutput 1:\n2\nOutput 2:\n4\n\nExample Explanation\nExplanation 1:\nThe 2 ways are:\n=> [5]\n=> [2, 3]\nExplanation 2:\nThe 4 ways are: [15], [7, 8], [4, 5, 6], [1, 2, 3, 4, 5].",
+    "sampleInput": "A = 5",
+    "sampleOutput": "2",
+    "story": "Count ways to write A as a run of consecutive positive integers. To crack it: a run of k terms starting at x sums to k*x + k*(k-1)/2 = A, so for each k check if the leftover divides evenly into a positive x.",
+    "plain": "If A is the sum of k consecutive integers starting at x, then A = k*x + k(k-1)/2. Rearranged, x = (A - k(k-1)/2) / k. For each k while k(k-1)/2 < A, count it if that expression is a positive integer.",
+    "tale": "For each possible run length, subtract the fixed triangular offset and see if the rest splits evenly among the terms.",
+    "solutions": [
+      {
+        "label": "Optimal — iterate over run length k",
+        "complexity": {
+          "time": "O(sqrt(A))",
+          "space": "O(1)"
+        },
+        "plain": "For each k starting at 1, compute the remaining value A - k(k-1)/2; if it is positive and divisible by k, it is a valid way.",
+        "approach": [
+          "Initialize count = 0.",
+          "Loop k = 1, 2, 3, ... while k*(k-1)/2 < A.",
+          "Compute rem = A - k*(k-1)/2.",
+          "If rem % k == 0, increment count (a valid starting x exists).",
+          "Return count."
+        ],
+        "pseudocode": "count = 0\nk = 1\nwhile k*(k-1)/2 < A:\n  rem = A - k*(k-1)/2\n  if rem % k == 0: count++\n  k++\nreturn count",
+        "code": "public class Solution {\n    public int solve(int A) {\n        int count = 0;\n        long k = 1;\n        while (k * (k - 1) / 2 < A) {\n            long rem = A - k * (k - 1) / 2;\n            if (rem % k == 0) {\n                count++;\n            }\n            k++;\n        }\n        return count;\n    }\n}",
+        "story": "Reference solution — Unsolved in the screenshot, code not captured."
+      }
+    ]
+  },
+  {
+    "num": 175,
+    "id": "s3-math-pascal-triangle",
+    "title": "Pascal Triangle",
+    "subTopic": "2D Array Construction",
+    "tags": [
+      "Maths",
+      "2D Array Construction"
+    ],
+    "description": "Write a program to print the pascal triangle up to A rows.\n\nProblem Constraints:\n1 <= A <= 25\n\nInput Format:\nThe first argument is an integer A.\n\nOutput Format:\nReturn a 2D array consisting of A rows whose each row contains A integers.",
+    "sampleInput": "A = 3\n\nA = 5",
+    "sampleOutput": "1 0 0\n1 1 0\n1 2 1\n\n1 0 0 0 0\n1 1 0 0 0\n1 2 1 0 0\n1 3 3 1 0\n1 4 6 4 1",
+    "story": "Build Pascal's triangle into a fixed A-by-A grid. Each interior cell is the sum of the cell directly above and the one above-left; everything else stays zero.",
+    "plain": "Make an A x A matrix filled with zeros. The first column of every row is 1. Every other cell equals the value above it plus the value above and to the left.",
+    "tale": "Like stacking coins where each coin's weight is shared down onto the two coins it rests between.",
+    "solutions": [
+      {
+        "label": "Grid build from row relation",
+        "complexity": {
+          "time": "O(A^2)",
+          "space": "O(A^2)"
+        },
+        "plain": "Fill an A x A array where cell[i][j] = cell[i-1][j] + cell[i-1][j-1], with the leftmost cell of each row set to 1.",
+        "approach": [
+          "Allocate an A x A integer matrix (defaults to zeros).",
+          "For each row i, set the first cell to 1.",
+          "For j from 1 to i, set matrix[i][j] = matrix[i-1][j] + matrix[i-1][j-1].",
+          "Return the matrix."
+        ],
+        "pseudocode": "res = new int[A][A]\nfor i in 0..A-1:\n  res[i][0] = 1\n  for j in 1..i:\n    res[i][j] = res[i-1][j] + res[i-1][j-1]\nreturn res",
+        "code": "public class Solution {\n    public int[][] solve(int A) {\n        int[][] res = new int[A][A];\n        for (int i = 0; i < A; i++) {\n            res[i][0] = 1;\n            for (int j = 1; j <= i; j++) {\n                res[i][j] = res[i - 1][j] + res[i - 1][j - 1];\n            }\n        }\n        return res;\n    }\n}",
+        "story": "Canonical reference solution; the editor was left empty (Unsolved)."
+      }
+    ]
+  },
+  {
+    "num": 176,
+    "id": "s3-math-excel-column-title",
+    "title": "Excel Column Title",
+    "subTopic": "Base-26 Conversion",
+    "tags": [
+      "Maths",
+      "Base-26 Conversion"
+    ],
+    "description": "Given a positive integer A, return its corresponding column title as it appears in an Excel sheet.\nFor example:\n1 -> A\n2 -> B\n3 -> C\n...\n26 -> Z\n27 -> AA\n28 -> AB\n\nProblem Constraints:\n1 <= A <= 10^9\n\nInput Format:\nFirst and only argument of input contains single integer A.\n\nOutput Format:\nReturn a string denoting the corresponding title.",
+    "sampleInput": "A = 3\n\nA = 27",
+    "sampleOutput": "\"C\"\n\"AA\"",
+    "story": "Convert a number to an Excel column label. It is base-26 but with no zero digit, so before each division you subtract 1 to shift into the 0-25 range.",
+    "plain": "Repeatedly take (A-1) % 26 to get a letter A..Z, append it, then set A = (A-1)/26. Build the string from least significant letter to most, then reverse it.",
+    "tale": "Like an odometer with 26 lettered wheels but no zero - each tick rolls A..Z and carries over once it passes Z.",
+    "solutions": [
+      {
+        "label": "Repeated bijective base-26",
+        "complexity": {
+          "time": "O(log A)",
+          "space": "O(log A)"
+        },
+        "plain": "Peel off letters using (A-1)%26 and A=(A-1)/26 until A is zero, then reverse.",
+        "approach": [
+          "Create a StringBuilder.",
+          "While A > 0: compute rem = (A-1) % 26, append the character 'A' + rem.",
+          "Update A = (A-1) / 26.",
+          "Reverse the builder and return it as a String."
+        ],
+        "pseudocode": "sb = ''\nwhile A>0:\n  rem=(A-1)%26\n  sb += char('A'+rem)\n  A=(A-1)/26\nreturn reverse(sb)",
+        "code": "public class Solution {\n    public String convertToTitle(int A) {\n        StringBuilder sb = new StringBuilder();\n        while (A > 0) {\n            int rem = (A - 1) % 26;\n            sb.append((char) ('A' + rem));\n            A = (A - 1) / 26;\n        }\n        return sb.reverse().toString();\n    }\n}",
+        "story": "Canonical reference solution; the editor was left empty (Unsolved). The (A-1) offset handles the missing zero digit in this bijective base-26 system."
+      }
+    ]
+  },
+  {
+    "num": 177,
+    "id": "s3-math-sorted-permutation-rank",
+    "title": "Sorted Permutation Rank",
+    "subTopic": "Combinatorics / Factorial",
+    "tags": [
+      "Maths",
+      "Combinatorics"
+    ],
+    "description": "Given a string A. Find the rank of the string amongst its permutations sorted lexicographically.\nAssume that no characters are repeated.\nNote: The answer might not fit in an integer, so return your answer % 1000003\n\nProblem Constraints\n1 <= |A| <= 1000\n\nInput Format\nFirst argument is a string A.\n\nOutput Format\nReturn an integer denoting the rank of the given string.\n\nExample Input\nInput 1:\nA = \"acb\"\nInput 2:\nA = \"a\"\n\nExample Output\nOutput 1:\n2\nOutput 2:\n1\n\nExample Explanation\nExplanation 1:\nGiven A = \"acb\".\nThe order permutations with letters 'a', 'c', and 'b' :\nabc\nacb\nbac\nbca\ncab\ncba\nSo, the rank of A is 2.",
+    "sampleInput": "A = \"acb\"",
+    "sampleOutput": "2",
+    "story": "Count how many permutations come before the given string. For each position, count how many unused characters are smaller than the current one; each such choice frees up (remaining)! arrangements after it. Sum those and add 1. To crack it: precompute factorials mod 1000003, and for each index count the smaller characters to its right.",
+    "plain": "For each character, multiply the number of smaller characters that appear after it by the factorial of the number of positions remaining, sum modulo 1000003, then add 1.",
+    "tale": "Like finding a word's page number in a dictionary: at each letter you skip ahead by all the words that could start with an earlier letter.",
+    "solutions": [
+      {
+        "label": "Factorial rank",
+        "complexity": {
+          "time": "O(n^2)",
+          "space": "O(n)"
+        },
+        "plain": "Precompute factorials mod 1000003. Walk each position, count smaller characters to the right, and accumulate smaller * fact[remaining].",
+        "approach": [
+          "Precompute fact[0..n] modulo 1000003.",
+          "For index i, count characters to its right that are smaller than A[i].",
+          "Add smaller * fact[n-1-i] to the running rank, mod the answer.",
+          "Return (rank + 1) % 1000003 since rank is 1-based."
+        ],
+        "pseudocode": "fact[0]=1; for i in 1..n: fact[i]=fact[i-1]*i % MOD\nrank=0\nfor i in 0..n-1:\n  smaller = count(j>i and A[j]<A[i])\n  rank = (rank + smaller*fact[n-1-i]) % MOD\nreturn (rank+1) % MOD",
+        "code": "public class Solution {\n    public int findRank(String A) {\n        int MOD = 1000003;\n        int n = A.length();\n        long[] fact = new long[n + 1];\n        fact[0] = 1;\n        for (int i = 1; i <= n; i++) fact[i] = (fact[i - 1] * i) % MOD;\n        long rank = 0;\n        for (int i = 0; i < n; i++) {\n            int smaller = 0;\n            for (int j = i + 1; j < n; j++) {\n                if (A.charAt(j) < A.charAt(i)) smaller++;\n            }\n            rank = (rank + (smaller * fact[n - 1 - i]) % MOD) % MOD;\n        }\n        return (int) ((rank + 1) % MOD);\n    }\n}",
+        "story": "Reference solution: the editor was empty (Unsolved), so this is the canonical factorial-based rank computation."
+      }
+    ]
+  },
+  {
+    "num": 178,
+    "id": "s3-math-excel-column-number",
+    "title": "Excel Column Number",
+    "subTopic": "Base Conversion",
+    "tags": [
+      "Maths",
+      "Base Conversion"
+    ],
+    "description": "Given a column title as appears in an Excel sheet, return its corresponding column number.\n\nProblem Constraints\n1 <= length of the column title <= 5\n\nInput Format\nThe only argument is a string that represents the column title in the excel sheet.\n\nOutput Format\nReturn a single integer that represents the corresponding column number.\n\nExample Input\nInput 1:\nAB\nInput 2:\nBB\n\nExample Output\nOutput 1:\n28\nOutput 2:\n54\n\nExample Explanation\nExplanation 1:\nA -> 1\nB -> 2\nC -> 3\n...\nZ -> 26\nAA -> 27\nAB -> 28",
+    "sampleInput": "AB",
+    "sampleOutput": "28",
+    "story": "Excel columns are a base-26 number system but with digits 1..26 instead of 0..25. Treat each letter as a digit: multiply the running total by 26 and add the letter's value (A=1..Z=26). To crack it: it's just Horner's method for base 26.",
+    "plain": "Convert the title from a base-26-like system: for each character, result = result * 26 + (char - 'A' + 1).",
+    "tale": "Like reading a number left to right: each new digit shifts everything up by one place value (times 26 here).",
+    "solutions": [
+      {
+        "label": "Base-26 conversion",
+        "complexity": {
+          "time": "O(n)",
+          "space": "O(1)"
+        },
+        "plain": "Iterate left to right, multiplying the accumulator by 26 and adding each letter's 1-based value.",
+        "approach": [
+          "Start result at 0.",
+          "For each character, result = result * 26 + (char - 'A' + 1).",
+          "Return result."
+        ],
+        "pseudocode": "result=0\nfor c in A: result = result*26 + (c - 'A' + 1)\nreturn result",
+        "code": "public class Solution {\n    public int titleToNumber(String A) {\n        int result = 0;\n        for (int i = 0; i < A.length(); i++) {\n            result = result * 26 + (A.charAt(i) - 'A' + 1);\n        }\n        return result;\n    }\n}",
+        "story": "Reference solution: the editor was empty (Unsolved), so this is the canonical base-26 conversion."
+      }
+    ]
+  }
+]

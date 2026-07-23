@@ -1,0 +1,495 @@
+[
+  {
+    "num": 216,
+    "id": "s3-tree-least-common-ancestor",
+    "title": "Least Common Ancestor",
+    "subTopic": "LCA in Binary Tree",
+    "tags": [
+      "Trees",
+      "LCA in Binary Tree"
+    ],
+    "description": "Find the lowest common ancestor in an unordered binary tree A, given two values, B and C, in the tree.\nLowest common ancestor: the lowest common ancestor (LCA) of two nodes v and w in a tree or directed acyclic graph (DAG) is the lowest (i.e., deepest) node that has both v and w as descendants.\n\nProblem Constraints:\n1 <= size of tree <= 100000\n1 <= B, C <= 10^9\n\nInput Format:\nFirst argument is head of tree A.\nSecond argument is integer B.\nThird argument is integer C.\n\nOutput Format:\nReturn the LCA.\n\nExample Input:\nInput 1:\n      1\n     / \\\n    2   3\nB = 2\nC = 3\n\nInput 2:\n      1\n     / \\\n    2   3\n   / \\\n  4   5\nB = 4\nC = 5\n\nExample Output:\nOutput 1: 1\nOutput 2: 2\n\nExample Explanation:\nExplanation 1: LCA is 1.\nExplanation 2: LCA is 2.",
+    "sampleInput": "Tree: 1 with children 2,3; B = 2, C = 3",
+    "sampleOutput": "1",
+    "story": "Given a general binary tree and two node values, find the deepest node that is an ancestor of both. How to crack it: recurse; if a subtree contains one target on the left and the other on the right, the current node is the answer. Return -1 if either value is missing.",
+    "plain": "First confirm both B and C exist. Then recurse: if the current node is B or C return it; combine results from left and right, and the node where both sides return non-null is the LCA.",
+    "tale": "Like tracing two family members' ancestry until you reach the nearest shared grandparent.",
+    "solutions": [
+      {
+        "label": "Recursive LCA with existence check",
+        "complexity": {
+          "time": "O(n)",
+          "space": "O(h)"
+        },
+        "plain": "Verify both values are present, then recurse to find the split point.",
+        "approach": [
+          "Check that both B and C exist in the tree; if not, return -1.",
+          "Recurse: return the node if it matches B or C.",
+          "Recurse into left and right subtrees.",
+          "If both sides return a node, the current node is the LCA; otherwise pass up the non-null side."
+        ],
+        "pseudocode": "if !exists(B) or !exists(C): return -1\nlca(node): if null return null; if node==B or node==C return node\nl=lca(left); r=lca(right)\nif l and r: return node\nreturn l!=null? l : r",
+        "code": "/**\n * Definition for binary tree\n * class TreeNode {\n *     int val;\n *     TreeNode left;\n *     TreeNode right;\n *     TreeNode(int x) {\n *         val = x;\n *         left = null;\n *         right = null;\n *     }\n * }\n */\npublic class Solution {\n    public int lca(TreeNode A, int B, int C) {\n        if (!exists(A, B) || !exists(A, C)) {\n            return -1;\n        }\n        TreeNode ans = helper(A, B, C);\n        return ans == null ? -1 : ans.val;\n    }\n\n    private TreeNode helper(TreeNode node, int B, int C) {\n        if (node == null) return null;\n        if (node.val == B || node.val == C) return node;\n        TreeNode left = helper(node.left, B, C);\n        TreeNode right = helper(node.right, B, C);\n        if (left != null && right != null) return node;\n        return left != null ? left : right;\n    }\n\n    private boolean exists(TreeNode node, int val) {\n        if (node == null) return false;\n        if (node.val == val) return true;\n        return exists(node.left, val) || exists(node.right, val);\n    }\n}"
+      }
+    ]
+  },
+  {
+    "num": 217,
+    "id": "s3-tree-path-sum",
+    "title": "Path Sum",
+    "subTopic": "Root-to-Leaf DFS",
+    "tags": [
+      "Trees",
+      "Root-to-Leaf DFS"
+    ],
+    "description": "Given a binary tree and a sum, determine if the tree has a root-to-leaf path such that adding up all the values along the path equals the given sum.\n\nProblem Constraints:\n1 <= number of nodes <= 10^5\n-100000 <= B, value of nodes <= 100000\n\nInput Format:\nFirst argument is a root node of the binary tree, A.\nSecond argument is an integer B denoting the sum.\n\nOutput Format:\nReturn 1, if there exist root-to-leaf path such that adding up all the values along the path equals the given sum. Else, return 0.\n\nExample Input:\nInput 1:\nTree:    5\n        / \\\n       4   8\n      /   / \\\n     11  13  4\n    /  \\      \\\n   7    2      1\nB = 22\n\nInput 2:\nTree:    5\n        / \\\n       4   8\n      /   / \\\n   -11 -13  4\nB = -1\n\nExample Output:\nOutput 1: 1\nOutput 2: 0\n\nExample Explanation:\nExplanation 1: There exist a root-to-leaf path 5 -> 4 -> 11 -> 2 which has sum 22. So, return 1.\nExplanation 2: There is no path which has sum -1.",
+    "sampleInput": "Tree rooted at 5 (as shown), B = 22",
+    "sampleOutput": "1",
+    "story": "Check whether some path from the root down to a leaf adds up exactly to B. How to crack it: DFS while subtracting each node's value from the target; at a leaf, success means the remaining target equals the leaf's value.",
+    "plain": "Walk from root to leaves, subtracting each node's value from B. When you reach a leaf and the remaining amount equals that leaf's value, a valid path exists.",
+    "tale": "Like spending a fixed budget as you walk down a branching road, checking if it hits exactly zero at any dead end.",
+    "solutions": [
+      {
+        "label": "DFS with running target",
+        "complexity": {
+          "time": "O(n)",
+          "space": "O(h)"
+        },
+        "plain": "Recurse down, reducing the target; a leaf that exactly consumes the remainder means yes.",
+        "approach": [
+          "If node is null, return false.",
+          "Subtract node value from the target.",
+          "If it's a leaf, return true when the remaining target is zero.",
+          "Otherwise recurse into left and right; return true if either succeeds."
+        ],
+        "pseudocode": "has(node, sum): if null return false\nsum -= node.val\nif leaf: return sum==0\nreturn has(left,sum) or has(right,sum)",
+        "code": "/**\n * Definition for binary tree\n * class TreeNode {\n *     int val;\n *     TreeNode left;\n *     TreeNode right;\n *     TreeNode(int x) {\n *         val = x;\n *         left = null;\n *         right = null;\n *     }\n * }\n */\npublic class Solution {\n    public int hasPathSum(TreeNode A, int B) {\n        return dfs(A, B) ? 1 : 0;\n    }\n\n    private boolean dfs(TreeNode node, int sum) {\n        if (node == null) return false;\n        sum -= node.val;\n        if (node.left == null && node.right == null) {\n            return sum == 0;\n        }\n        return dfs(node.left, sum) || dfs(node.right, sum);\n    }\n}"
+      }
+    ]
+  },
+  {
+    "num": 218,
+    "id": "s3-tree-kth-smallest-element-in-bst",
+    "title": "Kth Smallest Element In BST",
+    "subTopic": "Inorder Traversal",
+    "tags": [
+      "Trees",
+      "Inorder Traversal"
+    ],
+    "description": "Given a binary search tree represented by root A, write a function to find the Bth smallest element in the tree.\n\nProblem Constraints:\n1 <= Number of nodes in binary tree <= 100000\n0 <= node values <= 10^9\n\nInput Format:\nFirst and only argument is head of the binary tree A.\n\nOutput Format:\nReturn an integer, representing the Bth element.\n\nExample Input:\nInput 1:\n    2\n   / \\\n  1   3\nB = 2\n\nInput 2:\n    3\n   /\n  2\n /\n1\nB = 1\n\nExample Output:\nOutput 1: 2\nOutput 2: 1\n\nExample Explanation:\nExplanation 1: 2nd element is 2.\nExplanation 2: 1st element is 1.",
+    "sampleInput": "BST with root 2, children 1 and 3; B = 2",
+    "sampleOutput": "2",
+    "story": "Find the Bth smallest value in a BST. How to crack it: an inorder traversal of a BST visits values in ascending order, so stop at the Bth visited node.",
+    "plain": "Do an inorder traversal (left, node, right). Count nodes as you visit them; the Bth one visited is the answer.",
+    "tale": "Like reading names off a sorted roster and stopping when you reach the Bth name.",
+    "solutions": [
+      {
+        "label": "Inorder traversal with counter",
+        "complexity": {
+          "time": "O(h + B)",
+          "space": "O(h)"
+        },
+        "plain": "Traverse inorder while counting; return the Bth value seen.",
+        "approach": [
+          "Traverse the left subtree first.",
+          "Increment a counter when visiting each node.",
+          "When the counter reaches B, record that node's value.",
+          "Traverse the right subtree; return the recorded value."
+        ],
+        "pseudocode": "count=0, ans=-1\ninorder(node): if null or done return\ninorder(left); count++; if count==B ans=node.val; inorder(right)",
+        "code": "/**\n * Definition for binary tree\n * class TreeNode {\n *     int val;\n *     TreeNode left;\n *     TreeNode right;\n *     TreeNode(int x) {\n *         val = x;\n *         left = null;\n *         right = null;\n *     }\n * }\n */\npublic class Solution {\n    private int count = 0;\n    private int ans = -1;\n\n    public int kthsmallest(TreeNode A, int B) {\n        count = 0;\n        ans = -1;\n        inorder(A, B);\n        return ans;\n    }\n\n    private void inorder(TreeNode node, int B) {\n        if (node == null || ans != -1) return;\n        inorder(node.left, B);\n        count++;\n        if (count == B) {\n            ans = node.val;\n            return;\n        }\n        inorder(node.right, B);\n    }\n}"
+      }
+    ]
+  },
+  {
+    "num": 219,
+    "id": "s3-tree-lca-in-bst",
+    "title": "LCA in BST",
+    "subTopic": "BST Property Walk",
+    "tags": [
+      "Trees",
+      "BST Property Walk"
+    ],
+    "description": "Given a Binary Search Tree A. Also given are two nodes B and C. Find the lowest common ancestor of the two nodes.\nNote 1 :- It is guaranteed that the nodes B and C exist.\nNote 2 :- The LCA of B and C in A is the shared ancestor of B and C that is located farthest from the root.\n\nProblem Constraints:\n1 <= Number of nodes in binary tree <= 10^5\n1 <= B, C <= 10^5\n\nInput Format:\nFirst argument is a root node of the binary tree, A.\nSecond argument is an integer B.\nThird argument is an integer C.\n\nOutput Format:\nReturn the LCA of the two nodes.\n\nExample Input:\nInput 1:\n           15\n         /    \\\n       12     20\n      /  \\   /  \\\n    10  14 16  27\n    /\n   8\nB = 8\nC = 20\n\nInput 2:\n       8\n      / \\\n     6  21\n    / \\\n   1   7\nB = 7\nC = 1\n\nExample Output:\nOutput 1: 15\nOutput 2: 6\n\nExample Explanation:\nExplanation 1: The LCA of node 8 and 20 is the node 15.\nExplanation 2: The LCA of node 7 and 1 is the node 6.",
+    "sampleInput": "BST rooted at 15 (as shown), B = 8, C = 20",
+    "sampleOutput": "15",
+    "story": "Find the lowest common ancestor of two guaranteed-present nodes in a BST. How to crack it: use the BST ordering. From the root, if both values are smaller go left, if both larger go right; the first node that lies between them (or equals one) is the LCA.",
+    "plain": "Walk from the root. While both B and C are less than the current node, move left; while both are greater, move right. The moment they split (or one equals the node), that node is the LCA.",
+    "tale": "Like two people walking down a family tree together; they part ways at the nearest shared ancestor.",
+    "solutions": [
+      {
+        "label": "BST ordered walk",
+        "complexity": {
+          "time": "O(h)",
+          "space": "O(1)"
+        },
+        "plain": "Descend from the root, turning based on how B and C compare to the current node.",
+        "approach": [
+          "Start at the root.",
+          "If both B and C are less than the node's value, go left.",
+          "If both are greater, go right.",
+          "Otherwise the current node is the split point and the LCA."
+        ],
+        "pseudocode": "node=root\nwhile node: if B<val and C<val: node=left\nelse if B>val and C>val: node=right\nelse return val",
+        "code": "/**\n * Definition for binary tree\n * class TreeNode {\n *     int val;\n *     TreeNode left;\n *     TreeNode right;\n *     TreeNode(int x) {\n *         val = x;\n *         left = null;\n *         right = null;\n *     }\n * }\n */\npublic class Solution {\n    public int solve(TreeNode A, int B, int C) {\n        TreeNode node = A;\n        while (node != null) {\n            if (B < node.val && C < node.val) {\n                node = node.left;\n            } else if (B > node.val && C > node.val) {\n                node = node.right;\n            } else {\n                return node.val;\n            }\n        }\n        return -1;\n    }\n}"
+      }
+    ]
+  },
+  {
+    "num": 220,
+    "id": "s3-tree-morris-inorder-traversal",
+    "title": "Morris Inorder Traversal",
+    "subTopic": "Morris Traversal",
+    "tags": [
+      "Trees",
+      "Morris Traversal"
+    ],
+    "description": "Given a binary tree, return the inorder traversal of its nodes' values.\nNOTE: Using recursion and stack are not allowed.\n\nProblem Constraints\n1 <= number of nodes <= 10^5\n\nInput Format\nFirst and only argument is root node of the binary tree, A.\n\nOutput Format\nReturn an integer array denoting the inorder traversal of the given binary tree.\n\nExample Input\nInput 1:\n   1\n    \\\n     2\n    /\n   3\nInput 2:\n   1\n  / \\\n 6   2\n    /\n   3\n\nExample Output\nOutput 1:\n [1, 3, 2]\nOutput 2:\n [6, 1, 3, 2]\n\nExample Explanation\nExplanation 1:\n The Inorder Traversal of the given tree is [1, 3, 2].\nExplanation 2:\n The Inorder Traversal of the given tree is [6, 1, 3, 2].",
+    "sampleInput": "1\n \\\n  2\n /\n3",
+    "sampleOutput": "[1, 3, 2]",
+    "story": "Do an inorder walk without recursion or a stack. The trick is Morris traversal: use temporary threads from a node's inorder predecessor back to the node so you can climb back up without extra memory. How to crack it: for each node with a left child, find the rightmost node of its left subtree; if that thread doesn't exist yet, create it and go left; if it already exists, the left subtree is done, so remove the thread, record the value, and go right.",
+    "plain": "Morris inorder traversal using threading to achieve O(1) extra space.",
+    "tale": "Like leaving a string tied to a doorknob so you can find your way back out of a maze without a map.",
+    "solutions": [
+      {
+        "label": "Morris Traversal",
+        "complexity": {
+          "time": "O(n)",
+          "space": "O(1)"
+        },
+        "plain": "Thread the tree temporarily to walk inorder without recursion or a stack.",
+        "approach": [
+          "Start at the root. While current is not null:",
+          "If current has no left child, record current's value and move to current.right.",
+          "Otherwise find the inorder predecessor (rightmost node of the left subtree).",
+          "If the predecessor's right is null, set it to current (make the thread) and move left.",
+          "If the predecessor's right already points to current, remove the thread, record current's value, and move right."
+        ],
+        "pseudocode": "cur = root\nwhile cur:\n  if cur.left == null:\n    output(cur.val); cur = cur.right\n  else:\n    pred = cur.left\n    while pred.right != null and pred.right != cur: pred = pred.right\n    if pred.right == null: pred.right = cur; cur = cur.left\n    else: pred.right = null; output(cur.val); cur = cur.right",
+        "code": "public class Solution {\n    public int[] solve(TreeNode A) {\n        List<Integer> res = new ArrayList<>();\n        TreeNode cur = A;\n        while (cur != null) {\n            if (cur.left == null) {\n                res.add(cur.val);\n                cur = cur.right;\n            } else {\n                TreeNode pred = cur.left;\n                while (pred.right != null && pred.right != cur) {\n                    pred = pred.right;\n                }\n                if (pred.right == null) {\n                    pred.right = cur;\n                    cur = cur.left;\n                } else {\n                    pred.right = null;\n                    res.add(cur.val);\n                    cur = cur.right;\n                }\n            }\n        }\n        int[] ans = new int[res.size()];\n        for (int i = 0; i < res.size(); i++) ans[i] = res.get(i);\n        return ans;\n    }\n}",
+        "story": "Reference solution: the user's editor was empty, so this is the canonical Morris inorder traversal."
+      }
+    ]
+  },
+  {
+    "num": 221,
+    "id": "s3-tree-recover-binary-search-tree",
+    "title": "Recover Binary Search Tree",
+    "subTopic": "BST Inorder / Morris",
+    "tags": [
+      "Trees",
+      "BST Inorder / Morris"
+    ],
+    "description": "Two elements of a Binary Search Tree (BST), represented by root A are swapped by mistake. Tell us the 2 values, when swapped, will restore the Binary Search Tree (BST).\nA solution using O(n) space is pretty straightforward. Could you devise a constant space solution?\nNote: The 2 values must be returned in ascending order\n\nProblem Constraints\n1 <= size of tree <= 100000\n\nInput Format\nFirst and only argument is the head of the tree, A\n\nOutput Format\nReturn the 2 elements which need to be swapped.\n\nExample Input\nInput 1:\n    1\n   / \\\n  2   3\nInput 2:\n    2\n   / \\\n  3   1\n\nExample Output\nOutput 1:\n [2, 1]\nOutput 2:\n [3, 1]\n\nExample Explanation\nExplanation 1:\n Swapping 1 and 2 will change the BST to be\n    2\n   / \\\n  1   3\n which is a valid BST\nExplanation 2:\n Swapping 1 and 3 will change the BST to be\n    2\n   / \\\n  1   3\n which is a valid BST",
+    "sampleInput": "  1\n / \\\n2   3",
+    "sampleOutput": "[2, 1]",
+    "story": "A BST's inorder traversal is strictly increasing. Two swapped nodes create at most two spots where a value is larger than the next. How to crack it: walk inorder tracking the previous node; the first violation marks the first wrong node (the larger of the pair) and the second violation marks the second wrong node (the smaller). If there is only one violation, the two swapped nodes are adjacent. Return both values in ascending order.",
+    "plain": "Inorder walk to find the two out-of-order nodes, then return their values sorted.",
+    "tale": "Like reading a sorted roster aloud and spotting the two names that got shuffled out of alphabetical order.",
+    "solutions": [
+      {
+        "label": "Inorder scan for inversions",
+        "complexity": {
+          "time": "O(n)",
+          "space": "O(h)"
+        },
+        "plain": "Track the previous node during inorder and catch where the sequence dips.",
+        "approach": [
+          "Do an inorder traversal keeping a reference to the previously visited node.",
+          "When prev.val > cur.val, record a violation.",
+          "On the first violation set first = prev and second = cur.",
+          "On a second violation update second = cur.",
+          "The two swapped values are first and second; return them in ascending order."
+        ],
+        "pseudocode": "prev=null; first=null; second=null\ninorder(node):\n  if node==null: return\n  inorder(node.left)\n  if prev!=null and prev.val>node.val:\n    if first==null: first=prev\n    second=node\n  prev=node\n  inorder(node.right)\nreturn sorted([first.val, second.val])",
+        "code": "public class Solution {\n    private TreeNode first, second, prev;\n    public int[] recoverTree(TreeNode A) {\n        first = second = prev = null;\n        inorder(A);\n        int a = first.val, b = second.val;\n        if (a < b) { int t = a; a = b; b = t; }   // examples show larger value first\n        return new int[]{a, b};\n    }\n    private void inorder(TreeNode node) {\n        if (node == null) return;\n        inorder(node.left);\n        if (prev != null && prev.val > node.val) {\n            if (first == null) first = prev;\n            second = node;\n        }\n        prev = node;\n        inorder(node.right);\n    }\n}",
+        "story": "Reference solution — Unsolved in the screenshot. Inorder finds the two swapped nodes. The statement's note says 'ascending' but both examples output the larger value first, so this returns descending to match the examples."
+      }
+    ]
+  },
+  {
+    "num": 222,
+    "id": "s3-tree-common-nodes-in-two-bst",
+    "title": "Common Nodes in Two BST",
+    "subTopic": "BST Inorder Merge",
+    "tags": [
+      "Trees",
+      "BST Inorder Merge"
+    ],
+    "description": "Given two BST's A and B, return the (sum of all common nodes in both A and B) % (10^9 +7) .\nIn case there is no common node, return 0.\nNOTE:\nTry to do it one pass through the trees.\n\nProblem Constraints\n1 <= Number of nodes in the tree A and B <= 10^5\n1 <= Node values <= 10^6\n\nInput Format\nFirst argument represents the root of BST A.\nSecond argument represents the root of BST B.\n\nOutput Format\nReturn an integer denoting the (sum of all common nodes in both BST's A and B) % (10^9 +7) .\n\nExample Input\nInput 1:\nTree A:\n     5\n    / \\\n   2   8\n    \\    \\\n     3    15\n         /\n        9\nTree B:\n     7\n    / \\\n   1   10\n    \\    \\\n     2    15\n         /\n        11\nInput 2:\nTree A:\n     7\n    / \\\n   1   10\n    \\    \\\n     2    15\n         /\n        11\nTree B:\n     7\n    / \\\n   1   10\n    \\    \\\n     2    15\n         /\n        11",
+    "sampleInput": "Tree A: 5 (2(-,3), 8(-,15(9,-)))\nTree B: 7 (1(-,2), 10(-,15(11,-)))",
+    "sampleOutput": "17",
+    "story": "Both trees are BSTs, so their inorder traversals are sorted. Finding common values then reduces to merging two sorted lists. How to crack it: get the inorder list of each tree, then use two pointers; when the values match add it to the sum and advance both, otherwise advance the pointer at the smaller value. Take the total modulo 1e9+7.",
+    "plain": "Inorder both BSTs to get sorted arrays, then two-pointer merge to sum equal values mod 1e9+7.",
+    "tale": "Like two sorted guest lists scanned side by side to tally the names that appear on both.",
+    "solutions": [
+      {
+        "label": "Inorder + two-pointer merge",
+        "complexity": {
+          "time": "O(n + m)",
+          "space": "O(n + m)"
+        },
+        "plain": "Turn each BST into a sorted list, then walk both lists together summing matches.",
+        "approach": [
+          "Inorder-traverse tree A into a sorted list, same for tree B.",
+          "Use pointers i and j starting at 0.",
+          "If A[i] == B[j], add the value to the sum (mod 1e9+7) and advance both pointers.",
+          "If A[i] < B[j], advance i; otherwise advance j.",
+          "Return the accumulated sum modulo 1e9+7."
+        ],
+        "pseudocode": "a = inorder(A); b = inorder(B)\ni=j=0; sum=0; MOD=1e9+7\nwhile i<len(a) and j<len(b):\n  if a[i]==b[j]: sum=(sum+a[i])%MOD; i++; j++\n  elif a[i]<b[j]: i++\n  else: j++\nreturn sum",
+        "code": "public class Solution {\n    static final int MOD = 1000000007;\n    public int solve(TreeNode A, TreeNode B) {\n        List<Integer> a = new ArrayList<>();\n        List<Integer> b = new ArrayList<>();\n        inorder(A, a);\n        inorder(B, b);\n        int i = 0, j = 0;\n        long sum = 0;\n        while (i < a.size() && j < b.size()) {\n            int x = a.get(i), y = b.get(j);\n            if (x == y) {\n                sum = (sum + x) % MOD;\n                i++; j++;\n            } else if (x < y) {\n                i++;\n            } else {\n                j++;\n            }\n        }\n        return (int) sum;\n    }\n    private void inorder(TreeNode node, List<Integer> out) {\n        if (node == null) return;\n        inorder(node.left, out);\n        out.add(node.val);\n        inorder(node.right, out);\n    }\n}",
+        "story": "Reference solution: the user's editor was empty, so this is the canonical inorder + merge approach."
+      }
+    ]
+  },
+  {
+    "num": 223,
+    "id": "s3-tree-distance-between-nodes-of-bst",
+    "title": "Distance between Nodes of BST",
+    "subTopic": "LCA in BST",
+    "tags": [
+      "Trees",
+      "LCA in BST"
+    ],
+    "description": "Given a binary search tree.\nReturn the distance between two nodes with given two keys B and C. It may be assumed that both keys exist in BST.\nNOTE: Distance between two nodes is number of edges between them.\n\nProblem Constraints\n1 <= Number of nodes in binary tree <= 1000000\n0 <= node values <= 10^9\n\nInput Format\nFirst argument is a root node of the binary tree, A.\nSecond argument is an integer B.\nThird argument is an integer C.\n\nOutput Format\nReturn an integer denoting the distance between two nodes with given two keys B and C\n\nExample Input\nInput 1:\n        5\n       /  \\\n      2    8\n     / \\  / \\\n    1  4 6  11\n B = 2\n C = 11\nInput 2:\n        6\n       /  \\\n      2    9\n     / \\   / \\\n    1  4 7   10\n B = 2\n C = 6\n\nExample Output\nOutput 1:\n 3\nOutput 2:\n 1\n\nExample Explanation\nExplanation 1:\n Path between 2 and 11 is: 2 -> 5 -> 8 -> 11. Distance will be 3.\nExplanation 2:\n Path between 2 and 6 is: 2 -> 6. Distance will be 1",
+    "sampleInput": "Tree rooted at 5; B = 2, C = 11",
+    "sampleOutput": "3",
+    "story": "In a BST the lowest common ancestor of B and C is where the paths to them split. The distance between the two nodes equals the depth of B plus the depth of C measured from that LCA. How to crack it: use BST ordering to find the LCA (go left when both keys are smaller, right when both are larger, otherwise you are at the LCA), then count edges from the LCA down to B and down to C and add them.",
+    "plain": "Find LCA using BST property, then sum the edge distances from LCA to each key.",
+    "tale": "Like two hikers tracing back to the fork in the trail where their paths last met, then adding up how far each walked from it.",
+    "solutions": [
+      {
+        "label": "LCA + depth counting",
+        "complexity": {
+          "time": "O(h)",
+          "space": "O(1)"
+        },
+        "plain": "Locate where the two keys diverge, then measure each key's distance from there.",
+        "approach": [
+          "Find the LCA: from the root, if both B and C are less than the node go left, if both are greater go right, otherwise this node is the LCA.",
+          "From the LCA, walk down toward B counting edges using BST comparisons.",
+          "From the LCA, walk down toward C counting edges the same way.",
+          "Return the sum of the two edge counts."
+        ],
+        "pseudocode": "lca = root\nwhile true:\n  if B<lca.val and C<lca.val: lca=lca.left\n  elif B>lca.val and C>lca.val: lca=lca.right\n  else: break\nreturn dist(lca,B) + dist(lca,C)\ndist(node,key): count edges walking BST toward key",
+        "code": "public class Solution {\n    public int solve(TreeNode A, int B, int C) {\n        TreeNode lca = A;\n        while (lca != null) {\n            if (B < lca.val && C < lca.val) lca = lca.left;\n            else if (B > lca.val && C > lca.val) lca = lca.right;\n            else break;\n        }\n        return dist(lca, B) + dist(lca, C);\n    }\n    private int dist(TreeNode node, int key) {\n        int d = 0;\n        while (node != null && node.val != key) {\n            if (key < node.val) node = node.left;\n            else node = node.right;\n            d++;\n        }\n        return d;\n    }\n}",
+        "story": "Reference solution: the user's editor was empty, so this is the canonical BST LCA distance approach."
+      }
+    ]
+  },
+  {
+    "num": 224,
+    "id": "s3-tree-next-pointer-binary-tree",
+    "title": "Next Pointer Binary Tree",
+    "subTopic": "Level Order Connect",
+    "tags": [
+      "Trees",
+      "Level Order Connect"
+    ],
+    "description": "Given a binary tree,\nPopulate each next pointer to point to its next right node. If there is no next right node, the next pointer should be set to NULL.\nInitially, all next pointers are set to NULL.\nAssume perfect binary tree.\n\nProblem Constraints\n1 <= Number of nodes in binary tree <= 100000\n0 <= node values <= 10^9\n\nInput Format\nFirst and only argument is head of the binary tree A.\n\nOutput Format\nReturn the head of the binary tree after the changes are made.\n\nExample Input\nInput 1:\n     1\n    / \\\n   2   3\nInput 2:\n      1\n    /   \\\n   2     5\n  / \\   / \\\n 3   4 6   7\n\nExample Output\nOutput 1:\n     1 -> NULL\n    / \\\n   2 -> 3 -> NULL\nOutput 2:\n      1 -> NULL\n    /   \\\n   2 ->  5 -> NULL\n  / \\   / \\\n 3->4->6->7 -> NULL\n\nExample Explanation\nExplanation 1:\n Next pointers are set as given in the output.\nExplanation 2:\n Next pointers are set as given in the output.",
+    "sampleInput": "     1\n    / \\\n   2   3",
+    "sampleOutput": "1 -> NULL\n2 -> 3 -> NULL",
+    "story": "Every node's next should point to the node immediately to its right on the same level. Because the tree is perfect, once a level is fully linked you can use those next pointers to stitch the level below without any queue. How to crack it: walk level by level; at each node on the current level connect its left child to its right child, and connect its right child to the left child of the node's next neighbour. Move across the level via next, then drop down to the leftmost node of the next level.",
+    "plain": "Use already-built next pointers on each level to link the children below in O(1) space.",
+    "tale": "Like people in a stadium row passing a rope to their right so the row behind can grab onto it and line up too.",
+    "solutions": [
+      {
+        "label": "Level-by-level using next pointers",
+        "complexity": {
+          "time": "O(n)",
+          "space": "O(1)"
+        },
+        "plain": "Connect each level's children using the current level's next chain, then descend.",
+        "approach": [
+          "Start with the leftmost node of the current level (initially the root).",
+          "For each node on the level, set node.left.next = node.right.",
+          "If node.next exists, set node.right.next = node.next.left.",
+          "Advance to node.next until the level ends.",
+          "Move down to the leftmost child and repeat until there are no more children."
+        ],
+        "pseudocode": "leftmost = root\nwhile leftmost.left != null:\n  head = leftmost\n  while head != null:\n    head.left.next = head.right\n    if head.next != null: head.right.next = head.next.left\n    head = head.next\n  leftmost = leftmost.left\nreturn root",
+        "code": "public class Solution {\n    public TreeLinkNode connect(TreeLinkNode A) {\n        if (A == null) return null;\n        TreeLinkNode leftmost = A;\n        while (leftmost.left != null) {\n            TreeLinkNode head = leftmost;\n            while (head != null) {\n                head.left.next = head.right;\n                if (head.next != null) {\n                    head.right.next = head.next.left;\n                }\n                head = head.next;\n            }\n            leftmost = leftmost.left;\n        }\n        return A;\n    }\n}",
+        "story": "Reference solution: the user's editor was empty (the template was C++); this is the canonical O(1)-space connect written in Java."
+      }
+    ]
+  },
+  {
+    "num": 225,
+    "id": "s3-tree-vertical-order-traversal",
+    "title": "Vertical Order traversal",
+    "subTopic": "Horizontal Distance BFS",
+    "tags": [
+      "Trees",
+      "Horizontal Distance BFS"
+    ],
+    "description": "Given a binary tree, return a 2-D array with vertical order traversal of it. Go through the example and image for more details.\nNOTE: If 2 Tree Nodes shares the same vertical level then the one with lesser depth will come first.\n\nProblem Constraints\n0 <= number of nodes <= 10^5\n\nInput Format\nFirst and only arument is a pointer to the root node of binary tree, A.\n\nOutput Format\nReturn a 2D array denoting the vertical order traversal of tree as shown.\n\nExample Input\nInput 1:\n      6\n     / \\\n    3   7\n   / \\    \\\n  2   5    9\nInput 2:\n      1\n     / \\\n    3   7\n   /     \\\n  2       9\n\nExample Output\nOutput 1:\n [\n    [2],\n    [3],\n    [6, 5],\n    [7],\n    [9]\n ]\nOutput 2:\n [\n    [2],\n    [3],\n    [1],\n    [7],\n    [9]\n ]\n\nExample Explanation\nExplanation 1:\n First row represent the verticalline 1 of the tree and so on.\nExplanation 2:\n First row represent the verticalline 1 of the tree and so on.",
+    "sampleInput": "      6\n     / \\\n    3   7\n   / \\    \\\n  2   5    9",
+    "sampleOutput": "[[2],[3],[6,5],[7],[9]]",
+    "story": "Assign each node a horizontal distance: root is 0, going left subtracts 1 and going right adds 1. Nodes sharing a horizontal distance form one vertical line, ordered top to bottom. How to crack it: do a level-order BFS so nodes are naturally visited by increasing depth, bucketing each node's value by its horizontal distance. Then output the buckets from the smallest horizontal distance to the largest.",
+    "plain": "BFS while tracking each node's horizontal distance, group values by that distance, output left to right.",
+    "tale": "Like sorting falling leaves into labeled columns on the ground, then reading the columns from far left to far right.",
+    "solutions": [
+      {
+        "label": "BFS with horizontal distance buckets",
+        "complexity": {
+          "time": "O(n log n)",
+          "space": "O(n)"
+        },
+        "plain": "Level-order traverse, drop each value into a column keyed by horizontal distance.",
+        "approach": [
+          "Run a BFS with a queue holding (node, horizontal distance), starting the root at hd 0.",
+          "Left child gets hd - 1, right child gets hd + 1.",
+          "Use a TreeMap from hd to a list of values; BFS order guarantees lesser depth comes first.",
+          "Track the min and max hd (or rely on the sorted map).",
+          "Emit the lists in increasing order of hd as the 2D result."
+        ],
+        "pseudocode": "map = sorted map hd -> list\nqueue = [(root, 0)]\nwhile queue:\n  (node, hd) = queue.pop_front()\n  map[hd].add(node.val)\n  if node.left: queue.add((node.left, hd-1))\n  if node.right: queue.add((node.right, hd+1))\nreturn [map[hd] for hd in sorted keys]",
+        "code": "public class Solution {\n    public int[][] verticalOrderTraversal(TreeNode A) {\n        if (A == null) return new int[0][0];\n        TreeMap<Integer, List<Integer>> map = new TreeMap<>();\n        Queue<TreeNode> nodes = new LinkedList<>();\n        Queue<Integer> hds = new LinkedList<>();\n        nodes.add(A);\n        hds.add(0);\n        while (!nodes.isEmpty()) {\n            TreeNode node = nodes.poll();\n            int hd = hds.poll();\n            map.computeIfAbsent(hd, k -> new ArrayList<>()).add(node.val);\n            if (node.left != null) { nodes.add(node.left); hds.add(hd - 1); }\n            if (node.right != null) { nodes.add(node.right); hds.add(hd + 1); }\n        }\n        int[][] res = new int[map.size()][];\n        int i = 0;\n        for (List<Integer> col : map.values()) {\n            int[] row = new int[col.size()];\n            for (int j = 0; j < col.size(); j++) row[j] = col.get(j);\n            res[i++] = row;\n        }\n        return res;\n    }\n}",
+        "story": "Reference solution: the user's editor was empty, so this is the canonical BFS horizontal-distance approach."
+      }
+    ]
+  },
+  {
+    "num": 226,
+    "id": "s3-tree-top-view-of-binary-tree",
+    "title": "Top View of Binary tree",
+    "subTopic": "Horizontal Distance BFS",
+    "tags": [
+      "Trees",
+      "Horizontal Distance BFS"
+    ],
+    "description": "Given a binary tree of integers denoted by root A. Return an array of integers representing the top view of the Binary tree.\nThe top view of a Binary Tree is a set of nodes visible when the tree is visited from the top.\nReturn the nodes in any order.\n\nProblem Constraints\n1 <= Number of nodes in binary tree <= 100000\n0 <= node values <= 10^9\n\nInput Format\nFirst and only argument is head of the binary tree A.\n\nOutput Format\nReturn an array, representing the top view of the binary tree.\n\nExample Input\nInput 1:\n            1\n          /   \\\n         2     3\n        / \\   / \\\n       4   5 6   7\n      /\n     8\nInput 2:\n            1\n          /   \\\n         2     3\n          \\\n           4\n            \\\n             5\n\nExample Output\nOutput 1:\n [1, 2, 4, 8, 3, 7]\nOutput 2:\n [1, 2, 3]\n\nExample Explanation\nExplanation 1:\n Top view is described.\nExplanation 2:\n Top view is described.",
+    "sampleInput": "            1\n          /   \\\n         2     3\n        / \\   / \\\n       4   5 6   7\n      /\n     8",
+    "sampleOutput": "[1, 2, 4, 8, 3, 7]",
+    "story": "Looking down from above, for each vertical line (horizontal distance) only the first node you hit is visible. How to crack it: do a level-order BFS tracking horizontal distance; the first time a horizontal distance appears is the topmost node for that column, so record it and ignore later nodes at the same distance. Collect those first-seen values as the top view.",
+    "plain": "BFS by horizontal distance and keep only the first node seen at each distance.",
+    "tale": "Like a bird's eye view of stacked plates: from the top you only see the plate on top of each pile.",
+    "solutions": [
+      {
+        "label": "BFS keeping first node per horizontal distance",
+        "complexity": {
+          "time": "O(n log n)",
+          "space": "O(n)"
+        },
+        "plain": "Level-order traverse and lock in the first value encountered for each column.",
+        "approach": [
+          "Run a BFS with (node, horizontal distance), root at hd 0.",
+          "Left child gets hd - 1, right child gets hd + 1.",
+          "Use a TreeMap from hd to value; only store a value if that hd is not already present.",
+          "BFS guarantees the first node at each hd is the topmost.",
+          "Return the values ordered by hd (or in any order, as allowed)."
+        ],
+        "pseudocode": "map = sorted map hd -> val\nqueue = [(root, 0)]\nwhile queue:\n  (node, hd) = queue.pop_front()\n  if hd not in map: map[hd] = node.val\n  if node.left: queue.add((node.left, hd-1))\n  if node.right: queue.add((node.right, hd+1))\nreturn [map[hd] for hd in sorted keys]",
+        "code": "public class Solution {\n    public int[] solve(TreeNode A) {\n        if (A == null) return new int[0];\n        TreeMap<Integer, Integer> map = new TreeMap<>();\n        Queue<TreeNode> nodes = new LinkedList<>();\n        Queue<Integer> hds = new LinkedList<>();\n        nodes.add(A);\n        hds.add(0);\n        while (!nodes.isEmpty()) {\n            TreeNode node = nodes.poll();\n            int hd = hds.poll();\n            if (!map.containsKey(hd)) map.put(hd, node.val);\n            if (node.left != null) { nodes.add(node.left); hds.add(hd - 1); }\n            if (node.right != null) { nodes.add(node.right); hds.add(hd + 1); }\n        }\n        int[] res = new int[map.size()];\n        int i = 0;\n        for (int v : map.values()) res[i++] = v;\n        return res;\n    }\n}",
+        "story": "Reference solution: the user's editor was empty, so this is the canonical BFS top-view approach."
+      }
+    ]
+  },
+  {
+    "num": 227,
+    "id": "s3-tree-diameter-of-binary-tree",
+    "title": "Diameter of binary tree",
+    "subTopic": "Height DFS",
+    "tags": [
+      "Trees",
+      "Height DFS"
+    ],
+    "description": "Given a Binary Tree A consisting of N integer nodes, you need to find the diameter of the tree.\nThe diameter of a tree is the number of edges on the longest path between two nodes in the tree.\n\nProblem Constraints\n0 <= N <= 10^5\n\nInput Format\nFirst and only Argument represents the root of binary tree A.\n\nOutput Format\nReturn an single integer denoting the diameter of the tree.\n\nExample Input\nInput 1:\n           1\n          / \\\n         2   3\n        / \\\n       4   5\nInput 2:\n           1\n          / \\\n         2   3\n        / \\   \\\n       4   5   6\n\nExample Output\nOutput 1:\n 3\nOutput 2:\n 4\n\nExample Explanation\nExplanation 1:\n Longest Path in the tree is 4 -> 2 -> 1 -> 3 and the number of edges in this path is 3 so diameter is 3.\nExplanation 2:\n Longest Path in the tree is 4 -> 2 -> 1 -> 3 -> 6 and the number of edges in this path is 4 so diameter is 4.",
+    "sampleInput": "           1\n          / \\\n         2   3\n        / \\\n       4   5",
+    "sampleOutput": "3",
+    "story": "The longest path in a tree passes through some node as its highest point, where it equals the height of that node's left subtree plus the height of its right subtree. How to crack it: run a single post-order DFS that returns each node's height; at every node update a global best with leftHeight + rightHeight. The final best (in edges) is the diameter.",
+    "plain": "One post-order DFS returning heights while tracking the max left+right height sum.",
+    "tale": "Like measuring the widest span of a tree by adding the reach of its two longest branches meeting at a joint.",
+    "solutions": [
+      {
+        "label": "Post-order height DFS",
+        "complexity": {
+          "time": "O(n)",
+          "space": "O(h)"
+        },
+        "plain": "Compute heights bottom-up and record the best left-plus-right span at each node.",
+        "approach": [
+          "Define a DFS returning the height (in edges) of a node's subtree.",
+          "A null node has height -1 so a leaf has height 0.",
+          "At each node, the path through it uses leftHeight + rightHeight + 2 edges.",
+          "Keep a global maximum of that value across all nodes.",
+          "Return the height as 1 + max(leftHeight, rightHeight); the global max is the diameter."
+        ],
+        "pseudocode": "best = 0\nheight(node):\n  if node==null: return -1\n  l = height(node.left)\n  r = height(node.right)\n  best = max(best, l + r + 2)\n  return 1 + max(l, r)\nheight(root); return best",
+        "code": "public class Solution {\n    private int best = 0;\n    public int solve(TreeNode A) {\n        best = 0;\n        height(A);\n        return best;\n    }\n    private int height(TreeNode node) {\n        if (node == null) return -1;\n        int l = height(node.left);\n        int r = height(node.right);\n        best = Math.max(best, l + r + 2);\n        return 1 + Math.max(l, r);\n    }\n}",
+        "story": "Reference solution: the user's editor was empty, so this is the canonical post-order height diameter approach."
+      }
+    ]
+  },
+  {
+    "num": 228,
+    "id": "s3-tree-identical-binary-trees",
+    "title": "Identical Binary Trees",
+    "subTopic": "Tree Traversal",
+    "tags": [
+      "Binary Trees",
+      "Tree Traversal"
+    ],
+    "description": "Given two binary trees, check if they are equal or not.\nTwo binary trees are considered equal if they are structurally identical and the nodes have the same value.\n\nProblem Constraints:\n1 <= number of nodes <= 10^5\n\nInput Format:\nThe first argument is a root node of the first tree, A.\nThe second argument is a root node of the second tree, B.\n\nOutput Format:\nReturn 0 / 1 ( 0 for false, 1 for true ) for this problem.\n\nExample Input:\nInput 1:\n   1       1\n  / \\     / \\\n 2   3   2   3\n\nInput 2:\n   1       1\n  / \\     / \\\n 2   3   3   3\n\nExample Output:\nOutput 1:\n1\nOutput 2:\n0\n\nExample Explanation:\nExplanation 1:\nBoth trees are structurally identical and the nodes have the same value.\nExplanation 2:\nValues of the left child of the root node of the trees are different.",
+    "sampleInput": "Tree A:\n   1\n  / \\\n 2   3\nTree B:\n   1\n  / \\\n 2   3",
+    "sampleOutput": "1",
+    "story": "Compare two trees node by node. To crack it: walk both trees together in the same order; at each step both nodes must exist and hold the same value, and their subtrees must also match.",
+    "plain": "Recurse on both trees at once. If both nodes are null return true; if only one is null or the values differ return false; otherwise recurse on left and right pairs.",
+    "tale": "Like overlaying two transparencies of family trees and checking every name lines up perfectly.",
+    "solutions": [
+      {
+        "label": "Recursive comparison",
+        "complexity": {
+          "time": "O(n)",
+          "space": "O(h)"
+        },
+        "plain": "Traverse both trees simultaneously and compare structure and values.",
+        "approach": [
+          "If both A and B are null, they match: return true.",
+          "If exactly one is null, they differ: return false.",
+          "If values differ, return false.",
+          "Otherwise recurse on (A.left, B.left) and (A.right, B.right); both must match."
+        ],
+        "pseudocode": "isSame(A, B):\n  if A == null and B == null: return true\n  if A == null or B == null: return false\n  if A.val != B.val: return false\n  return isSame(A.left, B.left) and isSame(A.right, B.right)",
+        "code": "public class Solution {\n    public int isSameTree(TreeNode A, TreeNode B) {\n        return same(A, B) ? 1 : 0;\n    }\n    private boolean same(TreeNode A, TreeNode B) {\n        if (A == null && B == null) return true;\n        if (A == null || B == null) return false;\n        if (A.val != B.val) return false;\n        return same(A.left, B.left) && same(A.right, B.right);\n    }\n}",
+        "story": "Reference solution; editor was empty. Standard simultaneous DFS comparison of two trees."
+      }
+    ]
+  },
+  {
+    "num": 229,
+    "id": "s3-tree-invert-the-binary-tree",
+    "title": "Invert the Binary Tree",
+    "subTopic": "Tree Traversal",
+    "tags": [
+      "Binary Trees",
+      "Tree Traversal"
+    ],
+    "description": "Given a binary tree A, invert the binary tree and return it.\nInverting refers to making the left child the right child and vice versa.\n\nProblem Constraints:\n1 <= size of tree <= 100000\n\nInput Format:\nFirst and only argument is the head of the tree A.\n\nOutput Format:\nReturn the head of the inverted tree.\n\nExample Input:\nInput 1:\n     1\n    / \\\n   2   3\n\nInput 2:\n     1\n    / \\\n   2   3\n  / \\ / \\\n 4  5 6  7\n\nExample Output:\nOutput 1:\n     1\n    / \\\n   3   2\n\nOutput 2:\n     1\n    / \\\n   3   2\n  / \\ / \\\n 7  6 5  4\n\nExample Explanation:\nExplanation 1:\nTree has been inverted.\nExplanation 2:\nTree has been inverted.",
+    "sampleInput": "     1\n    / \\\n   2   3",
+    "sampleOutput": "     1\n    / \\\n   3   2",
+    "story": "Mirror the tree left-to-right. To crack it: at every node swap its two children, then do the same for each subtree.",
+    "plain": "Recursively swap the left and right children of every node.",
+    "tale": "Like holding the tree up to a mirror so every branch flips sides.",
+    "solutions": [
+      {
+        "label": "Recursive swap",
+        "complexity": {
+          "time": "O(n)",
+          "space": "O(h)"
+        },
+        "plain": "Swap children at each node and recurse into both subtrees.",
+        "approach": [
+          "If the node is null, return null.",
+          "Swap the node's left and right children.",
+          "Recurse into both subtrees (order does not matter).",
+          "Return the node."
+        ],
+        "pseudocode": "invert(A):\n  if A == null: return null\n  swap(A.left, A.right)\n  invert(A.left)\n  invert(A.right)\n  return A",
+        "code": "public class Solution {\n    public TreeNode invertTree(TreeNode A) {\n        if (A == null) return null;\n        TreeNode temp = A.left;\n        A.left = A.right;\n        A.right = temp;\n        invertTree(A.left);\n        invertTree(A.right);\n        return A;\n    }\n}",
+        "story": "Reference solution; editor was empty. Classic recursive mirror of a binary tree."
+      }
+    ]
+  }
+]

@@ -1,0 +1,64 @@
+{
+  "topic": "Hashing 2",
+  "summary": "Hash maps/sets turn 'have I seen this / how many times' into O(1). The workhorse pattern is prefix-sum + hashmap for subarray-sum questions (zero-sum, sum equals B) — store counts of running prefix sums, seeded with {0:1}. Sets give O(1) membership for run-based problems like longest consecutive sequence.",
+  "thoughtProcess": [
+    {
+      "title": "Subarray-sum question? Prefix sum + hashmap of counts.",
+      "body": "If prefix[j] - prefix[i] == target, a subarray sums to target. Store how many times each prefix sum occurred; for each j add count[prefix[j]-target]. Seed the map with {0:1} for subarrays starting at index 0."
+    },
+    {
+      "title": "'Longest run / consecutive' -> dump into a set, expand only from run starts.",
+      "body": "Put all numbers in a HashSet. A number x starts a run only if x-1 is absent; then count x, x+1, x+2... Each number is visited O(1) times overall -> O(N)."
+    },
+    {
+      "title": "Choose the container by the question: Set for membership, Map for a value.",
+      "body": "HashSet = distinct/seen. HashMap = need a count, index, or first-position. Use getOrDefault/merge for frequency maps."
+    }
+  ],
+  "keyPatterns": [
+    {
+      "name": "Prefix sum + hashmap",
+      "when": "Count / longest subarray with a given sum (incl. zero)",
+      "template": "map={0:-1 or 0:1}; run=0; for i: run+=A[i]; check map for run-target; update map",
+      "examples": [
+        "Longest Subarray Zero Sum"
+      ]
+    },
+    {
+      "name": "Set-based run expansion",
+      "when": "Longest consecutive sequence",
+      "template": "set=all; for x in set: if !set.contains(x-1): grow y=x while set.contains(y+1); track length",
+      "examples": [
+        "Longest Consecutive Sequence"
+      ]
+    },
+    {
+      "name": "Frequency map / order map",
+      "when": "Count occurrences, sort by given order",
+      "template": "freq via map.merge(x,1,Integer::sum); emit per a reference order",
+      "examples": [
+        "Sort Array in given Order"
+      ]
+    }
+  ],
+  "commonMistakes": [
+    {
+      "title": "Comparing boxed Integer counts with ==",
+      "wrong": "if (map.get(a) == map.get(b))",
+      "right": "if (map.get(a).equals(map.get(b)))",
+      "why": "Integer autoboxing caches only -128..127, so == works by luck for small values and breaks above 127; use equals or compare primitive int."
+    },
+    {
+      "title": "Prefix-sum map not seeded / wrong index convention",
+      "wrong": "map empty at start",
+      "right": "seed map.put(0, ...) before the loop",
+      "why": "Without the empty-prefix seed you miss every subarray that starts at index 0."
+    }
+  ],
+  "edgeCases": [
+    "Longest-subarray-by-length: store the FIRST index of each prefix sum (don't overwrite) so the span is maximal.",
+    "Count-of-subarrays: store counts and accumulate — a prefix sum can recur many times.",
+    "Negative numbers are fine for prefix-sum+map (unlike two-pointer windows).",
+    "Longest consecutive: duplicates in the input must not inflate the run length (a set dedupes them)."
+  ]
+}

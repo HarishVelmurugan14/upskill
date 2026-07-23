@@ -1,0 +1,177 @@
+[
+  {
+    "num": 230,
+    "id": "s3-hash2-longest-consecutive-sequence",
+    "title": "Longest Consecutive Sequence",
+    "subTopic": "HashSet",
+    "tags": [
+      "Hashing",
+      "HashSet"
+    ],
+    "description": "Given an unsorted integer array A of size N.\nFind the length of the longest set of consecutive elements from array A.\n\nProblem Constraints:\n1 <= N <= 10^6\n-10^6 <= A[i] <= 10^6\n\nInput Format:\nFirst argument is an integer array A of size N.\n\nOutput Format:\nReturn an integer denoting the length of the longest set of consecutive elements from the array A.\n\nExample Input:\nInput 1:\nA = [100, 4, 200, 1, 3, 2]\nInput 2:\nA = [2, 1]\n\nExample Output:\nOutput 1:\n4\nOutput 2:\n2\n\nExample Explanation:\nExplanation 1:\nThe set of consecutive elements will be [1, 2, 3, 4].\nExplanation 2:\nThe set of consecutive elements will be [1, 2].",
+    "sampleInput": "A = [100, 4, 200, 1, 3, 2]",
+    "sampleOutput": "4",
+    "story": "Find the longest run of consecutive integers hidden in an unsorted array. To crack it: put everything in a hash set and only start counting a run from a number that has no predecessor in the set.",
+    "plain": "Store all numbers in a HashSet. For each number that is a run start (x-1 not present), walk x, x+1, x+2... counting the run length, and track the maximum.",
+    "tale": "Like spotting the longest unbroken chain of house numbers on a street, only beginning to count from a house whose left neighbor is missing.",
+    "solutions": [
+      {
+        "label": "HashSet run-start scan",
+        "complexity": {
+          "time": "O(n)",
+          "space": "O(n)"
+        },
+        "plain": "Use a set; count runs only from numbers with no predecessor so each element is visited once.",
+        "approach": [
+          "Insert every element into a HashSet.",
+          "For each value x in the set, check if x-1 is present.",
+          "If x-1 is absent, x begins a run: keep incrementing while x+length is in the set.",
+          "Track the maximum run length seen."
+        ],
+        "pseudocode": "set = HashSet(A)\nbest = 0\nfor x in set:\n  if (x-1) not in set:\n    len = 1\n    while (x+len) in set: len++\n    best = max(best, len)\nreturn best",
+        "code": "import java.util.*;\npublic class Solution {\n    public int longestConsecutive(final int[] A) {\n        HashSet<Integer> set = new HashSet<>();\n        for (int x : A) set.add(x);\n        int best = 0;\n        for (int x : set) {\n            if (!set.contains(x - 1)) {\n                int len = 1;\n                while (set.contains(x + len)) len++;\n                best = Math.max(best, len);\n            }\n        }\n        return best;\n    }\n}",
+        "story": "Reference solution; editor was empty. Standard O(n) HashSet approach starting runs only from sequence heads."
+      }
+    ]
+  },
+  {
+    "num": 231,
+    "id": "s3-hash2-longest-subarray-zero-sum",
+    "title": "Longest Subarray Zero Sum",
+    "subTopic": "Prefix Sum + HashMap",
+    "tags": [
+      "Hashing",
+      "Prefix Sum + HashMap"
+    ],
+    "description": "Given an array A of N integers.\nFind the length of the longest subarray in the array which sums to zero.\nIf there is no subarray which sums to zero then return 0.\n\nProblem Constraints:\n1 <= N <= 10^5\n-10^9 <= A[i] <= 10^9\n\nInput Format:\nSingle argument which is an integer array A.\n\nOutput Format:\nReturn an integer.\n\nExample Input:\nInput 1:\nA = [1, -2, 1, 2]\nInput 2:\nA = [3, 2, -1]\n\nExample Output:\nOutput 1:\n3\nOutput 2:\n0\n\nExample Explanation:\nExplanation 1:\n[1, -2, 1] is the largest subarray which sums up to 0.\nExplanation 2:\nNo subarray sums up to 0.",
+    "sampleInput": "A = [1, -2, 1, 2]",
+    "sampleOutput": "3",
+    "story": "Find the longest stretch that cancels out to zero. To crack it: track running prefix sums; if the same prefix sum shows up twice, the elements in between sum to zero.",
+    "plain": "Maintain a prefix sum and a HashMap of the first index where each prefix sum occurred. If a prefix sum repeats, the subarray between the two indices sums to zero; take the widest such gap.",
+    "tale": "Like tracking your bank balance day by day: whenever the balance returns to a value it hit before, everything spent and earned in between nets to zero.",
+    "solutions": [
+      {
+        "label": "Prefix sum + HashMap",
+        "complexity": {
+          "time": "O(n)",
+          "space": "O(n)"
+        },
+        "plain": "Store the earliest index of each prefix sum; a repeat means a zero-sum window.",
+        "approach": [
+          "Keep a running prefix sum and a map from sum to its earliest index.",
+          "Seed the map with sum 0 at index -1 to handle prefixes that sum to zero.",
+          "At index i, if the current sum was seen before at index j, the subarray (j+1..i) sums to zero: candidate length i - j.",
+          "Otherwise record the current sum with index i. Track the maximum length."
+        ],
+        "pseudocode": "map = {0: -1}\nsum = 0, best = 0\nfor i in 0..n-1:\n  sum += A[i]\n  if sum in map: best = max(best, i - map[sum])\n  else map[sum] = i\nreturn best",
+        "code": "import java.util.*;\npublic class Solution {\n    public int solve(int[] A) {\n        HashMap<Long, Integer> first = new HashMap<>();\n        first.put(0L, -1);\n        long sum = 0;\n        int best = 0;\n        for (int i = 0; i < A.length; i++) {\n            sum += A[i];\n            if (first.containsKey(sum)) {\n                best = Math.max(best, i - first.get(sum));\n            } else {\n                first.put(sum, i);\n            }\n        }\n        return best;\n    }\n}",
+        "story": "Reference solution; editor was empty. Uses long prefix sums to avoid overflow given A[i] up to 10^9."
+      }
+    ]
+  },
+  {
+    "num": 232,
+    "id": "s3-hash2-colorful-number",
+    "title": "Colorful Number",
+    "subTopic": "HashSet",
+    "tags": [
+      "Hashing",
+      "HashSet"
+    ],
+    "description": "Given a number A, find if it is COLORFUL number or not.\nIf number A is a COLORFUL number return 1 else, return 0.\n\nWhat is a COLORFUL Number:\nA number can be broken into different consecutive sequence of digits.\nThe number 3245 can be broken into sequences like 3, 2, 4, 5, 32, 24, 45, 324, 245 and 3245.\nThis number is a COLORFUL number, since the product of every consecutive sequence of digits is different.\n\nProblem Constraints:\n1 <= A <= 2 * 10^9\n\nInput Format:\nThe first and only argument is an integer A.\n\nOutput Format:\nReturn 1 if integer A is COLORFUL else return 0.\n\nExample Input:\nInput 1:\nA = 23\nInput 2:\nA = 236\n\nExample Output:\nOutput 1:\n1\nOutput 2:\n0\n\nExample Explanation:\nExplanation 1:\nPossible Sub-sequences: [2, 3, 23] where\n2 -> 2\n3 -> 3\n23 -> 6  (product of digits)\nThis number is a COLORFUL number since product of every digit of a sub-sequence are different.\nExplanation 2:\nPossible Sub-sequences: [2, 3, 6, 23, 36, 236] where\n2 -> 2\n3 -> 3\n6 -> 6\n23 -> 6  (product of digits)\n36 -> 18  (product of digits)\n236 -> 36  (product of digits)\nThis number is not a COLORFUL number since the product sequence 23 and sequence 6 is same.",
+    "sampleInput": "A = 23",
+    "sampleOutput": "1",
+    "story": "Check whether every consecutive block of digits has a distinct digit-product. To crack it: enumerate all consecutive digit windows, compute each product, and fail the moment a product repeats.",
+    "plain": "Extract the digits, then for every start and end index compute the product of that digit window and store products in a HashSet. If any product is already present, the number is not colorful.",
+    "tale": "Like handing out raffle numbers for each stretch of digits: the moment two stretches draw the same number, the batch is disqualified.",
+    "solutions": [
+      {
+        "label": "All-substrings product set",
+        "complexity": {
+          "time": "O(d^2)",
+          "space": "O(d^2)"
+        },
+        "plain": "Compute the digit product of every consecutive digit window and require all products to be unique.",
+        "approach": [
+          "Collect the digits of A into a list.",
+          "For each starting index i, run a product forward over j = i..end, multiplying digits.",
+          "Add each running product to a HashSet; if it is already present, return 0.",
+          "If no duplicate is found across all windows, return 1."
+        ],
+        "pseudocode": "digits = digitsOf(A)\nseen = HashSet\nfor i in 0..d-1:\n  prod = 1\n  for j in i..d-1:\n    prod *= digits[j]\n    if prod in seen: return 0\n    seen.add(prod)\nreturn 1",
+        "code": "import java.util.*;\npublic class Solution {\n    public int colorful(int A) {\n        List<Integer> digits = new ArrayList<>();\n        if (A == 0) digits.add(0);\n        while (A > 0) {\n            digits.add(A % 10);\n            A /= 10;\n        }\n        int d = digits.size();\n        HashSet<Long> seen = new HashSet<>();\n        for (int i = 0; i < d; i++) {\n            long prod = 1;\n            for (int j = i; j < d; j++) {\n                prod *= digits.get(j);\n                if (seen.contains(prod)) return 0;\n                seen.add(prod);\n            }\n        }\n        return 1;\n    }\n}",
+        "story": "Reference solution; editor was empty. Enumerates all consecutive digit windows and checks products are all distinct."
+      }
+    ]
+  },
+  {
+    "num": 233,
+    "id": "s3-hash2-count-subarrays",
+    "title": "Count Subarrays",
+    "subTopic": "Sliding Window + HashSet",
+    "tags": [
+      "Hashing",
+      "Sliding Window + HashSet"
+    ],
+    "description": "Misha likes finding all Subarrays of an Array. Now she gives you an array A of N elements and told you to find the number of subarrays of A, that have unique elements.\nSince the number of subarrays could be large, return value % 10^9 +7.\n\nProblem Constraints:\n1 <= N <= 10^5\n1 <= A[i] <= 10^6\n\nInput Format:\nThe only argument given is an Array A, having N integers.\n\nOutput Format:\nReturn the number of subarrays of A, that have unique elements.\n\nExample Input:\nInput 1:\nA = [1, 1, 3]\nInput 2:\nA = [2, 1, 2]\n\nExample Output:\nOutput 1:\n4\nOutput 2:\n5\n\nExample Explanation:\nExplanation 1:\nSubarrays of A that have unique elements only:\n[1], [1], [1, 3], [3]\nExplanation 2:\nSubarrays of A that have unique elements only:\n[2], [1], [2, 1], [1, 2], [2]",
+    "sampleInput": "A = [1, 1, 3]",
+    "sampleOutput": "4",
+    "story": "Count all subarrays whose elements are all distinct. To crack it: slide a window that never contains a duplicate; for each right end, every window start from left to right gives a valid subarray.",
+    "plain": "Use a sliding window with a HashSet. Expand right; when a duplicate appears, shrink from left until unique again. For each right index, add (right - left + 1) valid subarrays, taking the result modulo 10^9+7.",
+    "tale": "Like reading a sentence and counting every phrase with no repeated word: you extend until a word repeats, then drop words off the front until it is clean again.",
+    "solutions": [
+      {
+        "label": "Sliding window + HashSet",
+        "complexity": {
+          "time": "O(n)",
+          "space": "O(n)"
+        },
+        "plain": "Maintain a duplicate-free window; each right end contributes (window size) new valid subarrays.",
+        "approach": [
+          "Keep two pointers left and right and a HashSet of the current window's values.",
+          "For each right, while A[right] is already in the set, remove A[left] and advance left.",
+          "Add A[right] to the set.",
+          "Add (right - left + 1) to the answer modulo 10^9+7."
+        ],
+        "pseudocode": "MOD = 1e9+7\nleft = 0, ans = 0, set = {}\nfor right in 0..n-1:\n  while A[right] in set:\n    set.remove(A[left]); left++\n  set.add(A[right])\n  ans = (ans + right - left + 1) % MOD\nreturn ans",
+        "code": "import java.util.*;\npublic class Solution {\n    public int solve(int[] A) {\n        final int MOD = 1000000007;\n        HashSet<Integer> set = new HashSet<>();\n        int left = 0;\n        long ans = 0;\n        for (int right = 0; right < A.length; right++) {\n            while (set.contains(A[right])) {\n                set.remove(A[left]);\n                left++;\n            }\n            set.add(A[right]);\n            ans = (ans + (right - left + 1)) % MOD;\n        }\n        return (int) ans;\n    }\n}",
+        "story": "Reference solution; editor was empty. Standard distinct-element sliding window counting subarrays per right endpoint."
+      }
+    ]
+  },
+  {
+    "num": 234,
+    "id": "s3-hash2-sort-array-in-given-order",
+    "title": "Sort Array in given Order",
+    "subTopic": "HashMap Counting",
+    "tags": [
+      "Hashing",
+      "HashMap Counting"
+    ],
+    "description": "Given two arrays of integers A and B, Sort A in such a way that the relative order among the elements will be the same as those are in B.\nFor the elements not present in B, append them at last in sorted order.\nReturn the array A after sorting from the above method.\nNOTE: Elements of B are unique.\n\nProblem Constraints:\n1 <= length of the array A <= 100000\n1 <= length of the array B <= 100000\n-10^9 <= A[i] <= 10^9\n\nInput Format:\nThe first argument given is the integer array A.\nThe second argument given is the integer array B.\n\nOutput Format:\nReturn the array A after sorting as described.\n\nExample Input:\nInput 1:\nA = [1, 2, 3, 4, 5, 4]\nB = [5, 4, 2]\nInput 2:\nA = [5, 17, 100, 11]\nB = [1, 100]\n\nExample Output:\nOutput 1:\n[5, 4, 4, 2, 1, 3]\nOutput 2:\n[100, 5, 11, 17]\n\nExample Explanation:\nExplanation 1:\nSince 2, 4, 5, 4 of A are present in the array B.  So Maintaining the relative order of B.\nThus, [5, 4, 4, 2] and appending the remaining element (1, 3) in sorted order.\nThe Final array is [5, 4, 4, 2, 1, 3]\nExplanation 2:\nSince 100 of A are present in the array B.  So Maintaining the relative order of B.\nThus, [100] and appending the remaining element (5, 11, 17) in sorted order.\nThe Final array is [100, 5, 11, 17]",
+    "sampleInput": "A = [1, 2, 3, 4, 5, 4]\nB = [5, 4, 2]",
+    "sampleOutput": "[5, 4, 4, 2, 1, 3]",
+    "story": "Reorder A to follow the priority order given by B, with leftovers sorted at the end. To crack it: count how many times each value appears in A, then emit values in B's order, and finally emit the rest in sorted order.",
+    "plain": "Count occurrences of each A value in a HashMap. Walk B and output each value as many times as it appears in A (removing it from the map). Then collect the remaining values, sort them, and append.",
+    "tale": "Like arranging guests by a VIP seating list first, then seating everyone else alphabetically at the back.",
+    "solutions": [
+      {
+        "label": "Count map + priority order B",
+        "complexity": {
+          "time": "O(n log n)",
+          "space": "O(n)"
+        },
+        "plain": "Tally A's values, emit in B's order, then append the leftover values sorted.",
+        "approach": [
+          "Build a frequency map of every value in A.",
+          "For each value in B, append it to the result count-many times and remove it from the map.",
+          "Gather all remaining values (with their counts) into a list.",
+          "Sort that list and append it after B's ordered portion."
+        ],
+        "pseudocode": "count = freqMap(A)\nres = []\nfor b in B:\n  add b count[b] times; count.remove(b)\nrest = []\nfor (v, c) in count: add v c times to rest\nsort(rest)\nres += rest\nreturn res",
+        "code": "import java.util.*;\npublic class Solution {\n    public int[] solve(int[] A, int[] B) {\n        HashMap<Integer, Integer> count = new HashMap<>();\n        for (int x : A) count.merge(x, 1, Integer::sum);\n        int[] res = new int[A.length];\n        int idx = 0;\n        for (int b : B) {\n            int c = count.getOrDefault(b, 0);\n            for (int k = 0; k < c; k++) res[idx++] = b;\n            count.remove(b);\n        }\n        List<Integer> rest = new ArrayList<>();\n        for (Map.Entry<Integer, Integer> e : count.entrySet()) {\n            for (int k = 0; k < e.getValue(); k++) rest.add(e.getKey());\n        }\n        Collections.sort(rest);\n        for (int v : rest) res[idx++] = v;\n        return res;\n    }\n}",
+        "story": "Reference solution; editor was empty. Frequency map plus B-priority emission with sorted leftovers appended."
+      }
+    ]
+  }
+]

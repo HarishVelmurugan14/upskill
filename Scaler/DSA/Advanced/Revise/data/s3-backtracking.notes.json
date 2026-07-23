@@ -1,0 +1,68 @@
+{
+  "topic": "Backtracking",
+  "summary": "Backtracking = build a partial solution, recurse, then UNDO the choice before trying the next. It powers permutations, subsets, parentheses, phone-letter combos, and grid maze paths. Two ideas cover most of it: the choose/explore/unchoose template, and grid DFS with a visited marker that you restore on the way out. A few problems (Kth Symbol) are pure divide-and-conquer recurrences, not search.",
+  "thoughtProcess": [
+    {
+      "title": "Write the recursion as choose -> explore -> unchoose.",
+      "body": "Add a choice to the current path, recurse, then remove it. The 'remove it' line is the one people forget; without it the path leaks state into sibling branches."
+    },
+    {
+      "title": "Subsets vs permutations vs combinations — the shape of the recursion differs.",
+      "body": "Subsets: at each index, include or skip. Permutations: pick any unused element (track used[]). Combinations/parentheses: constrain choices (e.g. can add ')' only if open>close)."
+    },
+    {
+      "title": "Grid/maze paths: DFS with visited + restore, and prune at the borders.",
+      "body": "Mark cell visited before recursing into neighbours, unmark after. Check bounds and hurdles before stepping. For shortest path in an unweighted grid prefer BFS over backtracking."
+    }
+  ],
+  "keyPatterns": [
+    {
+      "name": "Backtracking template",
+      "when": "Enumerate permutations/subsets/combinations",
+      "template": "void go(path, choices):\n  if complete: record(path); return\n  for c in choices:\n    path.add(c)          // choose\n    go(path, next)       // explore\n    path.removeLast()    // UNCHOOSE",
+      "examples": [
+        "Permutations",
+        "Generate Subsets",
+        "Generate all Parentheses II",
+        "Letter Phone"
+      ]
+    },
+    {
+      "name": "Grid DFS with restore",
+      "when": "Count/print paths through a maze with obstacles",
+      "template": "dfs(r,c): if out/hurdle/visited return; visit; recurse 4 dirs; unvisit",
+      "examples": [
+        "General maze / island grid DFS (mark visited, unmark on return). The Section 3 maze problems here use simpler variants: 1D recursion (Staircase), Down/Right only (Print All Maze Paths), or BFS (Shortest Path in Binary Maze)."
+      ]
+    },
+    {
+      "name": "Divide-and-conquer recurrence",
+      "when": "Kth element of a self-similar sequence",
+      "template": "Kth-symbol: value(n,k) depends on value(n-1, k/2) and a flip",
+      "examples": [
+        "Kth Symbol - Easy",
+        "Kth Symbol - Hard"
+      ]
+    }
+  ],
+  "commonMistakes": [
+    {
+      "title": "Forgetting to undo the choice",
+      "wrong": "path.add(c); go(...);   // no removeLast",
+      "right": "path.add(c); go(...); path.removeLast();",
+      "why": "State leaks into sibling branches, producing wrong/duplicated results."
+    },
+    {
+      "title": "Not restoring visited in grid DFS",
+      "wrong": "visited[r][c]=true; ...; // never reset",
+      "right": "visited[r][c]=true; recurse; visited[r][c]=false;",
+      "why": "A cell blocked on one path stays blocked for all other paths, undercounting solutions."
+    }
+  ],
+  "edgeCases": [
+    "Empty input (empty string / empty set) — the base case should still record the single empty solution where appropriate.",
+    "Duplicates in the input for subsets/permutations — sort and skip equal siblings to avoid repeat results.",
+    "Recursion depth grows with input size; deep grids/strings can approach the stack limit.",
+    "Shortest-path in an unweighted grid: BFS gives the true minimum; DFS/backtracking can explore exponentially."
+  ]
+}

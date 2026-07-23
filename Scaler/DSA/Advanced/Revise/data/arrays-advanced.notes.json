@@ -184,7 +184,7 @@
     "Minimum Swaps: K == 0 (no good elements) or K == n (all good) — return 0 without sliding.",
     "Insert Interval: empty input set -> output is just [B]; B before/after all intervals — one while-phase copies nothing, the other copies everything.",
     "Insert Interval: B touching two neighbours (e.g. [2,6] into [[1,3],[6,9]]) collapses BOTH into [1,9]; the widen-loop must keep consuming while A[i].start <= be.",
-    "Contribution / N^4-style product: cast to long BEFORE multiplying ((long)(i+1)*(N-i)*...); a 30x30 all-10s matrix already exceeds int.",
+    "Contribution / N^4-style products: cast to long BEFORE multiplying ((long)(i+1)*(N-i)*...). int wraps only for large grids or big values — a 30x30 all-10s matrix stays within int; overflow needs roughly a 90x90 matrix at value 10 (or 30x30 with cell values ~90+).",
     "Sorted-matrix staircase for lexicographically-smallest match: on equality keep moving LEFT (col--), prefer the lower row for duplicates — don't stop at the first hit."
   ]
 }

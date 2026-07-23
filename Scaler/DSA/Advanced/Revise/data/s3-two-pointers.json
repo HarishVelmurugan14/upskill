@@ -1,0 +1,361 @@
+[
+  {
+    "num": 183,
+    "id": "s3-twop-pairs-with-given-sum-ii",
+    "title": "Pairs with given sum II",
+    "subTopic": "Two pointers on sorted array",
+    "tags": [
+      "2 Pointers",
+      "Sorted array",
+      "Counting"
+    ],
+    "description": "Given a sorted array of integers (not necessarily distinct) A and an integer B, find and return how many pair of integers ( A[i], A[j] ) such that i != j have sum equal to B.\nSince the number of such pairs can be very large, return number of such pairs modulo (10^9 + 7).\n\nProblem Constraints\n1 <= |A| <= 100000\n1 <= A[i] <= 10^9\n1 <= B <= 10^9\n\nInput Format\nThe first argument given is the integer array A.\nThe second argument given is integer B.\n\nOutput Format\nReturn the number of pairs for which sum is equal to B modulo (10^9+7).\n\nExample Input\nInput 1:\nA = [1, 1, 1]\nB = 2\nInput 2:\nA = [1, 5, 7, 10]\nB = 8\n\nExample Output\nOutput 1:\n3\nOutput 2:\n1",
+    "sampleInput": "A = [1, 1, 1]\nB = 2",
+    "sampleOutput": "3",
+    "story": "Count index pairs in a sorted array summing to B. To crack it, use two pointers from both ends; when the two values are equal, count the combinations among duplicates with nC2.",
+    "plain": "Move a left pointer up and a right pointer down. If A[left]+A[right] < B move left in, if > B move right in. If equal, and the two values differ, multiply their duplicate counts; if they are the same value, add c*(c-1)/2. Take everything mod 1e9+7.",
+    "tale": "Two fingers walk toward each other; when their numbers add up right, count how many identical partners each finger has.",
+    "solutions": [
+      {
+        "label": "Optimal — two pointers with duplicate counting",
+        "complexity": {
+          "time": "O(N)",
+          "space": "O(1)"
+        },
+        "plain": "Standard two-pointer sweep; handle blocks of equal values to count all combinations, all under the modulus.",
+        "approach": [
+          "Set left = 0, right = N-1, count = 0, MOD = 1e9+7.",
+          "While left < right: compute sum = A[left] + A[right].",
+          "If sum < B, left++. If sum > B, right--.",
+          "If sum == B and A[left] != A[right]: count blocks of equal values c1 and c2, add c1*c2, move both pointers past the blocks.",
+          "If sum == B and A[left] == A[right]: with c elements remaining, add c*(c-1)/2 and break.",
+          "Return count % MOD."
+        ],
+        "pseudocode": "l=0, r=N-1, cnt=0\nwhile l<r:\n  if A[l]+A[r] < B: l++\n  elif A[l]+A[r] > B: r--\n  elif A[l]==A[r]: c=r-l+1; cnt+=c*(c-1)/2; break\n  else: count c1,c2 dup blocks; cnt+=c1*c2; l+=c1; r-=c2\nreturn cnt % MOD",
+        "code": "public class Solution {\n    public int solve(int[] A, int B) {\n        long MOD = 1000000007L;\n        int left = 0, right = A.length - 1;\n        long count = 0;\n        while (left < right) {\n            long sum = (long) A[left] + A[right];\n            if (sum < B) {\n                left++;\n            } else if (sum > B) {\n                right--;\n            } else if (A[left] == A[right]) {\n                long c = right - left + 1;\n                count = (count + c * (c - 1) / 2) % MOD;\n                break;\n            } else {\n                long c1 = 1, c2 = 1;\n                while (left + 1 < right && A[left + 1] == A[left]) { c1++; left++; }\n                while (right - 1 > left && A[right - 1] == A[right]) { c2++; right--; }\n                count = (count + c1 * c2) % MOD;\n                left++;\n                right--;\n            }\n        }\n        return (int) (count % MOD);\n    }\n}",
+        "story": "Reference solution — Unsolved in the screenshot, code not captured."
+      }
+    ]
+  },
+  {
+    "num": 184,
+    "id": "s3-twop-pairs-with-given-difference",
+    "title": "Pairs with Given Difference",
+    "subTopic": "Hashing / two pointers",
+    "tags": [
+      "2 Pointers",
+      "Hashing",
+      "Counting"
+    ],
+    "description": "Given an one-dimensional integer array A of size N and an integer B.\nCount all distinct pairs with difference equal to B.\nHere a pair is defined as an integer pair (x, y), where x and y are both numbers in the array and their absolute difference is B.\n\nProblem Constraints\n1 <= N <= 10^4\n0 <= A[i], B <= 10^5\n\nInput Format\nFirst argument is an one-dimensional integer array A of size N.\nSecond argument is an integer B.\n\nOutput Format\nReturn an integer denoting the count of all distinct pairs with difference equal to B.\n\nExample Input\nInput 1:\nA = [1, 5, 3, 4, 2]\nB = 3\nInput 2:\nA = [8, 12, 16, 4, 0, 20]\nB = 4\nInput 3:\nA = [1, 1, 1, 2, 2]\nB = 0\n\nExample Output\nOutput 1:\n2\nOutput 2:\n5",
+    "sampleInput": "A = [1, 5, 3, 4, 2]\nB = 3",
+    "sampleOutput": "2",
+    "story": "Count distinct value pairs with absolute difference B. To crack it, dump values into a set; for each unique value v check whether v+B also exists, and handle B=0 specially by counting values that appear at least twice.",
+    "plain": "Put all values in a set. If B > 0, for each distinct value v count 1 if v+B is in the set. If B == 0, count distinct values that occur more than once. Distinct pairs means each unique (x,y) is counted once.",
+    "tale": "For each number, ask 'does my number-plus-B exist here too?' — each yes is one distinct pair.",
+    "solutions": [
+      {
+        "label": "Optimal — hash set lookup",
+        "complexity": {
+          "time": "O(N)",
+          "space": "O(N)"
+        },
+        "plain": "Build a set of values (and a frequency map for the B=0 case), then count matches.",
+        "approach": [
+          "If B == 0: count distinct values whose frequency is >= 2 and return that.",
+          "Otherwise put all values into a HashSet.",
+          "For each distinct value v in the set, if the set contains v + B, increment count.",
+          "Return count."
+        ],
+        "pseudocode": "if B==0: return #{v : freq[v] >= 2}\nset = distinct values\ncount = 0\nfor v in set:\n  if (v+B) in set: count++\nreturn count",
+        "code": "public class Solution {\n    public int solve(int[] A, int B) {\n        HashMap<Integer, Integer> freq = new HashMap<>();\n        for (int x : A) {\n            freq.put(x, freq.getOrDefault(x, 0) + 1);\n        }\n        int count = 0;\n        if (B == 0) {\n            for (int v : freq.keySet()) {\n                if (freq.get(v) >= 2) count++;\n            }\n            return count;\n        }\n        for (int v : freq.keySet()) {\n            if (freq.containsKey(v + B)) count++;\n        }\n        return count;\n    }\n}",
+        "story": "Reference solution — Unsolved in the screenshot, code not captured. The user's editor had a partial, non-compiling HashMap attempt (undeclared count, indexing with an undefined i)."
+      }
+    ]
+  },
+  {
+    "num": 185,
+    "id": "s3-twop-check-pair-sum",
+    "title": "Check Pair Sum",
+    "subTopic": "Hashing",
+    "tags": [
+      "2 Pointers",
+      "Hashing"
+    ],
+    "description": "Given an Array of integers B, and a target sum A.\nCheck if there exists a pair (i,j) such that Bi + Bj = A and i!=j.\n\nProblem Constraints:\n1 <= Length of array B <= 10^5\n0 <= Bi <= 10^9\n0 <= A <= 10^9\n\nInput Format:\nFirst argument A is the Target sum, and second argument is the array B.\n\nOutput Format:\nReturn an integer value 1 if there exists such pair, else return 0.",
+    "sampleInput": "A = 8\nB = [3, 5, 1, 2, 1, 2]\n\nA = 21\nB = [9, 10, 7, 10, 9, 1, 5, 1, 5]",
+    "sampleOutput": "1\n0",
+    "story": "Check if any two different elements of the array add up to A. The trick is to remember, as you scan each number, what earlier value would complete a pair with it - a hash set makes that lookup instant.",
+    "plain": "Walk through the array once. For the current number x, we want to know if some earlier number equalled A-x. Keep a set of the complements (A-x) we still need. If x is already sitting in that set, an earlier number needed x, so a pair exists.",
+    "tale": "Like a lock-and-key box: for each key you pick up, you first check if a matching lock is already waiting; if not, you drop off the lock it would need.",
+    "solutions": [
+      {
+        "label": "One-pass HashSet",
+        "complexity": {
+          "time": "O(n)",
+          "space": "O(n)"
+        },
+        "plain": "Store the needed complement A-x for each number seen; if the current number is already a stored complement, return 1.",
+        "approach": [
+          "Create an empty HashSet.",
+          "For each x in B, if the set already contains x, a valid pair exists so return 1.",
+          "Otherwise add A-x (the value that would pair with x) to the set.",
+          "If the loop finishes with no match, return 0."
+        ],
+        "pseudocode": "set = {}\nfor x in B:\n  if x in set: return 1\n  set.add(A - x)\nreturn 0",
+        "code": "public class Solution {\n    public int solve(int A, int[] B) {\n        Set<Integer> set = new HashSet<>();\n        for(int x : B){\n            if(set.contains(x)){\n                return 1;\n            }\n            set.add(A-x);\n        }\n        return 0;\n    }\n}"
+      }
+    ]
+  },
+  {
+    "num": 186,
+    "id": "s3-twop-3-sum",
+    "title": "3 Sum",
+    "subTopic": "Sort + Two Pointers",
+    "tags": [
+      "2 Pointers",
+      "Sort + Two Pointers"
+    ],
+    "description": "Given an array A of N integers, find three integers in A such that the sum is closest to a given number B.\nReturn the sum of those three integers.\nAssume that there will only be one solution.\n\nProblem Constraints:\n-10^8 <= B <= 10^8\n1 <= N <= 10^4\n-10^8 <= A[i] <= 10^8\n\nInput Format:\nFirst argument is an integer array A of size N.\nSecond argument is an integer B denoting the sum you need to get close to.\n\nOutput Format:\nReturn a single integer denoting the sum of three integers which is closest to B.",
+    "sampleInput": "A = [-1, 2, 1, -4]\nB = 1\n\nA = [1, 2, 3]\nB = 6",
+    "sampleOutput": "2\n6",
+    "story": "Pick three numbers whose total lands as close as possible to B. Sort first, fix one number, then close in from both ends with two pointers to hunt the best remaining pair.",
+    "plain": "Sort the array. For each index i, treat A[i] as fixed and use two pointers (left just after i, right at the end). Track the running sum closest to B; move the pointers inward depending on whether the current sum is below or above B.",
+    "tale": "Like tuning three radio dials: lock one, then twist the other two in opposite directions until the signal sits nearest the target frequency.",
+    "solutions": [
+      {
+        "label": "Sort + fix-one two-pointer",
+        "complexity": {
+          "time": "O(n^2)",
+          "space": "O(1)"
+        },
+        "plain": "Sort, fix each element, and scan the rest with two pointers, keeping the sum with the smallest distance to B.",
+        "approach": [
+          "Sort array A.",
+          "Initialise closest to the sum of the first three (or a large-distance sentinel).",
+          "For each i, set l = i+1 and r = n-1.",
+          "Compute sum = A[i] + A[l] + A[r]; if |sum - B| < |closest - B|, update closest.",
+          "If sum < B move l right, if sum > B move r left, if equal return B.",
+          "Return closest after all iterations."
+        ],
+        "pseudocode": "sort(A)\nclosest = A[0]+A[1]+A[2]\nfor i in 0..n-3:\n  l=i+1; r=n-1\n  while l<r:\n    s=A[i]+A[l]+A[r]\n    if abs(s-B)<abs(closest-B): closest=s\n    if s<B: l++ elif s>B: r-- else: return B\nreturn closest",
+        "code": "public class Solution {\n    public int threeSumClosest(int[] A, int B) {\n        Arrays.sort(A);\n        int n = A.length;\n        int closest = A[0] + A[1] + A[2];\n        for (int i = 0; i < n - 2; i++) {\n            int l = i + 1, r = n - 1;\n            while (l < r) {\n                int sum = A[i] + A[l] + A[r];\n                if (Math.abs(sum - B) < Math.abs(closest - B)) {\n                    closest = sum;\n                }\n                if (sum < B) {\n                    l++;\n                } else if (sum > B) {\n                    r--;\n                } else {\n                    return B;\n                }\n            }\n        }\n        return closest;\n    }\n}",
+        "story": "Canonical reference solution; the editor was left empty (Unsolved)."
+      }
+    ]
+  },
+  {
+    "num": 187,
+    "id": "s3-twop-another-count-rectangles",
+    "title": "Another Count Rectangles",
+    "subTopic": "Two Pointers on Sorted Array",
+    "tags": [
+      "2 Pointers",
+      "Two Pointers on Sorted Array"
+    ],
+    "description": "You are given a sorted array of distinct positive integers A and a positive integer B. Count the number of rectangles with distinct configurations that can be formed by picking a length and a breadth from A such that the area is strictly less than B. Ordered pairs are distinct: a rectangle of size 2 x 3 is different from one of size 3 x 2.\n\nReturn the count modulo 10^9 + 7.\n\nProblem Constraints:\n1 <= |A| <= 10^5\n1 <= A[i] <= 10^9, all values are distinct and A is sorted in ascending order\n1 <= B <= 10^9\n\nInput Format:\nThe first argument is the sorted integer array A.\nThe second argument is the integer B.\n\nOutput Format:\nReturn a single integer, the count modulo 10^9 + 7.",
+    "sampleInput": "A = [1, 2]\nB = 5\n\nA = [1, 2]\nB = 1",
+    "sampleOutput": "4\n0",
+    "story": "Count ordered (length, breadth) pairs from a sorted array whose product is strictly below B. Because the array is sorted, a two-pointer sweep counts all valid partners for each length in one linear pass.",
+    "plain": "Sort is already given. Use two pointers l at start and r at end. For a fixed A[l], the largest A[r] with A[l]*A[r] < B tells you how many breadths work; since pairs are ordered, each valid unordered pair counts as arrangements. Slide r left when the product is too big, and add the counts modulo 1e9+7.",
+    "tale": "Like matching each plank of wood to every shorter plank it can pair with under a size limit, counting both orientations of the frame.",
+    "solutions": [
+      {
+        "label": "Two-pointer count of valid products",
+        "complexity": {
+          "time": "O(n)",
+          "space": "O(1)"
+        },
+        "plain": "For each left value, use a pointer to find how many right values keep the product below B, adding ordered-pair counts modulo 1e9+7.",
+        "approach": [
+          "Set MOD = 1_000_000_007, l = 0, r = n-1, ans = 0.",
+          "While l < r: if A[l]*A[r] < B then all pairs (l..r-1 with r) are valid; add contributions for both orderings and advance l.",
+          "If the product is too big, decrement r.",
+          "Handle equal-index (square) pairs where A[i]*A[i] < B separately, since a side may pair with itself.",
+          "Return ans modulo MOD."
+        ],
+        "pseudocode": "MOD=1e9+7; l=0; r=n-1; ans=0\nwhile l<r:\n  if (long)A[l]*A[r] < B:\n     ans = (ans + 2*(r-l)) % MOD   # ordered pairs\n     l++\n  else: r--\nfor i in 0..n-1:\n  if (long)A[i]*A[i] < B: ans=(ans+1)%MOD\nreturn ans",
+        "code": "public class Solution {\n    public int solve(int[] A, int B) {\n        final int MOD = 1_000_000_007;\n        int n = A.length;\n        long ans = 0;\n        int l = 0, r = n - 1;\n        while (l < r) {\n            if ((long) A[l] * A[r] < B) {\n                ans = (ans + 2L * (r - l)) % MOD;\n                l++;\n            } else {\n                r--;\n            }\n        }\n        for (int i = 0; i < n; i++) {\n            if ((long) A[i] * A[i] < B) {\n                ans = (ans + 1) % MOD;\n            }\n        }\n        return (int) ans;\n    }\n}",
+        "story": "Canonical reference solution; the editor was left empty (Unsolved). Ordered pairs are counted twice (2*(r-l)) plus the square cases where a side pairs with itself."
+      }
+    ]
+  },
+  {
+    "num": 188,
+    "id": "s3-twop-closest-pair-from-sorted-arrays",
+    "title": "Closest pair from sorted arrays",
+    "subTopic": "Two Pointers on Two Arrays",
+    "tags": [
+      "2 Pointers",
+      "Two Pointers on Two Arrays"
+    ],
+    "description": "Given two sorted arrays of distinct integers, A and B, and an integer C, find and return the pair whose sum is closest to C and the pair has one element from each array.\nMore formally, find A[i] and B[j] such that abs((A[i] + B[j]) - C) has minimum value.\nIf there are multiple solutions find the one with minimum i and even if there are multiple values of j for the same i then return the one with minimum j.\nReturn an array with two elements {A[i], B[j]}.\n\nProblem Constraints:\n1 <= length of both the arrays <= 10^5\n1 <= A[i], B[i] <= 10^9\n1 <= C <= 10^9\n\nInput Format:\nThe first argument given is the integer array A.\nThe second argument given is the integer array B.\nThe third argument given is integer C.\n\nOutput Format:\nReturn an array of size 2 denoting the pair which has sum closest to C.",
+    "sampleInput": "A = [1, 2, 3, 4, 5]\nB = [2, 4, 6, 8]\nC = 9\n\nA = [5, 10, 20]\nB = [1, 2, 30]\nC = 13",
+    "sampleOutput": "[1, 8]",
+    "story": "Pick one number from each sorted array so their sum sits closest to C. Start at opposite ends of the two arrays and walk inward, tracking the best pair and breaking ties by smallest indices.",
+    "plain": "Point i at the start of A and j at the end of B. Look at A[i]+B[j]: if it is below C move i forward to grow the sum, if above C move j backward to shrink it. Remember the closest sum so far, preferring smaller i then smaller j on ties.",
+    "tale": "Two people walking toward each other from opposite ends of a bridge, adjusting steps until their combined position is nearest the meeting mark.",
+    "solutions": [
+      {
+        "label": "Opposite-ends two-pointer",
+        "complexity": {
+          "time": "O(n + m)",
+          "space": "O(1)"
+        },
+        "plain": "Sweep i up A and j down B, keeping the pair with the smallest |A[i]+B[j]-C|, tie-broken by smallest i then j.",
+        "approach": [
+          "Set i = 0, j = B.length-1, and track best distance with resA, resB.",
+          "Compute sum = A[i] + B[j] and its distance to C.",
+          "If the distance is strictly smaller than the best (tie rules favour current smaller i/j scanned first), update the answer.",
+          "If sum < C increment i, else decrement j.",
+          "Continue until i or j runs off the array, then return {resA, resB}."
+        ],
+        "pseudocode": "i=0; j=m-1; best=INF\nwhile i<n and j>=0:\n  s=A[i]+B[j]; d=abs(s-C)\n  if d<best: best=d; resA=A[i]; resB=B[j]\n  if s<C: i++ else: j--\nreturn {resA, resB}",
+        "code": "public class Solution {\n    public int[] solve(int[] A, int[] B, int C) {\n        int i = 0, j = B.length - 1;\n        long best = Long.MAX_VALUE;\n        int resA = A[0], resB = B[0];\n        while (i < A.length && j >= 0) {\n            long sum = (long) A[i] + B[j];\n            long dist = Math.abs(sum - C);\n            if (dist < best) {\n                best = dist;\n                resA = A[i];\n                resB = B[j];\n            }\n            if (sum < C) {\n                i++;\n            } else {\n                j--;\n            }\n        }\n        return new int[]{resA, resB};\n    }\n}",
+        "story": "Canonical reference solution; the editor was left empty (Unsolved). Scanning i upward first naturally respects the minimum-i, then minimum-j tie-break."
+      }
+    ]
+  },
+  {
+    "num": 189,
+    "id": "s3-twop-container-with-most-water",
+    "title": "Container With Most Water",
+    "subTopic": "Two Pointers Shrinking Window",
+    "tags": [
+      "2 Pointers",
+      "Two Pointers Shrinking Window"
+    ],
+    "description": "Given N non-negative integers A[0], A[1], ..., A[N-1] , where each represents a point at coordinate (i, A[i]).\nN vertical lines are drawn such that the two endpoints of line i is at (i, A[i]) and (i, 0).\nFind two lines, which together with x-axis forms a container, such that the container contains the most water. You need to return this maximum area.\nNote: You may not slant the container. It is guaranteed that the answer will fit in integer limits.\n\nProblem Constraints:\n1 <= N <= 10^5\n1 <= A[i] <= 10^5\n\nInput Format:\nSingle Argument representing a 1-D array A.\n\nOutput Format:\nReturn single Integer denoting the maximum area you can obtain.",
+    "sampleInput": "A = [1, 5, 4, 3]\n\nA = [1]",
+    "sampleOutput": "6\n0",
+    "story": "Two vertical lines plus the x-axis form a bucket; the water it holds is width times the shorter line. Start with the widest pair and move the shorter side inward, since that is the only move that can improve the height.",
+    "plain": "Put one pointer at each end. Area = distance between them times the smaller height. Record the max, then move whichever pointer has the shorter line inward, because keeping the shorter one can never beat the current area.",
+    "tale": "Like choosing two fence posts to hold the most water: the low post always leaks, so you swap it out hoping for a taller one.",
+    "solutions": [
+      {
+        "label": "Two pointers from both ends",
+        "complexity": {
+          "time": "O(n)",
+          "space": "O(1)"
+        },
+        "plain": "Widest container first; repeatedly compute area and advance the shorter side inward, tracking the maximum.",
+        "approach": [
+          "Set l = 0, r = n-1, best = 0.",
+          "While l < r: area = (r - l) * min(A[l], A[r]); update best.",
+          "If A[l] < A[r] move l right, else move r left.",
+          "Return best."
+        ],
+        "pseudocode": "l=0; r=n-1; best=0\nwhile l<r:\n  area=(r-l)*min(A[l],A[r])\n  best=max(best,area)\n  if A[l]<A[r]: l++ else: r--\nreturn best",
+        "code": "public class Solution {\n    public int maxArea(int[] A) {\n        int l = 0, r = A.length - 1, best = 0;\n        while (l < r) {\n            int area = (r - l) * Math.min(A[l], A[r]);\n            best = Math.max(best, area);\n            if (A[l] < A[r]) {\n                l++;\n            } else {\n                r--;\n            }\n        }\n        return best;\n    }\n}",
+        "story": "Canonical reference solution; the editor was left empty (Unsolved). Moving the shorter wall is safe because the width only shrinks, so the taller wall can never yield a bigger area with the current shorter one."
+      }
+    ]
+  },
+  {
+    "num": 190,
+    "id": "s3-twop-subarray-with-given-sum",
+    "title": "Subarray with given sum",
+    "subTopic": "Sliding Window",
+    "tags": [
+      "Two Pointers",
+      "Sliding Window"
+    ],
+    "description": "Given an array of positive integers A and an integer B, find and return first continuous subarray which adds to B.\nIf the answer does not exist return an array with a single integer \"-1\".\nFirst sub-array means the sub-array for which starting index in minimum.\n\nProblem Constraints\n1 <= length of the array <= 100000\n1 <= A[i] <= 10^9\n1 <= B <= 10^9\n\nInput Format\nThe first argument given is the integer array A.\nThe second argument given is integer B.\n\nOutput Format\nReturn the first continuous sub-array which adds to B and if the answer does not exist return an array with a single integer \"-1\".\n\nExample Input\nInput 1:\nA = [1, 2, 3, 4, 5]\nB = 5\nInput 2:\nA = [5, 10, 20, 100, 105]\nB = 110\n\nExample Output\nOutput 1:\n[2, 3]\nOutput 2:\n[-1]",
+    "sampleInput": "A = [1, 2, 3, 4, 5]\nB = 5",
+    "sampleOutput": "[2, 3]",
+    "story": "Since all numbers are positive, a sliding window works: grow the window on the right, and whenever the sum overshoots B, shrink from the left. When the sum equals B, that window is the first (smallest start index) answer. To crack it: keep a running sum and a left pointer, shrink while sum > B.",
+    "plain": "Use a two-pointer sliding window. Add elements on the right; if the sum exceeds B, drop elements from the left; if it equals B, return that window.",
+    "tale": "Like adjusting a belt: tighten from the left when it's too loose (sum too big), loosen by adding on the right when too small.",
+    "solutions": [
+      {
+        "label": "Sliding window",
+        "complexity": {
+          "time": "O(n)",
+          "space": "O(1)"
+        },
+        "plain": "Maintain a window with running sum; expand right, shrink left when sum > B, return when sum == B.",
+        "approach": [
+          "Keep left pointer and currentSum.",
+          "For each right index, add A[i] to currentSum.",
+          "While currentSum > B, subtract A[left] and advance left.",
+          "If currentSum == B, copy A[left..i] into the result and return it.",
+          "If no window matches, return {-1}."
+        ],
+        "pseudocode": "left=0; sum=0\nfor i in 0..n-1:\n  sum += A[i]\n  while sum > B: sum -= A[left]; left++\n  if sum == B: return A[left..i]\nreturn [-1]",
+        "code": "public class Solution {\n    public int[] solve(int[] A, int B) {\n        int left = 0;\n        int n = A.length;\n        int currentSum = 0;\n        for(int i=0; i<n;i++){\n            currentSum += A[i];\n            while(currentSum > B){\n                currentSum = currentSum - A[left];\n                left++;\n            }\n            if(currentSum == B){\n                int[] res = new int[i-left+1];\n                int idx = 0;\n                for(int j = left; j <= i; j++){\n                    res[idx] = A[j];\n                    idx++;\n                }\n                return res;\n            }\n        }\n        return new int[]{-1};\n    }\n}"
+      }
+    ]
+  },
+  {
+    "num": 191,
+    "id": "s3-twop-array-3-pointers",
+    "title": "Array 3 Pointers",
+    "subTopic": "Three Pointers",
+    "tags": [
+      "Two Pointers",
+      "Three Pointers"
+    ],
+    "description": "You are given 3 sorted arrays A, B and C.\nFind i, j, k such that : max(abs(A[i] - B[j]), abs(B[j] - C[k]), abs(C[k] - A[i])) is minimized.\nReturn the minimum max(abs(A[i] - B[j]), abs(B[j] - C[k]), abs(C[k] - A[i])).\n\nProblem Constraints\n1 <= len(A), len(B), len(c) <= 10^6\n0 <= A[i], B[i], C[i] <= 10^7\n\nInput Format\nFirst argument is an integer array A.\nSecond argument is an integer array B.\nThird argument is an integer array C.\n\nOutput Format\nReturn an single integer denoting the minimum max(abs(A[i] - B[j]), abs(B[j] - C[k]), abs(C[k] - A[i])).\n\nExample Input\nInput 1:\nA = [1, 4, 10]\nB = [2, 15, 20]\nC = [10, 12]\nInput 2:\nA = [3, 5, 6]\nB = [2]\nC = [3, 4]\n\nExample Output\nOutput 1:\n5\nOutput 2:\n1",
+    "sampleInput": "A = [1, 4, 10]\nB = [2, 15, 20]\nC = [10, 12]",
+    "sampleOutput": "5",
+    "story": "Since all three arrays are sorted, keep one pointer per array and always advance the one pointing at the smallest value, because that is the only move that can shrink the spread. Track the best (minimum) of the maximum pairwise gaps seen. To crack it: advance the pointer at the minimum element each step.",
+    "plain": "Use three pointers, one per sorted array. At each step compute the max pairwise absolute difference, update the answer, then move the pointer at the smallest current value.",
+    "tale": "Like three runners on parallel tracks: to close the gap you always nudge the one who's lagging farthest behind forward.",
+    "solutions": [
+      {
+        "label": "Three pointers",
+        "complexity": {
+          "time": "O(len(A)+len(B)+len(C))",
+          "space": "O(1)"
+        },
+        "plain": "Walk three pointers; each iteration record the max spread and advance the pointer at the minimum value.",
+        "approach": [
+          "Set i=j=k=0 and ans=infinity.",
+          "While all pointers are in range, compute the max of the three absolute differences.",
+          "Update ans with the minimum of ans and that max.",
+          "Advance whichever pointer points to the smallest of A[i], B[j], C[k].",
+          "Return ans."
+        ],
+        "pseudocode": "i=j=k=0; ans=INF\nwhile i<lenA and j<lenB and k<lenC:\n  cur = max(|A[i]-B[j]|, |B[j]-C[k]|, |C[k]-A[i]|)\n  ans = min(ans, cur)\n  m = min(A[i], B[j], C[k])\n  if A[i]==m: i++ elif B[j]==m: j++ else k++\nreturn ans",
+        "code": "public class Solution {\n    public int minimize(final int[] A, final int[] B, final int[] C) {\n        int i = 0, j = 0, k = 0;\n        int ans = Integer.MAX_VALUE;\n        while (i < A.length && j < B.length && k < C.length) {\n            int cur = Math.max(Math.abs(A[i] - B[j]),\n                        Math.max(Math.abs(B[j] - C[k]), Math.abs(C[k] - A[i])));\n            ans = Math.min(ans, cur);\n            int min = Math.min(A[i], Math.min(B[j], C[k]));\n            if (A[i] == min) i++;\n            else if (B[j] == min) j++;\n            else k++;\n        }\n        return ans;\n    }\n}",
+        "story": "Reference solution: the editor was empty (Unsolved), so this is the canonical three-pointer sweep."
+      }
+    ]
+  },
+  {
+    "num": 192,
+    "id": "s3-twop-max-continuous-series-of-1s",
+    "title": "Max Continuous Series of 1s",
+    "subTopic": "Sliding Window",
+    "tags": [
+      "Two Pointers",
+      "Sliding Window"
+    ],
+    "description": "Given a binary array A, find the maximum sequence of continuous 1's that can be formed by replacing at-most B zeroes.\nFor this problem, return the indices of maximum continuous series of 1s in order.\nIf there are multiple possible solutions, return the sequence which has the minimum start index.\n\nProblem Constraints\n0 <= B <= 10^5\n1 <= size(A) <= 10^5\n0 <= A[i] <= 1\n\nInput Format\nFirst argument is a binary array A.\nSecond argument is an integer B.\n\nOutput Format\nReturn an array of integers denoting the indices(0-based) of 1's in the maximum continuous series.\n\nExample Input\nInput 1:\nA = [1, 1, 0, 1, 1, 0, 0, 1, 1, 1]\nB = 1\nInput 2:\nA = [1, 0, 0, 0, 1, 0, 1]\nB = 2\n\nExample Output\nOutput 1:\n[0, 1, 2, 3, 4]\nOutput 2:\n[3, 4, 5, 6]",
+    "sampleInput": "A = [1, 1, 0, 1, 1, 0, 0, 1, 1, 1]\nB = 1",
+    "sampleOutput": "[0, 1, 2, 3, 4]",
+    "story": "Slide a window that is allowed to contain at most B zeroes. Grow the right edge; if the zero count exceeds B, shrink from the left until it is valid again. Track the longest valid window, and since we scan left to right the first-found longest keeps the minimum start index. To crack it: it's a classic 'longest window with at most B zeros', then output that window's indices.",
+    "plain": "Use a sliding window that tolerates at most B zeros. Expand right, shrink left when zeros exceed B, remember the longest window, then emit its index range.",
+    "tale": "Like taping over at most B holes in a strip to make the longest unbroken run: slide the tape and keep the best stretch.",
+    "solutions": [
+      {
+        "label": "Sliding window with zero budget",
+        "complexity": {
+          "time": "O(n)",
+          "space": "O(1)"
+        },
+        "plain": "Track zero count in the window; when it exceeds B shrink from the left, and record the longest window's start and length.",
+        "approach": [
+          "Keep left pointer and zeroCount.",
+          "For each right index, if A[right]==0 increment zeroCount.",
+          "While zeroCount > B, if A[left]==0 decrement zeroCount, advance left.",
+          "If the window is longer than the best so far, record its start and length.",
+          "Build and return the array of consecutive indices for the best window."
+        ],
+        "pseudocode": "left=0; zeros=0; bestLeft=0; bestLen=0\nfor right in 0..n-1:\n  if A[right]==0: zeros++\n  while zeros>B: if A[left]==0: zeros--; left++\n  if right-left+1 > bestLen: bestLen=right-left+1; bestLeft=left\nreturn [bestLeft .. bestLeft+bestLen-1]",
+        "code": "public class Solution {\n    public int[] maxone(int[] A, int B) {\n        int left = 0, zeroCount = 0;\n        int bestLeft = 0, bestLen = 0;\n        for (int right = 0; right < A.length; right++) {\n            if (A[right] == 0) zeroCount++;\n            while (zeroCount > B) {\n                if (A[left] == 0) zeroCount--;\n                left++;\n            }\n            if (right - left + 1 > bestLen) {\n                bestLen = right - left + 1;\n                bestLeft = left;\n            }\n        }\n        int[] res = new int[bestLen];\n        for (int i = 0; i < bestLen; i++) res[i] = bestLeft + i;\n        return res;\n    }\n}",
+        "story": "Reference solution: the editor was empty (Unsolved), so this is the canonical sliding-window-with-zero-budget approach."
+      }
+    ]
+  }
+]

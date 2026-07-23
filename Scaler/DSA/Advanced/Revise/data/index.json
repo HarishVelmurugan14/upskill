@@ -1,5 +1,5 @@
 {
-  "nextNum": 172,
+  "nextNum": 235,
   "topics": [
     {
       "name": "Arrays",
@@ -72,6 +72,48 @@
       "section": "Section 2",
       "file": "trees.json",
       "notesFile": "trees.notes.json"
+    },
+    {
+      "name": "Combinatorics & Maths",
+      "section": "Section 3",
+      "file": "s3-combinatorics-maths.json",
+      "notesFile": "s3-combinatorics-maths.notes.json"
+    },
+    {
+      "name": "Prime Numbers",
+      "section": "Section 3",
+      "file": "s3-prime-numbers.json",
+      "notesFile": "s3-prime-numbers.notes.json"
+    },
+    {
+      "name": "Two Pointers",
+      "section": "Section 3",
+      "file": "s3-two-pointers.json",
+      "notesFile": "s3-two-pointers.notes.json"
+    },
+    {
+      "name": "Backtracking",
+      "section": "Section 3",
+      "file": "s3-backtracking.json",
+      "notesFile": "s3-backtracking.notes.json"
+    },
+    {
+      "name": "Linked List 2",
+      "section": "Section 3",
+      "file": "s3-linked-list-2.json",
+      "notesFile": "s3-linked-list-2.notes.json"
+    },
+    {
+      "name": "Binary Trees",
+      "section": "Section 3",
+      "file": "s3-binary-trees.json",
+      "notesFile": "s3-binary-trees.notes.json"
+    },
+    {
+      "name": "Hashing 2",
+      "section": "Section 3",
+      "file": "s3-hashing-2.json",
+      "notesFile": "s3-hashing-2.notes.json"
     }
   ]
 }

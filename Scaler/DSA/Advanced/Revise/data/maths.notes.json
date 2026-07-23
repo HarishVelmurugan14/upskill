@@ -48,9 +48,9 @@
     },
     {
       "title": "Overflow in (a * b) % m without casting",
-      "wrong": "long r = (a * b) % m;   // if a,b are int up to 1e5, fine; if up to 1e9, a*b overflows int BEFORE the implicit widening",
-      "right": "long r = ((long) a * b) % m;",
-      "why": "The multiplication happens in int width. Cast at least one operand to long first."
+      "wrong": "int p = a * b % m;              // 1e5 * 1e5 = 1e10 overflows int",
+      "right": "long p = (long) a * b % m;",
+      "why": "int*int is safe only while each operand is <= ~46340 (product < 2^31). At a,b = 1e5 the product 1e10 already overflows int, so cast one operand to long before multiplying."
     },
     {
       "title": "Fast power decrement-by-one (TLE)",
@@ -86,7 +86,7 @@
       "title": "Sieve inner loop starts at 2*i or uses int for i*i",
       "wrong": "for (int i = 2; i <= N; i++)\n    if (!comp[i])\n        for (int j = 2 * i; j <= N; j += i) comp[j] = true;",
       "right": "for (int i = 2; (long) i * i <= N; i++)\n    if (!comp[i])\n        for (long j = (long) i * i; j <= N; j += i) comp[(int) j] = true;",
-      "why": "Multiples below i*i were already crossed off by smaller primes, so start at i*i. And for N near 1e9, i*i exceeds Integer.MAX_VALUE — cast to long or the loop bound wraps negative."
+      "why": "Multiples below i*i were already crossed off by smaller primes, so start at i*i. i*i exceeds Integer.MAX_VALUE only when N approaches 2^31 (~2.1e9); for N ~= 1e9, i <= ~31623 so i*i ~= 1e9 still fits int. The (long) cast is defensive near the 2^31 boundary."
     },
     {
       "title": "Building factorial/nCr in a raw long without modding each step",
@@ -140,7 +140,7 @@
     {
       "name": "Frequency-array pairwise mod-sum",
       "when": "Sum / count over all pairs (a,b) with a small value range (≤ 1000) — replace the outer N² loop with iteration over distinct values.",
-      "template": "int[] freq = new int[MAX + 1];\nfor (int x : A) freq[x]++;\nlong ans = 0;\nfor (int b = 1; b <= MAX; b++) {\n    if (freq[b] == 0) continue;\n    for (int a = 1; a < b; a++) ans += (long) freq[a] * freq[b] * (a % b);\n    // multiples of b contribute 0 (a%b == 0)\n}",
+      "template": "int[] freq = new int[MAX + 1];\nfor (int x : A) freq[x]++;\nlong ans = 0;\nfor (int b = 1; b <= MAX; b++) {\n    if (freq[b] == 0) continue;\n    for (int a = 1; a < b; a++) ans += (long) freq[a] * freq[b] * (a % b);\n    // multiples of b contribute 0 (a%b == 0)\n}\n// NB: also add a%b for pairs where a > b and a is NOT a multiple of b (remainder = a - (a/b)*b); handle by scanning ranges [k*b,(k+1)*b) per divisor. Counting only a<b undercounts.",
       "examples": [
         "Mod Sum"
       ]
