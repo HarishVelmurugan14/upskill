@@ -14,6 +14,17 @@
     "story": "Given a general binary tree and two node values, find the deepest node that is an ancestor of both. How to crack it: recurse; if a subtree contains one target on the left and the other on the right, the current node is the answer. Return -1 if either value is missing.",
     "plain": "First confirm both B and C exist. Then recurse: if the current node is B or C return it; combine results from left and right, and the node where both sides return non-null is the LCA.",
     "tale": "Like tracing two family members' ancestry until you reach the nearest shared grandparent.",
+    "howToThink": [
+      "Unordered tree, no BST shortcut, so you must actually search both subtrees.",
+      "Classic pattern: recurse and let each side report whether it found a target.",
+      "The node where one target comes back from the left and the other from the right is the answer.",
+      "Values may be missing, so verify both exist before trusting the split point."
+    ],
+    "pitfalls": [
+      "Skipping the existence check returns a wrong node when B or C is absent.",
+      "Handle `node == null` first, before reading `node.val`.",
+      "Return the node itself (not its value) up the recursion, unwrap only at the top."
+    ],
     "solutions": [
       {
         "label": "Recursive LCA with existence check",
@@ -48,6 +59,16 @@
     "story": "Check whether some path from the root down to a leaf adds up exactly to B. How to crack it: DFS while subtracting each node's value from the target; at a leaf, success means the remaining target equals the leaf's value.",
     "plain": "Walk from root to leaves, subtracting each node's value from B. When you reach a leaf and the remaining amount equals that leaf's value, a valid path exists.",
     "tale": "Like spending a fixed budget as you walk down a branching road, checking if it hits exactly zero at any dead end.",
+    "howToThink": [
+      "\"Root-to-leaf path adds to a target\" signals a top-down DFS carrying state down.",
+      "Pass the remaining amount down instead of summing on the way back up.",
+      "Key realization: only check the total at a true leaf, not at internal nodes."
+    ],
+    "pitfalls": [
+      "A leaf is a node with no left AND no right child, not just any `null`.",
+      "Return false on `null` so a one-child node doesn't falsely pass.",
+      "Subtract the node's value before the leaf check, not after."
+    ],
     "solutions": [
       {
         "label": "DFS with running target",
@@ -82,6 +103,16 @@
     "story": "Find the Bth smallest value in a BST. How to crack it: an inorder traversal of a BST visits values in ascending order, so stop at the Bth visited node.",
     "plain": "Do an inorder traversal (left, node, right). Count nodes as you visit them; the Bth one visited is the answer.",
     "tale": "Like reading names off a sorted roster and stopping when you reach the Bth name.",
+    "howToThink": [
+      "It's a BST, so inorder gives values in sorted order for free.",
+      "Kth smallest = the Kth node visited during inorder.",
+      "Keep a running counter and stop as soon as it hits B."
+    ],
+    "pitfalls": [
+      "Once found, short-circuit remaining recursion so the counter can't overshoot.",
+      "Increment the counter between the left and right recursions, not before left.",
+      "Reset the global counter and answer at the start of each call."
+    ],
     "solutions": [
       {
         "label": "Inorder traversal with counter",
@@ -116,6 +147,16 @@
     "story": "Find the lowest common ancestor of two guaranteed-present nodes in a BST. How to crack it: use the BST ordering. From the root, if both values are smaller go left, if both larger go right; the first node that lies between them (or equals one) is the LCA.",
     "plain": "Walk from the root. While both B and C are less than the current node, move left; while both are greater, move right. The moment they split (or one equals the node), that node is the LCA.",
     "tale": "Like two people walking down a family tree together; they part ways at the nearest shared ancestor.",
+    "howToThink": [
+      "BST ordering means you never search both sides; compare and turn.",
+      "Both values smaller than the node means the LCA is entirely to the left; both larger means right.",
+      "The first node that sits between B and C (or equals one) is where they split off."
+    ],
+    "pitfalls": [
+      "Use the split as the stop condition; don't keep walking past it.",
+      "The equals case (a node is B or C) must fall into the \"else\" branch, not left/right.",
+      "An iterative walk needs no recursion; O(1) space is the point."
+    ],
     "solutions": [
       {
         "label": "BST ordered walk",
@@ -150,6 +191,16 @@
     "story": "Do an inorder walk without recursion or a stack. The trick is Morris traversal: use temporary threads from a node's inorder predecessor back to the node so you can climb back up without extra memory. How to crack it: for each node with a left child, find the rightmost node of its left subtree; if that thread doesn't exist yet, create it and go left; if it already exists, the left subtree is done, so remove the thread, record the value, and go right.",
     "plain": "Morris inorder traversal using threading to achieve O(1) extra space.",
     "tale": "Like leaving a string tied to a doorknob so you can find your way back out of a maze without a map.",
+    "howToThink": [
+      "\"No recursion, no stack\" rules out the usual inorder; that points to Morris threading.",
+      "Idea: temporarily link each node's inorder predecessor back to it so you can climb up.",
+      "First time you reach a node with a left child, thread and go left; second time, the left is done, so emit and go right."
+    ],
+    "pitfalls": [
+      "You must remove the thread on the second visit or the tree becomes a cycle.",
+      "Finding the predecessor loops while `pred.right != null && pred.right != cur`; both conditions matter.",
+      "Emit the value only when the left subtree is finished (thread already existed), not when creating it."
+    ],
     "solutions": [
       {
         "label": "Morris Traversal",
@@ -186,6 +237,16 @@
     "story": "A BST's inorder traversal is strictly increasing. Two swapped nodes create at most two spots where a value is larger than the next. How to crack it: walk inorder tracking the previous node; the first violation marks the first wrong node (the larger of the pair) and the second violation marks the second wrong node (the smaller). If there is only one violation, the two swapped nodes are adjacent. Return both values in ascending order.",
     "plain": "Inorder walk to find the two out-of-order nodes, then return their values sorted.",
     "tale": "Like reading a sorted roster aloud and spotting the two names that got shuffled out of alphabetical order.",
+    "howToThink": [
+      "A correct BST has strictly increasing inorder; a swap breaks that order.",
+      "Walk inorder tracking the previous node and catch every spot where prev > current.",
+      "Two dips means take the earlier prev and the later current; one dip means the pair is adjacent."
+    ],
+    "pitfalls": [
+      "On the first violation set `first = prev`, but on later ones only update `second = cur`.",
+      "Don't stop after the first violation; adjacent-swap cases have only one, far cases have two.",
+      "Watch output order: this problem returns the values largest-first to match the examples."
+    ],
     "solutions": [
       {
         "label": "Inorder scan for inversions",
@@ -222,6 +283,16 @@
     "story": "Both trees are BSTs, so their inorder traversals are sorted. Finding common values then reduces to merging two sorted lists. How to crack it: get the inorder list of each tree, then use two pointers; when the values match add it to the sum and advance both, otherwise advance the pointer at the smaller value. Take the total modulo 1e9+7.",
     "plain": "Inorder both BSTs to get sorted arrays, then two-pointer merge to sum equal values mod 1e9+7.",
     "tale": "Like two sorted guest lists scanned side by side to tally the names that appear on both.",
+    "howToThink": [
+      "Both are BSTs, so inorder gives two sorted lists.",
+      "Common values across two sorted lists is a two-pointer merge.",
+      "Advance the pointer at the smaller value; on a match add it and advance both."
+    ],
+    "pitfalls": [
+      "Take the sum modulo 1e9+7 and use a `long` accumulator to avoid overflow.",
+      "On a match advance BOTH pointers, else you double-count.",
+      "Stop the merge once either list is exhausted."
+    ],
     "solutions": [
       {
         "label": "Inorder + two-pointer merge",
@@ -258,6 +329,16 @@
     "story": "In a BST the lowest common ancestor of B and C is where the paths to them split. The distance between the two nodes equals the depth of B plus the depth of C measured from that LCA. How to crack it: use BST ordering to find the LCA (go left when both keys are smaller, right when both are larger, otherwise you are at the LCA), then count edges from the LCA down to B and down to C and add them.",
     "plain": "Find LCA using BST property, then sum the edge distances from LCA to each key.",
     "tale": "Like two hikers tracing back to the fork in the trail where their paths last met, then adding up how far each walked from it.",
+    "howToThink": [
+      "Distance between two nodes runs up to their LCA and back down.",
+      "In a BST, find the LCA cheaply by turning left/right until the keys split.",
+      "From the LCA, count edges down to B and down to C and add them."
+    ],
+    "pitfalls": [
+      "Measure both depths from the LCA, not from the root, or you double-count the shared part.",
+      "The distance is edges, so count each step, not nodes.",
+      "The split point (equals or between) is the LCA; break there before counting."
+    ],
     "solutions": [
       {
         "label": "LCA + depth counting",
@@ -293,6 +374,16 @@
     "story": "Every node's next should point to the node immediately to its right on the same level. Because the tree is perfect, once a level is fully linked you can use those next pointers to stitch the level below without any queue. How to crack it: walk level by level; at each node on the current level connect its left child to its right child, and connect its right child to the left child of the node's next neighbour. Move across the level via next, then drop down to the leftmost node of the next level.",
     "plain": "Use already-built next pointers on each level to link the children below in O(1) space.",
     "tale": "Like people in a stadium row passing a rope to their right so the row behind can grab onto it and line up too.",
+    "howToThink": [
+      "You need each level linked left to right, which smells like level-order.",
+      "But the tree is perfect, so the current level's next chain lets you wire the level below for free.",
+      "Per node: link its two children, then bridge its right child to the next node's left child."
+    ],
+    "pitfalls": [
+      "Guard the bridge with `if (node.next != null)` before touching `node.next.left`.",
+      "Stop the outer loop when `leftmost.left == null`; leaves have no children to connect.",
+      "Descend to `leftmost.left` for the next level, not to some random child."
+    ],
     "solutions": [
       {
         "label": "Level-by-level using next pointers",
@@ -329,6 +420,16 @@
     "story": "Assign each node a horizontal distance: root is 0, going left subtracts 1 and going right adds 1. Nodes sharing a horizontal distance form one vertical line, ordered top to bottom. How to crack it: do a level-order BFS so nodes are naturally visited by increasing depth, bucketing each node's value by its horizontal distance. Then output the buckets from the smallest horizontal distance to the largest.",
     "plain": "BFS while tracking each node's horizontal distance, group values by that distance, output left to right.",
     "tale": "Like sorting falling leaves into labeled columns on the ground, then reading the columns from far left to far right.",
+    "howToThink": [
+      "Columns are keyed by horizontal distance: root 0, left is -1, right is +1.",
+      "Use BFS so nodes fill each column top-to-bottom by depth automatically.",
+      "Bucket every value by its hd, then emit buckets from smallest hd to largest."
+    ],
+    "pitfalls": [
+      "Use BFS, not DFS; DFS can put a deeper node before a shallower one in the same column.",
+      "Carry hd alongside each node (parallel queue or a pair), don't recompute it.",
+      "A sorted map keyed by hd keeps columns in left-to-right order automatically."
+    ],
     "solutions": [
       {
         "label": "BFS with horizontal distance buckets",
@@ -365,6 +466,16 @@
     "story": "Looking down from above, for each vertical line (horizontal distance) only the first node you hit is visible. How to crack it: do a level-order BFS tracking horizontal distance; the first time a horizontal distance appears is the topmost node for that column, so record it and ignore later nodes at the same distance. Collect those first-seen values as the top view.",
     "plain": "BFS by horizontal distance and keep only the first node seen at each distance.",
     "tale": "Like a bird's eye view of stacked plates: from the top you only see the plate on top of each pile.",
+    "howToThink": [
+      "Same horizontal-distance idea as vertical order: root 0, left -1, right +1.",
+      "Top view keeps only the FIRST node seen at each hd.",
+      "BFS guarantees that first-seen node is the topmost, so record it and skip later ones."
+    ],
+    "pitfalls": [
+      "Only store an hd if it's not already present; overwriting loses the topmost node.",
+      "Use BFS, not DFS, so \"first seen\" really means shallowest.",
+      "Handle the empty tree before starting the queue."
+    ],
     "solutions": [
       {
         "label": "BFS keeping first node per horizontal distance",
@@ -401,6 +512,16 @@
     "story": "The longest path in a tree passes through some node as its highest point, where it equals the height of that node's left subtree plus the height of its right subtree. How to crack it: run a single post-order DFS that returns each node's height; at every node update a global best with leftHeight + rightHeight. The final best (in edges) is the diameter.",
     "plain": "One post-order DFS returning heights while tracking the max left+right height sum.",
     "tale": "Like measuring the widest span of a tree by adding the reach of its two longest branches meeting at a joint.",
+    "howToThink": [
+      "The longest path bends at some node: left-subtree height + right-subtree height.",
+      "One post-order DFS returns height while updating a global best at each node.",
+      "Diameter is measured in edges, so combine the two child heights at every node."
+    ],
+    "pitfalls": [
+      "Return the height but update the global best as a side effect; don't return the diameter.",
+      "Pick a consistent base: null height -1 (leaf 0) so edge counts line up.",
+      "Reset the global best at the start so repeated calls don't leak state."
+    ],
     "solutions": [
       {
         "label": "Post-order height DFS",
@@ -437,6 +558,16 @@
     "story": "Compare two trees node by node. To crack it: walk both trees together in the same order; at each step both nodes must exist and hold the same value, and their subtrees must also match.",
     "plain": "Recurse on both trees at once. If both nodes are null return true; if only one is null or the values differ return false; otherwise recurse on left and right pairs.",
     "tale": "Like overlaying two transparencies of family trees and checking every name lines up perfectly.",
+    "howToThink": [
+      "Compare both trees in lockstep with the same recursion on each.",
+      "At each step both nodes must exist and share a value.",
+      "Recurse on the left pair and the right pair; both must match."
+    ],
+    "pitfalls": [
+      "Handle both-null (true) before one-null (false), or you'll dereference a null.",
+      "Check the value only after confirming neither node is null.",
+      "Left must compare with left and right with right, not crossed."
+    ],
     "solutions": [
       {
         "label": "Recursive comparison",
@@ -472,6 +603,16 @@
     "story": "Mirror the tree left-to-right. To crack it: at every node swap its two children, then do the same for each subtree.",
     "plain": "Recursively swap the left and right children of every node.",
     "tale": "Like holding the tree up to a mirror so every branch flips sides.",
+    "howToThink": [
+      "Mirroring means swapping every node's two children.",
+      "Simple recursion: swap here, then invert each subtree.",
+      "Order of swap versus recursion doesn't matter as long as each node is swapped once."
+    ],
+    "pitfalls": [
+      "Return on `null` before swapping.",
+      "Save one child in a temp before overwriting, or you lose a subtree.",
+      "It mutates in place; return the same root, don't build a new tree."
+    ],
     "solutions": [
       {
         "label": "Recursive swap",

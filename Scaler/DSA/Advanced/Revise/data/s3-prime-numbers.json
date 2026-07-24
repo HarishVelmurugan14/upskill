@@ -15,6 +15,16 @@
     "story": "List every prime up to A. The clean way to crack it is the Sieve of Eratosthenes: mark all multiples of each prime as composite, then collect what stays unmarked.",
     "plain": "Mark 0 and 1 as non-prime, then for each i from 2, if i is prime record it and cross out all its multiples. Collecting the unmarked numbers gives the sorted prime list.",
     "tale": "Cross out every second number after 2, every third after 3, and so on. Whatever survives the crossing-out is prime.",
+    "howToThink": [
+      "\"All primes up to A\" with A as large as 10^6 -> don't test each number alone, sieve them all at once.",
+      "Sieve of Eratosthenes: keep a boolean array, and for each prime cross out its multiples.",
+      "Whatever stays unmarked from 2 to A is prime; collect those in order."
+    ],
+    "pitfalls": [
+      "Mark 0 and 1 as non-prime before you start.",
+      "Sieve array must be size `A+1` so index `A` is valid.",
+      "Cross out multiples starting from `i*i` (smaller multiples are already marked); mark index `j`, not `i`."
+    ],
     "solutions": [
       {
         "label": "User solution — sieve with primality check",
@@ -51,6 +61,16 @@
     "story": "Split an even number into two primes (Goldbach). To crack it and get the lexicographically smallest pair, scan i from the small side and return the first i where both i and A-i are prime.",
     "plain": "Handle A=4 as [2,2]. Then loop i over odd values from 3 up to A/2; the first i where both i and A-i are prime gives the smallest pair. Scanning upward guarantees lexicographic minimality.",
     "tale": "Try the smallest prime first as one half; the first time its partner (A minus it) is also prime, you have the earliest matching pair.",
+    "howToThink": [
+      "\"Even number as sum of two primes\" is Goldbach -> pick one half, check if the other half is prime.",
+      "For the lexicographically smallest pair, scan the smaller prime `i` upward from the bottom.",
+      "First `i` where both `i` and `A-i` are prime is the answer, so a fast `isPrime` check is all you need."
+    ],
+    "pitfalls": [
+      "Special-case `A == 4` -> `[2,2]`, since scanning odds from 3 misses it.",
+      "Only loop `i` up to `A/2` so you don't return the same pair reversed.",
+      "`isPrime` must treat 0 and 1 as non-prime and loop to `sqrt(n)` inclusive."
+    ],
     "solutions": [
       {
         "label": "User solution — scan primes from small side",
@@ -86,6 +106,16 @@
     "story": "For each number in the array, count its divisors. To crack it fast across many queries, precompute a divisor-count sieve up to the max value, then answer each element in O(1).",
     "plain": "Build a divisor-count array with a sieve: for every d from 1 to max, add 1 to every multiple of d. Then look up the count for each A[i]. Alternatively, count divisors of each element in O(sqrt(A[i])).",
     "tale": "Every number d ticks a mark on all its multiples; at the end each slot holds how many numbers divide into it.",
+    "howToThink": [
+      "Many numbers, each needs its divisor count -> precompute once instead of testing each.",
+      "Flip the loop: every `d` is a divisor of all its multiples, so add 1 to `divCount[d], divCount[2d], ...`.",
+      "After the sieve, each query is an O(1) lookup `divCount[A[i]]`."
+    ],
+    "pitfalls": [
+      "Size the sieve to the max value in `A`, not to the array length.",
+      "Keep output order the same as input; just map each `A[i]` through `divCount`.",
+      "Every number counts 1 and itself, so the minimum count is 2 (except 1, which has count 1)."
+    ],
     "solutions": [
       {
         "label": "Optimal — divisor-count sieve",
@@ -122,6 +152,16 @@
     "story": "Count numbers up to A that have exactly two different prime factors. A modified sieve lets us tally, for every number, how many distinct primes divide it.",
     "plain": "Use a sieve: keep a count array. For each prime p, walk through all its multiples and add 1 to their distinct-prime count. At the end, count how many numbers from 1 to A have a count of exactly 2.",
     "tale": "Like stamping each locker with the initials of every prime that owns a share; lucky lockers are the ones carrying exactly two distinct stamps.",
+    "howToThink": [
+      "\"Exactly 2 distinct prime divisors\" -> you need, per number, a count of distinct primes dividing it.",
+      "Modified sieve: for each prime `i`, walk its multiples and bump their counter by 1.",
+      "At the end, count how many values from 1 to A have a counter of exactly 2."
+    ],
+    "pitfalls": [
+      "A number is prime here when its count is still 0 when you reach it (`cnt[i]==0`).",
+      "Walk multiples from `i` itself so `i` gets counted too.",
+      "Count distinct primes, not total factors, so bump once per prime, never per prime power."
+    ],
     "solutions": [
       {
         "label": "Distinct-prime-factor sieve",

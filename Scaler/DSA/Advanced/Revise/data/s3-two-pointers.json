@@ -15,6 +15,17 @@
     "story": "Count index pairs in a sorted array summing to B. To crack it, use two pointers from both ends; when the two values are equal, count the combinations among duplicates with nC2.",
     "plain": "Move a left pointer up and a right pointer down. If A[left]+A[right] < B move left in, if > B move right in. If equal, and the two values differ, multiply their duplicate counts; if they are the same value, add c*(c-1)/2. Take everything mod 1e9+7.",
     "tale": "Two fingers walk toward each other; when their numbers add up right, count how many identical partners each finger has.",
+    "howToThink": [
+      "Sorted array plus 'count pairs summing to B' is the classic sign for two pointers from both ends.",
+      "If `A[l]+A[r]` is too small move `l` right, too big move `r` left, so each element is seen once.",
+      "The twist is duplicates: when a value repeats, every copy on the left can pair with every copy on the right, so count blocks and multiply.",
+      "When the two pointers land on the same value, all remaining elements are equal, so it is just `c*(c-1)/2` combinations."
+    ],
+    "pitfalls": [
+      "`A[l]+A[r]` can hit 2e9, so add as `long` to avoid overflow.",
+      "On a match count both duplicate blocks and jump past them; do not advance one step at a time.",
+      "Take the count mod `1e9+7`, and break (not continue) once both pointers sit on equal values."
+    ],
     "solutions": [
       {
         "label": "Optimal — two pointers with duplicate counting",
@@ -53,6 +64,16 @@
     "story": "Count distinct value pairs with absolute difference B. To crack it, dump values into a set; for each unique value v check whether v+B also exists, and handle B=0 specially by counting values that appear at least twice.",
     "plain": "Put all values in a set. If B > 0, for each distinct value v count 1 if v+B is in the set. If B == 0, count distinct values that occur more than once. Distinct pairs means each unique (x,y) is counted once.",
     "tale": "For each number, ask 'does my number-plus-B exist here too?' — each yes is one distinct pair.",
+    "howToThink": [
+      "'Distinct pairs with a fixed difference' means for each value you just need to know if `v+B` also exists, so a set gives O(1) lookups.",
+      "Distinct pairs, not index pairs, so work over unique values, not the raw array.",
+      "`B == 0` is a different question: you are counting values that appear at least twice, so you need frequencies, not just a set."
+    ],
+    "pitfalls": [
+      "Handle `B == 0` separately or you will count every value paired with itself.",
+      "Deduplicate first; counting over the raw array double-counts pairs.",
+      "Only check `v+B` (not also `v-B`) per value, or each pair gets counted twice."
+    ],
     "solutions": [
       {
         "label": "Optimal — hash set lookup",
@@ -88,6 +109,16 @@
     "story": "Check if any two different elements of the array add up to A. The trick is to remember, as you scan each number, what earlier value would complete a pair with it - a hash set makes that lookup instant.",
     "plain": "Walk through the array once. For the current number x, we want to know if some earlier number equalled A-x. Keep a set of the complements (A-x) we still need. If x is already sitting in that set, an earlier number needed x, so a pair exists.",
     "tale": "Like a lock-and-key box: for each key you pick up, you first check if a matching lock is already waiting; if not, you drop off the lock it would need.",
+    "howToThink": [
+      "You only need existence, not a count, so one pass storing what you have seen is enough.",
+      "For the current `x`, the value that completes a pair is `A-x`; a hash set makes 'have I seen the complement?' instant.",
+      "Store complements as you go: if `x` is already a stored complement, some earlier number needed exactly `x`, so a pair exists."
+    ],
+    "pitfalls": [
+      "Check the set before adding, so you never pair an element with itself.",
+      "Note the argument order here: `A` is the target and `B` is the array.",
+      "A hash set beats sorting plus two pointers since the array is not sorted."
+    ],
     "solutions": [
       {
         "label": "One-pass HashSet",
@@ -122,6 +153,16 @@
     "story": "Pick three numbers whose total lands as close as possible to B. Sort first, fix one number, then close in from both ends with two pointers to hunt the best remaining pair.",
     "plain": "Sort the array. For each index i, treat A[i] as fixed and use two pointers (left just after i, right at the end). Track the running sum closest to B; move the pointers inward depending on whether the current sum is below or above B.",
     "tale": "Like tuning three radio dials: lock one, then twist the other two in opposite directions until the signal sits nearest the target frequency.",
+    "howToThink": [
+      "'Three numbers closest to B' with N up to 1e4 rules out brute force; sort, then fix one and two-pointer the rest for O(n^2).",
+      "Once sorted, for a fixed `A[i]` a smaller sum means move `l` right, a bigger sum means move `r` left.",
+      "Track the closest sum by `|sum - B|`, not by sum itself; an exact hit means you can return B immediately."
+    ],
+    "pitfalls": [
+      "Seed `closest` from a real triple like the first three, not 0.",
+      "Compare distances with `Math.abs`, and remember sums can be negative.",
+      "Sums can reach ~3e8, which fits in int here, but keep the sort before the two-pointer scan."
+    ],
     "solutions": [
       {
         "label": "Sort + fix-one two-pointer",
@@ -159,6 +200,16 @@
     "story": "Count ordered (length, breadth) pairs from a sorted array whose product is strictly below B. Because the array is sorted, a two-pointer sweep counts all valid partners for each length in one linear pass.",
     "plain": "Sort is already given. Use two pointers l at start and r at end. For a fixed A[l], the largest A[r] with A[l]*A[r] < B tells you how many breadths work; since pairs are ordered, each valid unordered pair counts as arrangements. Slide r left when the product is too big, and add the counts modulo 1e9+7.",
     "tale": "Like matching each plank of wood to every shorter plank it can pair with under a size limit, counting both orientations of the frame.",
+    "howToThink": [
+      "Sorted distinct array plus 'count pairs with product below B' points straight at two pointers from both ends.",
+      "For a fixed `A[l]`, if `A[l]*A[r] < B` then every value between `l` and `r` also works, so you count a whole range at once instead of one at a time.",
+      "Pairs are ordered, so each unordered pair counts twice; equal sides (squares) are counted once, separately."
+    ],
+    "pitfalls": [
+      "`A[l]*A[r]` reaches 1e18, so cast to `long` before comparing to B.",
+      "Do not forget the square cases `A[i]*A[i] < B`; the l<r loop misses them.",
+      "Add `2*(r-l)` for ordered pairs and keep everything mod `1e9+7`."
+    ],
     "solutions": [
       {
         "label": "Two-pointer count of valid products",
@@ -195,6 +246,16 @@
     "story": "Pick one number from each sorted array so their sum sits closest to C. Start at opposite ends of the two arrays and walk inward, tracking the best pair and breaking ties by smallest indices.",
     "plain": "Point i at the start of A and j at the end of B. Look at A[i]+B[j]: if it is below C move i forward to grow the sum, if above C move j backward to shrink it. Remember the closest sum so far, preferring smaller i then smaller j on ties.",
     "tale": "Two people walking toward each other from opposite ends of a bridge, adjusting steps until their combined position is nearest the meeting mark.",
+    "howToThink": [
+      "Two sorted arrays and 'sum closest to C' is two pointers, but start `i` at the front of A and `j` at the back of B.",
+      "If the sum is below C grow it by `i++`; if above C shrink it by `j--`, so you never revisit a pair.",
+      "Scanning `i` upward first naturally gives the smallest-`i`, then smallest-`j` tie-break for free."
+    ],
+    "pitfalls": [
+      "Use `long` for the sum since values reach 1e9.",
+      "Update the answer only on a strictly smaller distance, so ties keep the earlier (smaller i/j) pair.",
+      "Stop as soon as either pointer runs off its array."
+    ],
     "solutions": [
       {
         "label": "Opposite-ends two-pointer",
@@ -231,6 +292,16 @@
     "story": "Two vertical lines plus the x-axis form a bucket; the water it holds is width times the shorter line. Start with the widest pair and move the shorter side inward, since that is the only move that can improve the height.",
     "plain": "Put one pointer at each end. Area = distance between them times the smaller height. Record the max, then move whichever pointer has the shorter line inward, because keeping the shorter one can never beat the current area.",
     "tale": "Like choosing two fence posts to hold the most water: the low post always leaks, so you swap it out hoping for a taller one.",
+    "howToThink": [
+      "'Max area between two lines' screams two pointers starting at the widest pair, since width is largest there.",
+      "Area is `width * min(height)`, so the shorter wall is the bottleneck.",
+      "Key realization: moving the taller wall can never help (width shrinks, height still capped by the short wall), so always move the shorter one inward."
+    ],
+    "pitfalls": [
+      "Always advance the pointer at the shorter line, not a fixed side.",
+      "Single-element or empty input has no container, so the answer is 0.",
+      "Recompute area every step and keep the running max; the last pair is not the answer."
+    ],
     "solutions": [
       {
         "label": "Two pointers from both ends",
@@ -266,6 +337,16 @@
     "story": "Since all numbers are positive, a sliding window works: grow the window on the right, and whenever the sum overshoots B, shrink from the left. When the sum equals B, that window is the first (smallest start index) answer. To crack it: keep a running sum and a left pointer, shrink while sum > B.",
     "plain": "Use a two-pointer sliding window. Add elements on the right; if the sum exceeds B, drop elements from the left; if it equals B, return that window.",
     "tale": "Like adjusting a belt: tighten from the left when it's too loose (sum too big), loosen by adding on the right when too small.",
+    "howToThink": [
+      "All-positive values plus 'contiguous subarray summing to B' is the sliding-window signal.",
+      "Positivity is what makes it work: adding on the right only grows the sum, removing on the left only shrinks it, so the window is monotonic.",
+      "Grow right, shrink left while the sum exceeds B, and the first window that hits B (smallest start) is the answer."
+    ],
+    "pitfalls": [
+      "This only works because values are positive; with negatives use prefix-sum plus a hashmap.",
+      "Return the first matching window, so return immediately on `sum == B`.",
+      "Return `{-1}` (not an empty array) when nothing matches."
+    ],
     "solutions": [
       {
         "label": "Sliding window",
@@ -301,6 +382,16 @@
     "story": "Since all three arrays are sorted, keep one pointer per array and always advance the one pointing at the smallest value, because that is the only move that can shrink the spread. Track the best (minimum) of the maximum pairwise gaps seen. To crack it: advance the pointer at the minimum element each step.",
     "plain": "Use three pointers, one per sorted array. At each step compute the max pairwise absolute difference, update the answer, then move the pointer at the smallest current value.",
     "tale": "Like three runners on parallel tracks: to close the gap you always nudge the one who's lagging farthest behind forward.",
+    "howToThink": [
+      "Three sorted arrays and 'minimize the max pairwise gap' is a three-pointer sweep, one pointer per array.",
+      "The spread is driven by its smallest element, so advancing the pointer at the minimum is the only move that can shrink it.",
+      "Record the max of the three absolute differences each step and keep the minimum seen."
+    ],
+    "pitfalls": [
+      "Advance only the pointer at the current minimum value, not all three.",
+      "Stop when any one array is exhausted, since you need one element from each.",
+      "Seed the answer at a large value like `Integer.MAX_VALUE` before the loop."
+    ],
     "solutions": [
       {
         "label": "Three pointers",
@@ -337,6 +428,16 @@
     "story": "Slide a window that is allowed to contain at most B zeroes. Grow the right edge; if the zero count exceeds B, shrink from the left until it is valid again. Track the longest valid window, and since we scan left to right the first-found longest keeps the minimum start index. To crack it: it's a classic 'longest window with at most B zeros', then output that window's indices.",
     "plain": "Use a sliding window that tolerates at most B zeros. Expand right, shrink left when zeros exceed B, remember the longest window, then emit its index range.",
     "tale": "Like taping over at most B holes in a strip to make the longest unbroken run: slide the tape and keep the best stretch.",
+    "howToThink": [
+      "'Longest run of 1s after flipping at most B zeros' is a sliding window that tolerates at most B zeros.",
+      "Grow the right edge; when the window holds more than B zeros, shrink from the left until it is valid again.",
+      "Scanning left to right and keeping the longest window gives the minimum start index for free."
+    ],
+    "pitfalls": [
+      "Decrement `zeroCount` only when the element leaving on the left was a zero.",
+      "Output the actual indices in the best window, not the count or the flipped positions.",
+      "`B == 0` is valid; the window then just tracks the longest run of existing 1s."
+    ],
     "solutions": [
       {
         "label": "Sliding window with zero budget",

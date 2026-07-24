@@ -14,6 +14,16 @@
     "story": "We must sort a singly linked list in O(n log n), and merge sort fits linked lists naturally because splitting and merging only relink pointers, no random access needed. How to crack it: find the middle with slow/fast pointers, sort each half recursively, then merge the two sorted halves.",
     "plain": "Merge sort: split the list at the middle, recursively sort both halves, and merge them by comparing node values.",
     "tale": "Like sorting a chain of beads by cutting it in half, sorting each shorter chain, then zipping the two ordered chains back together.",
+    "howToThink": [
+      "\"Sort in O(n log n)\" on a list rules out swapping values — think divide and conquer.",
+      "Merge sort fits: splitting and joining only relink pointers, no random access needed.",
+      "Find the middle with slow/fast, sort each half, then merge two sorted lists."
+    ],
+    "pitfalls": [
+      "Cut the list with `slow.next = null` before recursing, or the halves stay joined and it loops.",
+      "Start `fast` at `A.next` (or check carefully) so a 2-node list actually splits.",
+      "Return `dummy.next` from merge, not `dummy`."
+    ],
     "solutions": [
       {
         "label": "Merge sort (linked list)",
@@ -49,6 +59,16 @@
     "story": "Combine two already-sorted linked lists into one sorted list. To crack it: use a dummy head node, walk both lists with two pointers, and repeatedly attach whichever current node is smaller; when one list runs out, attach the rest of the other.",
     "plain": "Use a dummy node. Compare heads of A and B, splice the smaller node onto the tail, advance that pointer. Attach the leftover list at the end.",
     "tale": "Like merging two sorted stacks of numbered cards by always taking the smaller top card next.",
+    "howToThink": [
+      "Both inputs are already sorted, so one pass comparing heads is enough.",
+      "Head could come from either list — a dummy head avoids special-casing the first node.",
+      "Attach the smaller front node each step; when one runs out, hook on the rest of the other."
+    ],
+    "pitfalls": [
+      "Handle one list being null — the `while` stops and you attach the leftover.",
+      "Advance `tail` after every splice or you overwrite the same link.",
+      "Return `dummy.next`, not `dummy`."
+    ],
     "solutions": [
       {
         "label": "Dummy head two-pointer merge",
@@ -84,6 +104,16 @@
     "story": "Check whether a linked list reads the same forwards and backwards. To crack it: find the middle with slow/fast pointers, reverse the second half in place, then compare the two halves node by node.",
     "plain": "Find the midpoint using slow/fast pointers, reverse the second half, then walk both halves comparing values. All equal means palindrome.",
     "tale": "Like folding a strip of numbered tickets in half and checking each pair lines up.",
+    "howToThink": [
+      "Palindrome means front mirrors back — you need to walk from both ends of a one-way list.",
+      "Slow/fast finds the middle; reverse the second half so you can compare inward.",
+      "Walk the first half and reversed second half together, comparing values."
+    ],
+    "pitfalls": [
+      "Reverse from `slow.next`, not `slow`, so the two halves don't overlap.",
+      "Loop while the shorter (reversed) half is non-null so odd length works.",
+      "Guard empty and single-node lists — they're trivially palindromes."
+    ],
     "solutions": [
       {
         "label": "Reverse second half, compare",
@@ -119,6 +149,16 @@
     "story": "Return the middle node value of a linked list. To crack it: move a slow pointer one step and a fast pointer two steps; when fast reaches the end, slow sits on the middle.",
     "plain": "Use slow and fast pointers. Fast moves twice as fast, so when it hits the end, slow is at the middle. Return slow's value.",
     "tale": "Two runners on the same track, one at double speed; when the fast one finishes, the slow one is exactly halfway.",
+    "howToThink": [
+      "\"Middle\" without knowing the length hints at fast/slow instead of counting twice.",
+      "Fast moves two, slow moves one; when fast hits the end, slow is halfway.",
+      "Starting both at head gives the (N/2 + 1)th node on even lengths, which the problem wants."
+    ],
+    "pitfalls": [
+      "Check both `fast != null && fast.next != null` before stepping two.",
+      "Where you start fast (head vs head.next) shifts which node is \"middle\" on even lengths.",
+      "Return `slow.val`, not `slow`."
+    ],
     "solutions": [
       {
         "label": "Slow and fast pointers",
@@ -154,6 +194,16 @@
     "story": "Swap adjacent node pairs by relinking, not by copying values. To crack it: use a dummy node before the head and, for each pair, rewire prev->second->first->rest, then advance prev by two.",
     "plain": "Use a dummy head. For each pair of nodes, relink pointers so the second comes before the first, then move on. No value swapping allowed.",
     "tale": "Like swapping neighboring dancers in a line by having each pair change hands, one couple at a time.",
+    "howToThink": [
+      "\"Swap nodes, don't change values\" means pure pointer relinking.",
+      "The head changes (first pair swaps), so use a dummy node before it.",
+      "For each pair rewire prev->second->first->rest, then jump prev forward two."
+    ],
+    "pitfalls": [
+      "Save `first.next` (the rest) before rewiring or you lose the tail.",
+      "Loop only while both `prev.next` and `prev.next.next` exist — leave a lone last node alone.",
+      "Advance `prev` to `first` (now the second of the pair), not to `second`."
+    ],
     "solutions": [
       {
         "label": "Dummy head pointer relinking",
@@ -190,6 +240,16 @@
     "story": "Add two numbers whose digits are stored reversed in linked lists. To crack it: walk both lists together adding digit + digit + carry, push each result digit into a new list, and remember to emit a final carry node.",
     "plain": "Traverse both lists at once. At each step add the two digits plus carry, store digit%10 in a new node, keep carry = sum/10. Don't forget a trailing carry node.",
     "tale": "Like grade-school column addition from the ones place, carrying the 1 as you go.",
+    "howToThink": [
+      "Digits are stored reversed, so the heads are the ones place — add left to right directly.",
+      "It's grade-school column addition: digit + digit + carry each step.",
+      "Build a fresh list with a dummy head, storing sum%10 and carrying sum/10."
+    ],
+    "pitfalls": [
+      "Keep looping while carry is non-zero even after both lists end (e.g. 9+1).",
+      "Advance A and B only when they're non-null so unequal lengths work.",
+      "Return `dummy.next`, not `dummy`."
+    ],
     "solutions": [
       {
         "label": "Elementary addition with carry",
@@ -226,6 +286,16 @@
     "story": "Find the longest contiguous sublist that is a palindrome, using O(1) extra memory. To crack it: because the list can't be indexed cheaply, reverse links as you go and expand around each node (and each gap) as a center, counting how far the palindrome extends both ways.",
     "plain": "Treat each node and each adjacent pair as a palindrome center. Expand outward comparing values on both sides, tracking the max length. Reverse the left half's pointers in place so you can walk leftward with O(1) memory.",
     "tale": "Like standing at each seam in a row of tiles and stepping outward both directions to see how far the mirror pattern holds.",
+    "howToThink": [
+      "You want the longest palindromic sublist, so test every possible center.",
+      "Expand around center: each node is an odd center, each gap an even center.",
+      "Grow outward while both sides match, tracking the max length."
+    ],
+    "pitfalls": [
+      "Cover both odd (single node) and even (two-node) centers or you miss cases.",
+      "Values repeat and are small — compare values, not node identity.",
+      "Keep expand bounds valid (`l >= 0 && r < n`) to avoid overrun."
+    ],
     "solutions": [
       {
         "label": "Expand around center (in-place reverse)",
@@ -261,6 +331,16 @@
     "story": "Find the first shared node where two singly linked lists merge. To crack it: use two pointers that each traverse A then B (and B then A); after switching once they cancel out the length difference and meet at the intersection (or both reach null).",
     "plain": "Point p at A and q at B. Advance both; when one hits null, redirect it to the other list's head. They travel equal total distance and meet at the intersection node, or both become null if none.",
     "tale": "Two walkers on paths of different lengths swap trails when they finish; having walked the same total distance, they arrive at the junction together.",
+    "howToThink": [
+      "The tails are shared, so the lists differ only by their unequal prefixes.",
+      "Two pointers each walking A-then-B (and B-then-A) travel the same total distance.",
+      "After the one switch they align and meet at the intersection, or both hit null."
+    ],
+    "pitfalls": [
+      "Switch to the other list's head on null, not skip — that's what cancels the length gap.",
+      "No intersection: both become null and `p == q` ends the loop, so return null naturally.",
+      "Compare nodes by identity (`p != q`), not by value."
+    ],
     "solutions": [
       {
         "label": "Two-pointer switch (length alignment)",
@@ -297,6 +377,16 @@
     "story": "Build a cache with O(1) get and set that evicts the least recently used key when full. To crack it: combine a HashMap (key -> node) for O(1) lookup with a doubly linked list ordered by recency; on every access move the node to the most-recent end, and evict from the least-recent end when over capacity.",
     "plain": "HashMap maps keys to list nodes; a doubly linked list keeps recency order. On get/set, remove the node and re-insert it at the recent end. On overflow, drop the node at the stale end.",
     "tale": "Like a stack of recently-read books on your desk: whatever you touch goes back on top, and when the stack is too tall you toss the bottom one.",
+    "howToThink": [
+      "Need O(1) lookup and O(1) recency reorder, so no single structure suffices.",
+      "HashMap gives key->node lookup; a doubly linked list orders nodes by recency.",
+      "On every get/set move the node to the recent end; when full evict from the stale end."
+    ],
+    "pitfalls": [
+      "Use head/tail sentinels so first/last inserts and removals need no null checks.",
+      "On get you must also refresh recency (remove and re-insert), not just read the value.",
+      "When evicting, remove the key from the map too, not just from the list."
+    ],
     "solutions": [
       {
         "label": "HashMap + custom doubly linked list",
@@ -333,6 +423,16 @@
     "story": "A linked list may contain a cycle. Find where the cycle begins and cut the last edge so the list becomes straight again. How to crack it: use Floyd's two-pointer trick to detect the loop, then reset one pointer to the head and advance both one step at a time until they meet at the loop start; track the previous node so you can null out its next.",
     "plain": "Use slow and fast pointers to detect a cycle. Once they meet inside the loop, move one pointer back to the head and walk both one step at a time; they meet at the loop's starting node. Keep the node just before it and set its next to null.",
     "tale": "Like walking a running track and marking the exact spot where the loop rejoins, then removing the shortcut that closed the circle.",
+    "howToThink": [
+      "A cycle means fast will eventually lap slow — Floyd's detection.",
+      "After they meet, resetting one to head and stepping both by one finds the loop's start.",
+      "Then find the node whose next is that start and cut it to null."
+    ],
+    "pitfalls": [
+      "If the loop starts at the head, a prev-based cut dereferences null — walk the cycle to the node before start instead.",
+      "Realign correctly for the fast=head.next start before the equal-speed phase.",
+      "Return head unchanged when there's no loop (fast reaches null)."
+    ],
     "solutions": [
       {
         "label": "Floyd's cycle detection and break",
@@ -368,6 +468,16 @@
     "story": "Rearrange a list so it weaves the front and back together: first node, last node, second node, second-last node, and so on. How to crack it: find the middle with slow/fast, reverse the second half, then merge the two halves alternately.",
     "plain": "Split the list at the middle, reverse the second half, then interleave nodes from the first half and the reversed second half one at a time.",
     "tale": "Like folding a strip of paper in half and zipping the two edges together tooth by tooth.",
+    "howToThink": [
+      "Target weaves front and back: A0, An, A1, An-1 — you need both ends.",
+      "Find the middle with slow/fast, reverse the second half, then merge alternately.",
+      "This is split + reverse + merge, the classic three-step list reorder."
+    ],
+    "pitfalls": [
+      "Set `slow.next = null` after reversing so the first half terminates cleanly.",
+      "Cache `first.next` and `second.next` before relinking each step or you lose the rest.",
+      "Loop while `second` is non-null so odd length leaves the middle correctly placed."
+    ],
     "solutions": [
       {
         "label": "Find middle, reverse, merge",
@@ -402,6 +512,16 @@
     "story": "Split the list into nodes smaller than B and nodes at least B, keeping each group's original order, then join them. How to crack it: build two separate chains with dummy heads and link them at the end.",
     "plain": "Walk the list once. Append each node to a 'less' list if its value < B, otherwise to a 'greater-or-equal' list. Finally connect the tail of the less list to the head of the other, and null-terminate.",
     "tale": "Like sorting mail into two trays, small envelopes first, then stacking the second tray on top while keeping each tray's order.",
+    "howToThink": [
+      "Two groups (less than B, at least B) with original order preserved — build two chains.",
+      "A dummy head per chain lets you append without special-casing the first node.",
+      "One pass appends each node to its chain, then stitch less-tail to ge-head."
+    ],
+    "pitfalls": [
+      "Null-terminate the ge chain (`ge.next = null`) or you drag in a stale link and loop.",
+      "Join in order: less tail -> geDummy.next, then return `lessDummy.next`.",
+      "Use strict `< B` for the less group to match \"greater than or equal\" on the other side."
+    ],
     "solutions": [
       {
         "label": "Two dummy lists",
@@ -436,6 +556,16 @@
     "story": "You have a main list where each node heads its own sorted down-list. Merge everything into one sorted down-linked list. How to crack it: repeatedly merge two sorted down-lists, moving across the right pointers, like merge in merge sort.",
     "plain": "Recurse to the rightmost list, then merge each list with the flattened result to its right using a standard two-pointer merge on the down pointers.",
     "tale": "Like combining several already-sorted stacks of cards into one big sorted stack, two stacks at a time.",
+    "howToThink": [
+      "Every down-list is already sorted, so the whole thing is a repeated merge of sorted lists.",
+      "Flatten right-to-left: flatten the rest, then merge the current down-list into it.",
+      "Merge uses the down pointer, like the standard two-sorted-lists merge."
+    ],
+    "pitfalls": [
+      "Merge and link using `down`, not `right`, and clear `right` on merged nodes.",
+      "Base case: return root when root or root.right is null.",
+      "Keep the merge sorted by always taking the smaller `val` and recursing on its `down`."
+    ],
     "solutions": [
       {
         "label": "Recursive merge of sorted lists",

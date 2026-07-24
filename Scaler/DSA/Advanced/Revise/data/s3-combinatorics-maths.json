@@ -16,6 +16,17 @@
     "story": "Compute C(n,r) mod m. You cannot just divide under a modulus, so build Pascal's triangle mod m (or use modular inverse when m is prime). To crack it: fill a 2D DP where C[i][j] = C[i-1][j-1] + C[i-1][j], all taken mod m.",
     "plain": "Division does not distribute over modulo, so the naive factorial/(factorial*factorial) then mod is wrong. Use Pascal's rule: nCr = (n-1)C(r-1) + (n-1)Cr, and take mod m at every addition. This avoids any division entirely.",
     "tale": "Like building a pyramid of blocks where each block is the sum of the two above it, but you only keep the last digit that fits in your pocket (mod m).",
+    "howToThink": [
+      "You need `nCr` but under a modulus, so the naive factorial/(factorial*factorial) then `% m` is wrong.",
+      "Division does not distribute over `%`, and `m` here is any number, not guaranteed prime, so modular inverse is risky.",
+      "That points to Pascal's rule: `nCr = (n-1)C(r-1) + (n-1)Cr`, which uses only addition.",
+      "Fill a DP table taking `% m` at every add; answer is `dp[n][r]`."
+    ],
+    "pitfalls": [
+      "Do not compute real factorials then divide, integer division under a modulus is invalid.",
+      "`m` is not guaranteed prime, so avoid Fermat modular inverse; Pascal addition is safe.",
+      "Use `long` for the table and reduce `% m` after each addition to avoid overflow."
+    ],
     "solutions": [
       {
         "label": "Optimal — Pascal's triangle DP (no division)",
@@ -52,6 +63,17 @@
     "story": "Count how many times the digit 1 shows up across 0..A. To crack it, count the 1s contributed at each place value (ones, tens, hundreds...) with a closed formula instead of iterating over every number.",
     "plain": "For each place value i (1, 10, 100, ...), the count of 1s at that position is determined by the higher digits, the current digit, and the lower digits. Sum this over all positions to get the total.",
     "tale": "Instead of reading every number and tallying 1s, you ask column by column: how often does a 1 sit in this column across all numbers up to A?",
+    "howToThink": [
+      "Counting a digit across `0..A` with `A` up to `1e9`, so looping over every number will TLE.",
+      "That signals per-place-value counting instead of enumeration.",
+      "For each power of ten, split `A` into high, current, and low digits.",
+      "The count of 1s at that place depends only on whether `cur` is 0, 1, or >= 2."
+    ],
+    "pitfalls": [
+      "Use `long` for the place multiplier `i`, since `i*10` and `high*i` overflow int near `1e9`.",
+      "When `cur == 1` you must add `low + 1`, forgetting the `+1` undercounts.",
+      "Loop condition is `i <= A`, an off-by-one stops the highest place from being counted."
+    ],
     "solutions": [
       {
         "label": "Optimal — per-digit place-value counting",
@@ -90,6 +112,17 @@
     "story": "Count ways to write A as a run of consecutive positive integers. To crack it: a run of k terms starting at x sums to k*x + k*(k-1)/2 = A, so for each k check if the leftover divides evenly into a positive x.",
     "plain": "If A is the sum of k consecutive integers starting at x, then A = k*x + k(k-1)/2. Rearranged, x = (A - k(k-1)/2) / k. For each k while k(k-1)/2 < A, count it if that expression is a positive integer.",
     "tale": "For each possible run length, subtract the fixed triangular offset and see if the rest splits evenly among the terms.",
+    "howToThink": [
+      "Asking for runs of consecutive integers summing to `A` hints at the arithmetic-series formula.",
+      "A run of `k` terms from `x` sums to `k*x + k(k-1)/2 = A`.",
+      "So for each `k`, the leftover `A - k(k-1)/2` must divide evenly by `k` to give a valid start.",
+      "Stop when `k(k-1)/2 >= A`, giving an `O(sqrt A)` loop, not `O(A)`."
+    ],
+    "pitfalls": [
+      "Use `long` for `k` and `rem`, `k*(k-1)/2` overflows int as `k` grows.",
+      "Check `rem % k == 0` for divisibility, not that `rem` itself is positive only.",
+      "Loop while `k(k-1)/2 < A` (strict), else you count an invalid empty leftover."
+    ],
     "solutions": [
       {
         "label": "Optimal — iterate over run length k",
@@ -126,6 +159,17 @@
     "story": "Build Pascal's triangle into a fixed A-by-A grid. Each interior cell is the sum of the cell directly above and the one above-left; everything else stays zero.",
     "plain": "Make an A x A matrix filled with zeros. The first column of every row is 1. Every other cell equals the value above it plus the value above and to the left.",
     "tale": "Like stacking coins where each coin's weight is shared down onto the two coins it rests between.",
+    "howToThink": [
+      "You must return a fixed `A x A` grid, so cells past each row stay zero.",
+      "Each interior cell is the sum of the one above and the one above-left, that is Pascal's rule.",
+      "Set the first column of every row to 1, then fill left to right.",
+      "No modulus here, so plain int addition builds the whole triangle."
+    ],
+    "pitfalls": [
+      "Inner loop runs `j` only up to `i`, going further writes into the zero region.",
+      "Read from row `i-1` (`[i-1][j]` and `[i-1][j-1]`), mixing up the offsets breaks the recurrence.",
+      "`A <= 25` so int is safe, but do not forget to seed `res[i][0] = 1` before the inner loop."
+    ],
     "solutions": [
       {
         "label": "Grid build from row relation",
@@ -161,6 +205,17 @@
     "story": "Convert a number to an Excel column label. It is base-26 but with no zero digit, so before each division you subtract 1 to shift into the 0-25 range.",
     "plain": "Repeatedly take (A-1) % 26 to get a letter A..Z, append it, then set A = (A-1)/26. Build the string from least significant letter to most, then reverse it.",
     "tale": "Like an odometer with 26 lettered wheels but no zero - each tick rolls A..Z and carries over once it passes Z.",
+    "howToThink": [
+      "Mapping a number to letters looks like base conversion, but there is no zero digit (A=1..Z=26).",
+      "That missing zero means you subtract 1 before each divide and mod.",
+      "Peel a letter with `(A-1)%26`, then shrink with `A=(A-1)/26`.",
+      "You build least-significant letter first, so reverse the string at the end."
+    ],
+    "pitfalls": [
+      "Forgetting the `-1` breaks the bijection, `26` should map to `Z` and `27` to `AA`.",
+      "Append then reverse, building forward without reversing gives the letters backwards.",
+      "Loop while `A > 0`; using `>= 0` adds a bogus extra letter."
+    ],
     "solutions": [
       {
         "label": "Repeated bijective base-26",
@@ -196,6 +251,17 @@
     "story": "Count how many permutations come before the given string. For each position, count how many unused characters are smaller than the current one; each such choice frees up (remaining)! arrangements after it. Sum those and add 1. To crack it: precompute factorials mod 1000003, and for each index count the smaller characters to its right.",
     "plain": "For each character, multiply the number of smaller characters that appear after it by the factorial of the number of positions remaining, sum modulo 1000003, then add 1.",
     "tale": "Like finding a word's page number in a dictionary: at each letter you skip ahead by all the words that could start with an earlier letter.",
+    "howToThink": [
+      "Rank among sorted permutations is a counting problem: how many strings come before this one.",
+      "At each position, every smaller unused character to its right frees `(remaining)!` arrangements.",
+      "So sum `smaller * fact[remaining]` across positions, then add 1 for a 1-based rank.",
+      "Answer needs `% 1000003`, so precompute factorials mod that prime."
+    ],
+    "pitfalls": [
+      "Build `fact[]` as `long` and reduce `% MOD` each step, factorials overflow fast.",
+      "Cast to `long` before `smaller * fact[...]` and mod before adding to `rank`.",
+      "Add 1 at the very end for the 1-based rank, then take `% MOD` once more."
+    ],
     "solutions": [
       {
         "label": "Factorial rank",
@@ -231,6 +297,17 @@
     "story": "Excel columns are a base-26 number system but with digits 1..26 instead of 0..25. Treat each letter as a digit: multiply the running total by 26 and add the letter's value (A=1..Z=26). To crack it: it's just Horner's method for base 26.",
     "plain": "Convert the title from a base-26-like system: for each character, result = result * 26 + (char - 'A' + 1).",
     "tale": "Like reading a number left to right: each new digit shifts everything up by one place value (times 26 here).",
+    "howToThink": [
+      "Letters to a number is the reverse base-26 map, again 1-indexed (A=1..Z=26).",
+      "Read left to right like any positional number: shift up by a factor of 26 each step.",
+      "So `result = result * 26 + (ch - 'A' + 1)`, which is just Horner's method.",
+      "No modulus and title length <= 5, so the arithmetic stays small."
+    ],
+    "pitfalls": [
+      "Use `ch - 'A' + 1` (1-based), dropping the `+1` maps `A` to 0 and undercounts.",
+      "Multiply the accumulator by 26 before adding the new digit, not after.",
+      "Titles are short so int is fine here, no overflow guard needed."
+    ],
     "solutions": [
       {
         "label": "Base-26 conversion",

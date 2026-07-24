@@ -14,6 +14,17 @@
     "story": "Build permutations by fixing one position at a time. Swap each remaining element into the current position, recurse for the next position, then swap back to restore the array. When the position reaches the end, record a copy. To crack it: swap-based backtracking with restore after each recursive call.",
     "plain": "Backtracking: for each index, swap every candidate into place, recurse deeper, then undo the swap. Record a copy when a full permutation is built.",
     "tale": "Like arranging guests in chairs one seat at a time: try each remaining guest in the seat, seat the rest, then stand them back up to try the next.",
+    "howToThink": [
+      "\"All possible permutations\" is the signal: enumerate by fixing one position at a time.",
+      "The decision at index `start` is which unused element sits there — try each with a swap.",
+      "Base case is `start == N`: a full ordering is built, so record a copy.",
+      "Swapping in place needs a swap-back afterwards to restore the array for the next choice."
+    ],
+    "pitfalls": [
+      "Record `A.clone()`, not `A` itself — the shared array keeps mutating.",
+      "Always swap back after recursing, or later positions see a scrambled array.",
+      "Loop `i` from `start`, not 0, so already-fixed positions aren't reshuffled."
+    ],
     "solutions": [
       {
         "label": "Swap-based backtracking",
@@ -50,6 +61,17 @@
     "story": "Build the string character by character, tracking how many open and close parentheses have been used. You may add '(' while open count is below A, and you may add ')' only while close count is below open count (so it never becomes invalid). When both reach A, the string is complete. Adding '(' before ')' at each step naturally produces the sorted order. To crack it: backtrack with two counters and the two validity rules.",
     "plain": "Backtracking with counts of open and close brackets: add '(' if openCount < A, add ')' if closeCount < openCount, record when both equal A.",
     "tale": "Like stacking and unstacking plates: you can only put a plate down (close) if there's one already up (open) to match it.",
+    "howToThink": [
+      "\"All well-formed combinations\" of a fixed length points to building the string choice by choice.",
+      "One decision per step: add `(` or add `)` — each guarded by a rule that keeps it valid.",
+      "Key realization: `(` allowed while open < A; `)` allowed only while close < open.",
+      "Base case is open == A and close == A: the string is complete, so record it."
+    ],
+    "pitfalls": [
+      "Don't add `)` when close is not below open — that yields malformed strings.",
+      "Try `(` before `)` so output comes out sorted without an extra sort.",
+      "Since you pass `pattern + \"(\"` (a new string), there's no explicit undo — don't mutate a shared builder without restoring it."
+    ],
     "solutions": [
       {
         "label": "Backtracking with open/close counts",
@@ -85,6 +107,17 @@
     "story": "For each element decide include or exclude, recursing through indices. When the index passes the end, record a copy of the current subset. Take/not-take at each index generates all 2^n subsets. To crack it: include the element and recurse, then remove it and recurse (the two branches).",
     "plain": "Backtracking with an include/exclude choice per element. At each index add the element and recurse, then remove it and recurse; snapshot the subset at the base case.",
     "tale": "Like packing for a trip going down a checklist: for each item you either put it in the bag or leave it out, and every combination of choices is a subset.",
+    "howToThink": [
+      "\"All possible subsets\" means each element is independently in or out — 2^n choices.",
+      "The decision at each index is take or skip; recurse both branches.",
+      "Base case is index past the end: snapshot the current subset.",
+      "Two branches (add then recurse, remove then recurse) cover every combination."
+    ],
+    "pitfalls": [
+      "Add a copy `new ArrayList<>(currentList)`, not the list reference, or all entries end up identical.",
+      "After the take branch, remove the element before the skip branch — forgetting the undo leaks state.",
+      "`remove(Integer.valueOf(x))` removes by value; `remove(x)` would remove by index and be wrong."
+    ],
     "solutions": [
       {
         "label": "Take / not-take DFS",
@@ -119,6 +152,17 @@
     "story": "Each digit can become one of a few letters. We build every combination by choosing a letter for each digit in turn. How to crack it: recurse digit by digit, appending one candidate letter and backtracking. Since we scan digits left to right and each digit's letters are already in alphabetical order, the results come out lexicographically sorted for free.",
     "plain": "Backtracking: for the current digit, try each of its mapped letters, recurse to the next digit, then undo.",
     "tale": "Like spinning a set of dials where each dial has a few letters; you write down every combination the dials can spell.",
+    "howToThink": [
+      "Each digit maps to a few letters, and you want every combination — recurse digit by digit.",
+      "The decision at each index is which of that digit's letters to place.",
+      "Base case is index past the last digit: record the built string.",
+      "Scanning left to right with each digit's letters already alphabetical gives sorted output for free."
+    ],
+    "pitfalls": [
+      "Handle 0 and 1, which map to themselves, not to a letter group.",
+      "After appending a letter and recursing, delete that last char to backtrack.",
+      "Index the map with `A.charAt(idx) - '0'`, not the raw char."
+    ],
     "solutions": [
       {
         "label": "Backtracking",
@@ -154,6 +198,17 @@
     "story": "Each row is generated from the one above: a 0 becomes 01 and a 1 becomes 10. So the symbol at index B in row A depends on the symbol at index B/2 in row A-1. How to crack it: recurse up one row, look at the parent symbol, and flip it only when B is odd (the second half of the 2-symbol expansion).",
     "plain": "Recursion: the parent of index B is index B/2 in the previous row; if B is even keep the parent's value, if odd flip it.",
     "tale": "Like a family tree where each parent produces two children 0->(0,1) and 1->(1,0); to know a child you ask the parent and check if you are the left or right child.",
+    "howToThink": [
+      "Each row is expanded from the one above (0->01, 1->10), so ask the parent, don't build the row.",
+      "The symbol at index B comes from index B/2 in the previous row — a divide-and-conquer recurrence.",
+      "Key realization: even B keeps the parent's value, odd B flips it (second half of the pair).",
+      "Base case is row 1, which is always 0."
+    ],
+    "pitfalls": [
+      "Parent index is `B/2`, not `B` — halve as you climb one row.",
+      "Flip only on odd B; flipping on even B inverts the answer.",
+      "Base case is `A == 1` (rows are 1-indexed here), not `A == 0`."
+    ],
     "solutions": [
       {
         "label": "Recursion on parent index",
@@ -188,6 +243,17 @@
     "story": "We want every ordered combination of 1s and 2s that adds up to A. How to crack it: recurse on the remaining steps, always trying a 1 before a 2 so the paths come out lexicographically sorted, and record a path each time the remaining count hits zero.",
     "plain": "Backtracking: from the remaining steps, first add a 1 and recurse, then add a 2 and recurse; collect a path when remaining reaches 0.",
     "tale": "Like listing every way to tile a strip of length A with tiles of size 1 and 2, always placing the smaller tile first so the list stays in order.",
+    "howToThink": [
+      "You want every ordered sequence of 1s and 2s that sums to A — enumerate, don't just count.",
+      "The decision at each step is take a 1-step or a 2-step from the remaining count.",
+      "Base case is remaining == 0: record a copy of the path.",
+      "Trying the 1 branch before the 2 branch makes paths come out sorted."
+    ],
+    "pitfalls": [
+      "Add a copy of `cur` at the base case, not the shared list.",
+      "Remove the last step after each recursive branch to undo the choice.",
+      "Guard the 2-step branch with `rem >= 2` so you don't overshoot the top."
+    ],
     "solutions": [
       {
         "label": "Backtracking (1 before 2)",
@@ -224,6 +290,17 @@
     "story": "The maze has open cells (1) and hurdles (0), and we want the fewest moves from source to destination. How to crack it: because every step costs the same, a breadth-first search from the source expands cells layer by layer, so the first time we reach the destination we have the shortest distance.",
     "plain": "BFS from the source, moving to adjacent cells that are 1 and unvisited; return the level at which the destination is first reached, else -1.",
     "tale": "Like ripples spreading out from where a stone drops in water; the ripple reaches each open spot by the shortest route first.",
+    "howToThink": [
+      "\"Shortest path\" with every step costing the same is the signal for BFS, not backtracking.",
+      "Treat each open cell (value 1) as a node; expand outward layer by layer.",
+      "Key realization: BFS reaches each cell by its shortest route first, so the destination's level is the answer.",
+      "Mark cells visited on enqueue so you never process one twice; return -1 if the queue drains."
+    ],
+    "pitfalls": [
+      "Mark visited when enqueuing, not when dequeuing, or the same cell gets queued many times.",
+      "Only step onto in-bounds cells valued 1; hurdles (0) are blocked.",
+      "Don't reach for DFS here — it can wander exponentially and miss the true minimum."
+    ],
     "solutions": [
       {
         "label": "BFS (level order)",
@@ -258,6 +335,17 @@
     "story": "From the top-left of an A x B grid we walk to the bottom-right using only Down and Right moves, and list every route. How to crack it: recurse position by position, always trying Down (D) before Right (R) so the strings come out alphabetically sorted, and record the string when we land on the bottom-right cell.",
     "plain": "Backtracking: at each cell try moving Down first then Right, appending the move letter; record the path when you reach the bottom-right corner.",
     "tale": "Like tracing every staircase route across a grid where you may only go down or right, writing down each route in alphabetical order.",
+    "howToThink": [
+      "Top-left to bottom-right with only Down/Right moves — enumerate every route as a string.",
+      "The decision at each cell is move Down or move Right, if a row/column still remains.",
+      "Base case is landing on the bottom-right cell: record the path string.",
+      "Trying D before R keeps the output alphabetically sorted."
+    ],
+    "pitfalls": [
+      "Guard Down with `r < A-1` and Right with `c < B-1` so you don't walk off the board.",
+      "Delete the last move char after each branch to backtrack.",
+      "Append D before R, not the reverse, or the sorted-order requirement breaks."
+    ],
     "solutions": [
       {
         "label": "Backtracking (D before R)",
@@ -294,6 +382,17 @@
     "story": "Same generation rule as the easy version (0 -> 01, 1 -> 10), but B can be huge, so recursion up to A rows is wasteful. How to crack it: the symbol at index B equals the parity of the number of set bits in B. Each step from parent to child flips the value exactly when the child index is odd, and following the chain up shows the answer is simply the count of 1-bits in B taken mod 2.",
     "plain": "The answer is the number of 1 bits in B modulo 2 (0 if even, 1 if odd).",
     "tale": "Like folding a paper: each crease flips the pattern, and the final side you see depends only on how many folds (set bits) landed odd.",
+    "howToThink": [
+      "Same 0->01, 1->10 rule as the easy version, but A up to 10^5 makes row-by-row recursion too deep.",
+      "Each descent flips the value only when that level's index is odd — count the flips.",
+      "Key realization: total flips equal the number of set bits in B, so the answer is popcount(B) mod 2.",
+      "This collapses the whole recurrence to an O(1) bit-count."
+    ],
+    "pitfalls": [
+      "Use a 64-bit type for B — it can reach 10^18.",
+      "It's parity of set bits, so return popcount mod 2, not the raw count.",
+      "Don't recurse A levels here; large A would blow the stack."
+    ],
     "solutions": [
       {
         "label": "Popcount parity",
@@ -328,6 +427,17 @@
     "story": "We check whether any subset of A adds up exactly to B, and negatives are allowed so we cannot prune by size alone. How to crack it: with N at most 17 we can try every subset by an include/exclude recursion, subtracting the chosen element from the target and asking if the rest can reach zero.",
     "plain": "Backtracking: for each element decide to include it (subtract from target) or skip it; success when all elements are considered and target is 0.",
     "tale": "Like deciding for each item in a bag whether to take it, checking if any selection hits the exact target weight.",
+    "howToThink": [
+      "Asking whether any subset hits an exact sum, with negatives allowed, points to try-every-subset.",
+      "The decision per element is include (subtract from target) or exclude.",
+      "Base case is index past the end: success is target == 0.",
+      "N <= 17 keeps the full 2^N include/exclude search feasible."
+    ],
+    "pitfalls": [
+      "Negatives mean you can't prune by size or sign — a full search is needed.",
+      "Base case checks `target == 0` only after all elements are considered, not mid-way.",
+      "Use a wide (long) target since values reach 10^9 and can accumulate."
+    ],
     "solutions": [
       {
         "label": "Include / exclude recursion",

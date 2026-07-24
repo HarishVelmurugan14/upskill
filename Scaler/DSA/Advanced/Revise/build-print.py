@@ -38,6 +38,12 @@ PROFILES = {
         "layout": "think",
         "subtitle": "Section 2",
     },
+    "section3": {
+        "sections": {"Section 3"},
+        "out": "section3.html",
+        "layout": "think",
+        "subtitle": "Section 3",
+    },
 }
 PROFILE = PROFILES[sys.argv[1] if len(sys.argv) > 1 else "section2"]
 OUT = os.path.join(HERE, PROFILE["out"])

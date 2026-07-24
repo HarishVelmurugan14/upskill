@@ -14,6 +14,16 @@
     "story": "Find the longest run of consecutive integers hidden in an unsorted array. To crack it: put everything in a hash set and only start counting a run from a number that has no predecessor in the set.",
     "plain": "Store all numbers in a HashSet. For each number that is a run start (x-1 not present), walk x, x+1, x+2... counting the run length, and track the maximum.",
     "tale": "Like spotting the longest unbroken chain of house numbers on a street, only beginning to count from a house whose left neighbor is missing.",
+    "howToThink": [
+      "\"Consecutive elements, unsorted, up to 10^6\" rules out sorting for the intended O(n) — think fast membership.",
+      "Dump everything into a HashSet so `x-1` and `x+1` lookups are O(1).",
+      "Key trick: only start counting a run from a number whose predecessor `x-1` is absent, so each element is walked once."
+    ],
+    "pitfalls": [
+      "Iterate over the set, not the array, or duplicates make you redo the same run.",
+      "Without the `x-1` run-start check you get O(n^2) walking every element forward.",
+      "Duplicates must not inflate the length — the set already dedupes, so count via membership not occurrences."
+    ],
     "solutions": [
       {
         "label": "HashSet run-start scan",
@@ -49,6 +59,16 @@
     "story": "Find the longest stretch that cancels out to zero. To crack it: track running prefix sums; if the same prefix sum shows up twice, the elements in between sum to zero.",
     "plain": "Maintain a prefix sum and a HashMap of the first index where each prefix sum occurred. If a prefix sum repeats, the subarray between the two indices sums to zero; take the widest such gap.",
     "tale": "Like tracking your bank balance day by day: whenever the balance returns to a value it hit before, everything spent and earned in between nets to zero.",
+    "howToThink": [
+      "\"Longest subarray summing to zero\" is a subarray-sum question -> prefix sum + HashMap.",
+      "If two prefixes are equal, the elements between them cancel to zero.",
+      "For longest, store the FIRST index of each prefix sum so the gap is as wide as possible."
+    ],
+    "pitfalls": [
+      "Seed the map with `{0: -1}` or you miss subarrays starting at index 0.",
+      "Don't overwrite an existing prefix sum — keep the earliest index for max length.",
+      "`A[i]` up to 10^9 means sums overflow int; use `long` as the key."
+    ],
     "solutions": [
       {
         "label": "Prefix sum + HashMap",
@@ -84,6 +104,16 @@
     "story": "Check whether every consecutive block of digits has a distinct digit-product. To crack it: enumerate all consecutive digit windows, compute each product, and fail the moment a product repeats.",
     "plain": "Extract the digits, then for every start and end index compute the product of that digit window and store products in a HashSet. If any product is already present, the number is not colorful.",
     "tale": "Like handing out raffle numbers for each stretch of digits: the moment two stretches draw the same number, the batch is disqualified.",
+    "howToThink": [
+      "\"Product of every consecutive digit block must be distinct\" -> collect products in a HashSet and fail on a repeat.",
+      "Only ~10 digits, so brute-forcing all windows (O(d^2)) is fine.",
+      "Grow the product incrementally: for a fixed start, multiply the next digit as you extend the window."
+    ],
+    "pitfalls": [
+      "Check the set BEFORE adding, then add — otherwise you never detect the duplicate.",
+      "Products can exceed int (9*9*... over many digits); use `long` for the product and set.",
+      "Watch digit 0: a window product of 0 still counts, and repeated 0-products must fail correctly."
+    ],
     "solutions": [
       {
         "label": "All-substrings product set",
@@ -119,6 +149,16 @@
     "story": "Count all subarrays whose elements are all distinct. To crack it: slide a window that never contains a duplicate; for each right end, every window start from left to right gives a valid subarray.",
     "plain": "Use a sliding window with a HashSet. Expand right; when a duplicate appears, shrink from left until unique again. For each right index, add (right - left + 1) valid subarrays, taking the result modulo 10^9+7.",
     "tale": "Like reading a sentence and counting every phrase with no repeated word: you extend until a word repeats, then drop words off the front until it is clean again.",
+    "howToThink": [
+      "\"Count subarrays with all-distinct elements\" -> sliding window with a HashSet of the current window.",
+      "Expand right; on a duplicate, shrink from left until the window is unique again.",
+      "Key count: each right end adds `(right - left + 1)` valid subarrays ending there."
+    ],
+    "pitfalls": [
+      "Remove `A[left]` from the set while advancing left, or the window stays corrupted.",
+      "Take the running total modulo 10^9+7 and use a `long` accumulator to avoid overflow.",
+      "Add `A[right]` to the set only after the shrink loop finishes."
+    ],
     "solutions": [
       {
         "label": "Sliding window + HashSet",
@@ -154,6 +194,16 @@
     "story": "Reorder A to follow the priority order given by B, with leftovers sorted at the end. To crack it: count how many times each value appears in A, then emit values in B's order, and finally emit the rest in sorted order.",
     "plain": "Count occurrences of each A value in a HashMap. Walk B and output each value as many times as it appears in A (removing it from the map). Then collect the remaining values, sort them, and append.",
     "tale": "Like arranging guests by a VIP seating list first, then seating everyone else alphabetically at the back.",
+    "howToThink": [
+      "\"Order A by B's order, rest sorted at end\" -> count A's values in a HashMap, then emit by B.",
+      "The map answers \"how many of this value are in A\"; walk B and output that many copies.",
+      "Whatever B never mentioned is the leftover — collect, sort, and append."
+    ],
+    "pitfalls": [
+      "Use `getOrDefault(b, 0)` since a B value may not appear in A at all.",
+      "Remove each B value from the map after emitting so it isn't re-added to the leftovers.",
+      "Expand leftovers by their counts (duplicates) before sorting, not just distinct keys."
+    ],
     "solutions": [
       {
         "label": "Count map + priority order B",
