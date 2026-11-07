@@ -1,0 +1,179 @@
+{
+  "topic": "Graphs",
+  "summary": "Almost every graph problem is: build the adjacency list, then run one of five traversals. BFS for unweighted shortest path and for level-by-level spread; DFS for reachability, connected components and cycle detection; Dijkstra for non-negative weighted shortest path; Kahn's BFS for topological order and directed-cycle detection; Prim or Kruskal for a minimum spanning tree. Grids are graphs too -- a cell is a node and its four neighbours are its edges. The two invariants that cause most bugs: mark visited when you PUSH (not when you pop), and for directed-cycle detection track the recursion stack separately from visited.",
+  "thoughtProcess": [
+    {
+      "title": "1. Build the adjacency list first, always.",
+      "body": "Never traverse an edge list directly. Convert to List<List<Integer>> or a HashMap of node -> neighbours in one O(E) pass, and remember to add BOTH directions for an undirected graph. Nodes are usually 1-indexed in Scaler problems, so size the list N + 1."
+    },
+    {
+      "title": "2. Unweighted shortest path -> BFS. Weighted non-negative -> Dijkstra.",
+      "body": "BFS is correct for shortest path only when every edge costs the same, because the first time you reach a node is via the fewest edges. The moment weights differ, that guarantee dies and you need Dijkstra's priority queue. Negative weights break Dijkstra too -- that is Bellman-Ford territory."
+    },
+    {
+      "title": "3. Cycle detection differs by direction.",
+      "body": "Directed: DFS with a separate recursion-stack array -- a cycle is an edge back to a node still ON the current stack, not merely one already visited. Undirected: DFS with visited plus the parent node -- an edge back to any visited node that is not your parent is a cycle."
+    },
+    {
+      "title": "4. Ordering with prerequisites -> topological sort.",
+      "body": "Kahn's algorithm: compute indegrees, queue every node with indegree 0, pop and decrement neighbours. If you emit fewer than N nodes, the graph has a cycle -- which is exactly how course-scheduling feasibility is answered. Only valid on a DAG."
+    },
+    {
+      "title": "5. Spreading from many origins at once -> multi-source BFS.",
+      "body": "Push every source into the queue before the first pop, all at distance 0. One level of the BFS then equals one unit of time for all of them simultaneously. Rotten oranges, nearest-exit and fire-spread problems are all this pattern -- do not run N separate BFS passes."
+    },
+    {
+      "title": "6. Minimum spanning tree -> Prim (heap) or Kruskal (sort + DSU).",
+      "body": "Prim grows one tree: keep a min-heap of edges crossing the frontier, repeatedly take the cheapest edge to an unvisited node. Kruskal sorts all edges and unions endpoints that are not already connected. Both give O(E log V) in practice; pick whichever the graph representation favours."
+    },
+    {
+      "title": "7. A grid is an implicit graph.",
+      "body": "Cell (x, y) is a node; its edges are the four (or eight) in-bounds neighbours. Use a direction array int[][] dirs = {{0,1},{1,0},{0,-1},{-1,0}} and one isValid(x, y) bounds check rather than writing four near-identical branches."
+    }
+  ],
+  "keyPatterns": [
+    {
+      "name": "Build the adjacency list",
+      "when": "Step zero of every graph problem.",
+      "template": "List<List<Integer>> adj = new ArrayList<>();\nfor (int i = 0; i <= N; i++) {\n    adj.add(new ArrayList<>());\n}\nfor (int[] edge : B) {\n    adj.get(edge[0]).add(edge[1]);\n    adj.get(edge[1]).add(edge[0]);   // omit this line for a DIRECTED graph\n}",
+      "examples": [
+        "Path in Directed Graph",
+        "Cycle Detection"
+      ]
+    },
+    {
+      "name": "DFS with visited (reachability / components)",
+      "when": "Is B reachable from A, how many connected components, flood fill.",
+      "template": "private boolean dfs(int node, int target, List<List<Integer>> adj, boolean[] visited) {\n    if (node == target) {\n        return true;\n    }\n    visited[node] = true;            // mark BEFORE recursing\n    for (int next : adj.get(node)) {\n        if (!visited[next]) {\n            if (dfs(next, target, adj, visited)) {\n                return true;\n            }\n        }\n    }\n    return false;\n}",
+      "examples": [
+        "Path in Directed Graph",
+        "Number of Islands"
+      ]
+    },
+    {
+      "name": "BFS shortest path (unweighted)",
+      "when": "Fewest edges / fewest moves, every edge costs the same.",
+      "template": "Queue<Integer> q = new LinkedList<>();\nint[] dist = new int[N + 1];\nArrays.fill(dist, -1);\nq.add(src);\ndist[src] = 0;\nwhile (!q.isEmpty()) {\n    int node = q.poll();\n    for (int next : adj.get(node)) {\n        if (dist[next] == -1) {      // unvisited\n            dist[next] = dist[node] + 1;\n            q.add(next);             // set dist WHEN PUSHING, not when popping\n        }\n    }\n}\nreturn dist[dest];",
+      "examples": [
+        "Shortest Path in a Maze",
+        "Another BFS"
+      ]
+    },
+    {
+      "name": "Directed cycle detection (recursion stack)",
+      "when": "Does a directed graph contain a cycle.",
+      "template": "private boolean hasCycle(int node, List<List<Integer>> adj, boolean[] visited, boolean[] recStack) {\n    visited[node] = true;\n    recStack[node] = true;\n    for (int next : adj.get(node)) {\n        if (!visited[next]) {\n            if (hasCycle(next, adj, visited, recStack)) {\n                return true;\n            }\n        } else if (recStack[next]) {\n            return true;             // back-edge to a node still on THIS path\n        }\n    }\n    recStack[node] = false;          // unwind: off the current path\n    return false;\n}",
+      "examples": [
+        "Cycle Detection in a Directed Graph"
+      ]
+    },
+    {
+      "name": "Dijkstra (non-negative weights)",
+      "when": "Shortest path when edges carry different non-negative costs.",
+      "template": "PriorityQueue<int[]> pq = new PriorityQueue<>((a, b) -> a[1] - b[1]);   // {node, dist}\nint[] dist = new int[N];\nArrays.fill(dist, Integer.MAX_VALUE);\ndist[src] = 0;\npq.add(new int[]{src, 0});\nwhile (!pq.isEmpty()) {\n    int[] cur = pq.poll();\n    if (cur[1] > dist[cur[0]]) {\n        continue;                    // stale entry, already improved\n    }\n    for (State e : adj.get(cur[0])) {\n        if (dist[cur[0]] + e.weight < dist[e.node]) {\n            dist[e.node] = dist[cur[0]] + e.weight;\n            pq.add(new int[]{e.node, dist[e.node]});\n        }\n    }\n}",
+      "examples": [
+        "Dijkstra",
+        "Shortest Path"
+      ]
+    },
+    {
+      "name": "Topological sort (Kahn's BFS on indegree)",
+      "when": "Dependency ordering, course scheduling, directed-cycle feasibility.",
+      "template": "int[] indegree = new int[N + 1];\nfor (int[] e : B) {\n    indegree[e[1]]++;\n}\nQueue<Integer> q = new LinkedList<>();\nfor (int i = 1; i <= N; i++) {\n    if (indegree[i] == 0) {\n        q.add(i);\n    }\n}\nList<Integer> order = new ArrayList<>();\nwhile (!q.isEmpty()) {\n    int node = q.poll();\n    order.add(node);\n    for (int next : adj.get(node)) {\n        indegree[next]--;\n        if (indegree[next] == 0) {\n            q.add(next);\n        }\n    }\n}\n// order.size() < N  =>  the graph has a cycle",
+      "examples": [
+        "Topological Sort",
+        "Course Schedule"
+      ]
+    },
+    {
+      "name": "Multi-source BFS on a grid",
+      "when": "Simultaneous spread from every source; answer is elapsed time.",
+      "template": "Queue<int[]> q = new LinkedList<>();\nfor (int i = 0; i < n; i++) {\n    for (int j = 0; j < m; j++) {\n        if (grid[i][j] == 2) {\n            q.add(new int[]{i, j});   // ALL sources before the first poll\n        }\n    }\n}\nint time = 0;\nwhile (!q.isEmpty()) {\n    int size = q.size();              // freeze the level size\n    for (int k = 0; k < size; k++) {\n        int[] cell = q.poll();\n        for (int[] d : dirs) {\n            int x = cell[0] + d[0], y = cell[1] + d[1];\n            if (isValid(x, y, n, m) && grid[x][y] == 1) {\n                grid[x][y] = 2;\n                q.add(new int[]{x, y});\n            }\n        }\n    }\n    time++;\n}",
+      "examples": [
+        "Rotten Oranges"
+      ]
+    },
+    {
+      "name": "Prim's MST (min-heap on edge weight)",
+      "when": "Cheapest set of edges connecting every node.",
+      "template": "PriorityQueue<int[]> pq = new PriorityQueue<>((a, b) -> a[1] - b[1]);   // {node, weight}\nboolean[] inMst = new boolean[N + 1];\npq.add(new int[]{1, 0});\nint total = 0;\nwhile (!pq.isEmpty()) {\n    int[] cur = pq.poll();\n    if (inMst[cur[0]]) {\n        continue;                     // already absorbed\n    }\n    inMst[cur[0]] = true;\n    total += cur[1];\n    for (Road r : adj.get(cur[0])) {\n        if (!inMst[r.to]) {\n            pq.add(new int[]{r.to, r.cost});\n        }\n    }\n}\nreturn total;",
+      "examples": [
+        "Commutable Islands",
+        "Minimum Cost Roads"
+      ]
+    },
+    {
+      "name": "Grid direction array + bounds guard",
+      "when": "Any 4- or 8-neighbour grid traversal.",
+      "template": "private static final int[][] DIRS = {{0, 1}, {1, 0}, {0, -1}, {-1, 0}};\n\nprivate boolean isValid(int x, int y, int n, int m) {\n    return x >= 0 && x < n && y >= 0 && y < m;\n}",
+      "examples": [
+        "Number of Islands",
+        "Rotten Oranges",
+        "Maze Shortest Path"
+      ]
+    }
+  ],
+  "commonMistakes": [
+    {
+      "title": "Marking visited when popping instead of when pushing",
+      "wrong": "int node = q.poll();\nvisited[node] = true;\nfor (int next : adj.get(node)) { if (!visited[next]) { q.add(next); } }",
+      "right": "for (int next : adj.get(node)) {\n    if (!visited[next]) {\n        visited[next] = true;   // mark at PUSH time\n        q.add(next);\n    }\n}",
+      "why": "Between a node being pushed and popped, other nodes can push it again -- the same node enters the queue many times, blowing up the queue and (in weighted variants) producing wrong distances. Mark it the moment it is enqueued."
+    },
+    {
+      "title": "Using visited alone for directed cycle detection",
+      "wrong": "if (visited[next]) { return true; }",
+      "right": "if (!visited[next]) {\n    if (hasCycle(next, ...)) { return true; }\n} else if (recStack[next]) {\n    return true;\n}",
+      "why": "A node already visited on a DIFFERENT finished branch is not a cycle -- a diamond-shaped DAG would be falsely reported. Only an edge back to a node still on the current recursion stack is a real cycle."
+    },
+    {
+      "title": "Forgetting to clear recStack on the way out",
+      "wrong": "for (int next : adj.get(node)) { ... }\nreturn false;   // recStack[node] left true",
+      "right": "for (int next : adj.get(node)) { ... }\nrecStack[node] = false;\nreturn false;",
+      "why": "A node left marked on the stack after its subtree finishes makes later, unrelated branches see a phantom back-edge and report a cycle that does not exist."
+    },
+    {
+      "title": "Adding only one direction for an undirected graph",
+      "wrong": "adj.get(edge[0]).add(edge[1]);",
+      "right": "adj.get(edge[0]).add(edge[1]);\nadj.get(edge[1]).add(edge[0]);",
+      "why": "Half the edges silently vanish, so traversal reports unreachable nodes and MST/shortest-path answers come out too large. Decide directed vs undirected before writing the builder."
+    },
+    {
+      "title": "BFS used for a weighted shortest path",
+      "wrong": "// edges have costs 1..1000, but plain BFS is used\nif (dist[next] == -1) { dist[next] = dist[node] + w; q.add(next); }",
+      "right": "// use Dijkstra with a PriorityQueue ordered by distance",
+      "why": "BFS's correctness rests on every edge costing the same, so the first arrival is the cheapest. With differing weights a longer-in-edges path can be cheaper, and BFS locks in the wrong distance on first touch."
+    },
+    {
+      "title": "Sizing arrays N instead of N + 1 for 1-indexed nodes",
+      "wrong": "boolean[] visited = new boolean[N];   // nodes are 1..N",
+      "right": "boolean[] visited = new boolean[N + 1];",
+      "why": "Indexing visited[N] throws ArrayIndexOutOfBounds on the last node. Scaler graph problems are almost always 1-indexed -- size every per-node array N + 1 by default."
+    },
+    {
+      "title": "Not skipping stale Dijkstra entries",
+      "wrong": "int[] cur = pq.poll();\nfor (State e : adj.get(cur[0])) { ... }",
+      "right": "int[] cur = pq.poll();\nif (cur[1] > dist[cur[0]]) {\n    continue;\n}",
+      "why": "A node can sit in the heap several times with different tentative distances. Processing an outdated, larger entry re-relaxes neighbours needlessly and degrades the running time; the answer survives but the solution can TLE."
+    },
+    {
+      "title": "Reading a level-by-level BFS without freezing the level size",
+      "wrong": "while (!q.isEmpty()) {\n    int[] cell = q.poll();\n    ...\n    time++;\n}",
+      "right": "while (!q.isEmpty()) {\n    int size = q.size();\n    for (int k = 0; k < size; k++) { ... }\n    time++;\n}",
+      "why": "The queue grows while you iterate it, so without capturing q.size() first you mix several levels into one and the elapsed-time count becomes the node count instead."
+    }
+  ],
+  "edgeCases": [
+    "Disconnected graph -- loop over every node as a DFS/BFS start, not just node 1.",
+    "Nodes are 1-indexed: size every per-node array N + 1.",
+    "Self-loop (u -> u) is a cycle in a directed graph and must be detected.",
+    "Parallel / duplicate edges between the same pair -- MST and cycle logic must tolerate them.",
+    "Source equals destination: shortest path is 0, and the code must return before traversing.",
+    "Destination unreachable: return -1 (or whatever the statement specifies), not Integer.MAX_VALUE.",
+    "Rotten oranges with no fresh oranges at all -> answer 0; with an unreachable fresh orange -> -1.",
+    "A grid that is entirely water -> 0 islands; a single-cell grid -> 1 if land.",
+    "Topological sort on a graph with a cycle: order.size() < N, report infeasible.",
+    "Edge weights that sum past int range on long paths -- accumulate distances in long.",
+    "Empty edge list with N nodes: N separate components, no cycle, MST is impossible unless N == 1."
+  ]
+}

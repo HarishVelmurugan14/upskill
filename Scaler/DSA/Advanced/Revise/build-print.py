@@ -23,7 +23,7 @@ import sys
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 DATA = os.path.join(HERE, "data")
-GENERATED = "2026-07-15"
+GENERATED = "2026-09-24"
 
 PROFILES = {
     "section1": {
@@ -31,18 +31,28 @@ PROFILES = {
         "out": "section1.html",
         "layout": "crack",
         "subtitle": "Section 0 &amp; 1",
+        "title": "DSA revision — physical copy",
     },
     "section2": {
         "sections": {"Section 2"},
         "out": "section2.html",
         "layout": "think",
         "subtitle": "Section 2",
+        "title": "DSA revision — Section 2",
     },
     "section3": {
         "sections": {"Section 3"},
         "out": "section3.html",
         "layout": "think",
         "subtitle": "Section 3",
+        "title": "DSA revision — Section 3",
+    },
+    "section4": {
+        "sections": {"Section 4"},
+        "out": "section4.html",
+        "layout": "think",
+        "subtitle": "Section 4",
+        "title": "DSA revision — Section 4",
     },
 }
 PROFILE = PROFILES[sys.argv[1] if len(sys.argv) > 1 else "section2"]
@@ -299,6 +309,16 @@ def render_answer(problem):
     )
 
 
+def render_writing_space():
+    """Blank two-column panel for the user to hand-write their own version.
+
+    Kept white (pen has to be readable on it) and break-inside: avoid, so when
+    the answer code runs long the whole panel moves to the next page instead of
+    being sliced in half.
+    """
+    return '<div class="mine"></div>'
+
+
 def render_complexity_line(problem):
     """Compact brute -> optimal complexity summary (Section 2)."""
     sols = problem.get("solutions") or []
@@ -349,6 +369,7 @@ def render_problem(topic, problem):
         + middle
         + f"{render_pitfalls(problem)}"
         + f"{render_answer(problem)}"
+        + render_writing_space()
         + "</section>"
     )
 
@@ -436,6 +457,9 @@ pre.code { font-family: "SF Mono", ui-monospace, Menlo, Consolas, monospace; fon
 .answer { margin-top: 8px; }
 .answer pre.code { background: #ededed; break-inside: avoid; }
 
+/* reserved blank space for hand-writing your own version — no rules, no border */
+.mine { min-height: 110mm; margin-top: 10px; break-inside: avoid; }
+
 /* ---- paged media (Paged.js): page numbers + running topic header ---- */
 @page {
   size: A4;
@@ -495,7 +519,7 @@ def main():
     )
     cover = (
         '<section class="cover">'
-        "<h1>DSA revision — physical copy</h1>"
+        f"<h1>{PROFILE['title']}</h1>"
         f'<div class="sub">Scaler Advanced · {PROFILE["subtitle"]} · {total} problems · '
         f"generated {GENERATED}</div>"
         '<div class="toc-title">Contents</div>'
@@ -511,7 +535,7 @@ def main():
     doc = (
         "<!doctype html><html lang=\"en\"><head><meta charset=\"utf-8\">"
         '<meta name="viewport" content="width=device-width, initial-scale=1">'
-        "<title>DSA revision — physical copy</title>"
+        f"<title>{PROFILE['title']}</title>"
         f"<style>{CSS}</style></head><body>"
         f'<div class="page-wrap">{cover}{"".join(body)}</div>'
         f"<script>{polyfill}</script>"

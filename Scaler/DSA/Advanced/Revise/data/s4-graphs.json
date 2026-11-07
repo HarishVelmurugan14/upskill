@@ -1,0 +1,1128 @@
+[
+  {
+    "num": 282,
+    "id": "s4-graphs-cycle-in-directed-graph",
+    "title": "Cycle in Directed Graph",
+    "subTopic": "DFS cycle detection with a recursion stack",
+    "tags": [
+      "Graphs",
+      "DFS",
+      "Cycle Detection",
+      "Directed Graph"
+    ],
+    "description": "Given an directed graph having A nodes. A matrix B of size M x 2 is given which represents the M edges such that there is a edge directed from node B[i][0] to node B[i][1].\nFind whether the graph contains a cycle or not, return 1 if cycle is present else return 0.\nNOTE:\n\n- The cycle must contain atleast two nodes.\n- There are no self-loops in the graph.\n- There are no multiple edges between two nodes.\n- The graph may or may not be connected.\n- Nodes are numbered from 1 to A.\n- Your solution will run on multiple test cases. If you are using global variables make sure to clear them.\n\nProblem Constraints\n2 <= A <= 10^5\n1 <= M <= min(200000,A*(A-1))\n1 <= B[i][0], B[i][1] <= A\n\nInput Format\nThe first argument given is an integer A representing the number of nodes in the graph.\nThe second argument given a matrix B of size M x 2 which represents the M edges such that there is a edge directed from node B[i][0] to node B[i][1].\n\nOutput Format\nReturn 1 if cycle is present else return 0.\n\nExample Input\nInput 1:\nA = 5\nB = [  [1, 2]\n       [4, 1]\n       [2, 4]\n       [3, 4]\n       [5, 2]\n       [1, 3] ]\nInput 2:\nA = 5\nB = [  [1, 2]\n       [2, 3]\n       [3, 4]\n       [4, 5] ]\n\nExample Output\nOutput 1:\n1\nOutput 2:\n0",
+    "sampleInput": "A = 5\nB = [[1, 2], [4, 1], [2, 4], [3, 4], [5, 2], [1, 3]]",
+    "sampleOutput": "1",
+    "story": "A directed cycle exists exactly when DFS walks into a node that is still sitting on the current recursion path.",
+    "plain": "Build a directed adjacency list from the edge matrix. Run DFS from every unvisited node while keeping two boolean arrays: `visited` for nodes ever explored, and `recStack` for nodes currently on the active DFS path. Mark both on entry, recurse into each neighbour, and clear only `recStack` on exit. If a neighbour is already `visited` and also still in `recStack`, that edge points back onto the current path, so a cycle exists and you return 1. If every DFS finishes without hitting that case, return 0.",
+    "howToThink": [
+      "DFS + recursion-stack array: a directed graph has a cycle iff DFS finds a back edge to a node still on the current path.",
+      "`visited` alone is wrong here — in a directed graph you can legitimately re-reach a node through a different branch (cross/forward edge) with no cycle at all. `recStack` is what separates 'seen before' from 'seen on this path'.",
+      "Mark `recStack[node] = true` before recursing and reset it to `false` right before returning; the reset is the whole trick, it keeps `recStack` a path marker rather than a second `visited`.",
+      "The graph may be disconnected, so loop `i` from `1..A` and launch a DFS from every node that is still unvisited."
+    ],
+    "pitfalls": [
+      "Forgetting `recStack[node] = false` on the way out turns it into a duplicate `visited` and reports a false cycle on any diamond-shaped DAG (e.g. 1->2, 1->3, 2->4, 3->4).",
+      "Only DFS-ing from node 1 misses cycles that live in another component.",
+      "Nodes are 1-based: size `visited` and `recStack` as `A + 1` and give the adjacency list `A + 1` slots, else `adj.get(A)` throws.",
+      "Multiple test cases run in the same process — keeping `visited`/`recStack`/`adj` as static or instance state without clearing carries the previous graph over.",
+      "Recursive DFS goes `A` frames deep; on a 10^5-node path graph that overflows the default JVM stack. Convert to an explicit stack, or use Kahn's indegree BFS, if the judge runs with the default stack size."
+    ],
+    "solutions": [
+      {
+        "label": "Optimal — DFS with visited + recStack",
+        "complexity": {
+          "time": "O(V + E) — every node and edge touched once",
+          "space": "O(V + E) — adjacency list, plus O(V) for visited/recStack and O(V) call stack"
+        },
+        "plain": "Convert the edge matrix into an adjacency list once. Then DFS each unvisited node, flipping `recStack[node]` on when you enter and off when you leave. Any neighbour found with `recStack[neighbour] == true` closes a loop onto the live path, which is the cycle. Unvisited neighbours recurse; visited-but-not-on-stack neighbours are ignored because they belong to an already-finished subtree.",
+        "approach": [
+          "Build `adj` with `A + 1` lists and push `v` into `adj[u]` for each edge `(u, v)` — one direction only.",
+          "Allocate `visited[A + 1]` and `recStack[A + 1]`.",
+          "For `i` in `1..A`, if `!visited[i]`, call the DFS; return 1 the moment it returns true.",
+          "In the DFS, set `visited[node]` and `recStack[node]` to true.",
+          "For each neighbour: if unvisited, recurse and bubble up true on success; else if `recStack[neighbour]`, return true.",
+          "Before returning false, set `recStack[node] = false`.",
+          "If no DFS reported a cycle, return 0."
+        ],
+        "pseudocode": "adj = buildDirectedAdjList(A, B)\nvisited[1..A] = false; recStack[1..A] = false\n\nfor i in 1..A:\n    if not visited[i] and dfs(i) → return 1\nreturn 0\n\ndfs(node):\n    visited[node] = true\n    recStack[node] = true\n    for nb in adj[node]:\n        if not visited[nb]:\n            if dfs(nb) → return true\n        else if recStack[nb] → return true   // back edge\n    recStack[node] = false\n    return false",
+        "story": "Track not just where you have been, but where you currently are standing.",
+        "code": "public int cycleInDirectedGraph(int A, int[][] B) {\n    List<List<Integer>> adj = buildAdjacencyListForDirectedGraph(A, B);\n\n    // nodes are 1-based, so size everything A + 1\n    boolean[] visited = new boolean[A + 1];\n    boolean[] recStack = new boolean[A + 1];\n\n    for (int i = 1; i <= A; i++) {\n        if (!visited[i]) {\n            if (dfsForCycleDetection(i, adj, visited, recStack)) {\n                return 1;\n            }\n        }\n    }\n    return 0;\n}\n\nprivate boolean dfsForCycleDetection(int node, List<List<Integer>> adj, boolean[] visited, boolean[] recStack) {\n    visited[node] = true;\n    recStack[node] = true;\n\n    for (int neighbour : adj.get(node)) {\n        if (!visited[neighbour]) {\n            if (dfsForCycleDetection(neighbour, adj, visited, recStack)) {\n                return true;\n            }\n        } else if (recStack[neighbour]) {\n            return true; // back edge onto a node still on the current DFS path\n        }\n    }\n\n    recStack[node] = false; // leaving the path, unmark\n    return false;\n}\n\nprivate List<List<Integer>> buildAdjacencyListForDirectedGraph(int numberOfNodes, int[][] connections) {\n    List<List<Integer>> adj = new ArrayList<>();\n\n    for (int i = 0; i <= numberOfNodes; i++) {\n        adj.add(new ArrayList<>());\n    }\n\n    for (int i = 0; i < connections.length; i++) {\n        int u = connections[i][0]; // source\n        int v = connections[i][1]; // dest\n        adj.get(u).add(v);\n    }\n    return adj;\n}"
+      }
+    ]
+  },
+  {
+    "num": 283,
+    "id": "s4-graphs-path-in-directed-graph",
+    "title": "Path in Directed Graph",
+    "subTopic": "DFS reachability from node 1 to node A",
+    "tags": [
+      "Graphs",
+      "DFS",
+      "Directed Graph",
+      "Reachability"
+    ],
+    "description": "Given an directed graph having A nodes labelled from 1 to A containing M edges given by matrix B of size M x 2 such that there is a edge directed from node\nB[i][0] to node B[i][1].\nFind whether a path exists from node 1 to node A.\nReturn 1 if path exists else return 0.\nNOTE:\n\n- There are no self-loops in the graph.\n- There are no multiple edges between two nodes.\n- The graph may or may not be connected.\n- Nodes are numbered from 1 to A.\n- Your solution will run on multiple test cases. If you are using global variables make sure to clear them.\n\nProblem Constraints\n2 <= A <= 10^5\n1 <= M <= min(200000,A*(A-1))\n1 <= B[i][0], B[i][1] <= A\n\nInput Format\nThe first argument given is an integer A representing the number of nodes in the graph.\nThe second argument given a matrix B of size M x 2 which represents the M edges such that there is a edge directed from node B[i][0] to node B[i][1].\n\nOutput Format\nReturn 1 if path exists between node 1 to node A else return 0.\n\nExample Input\nInput 1:\nA = 5\nB = [  [1, 2]\n       [4, 1]\n       [2, 4]\n       [3, 4]\n       [5, 2]\n       [1, 3] ]\nInput 2:\nA = 5\nB = [  [1, 2]\n       [2, 3]\n       [3, 4]\n       [4, 5] ]\n\nExample Output\nOutput 1:\n0\nOutput 2:\n1",
+    "sampleInput": "A = 5\nB = [[1, 2], [4, 1], [2, 4], [3, 4], [5, 2], [1, 3]]",
+    "sampleOutput": "0",
+    "story": "Reachability from 1 to A is one DFS that follows edges forward only.",
+    "plain": "Build the directed adjacency list from B, adding only `u -> v`. Start DFS at node 1 with a `visited` array. At each node, if it equals A you are done, return 1. Otherwise recurse into every unvisited neighbour and propagate a 1 upward the instant any branch succeeds. If the traversal exhausts without reaching A, node A is unreachable, so return 0.",
+    "howToThink": [
+      "Plain DFS reachability: is `A` in the set of nodes reachable from `1` in the directed graph?",
+      "Edges are one-way — push only `v` into `adj[u]`. Adding the reverse edge invents paths that do not exist.",
+      "Inside the neighbour loop, do not `return dfs(neighbour)` directly; use `if (dfs(neighbour) == 1) { return 1; }` so a dead-end branch does not abort the remaining neighbours.",
+      "`visited` bounds the work to one touch per node and per edge, so it is O(V + E) even on a dense graph; BFS with a queue is interchangeable here."
+    ],
+    "pitfalls": [
+      "`return dfsForPath(neighbour, ...)` inside the loop kills the search after the first branch — only return early on success.",
+      "Marking `visited[node]` after the recursive call (or not at all) makes any cycle in the graph loop forever and blow the stack.",
+      "`A` is both the node count and the target node — do not treat it as an array length.",
+      "1-based nodes: `new boolean[A + 1]` and an adjacency list with `A + 1` slots, otherwise `adj.get(A)` is out of bounds.",
+      "Recursive DFS recurses once per node — at `A = 10^5` in a path-shaped graph it overflows the default JVM stack. An explicit `Deque` stack is the drop-in fix."
+    ],
+    "solutions": [
+      {
+        "label": "Optimal — DFS from node 1 targeting node A",
+        "complexity": {
+          "time": "O(V + E) — each node and edge visited once",
+          "space": "O(V + E) — adjacency list, plus O(V) visited and O(V) call stack"
+        },
+        "plain": "Build `adj` once from the edge matrix in the forward direction. Fire a single DFS at node 1. The base case is `node == targetNode`, which short-circuits to 1. Every unvisited neighbour is recursed into, and a 1 from any of them is passed straight up. Falling out of the loop means this subtree cannot reach A, so return 0.",
+        "approach": [
+          "Build `adj` with `A + 1` lists; for each edge push `v` into `adj[u]`.",
+          "Allocate `visited[A + 1]`, set `sourceNode = 1`.",
+          "DFS(node, target): if `node == target`, return 1.",
+          "Mark `visited[node] = true`.",
+          "Loop over neighbours; for each unvisited one, recurse and return 1 if it returns 1.",
+          "Return 0 when the loop finishes; the outer call's return value is the answer."
+        ],
+        "pseudocode": "adj = buildDirectedAdjList(A, B)\nvisited[1..A] = false\nreturn dfs(1, A)\n\ndfs(node, target):\n    if node == target → return 1\n    visited[node] = true\n    for nb in adj[node]:\n        if not visited[nb] and dfs(nb, target) == 1 → return 1\n    return 0",
+        "story": "One traversal from the source; the answer is just whether the target was touched.",
+        "code": "public int pathInADirectedGraph(int A, int[][] B) {\n    List<List<Integer>> adj = buildAdjacencyListForDirectedGraph(A, B);\n    boolean[] visited = new boolean[A + 1];\n\n    int sourceNode = 1;\n\n    return dfsForPathInADirectedGraph(sourceNode, A, adj, visited);\n}\n\nprivate int dfsForPathInADirectedGraph(int node, int targetNode, List<List<Integer>> adj, boolean[] visited) {\n    if (node == targetNode) {\n        return 1;\n    }\n    visited[node] = true;\n\n    for (int neighbour : adj.get(node)) {\n        if (!visited[neighbour]) {\n            // do not return directly, other neighbours still need a chance\n            if (dfsForPathInADirectedGraph(neighbour, targetNode, adj, visited) == 1) {\n                return 1;\n            }\n        }\n    }\n    return 0;\n}\n\nprivate List<List<Integer>> buildAdjacencyListForDirectedGraph(int numberOfNodes, int[][] connections) {\n    List<List<Integer>> adj = new ArrayList<>();\n\n    for (int i = 0; i <= numberOfNodes; i++) {\n        adj.add(new ArrayList<>());\n    }\n\n    for (int i = 0; i < connections.length; i++) {\n        int u = connections[i][0]; // source\n        int v = connections[i][1]; // dest\n        adj.get(u).add(v);\n    }\n    return adj;\n}"
+      }
+    ]
+  },
+  {
+    "num": 284,
+    "id": "s4-graphs-first-depth-first-search",
+    "title": "First Depth First Search",
+    "subTopic": "DFS reachability on an array-encoded directed tree",
+    "tags": [
+      "Graphs",
+      "DFS",
+      "Trees",
+      "Reachability"
+    ],
+    "description": "You are given N towns (1 to N). All towns are connected via unique directed path as mentioned in the input.\nGiven 2 towns find whether you can reach the first town from the second without repeating any edge.\nB C : query to find whether B is reachable from C.\nInput contains an integer array A of size N and 2 integers B and C ( 1 <= B, C <= N ).\nThere exist a directed edge from A[i] to i+1 for every 1 <= i < N. Also, it's guaranteed that A[i] <= i for every 1 <= i < N.\nNOTE: Array A is 0-indexed. A[0] = 1 which you can ignore as it doesn't represent any edge.\n\nProblem Constraints\n1 <= N <= 100000\n\nInput Format\nFirst argument is vector A\nSecond argument is integer B\nThird argument is integer C\n\nOutput Format\nReturn 1 if reachable, 0 otherwise.\n\nExample Input\nInput 1:\nA = [1, 1, 2]\nB = 1\nC = 2\nInput 2:\nA = [1, 1, 2]\nB = 2\nC = 1\n\nExample Output\nOutput 1:\n0\nOutput 2:\n1\n\nExample Explanation\nExplanation 1:\nTree is 1--> 2--> 3 and hence 1 is not reachable from 2.\nExplanation 2:\nTree is 1--> 2--> 3 and hence 2 is reachable from 1.",
+    "sampleInput": "A = [1, 1, 2]\nB = 1\nC = 2",
+    "sampleOutput": "0",
+    "story": "The array is an edge list in disguise: A[i] is the parent of i+1, so the query is a single DFS from C looking for B.",
+    "plain": "The array encodes a rooted tree: for every `i` in `1..N-1` there is a directed edge from `A[i]` to `i + 1`, and `A[0]` is padding you skip. Build the adjacency list with those edges in that direction only. The query asks whether B is reachable from C, so start DFS at C with B as the destination. Return 1 the moment the destination is hit, and 0 if the traversal runs out of nodes.",
+    "howToThink": [
+      "DFS reachability on a directed tree — source `C`, target `B`, nothing more.",
+      "Decode the input first: edge `A[i] -> i + 1` for `1 <= i < N`, with `A[0]` a dummy. Everything else follows once the adjacency list is right.",
+      "Direction matters and the wording inverts it: 'B is reachable from C' means the DFS starts at `C`.",
+      "`A[i] <= i` guarantees every edge points to a strictly larger label, so the structure is acyclic — keep `visited` anyway, it is free and protects against malformed input."
+    ],
+    "pitfalls": [
+      "Swapping source and destination — it is `dfs(C, ..., B)`, not `dfs(B, ..., C)`; the two sample cases differ only by that swap.",
+      "Adding the reverse edge `v -> u` makes the tree undirected and every query returns 1.",
+      "Putting an `else { return false; }` on the visited branch aborts the search at the first already-seen neighbour instead of just skipping it.",
+      "The `node == destination` check must run before marking visited and recursing, otherwise the source-equals-destination case is missed.",
+      "`A` is 0-indexed but towns are 1-based: size `visited` as `A.length + 1` and start the edge loop at `i = 1`.",
+      "Recursive DFS recurses once per node, so a 10^5-node chain overflows the default JVM stack. Swap in an explicit stack if depth is a concern."
+    ],
+    "solutions": [
+      {
+        "label": "Optimal — build adjacency from A[i] -> i+1, then DFS",
+        "complexity": {
+          "time": "O(N) — N-1 edges, each node touched once",
+          "space": "O(N) — adjacency list and visited, plus O(N) call stack on a path-shaped tree"
+        },
+        "plain": "Create `N + 1` empty lists and, for each `i` from 1 to `N-1`, push `i + 1` into the list of `A[i]`. Then DFS from C. The base case returns true when the current node equals B. Unvisited neighbours recurse and true propagates straight up. Anything else returns false. Convert the boolean to 1/0 at the top.",
+        "approach": [
+          "Allocate `adj` with `A.length + 1` empty lists.",
+          "For `i` in `1..A.length-1`: `u = A[i]`, `v = i + 1`, push `v` into `adj[u]` (forward only).",
+          "Allocate `visited[A.length + 1]`.",
+          "Call `dfs(C, adj, visited, B)`.",
+          "In the DFS: return true if `node == destination`; mark visited; recurse into unvisited neighbours and return true on any success; return false otherwise.",
+          "Map true to 1 and false to 0."
+        ],
+        "pseudocode": "adj[0..N] = empty lists\nfor i in 1..N-1:\n    adj[A[i]].add(i + 1)      // A[0] skipped, it is padding\n\nreturn dfs(C, B) ? 1 : 0\n\ndfs(node, dest):\n    if node == dest → return true\n    visited[node] = true\n    for nb in adj[node]:\n        if not visited[nb] and dfs(nb, dest) → return true\n    return false",
+        "story": "Decode the array into edges, then it is the plainest reachability DFS there is.",
+        "code": "public int firstDepthFirstSearch(int[] A, final int B, final int C) {\n    List<List<Integer>> adj = buildAdjacencyListTownsProblem(A);\n    boolean[] visited = new boolean[A.length + 1];\n\n    // query is \"is B reachable from C\", so C is the source\n    return dfsTownsProblem(C, adj, visited, B) ? 1 : 0;\n}\n\nprivate boolean dfsTownsProblem(int node, List<List<Integer>> adj, boolean[] visited, int destination) {\n    if (node == destination) {\n        return true;\n    }\n    visited[node] = true;\n\n    for (int neighbour : adj.get(node)) {\n        if (!visited[neighbour]) {\n            if (dfsTownsProblem(neighbour, adj, visited, destination)) {\n                return true;\n            }\n        }\n    }\n    return false;\n}\n\nprivate List<List<Integer>> buildAdjacencyListTownsProblem(int[] A) {\n    List<List<Integer>> adj = new ArrayList<>();\n\n    for (int i = 0; i <= A.length; i++) {\n        adj.add(new ArrayList<>());\n    }\n\n    // A[0] is padding; edge A[i] -> i + 1, one direction only\n    for (int i = 1; i < A.length; i++) {\n        int u = A[i];\n        int v = i + 1;\n        adj.get(u).add(v);\n    }\n    return adj;\n}"
+      }
+    ]
+  },
+  {
+    "num": 285,
+    "id": "s4-graphs-maximum-depth",
+    "title": "Maximum Depth",
+    "subTopic": "DFS level bucketing + per-query search",
+    "tags": [
+      "Graphs",
+      "DFS",
+      "Trees",
+      "Binary Search",
+      "Queries"
+    ],
+    "description": "Given a Tree of A nodes having A-1 edges. Each node is numbered from 1 to A where 1 is the root of the tree.\nYou are given Q queries. In each query, you will be given two integers L and X. Find the value of such node which lies at level L mod (MaxDepth + 1) and has value greater than or equal to X.\nAnswer to the query is the smallest possible value or -1, if all the values at the required level are smaller than X.\nNOTE:\n\n- Level and Depth of the root is considered as 0.\n- It is guaranteed that each edge will be connecting exactly two different nodes of the tree.\n- Please read the input format for more clarification.\n\nProblem Constraints\n2 <= A, Q(size of array E and F) <= 10^5\n1 <= B[i], C[i] <= A\n1 <= D[i], E[i], F[i] <= 10^6\n\nInput Format\nThe first argument is an integer A denoting the number of nodes.\nThe second and third arguments are the integer arrays B and C where for each i (0 <= i < A-1), B[i] and C[i] are the nodes connected by an edge.\nThe fourth argument is an integer array D, where D[i] denotes the value of the (i+1)th node\nThe fifth and sixth arguments are the integer arrays E and F where for each i (0 <= i < Q), E[i] denotes L and F[i] denotes X for i-th query.\n\nOutput Format\nReturn an array of integers where the i-th element denotes the answer to i-th query.\n\nExample Input\nInput 1:\nA = 5\nB = [1, 4, 3, 1]\nC = [5, 2, 4, 4]\nD = [7, 38, 27, 37, 1]\nE = [1, 1, 2]\nF = [32, 18, 26]\nInput 2:\nA = 3\nB = [1, 2]\nC = [3, 1]\nD = [7, 15, 27]\nE = [1, 10, 1]\nF = [29, 6, 26]\n\nExample Output\nOutput 1:\n[37, 37, 27]\nOutput 2:\n[-1, 7, 27]",
+    "sampleInput": "A = 5\nB = [1, 4, 3, 1]\nC = [5, 2, 4, 4]\nD = [7, 38, 27, 37, 1]\nE = [1, 1, 2]\nF = [32, 18, 26]",
+    "sampleOutput": "[37, 37, 27]",
+    "story": "One DFS groups every node by its level; each query then reduces to 'smallest value >= X' inside one bucket.",
+    "plain": "Build an undirected adjacency map of the tree from the edge arrays B and C, then DFS from node 1 carrying the current level. Push each node into a bucket keyed by its level and track the deepest level reached as `maxLevel`. For a query `(L, X)` the target level is `L % (maxLevel + 1)`. Inside that bucket you want the smallest value `D[node - 1]` that is `>= X`, and `-1` when no value qualifies. Sorting every bucket once upfront turns that per-query scan into a binary search for the first value `>= X`.",
+    "howToThink": [
+      "DFS once to bucket nodes by level, then answer each query inside its single bucket — group first, query second.",
+      "The tree arrives as an edge list, so add both `u -> v` and `v -> u`, and root it by starting DFS at node 1 with `level = 0`; `visited` is the only thing stopping you from walking back into the parent.",
+      "`maxLevel` must be finalised before any query is answered, because the query level is `E[i] % (maxLevel + 1)`.",
+      "Per query you need the smallest value `>= X` at that level — sort each bucket once (`O(A log A)` total) and lower-bound it, instead of re-scanning the bucket `Q` times.",
+      "`D` is 0-indexed while nodes are 1-indexed, so a node's value is always `D[node - 1]`."
+    ],
+    "pitfalls": [
+      "`D[node]` instead of `D[node - 1]` — silently off by one on every single answer.",
+      "Keeping `maxLevel` as a class field and not resetting it: the previous test case's depth leaks into `E[i] % (maxLevel + 1)` and every query lands on the wrong level.",
+      "Sentinel choice: start `res` at `Integer.MAX_VALUE` and convert to `-1` at the end. Starting at `-1` and using `Math.max` answers the largest qualifying value, but the problem asks for the smallest.",
+      "Building the adjacency in one direction only breaks the traversal — the edge list is unordered, so `B[i]` is not guaranteed to be the parent.",
+      "Depth can reach 10^5 on a path-shaped tree, so recursive DFS can overflow the default stack; switch to an explicit stack if it does.",
+      "`levelValues.keySet()` is a `HashMap` key set and is not sorted — scan it for the max rather than assuming the last key is the deepest level.",
+      "The DFS that assigns levels recurses once per node and overflows the default JVM stack on a 10^5-node chain; a BFS level assignment avoids the call stack entirely."
+    ],
+    "solutions": [
+      {
+        "label": "DFS level buckets + linear scan per query",
+        "complexity": {
+          "time": "O(A + Q * K) — K is the size of the queried level, O(A) in the worst case (a star-shaped tree)",
+          "space": "O(A) — adjacency map and level buckets, plus O(A) call stack"
+        },
+        "plain": "One DFS from node 1 fills `levelList[level]` with the node ids at that level and updates `maxLevel`. Each query computes its level by the modulo, then walks that bucket keeping the minimum `D[node - 1]` that clears the threshold `F[i]`. An untouched `Integer.MAX_VALUE` sentinel means nothing qualified, which becomes `-1`. This is the submitted version and it passes, but it degrades when one level holds most of the tree.",
+        "approach": [
+          "Build `adj` as a map, adding both directions for each edge `(B[i], C[i])`.",
+          "Reset `maxLevel = 0`, allocate `visited[A + 1]` and an empty `levelList` map.",
+          "DFS from node 1 at level 0: mark visited, append the node to `levelList[level]`, and for each unvisited neighbour update `maxLevel` and recurse at `level + 1`.",
+          "For each query `i`: `level = E[i] % (maxLevel + 1)`, `threshold = F[i]`, `res = Integer.MAX_VALUE`.",
+          "Scan `levelList[level]`; whenever `D[node - 1] >= threshold`, take `res = min(res, D[node - 1])`.",
+          "Write `res == Integer.MAX_VALUE ? -1 : res` into the result array."
+        ],
+        "pseudocode": "adj = undirected adjacency from (B, C)\nmaxLevel = 0\ndfs(1, level = 0):\n    visited[node] = true\n    levelList[level].add(node)\n    for nb in adj[node]:\n        if not visited[nb]:\n            maxLevel = max(maxLevel, level + 1)\n            dfs(nb, level + 1)\n\nfor each query i:\n    level = E[i] % (maxLevel + 1)\n    res = +INF\n    for node in levelList[level]:\n        if D[node - 1] >= F[i] → res = min(res, D[node - 1])\n    ans[i] = (res == +INF) ? -1 : res",
+        "story": "Bucket by level once, then every query is a single-bucket minimum above a threshold.",
+        "code": "private int maxLevel = 0;\n\npublic int[] maximumDepthQueries(int A, int[] B, int[] C, int[] D, int[] E, int[] F) {\n    maxLevel = 0; // multiple test cases share the object, always reset\n    Map<Integer, List<Integer>> adj = buildAdjacencyMapMaxDepth(A, B, C);\n    boolean[] visited = new boolean[A + 1];\n    Map<Integer, List<Integer>> levelList = new HashMap<>();\n\n    dfsCollectLevels(1, adj, visited, 0, levelList);\n\n    int[] result = new int[E.length];\n    for (int i = 0; i < E.length; i++) {\n        int res = Integer.MAX_VALUE;\n        int level = E[i] % (maxLevel + 1);\n        int threshold = F[i];\n\n        for (int node : levelList.get(level)) {\n            if (D[node - 1] >= threshold) { // node is 1-based, D is 0-based\n                res = Math.min(res, D[node - 1]);\n            }\n        }\n        result[i] = res != Integer.MAX_VALUE ? res : -1;\n    }\n    return result;\n}\n\nprivate void dfsCollectLevels(int node, Map<Integer, List<Integer>> adj, boolean[] visited, int level, Map<Integer, List<Integer>> levelList) {\n    visited[node] = true;\n    levelList.computeIfAbsent(level, k -> new ArrayList<>()).add(node);\n\n    for (int neighbour : adj.get(node)) {\n        if (!visited[neighbour]) {\n            int newLev = level + 1;\n            maxLevel = Math.max(maxLevel, newLev);\n            dfsCollectLevels(neighbour, adj, visited, newLev, levelList);\n        }\n    }\n}\n\nprivate Map<Integer, List<Integer>> buildAdjacencyMapMaxDepth(int A, int[] B, int[] C) {\n    Map<Integer, List<Integer>> adj = new HashMap<>();\n\n    for (int i = 0; i < A - 1; i++) {\n        int u = B[i];\n        int v = C[i];\n        adj.computeIfAbsent(u, k -> new ArrayList<>()).add(v);\n        adj.computeIfAbsent(v, k -> new ArrayList<>()).add(u); // tree edges are undirected\n    }\n    return adj;\n}"
+      },
+      {
+        "label": "Optimal — sorted level buckets + binary search per query",
+        "complexity": {
+          "time": "O(A log A + Q log A) — sorting all buckets totals A log A, each query is one lower-bound",
+          "space": "O(A) — adjacency map and level buckets, plus O(A) call stack"
+        },
+        "plain": "Same DFS, but store the node values `D[node - 1]` directly in each level bucket instead of node ids, then sort every bucket once. The sum of all bucket sizes is A, so total sorting is O(A log A). A query is now a lower-bound binary search: find the leftmost value `>= X` in the bucket for level `L % (maxLevel + 1)`, and return `-1` if the search never landed on one. `maxLevel` is recovered by scanning the map's keys, so no mutable field survives between test cases.",
+        "approach": [
+          "Build the undirected adjacency map from `(B, C)`.",
+          "DFS from node 1 at level 0, appending `D[node - 1]` into `levelValues[level]`.",
+          "Compute `maxLevel` as the largest key of `levelValues` (scan the key set, it is unordered).",
+          "Sort each bucket in `levelValues` ascending.",
+          "For each query: `level = E[i] % (maxLevel + 1)`.",
+          "Binary search the sorted bucket for the leftmost value `>= F[i]`: on a hit record it and move `high = mid - 1`, else `low = mid + 1`.",
+          "Return the recorded value, or `-1` if no element ever qualified."
+        ],
+        "pseudocode": "dfs(1, level = 0): levelValues[level].add(D[node - 1])\nmaxLevel = max key in levelValues\nsort every list in levelValues\n\nfor each query i:\n    bucket = levelValues[E[i] % (maxLevel + 1)]\n    low = 0, high = bucket.size - 1, ans = -1\n    while low <= high:\n        mid = low + (high - low) / 2\n        if bucket[mid] >= F[i] → ans = bucket[mid]; high = mid - 1\n        else                   → low = mid + 1\n    result[i] = ans",
+        "story": "Sort each level once so every query costs a logarithm instead of a level sweep.",
+        "code": "public int[] maximumDepthQueriesBinarySearch(int A, int[] B, int[] C, int[] D, int[] E, int[] F) {\n    Map<Integer, List<Integer>> adj = buildAdjacencyMapMaxDepth(A, B, C);\n    boolean[] visited = new boolean[A + 1];\n    Map<Integer, List<Integer>> levelValues = new HashMap<>();\n\n    dfsCollectValues(1, adj, visited, 0, D, levelValues);\n\n    int maxLevel = 0;\n    for (int level : levelValues.keySet()) {\n        maxLevel = Math.max(maxLevel, level); // keySet order is not sorted, so scan it\n    }\n\n    for (List<Integer> values : levelValues.values()) {\n        Collections.sort(values);\n    }\n\n    int[] result = new int[E.length];\n    for (int i = 0; i < E.length; i++) {\n        int level = E[i] % (maxLevel + 1);\n        result[i] = smallestAtLeast(levelValues.get(level), F[i]);\n    }\n    return result;\n}\n\nprivate void dfsCollectValues(int node, Map<Integer, List<Integer>> adj, boolean[] visited, int level, int[] D, Map<Integer, List<Integer>> levelValues) {\n    visited[node] = true;\n    levelValues.computeIfAbsent(level, k -> new ArrayList<>()).add(D[node - 1]);\n\n    for (int neighbour : adj.get(node)) {\n        if (!visited[neighbour]) {\n            dfsCollectValues(neighbour, adj, visited, level + 1, D, levelValues);\n        }\n    }\n}\n\nprivate int smallestAtLeast(List<Integer> sorted, int target) {\n    int low = 0;\n    int high = sorted.size() - 1;\n    int ans = -1;\n\n    while (low <= high) {\n        int mid = low + (high - low) / 2;\n        if (sorted.get(mid) >= target) {\n            ans = sorted.get(mid);\n            high = mid - 1;\n        } else {\n            low = mid + 1;\n        }\n    }\n    return ans;\n}\n\nprivate Map<Integer, List<Integer>> buildAdjacencyMapMaxDepth(int A, int[] B, int[] C) {\n    Map<Integer, List<Integer>> adj = new HashMap<>();\n\n    for (int i = 0; i < A - 1; i++) {\n        int u = B[i];\n        int v = C[i];\n        adj.computeIfAbsent(u, k -> new ArrayList<>()).add(v);\n        adj.computeIfAbsent(v, k -> new ArrayList<>()).add(u);\n    }\n    return adj;\n}"
+      }
+    ]
+  },
+  {
+    "num": 286,
+    "id": "s4-graphs-commutable-islands",
+    "title": "Commutable Islands",
+    "subTopic": "Prim's MST with a lazy min-heap",
+    "tags": [
+      "Graphs",
+      "MST",
+      "Prim's",
+      "Priority Queue",
+      "Greedy"
+    ],
+    "description": "Problem Description\n\nThere are A islands and there are M bridges connecting them. Each bridge has some cost attached to it.\nWe need to find bridges with minimal cost such that all islands are connected.\nIt is guaranteed that input data will contain at least one possible scenario in which all islands are connected with each other.\n\nProblem Constraints\n1 <= A, M <= 6*10^4\n1 <= B[i][0], B[i][1] <= A\n1 <= B[i][2] <= 10^3\n\nInput Format\nThe first argument contains an integer, A, representing the number of islands.\nThe second argument contains an 2-d integer matrix, B, of size M x 3 where Island B[i][0] and B[i][1] are connected using a bridge of cost B[i][2].\n\nOutput Format\nReturn an integer representing the minimal cost required.\n\nExample Input\nInput 1:\nA = 4\nB = [   [1, 2, 1]\n        [2, 3, 4]\n        [1, 4, 3]\n        [4, 3, 2]\n        [1, 3, 10]  ]\nInput 2:\nA = 4\nB = [   [1, 2, 1]\n        [2, 3, 2]\n        [3, 4, 4]\n        [1, 4, 3]   ]\n\nExample Output\nOutput 1:\n6\nOutput 2:\n6\n\nExample Explanation\nExplanation 1:\nWe can choose bridges (1, 2, 1), (1, 4, 3) and (4, 3, 2), where the total cost incurred will be (1 + 3 + 2) = 6.\nExplanation 2:\nWe can choose bridges (1, 2, 1), (2, 3, 2) and (1, 4, 3), where the total cost incurred will be (1 + 2 + 3) = 6.",
+    "sampleInput": "A = 4, B = [[1, 2, 1], [2, 3, 4], [1, 4, 3], [4, 3, 2], [1, 3, 10]]",
+    "sampleOutput": "6",
+    "story": "Grow one connected blob from island 1, always swallowing the cheapest bridge that leaves it.",
+    "plain": "Build an undirected adjacency list of (neighbour, cost) pairs. Push a zero-cost entry for node 1 into a min-heap ordered by cost. Repeatedly pop the cheapest entry; if that node is already visited, discard it and continue, otherwise mark it visited, add its cost to the running total, and push every unvisited neighbour edge. Because a node can be pushed many times with different costs, the visited check has to happen on pop, not on push. When the heap drains, the number of nodes you actually visited tells you whether the graph was connected.",
+    "howToThink": [
+      "Prim's MST with a lazy min-heap: pop the cheapest frontier edge, skip if its endpoint is already in the tree.",
+      "\"Connect everything at minimum total edge weight\" with no start constraint = MST, not shortest path. Never relax distances, just take edge costs.",
+      "Key difference from Dijkstra: push `neighbour.cost` (the raw edge weight), not `cost + neighbour.cost`. Dijkstra accumulates, Prim's does not.",
+      "Lazy variant means the heap can hold up to `E` entries, so `visited[node]` is the gate — check it the instant you poll.",
+      "Track `islandVisitedSoFar`; if it ends below `A` the graph was disconnected, so return -1."
+    ],
+    "pitfalls": [
+      "Pushing `cost + neighbour.cost` turns Prim's into Dijkstra and gives the wrong total — push the raw edge weight only.",
+      "Marking `visited[node] = true` at push time instead of pop time can lock in a more expensive edge to that node.",
+      "Reusing the neighbour object from the adjacency list instead of `new Bridge(neighbour.end, neighbour.cost)` — mutating it later corrupts the adjacency list.",
+      "`adjacencyList.get(node)` returns null for an isolated island; use `getOrDefault(node, new ArrayList<>())`."
+    ],
+    "solutions": [
+      {
+        "label": "Optimal — Prim's with lazy min-heap",
+        "complexity": {
+          "time": "O(E log V)",
+          "space": "O(V + E) — adjacency list plus up to E heap entries"
+        },
+        "plain": "Convert the edge list into an undirected adjacency map of Bridge(end, cost). Seed the heap with Bridge(1, 0) so island 1 joins for free. Each pop that lands on a fresh island commits that edge's cost and expands the frontier with all its unvisited neighbours. Already-visited pops are stale duplicates and are skipped in O(1). Compare the visit count against A at the end to detect disconnection.",
+        "approach": [
+          "Build `adjacencyList`: for every `[s, d, c]` add `Bridge(d, c)` under `s` and `Bridge(s, c)` under `d`.",
+          "Create a `PriorityQueue<Bridge>` ordered by `cost`; add `new Bridge(1, 0)`.",
+          "Allocate `boolean[] visited` of size `islands + 1`.",
+          "Poll the heap: if `visited[node]`, continue.",
+          "Otherwise set `visited[node] = true`, increment `islandVisitedSoFar`, add `cost` to `totalCost`.",
+          "Push a fresh `Bridge` for every unvisited neighbour of `node`.",
+          "Return `totalCost` when `islandVisitedSoFar == islands`, else -1."
+        ],
+        "pseudocode": "adj = undirected adjacency list of (end, cost)\nheap = min-heap by cost, seeded with (1, 0)\nvisited = boolean[A + 1]; total = 0; seen = 0\n\nwhile heap not empty:\n    (node, cost) = heap.poll()\n    visited[node] ? -> continue\n    visited[node] = true\n    seen++, total += cost\n    for (nb, w) in adj[node]:\n        !visited[nb] -> heap.push((nb, w))\n\nreturn seen == A ? total : -1",
+        "story": "The heap always holds the cheapest way out of the current blob; take it, absorb the node, repeat.",
+        "code": "public int commutableIslandsMinimumCost(int islands, int[][] bridges) {\n    HashMap<Integer, ArrayList<Bridge>> adjacencyList = buildAdj(bridges);\n    PriorityQueue<Bridge> minHeap = new PriorityQueue<>(Comparator.comparingInt(x -> x.cost));\n    minHeap.add(new Bridge(1, 0));\n    boolean[] visited = new boolean[islands + 1];\n    int totalCost = 0;\n    int islandVisitedSoFar = 0;\n\n    while (!minHeap.isEmpty()) {\n        Bridge current = minHeap.poll();\n        int node = current.end;\n        int cost = current.cost;\n        if (visited[node]) {\n            continue; // stale duplicate — a node can sit in the heap many times\n        }\n        visited[node] = true; // mark on POP, not on push\n        islandVisitedSoFar++;\n        totalCost += cost;\n        for (Bridge neighbour : adjacencyList.getOrDefault(node, new ArrayList<>())) {\n            if (!visited[neighbour.end]) {\n                minHeap.add(new Bridge(neighbour.end, neighbour.cost)); // fresh object, raw edge weight\n            }\n        }\n    }\n    return islandVisitedSoFar == islands ? totalCost : -1;\n}\n\nprivate HashMap<Integer, ArrayList<Bridge>> buildAdj(int[][] bridges) {\n    HashMap<Integer, ArrayList<Bridge>> map = new HashMap<>();\n    for (int[] bridge : bridges) {\n        int source = bridge[0];\n        int dest = bridge[1];\n        int cost = bridge[2];\n        map.computeIfAbsent(source, k -> new ArrayList<>()).add(new Bridge(dest, cost));\n        map.computeIfAbsent(dest, k -> new ArrayList<>()).add(new Bridge(source, cost));\n    }\n    return map;\n}\n\nprivate static class Bridge {\n    int end, cost;\n\n    Bridge(int end, int cost) {\n        this.end = end;\n        this.cost = cost;\n    }\n}"
+      }
+    ]
+  },
+  {
+    "num": 287,
+    "id": "s4-graphs-rotten-oranges",
+    "title": "Rotten Oranges",
+    "subTopic": "Multi-source BFS on a grid, level = minute",
+    "tags": [
+      "Graphs",
+      "BFS",
+      "Matrix",
+      "Multi-source"
+    ],
+    "description": "Problem Description\n\nGiven a matrix of integers A of size N x M consisting of 0, 1 or 2.\nEach cell can have three values:\nThe value 0 representing an empty cell.\nThe value 1 representing a fresh orange.\nThe value 2 representing a rotten orange.\nEvery minute, any fresh orange that is adjacent (Left, Right, Top, or Bottom) to a rotten orange becomes rotten. Return the minimum number of minutes that must elapse until no cell has a fresh orange. If this is impossible, return -1 instead.\nNote: Your solution will run on multiple test cases. If you are using global variables, make sure to clear them.\n\nProblem Constraints\n1 <= N, M <= 1000\n0 <= A[i][j] <= 2\n\nInput Format\nThe first argument given is the integer matrix A.\n\nOutput Format\nReturn the minimum number of minutes that must elapse until no cell has a fresh orange.\nIf this is impossible, return -1 instead.\n\nExample Input\nInput 1:\nA = [   [2, 1, 1]\n        [1, 1, 0]\n        [0, 1, 1]   ]\nInput 2:\nA = [   [2, 1, 1]\n        [0, 1, 1]\n        [1, 0, 1]   ]\n\nExample Output\nOutput 1:\n4\nOutput 2:\n-1\n\nExample Explanation\nExplanation 1:\nMinute 0: [ [2, 1, 1]\n            [1, 1, 0]\n            [0, 1, 1] ]\nMinute 1: [ [2, 2, 1]\n            [2, 1, 0]\n            [0, 1, 1] ]\nMinute 2: [ [2, 2, 2]\n            [2, 2, 0]\n            [0, 1, 1] ]\nMinute 3: [ [2, 2, 2]",
+    "sampleInput": "A = [[2, 1, 1], [1, 1, 0], [0, 1, 1]]",
+    "sampleOutput": "4",
+    "story": "All rotten oranges spread at once, so BFS from every one of them at the same time and count levels.",
+    "plain": "Scan the grid once: push every rotten cell into a queue and count the fresh ones. If there are no fresh oranges, the answer is 0. Then run BFS level by level, where one level equals one minute: pop exactly the current level's size, and for each cell rot any adjacent fresh neighbour, decrement the fresh counter, and enqueue it. Increment the minute counter after finishing each level. At the end, if the fresh counter is zero return the minutes, otherwise some orange was unreachable, so return -1.",
+    "howToThink": [
+      "Multi-source BFS: seed the queue with every rotten cell at once, then each BFS level is one minute.",
+      "Simultaneous spread rules out single-source BFS per rotten orange — that would double count time.",
+      "Level boundaries matter, so capture `currentLevelSize = queue.size()` before the inner loop; you cannot increment minutes per pop.",
+      "Keep a `freshOranges` counter instead of rescanning the grid — it gives the -1 check for free.",
+      "Rot the neighbour in place (`oranges[row][col] = 2`) at enqueue time; the grid doubles as the `visited` array."
+    ],
+    "pitfalls": [
+      "Incrementing `minutes` per popped cell instead of per level — snapshot `queue.size()` first.",
+      "Returning `minutes` without the `freshOranges == 0` check: a fresh orange walled off by 0s makes the answer -1, not the elapsed minutes.",
+      "Forgetting the `freshOranges == 0` early return — an all-rotten or all-empty grid must return 0, and a plain loop would return 1 or -1.",
+      "Marking rotten at pop time instead of enqueue time, which lets two neighbours enqueue the same cell twice and undercounts `freshOranges`.",
+      "The Note about global variables: reset any instance state, since the judge runs several test cases in one process."
+    ],
+    "solutions": [
+      {
+        "label": "Optimal — multi-source BFS, one level per minute",
+        "complexity": {
+          "time": "O(N * M)",
+          "space": "O(N * M) — queue in the worst case, grid reused as visited"
+        },
+        "plain": "One pass collects all rotten cells as BFS sources and counts fresh oranges. The BFS then expands in lock-step: each iteration of the outer while drains exactly the cells that turned rotten in the previous minute. Neighbours that are fresh get flipped to 2 immediately so they are never enqueued twice. The loop also stops as soon as `freshOranges` hits 0, so no trailing minute is counted.",
+        "approach": [
+          "Scan the grid: enqueue every `Position` with value 2, count cells with value 1 into `freshOranges`.",
+          "If `freshOranges == 0`, return 0 immediately.",
+          "While the queue is non-empty and `freshOranges > 0`, snapshot `currentLevelSize = queue.size()`.",
+          "Pop that many cells; for each, walk the 4 directions.",
+          "If the neighbour is in bounds and equals 1, set it to 2, decrement `freshOranges`, enqueue it.",
+          "After the level loop, `minutes++`.",
+          "Return `freshOranges == 0 ? minutes : -1`."
+        ],
+        "pseudocode": "queue = all cells with value 2\nfresh = count of cells with value 1\nfresh == 0 -> return 0\nminutes = 0\n\nwhile queue not empty AND fresh > 0:\n    size = queue.size()\n    repeat size times:\n        cell = queue.poll()\n        for d in {up, down, left, right}:\n            (r, c) = cell + d\n            in-bounds AND grid[r][c] == 1 ->\n                grid[r][c] = 2; fresh--; queue.push((r, c))\n    minutes++\n\nreturn fresh == 0 ? minutes : -1",
+        "story": "Every rotten orange is a BFS source; the wavefront's depth is the clock.",
+        "code": "public int rottenOrangesMinimumMinutes(int[][] oranges) {\n    int[][] directions = {{-1, 0}, {1, 0}, {0, -1}, {0, 1}};\n    Queue<Position> queue = new LinkedList<>();\n    int m = oranges.length;\n    int n = oranges[0].length;\n    int freshOranges = 0;\n    for (int i = 0; i < m; i++) {\n        for (int j = 0; j < n; j++) {\n            if (oranges[i][j] == 2) {\n                queue.add(new Position(i, j));\n            } else if (oranges[i][j] == 1) {\n                freshOranges++;\n            }\n        }\n    }\n\n    int minutes = 0;\n    if (freshOranges == 0) {\n        return minutes;\n    }\n\n    while (!queue.isEmpty() && freshOranges > 0) {\n        int currentLevelSize = queue.size(); // snapshot BEFORE popping — one level == one minute\n        for (int i = 0; i < currentLevelSize; i++) {\n            Position cell = queue.poll();\n            for (int[] direction : directions) {\n                int row = cell.row + direction[0];\n                int col = cell.col + direction[1];\n                if (isValidCell(row, col, m, n) && oranges[row][col] == 1) {\n                    oranges[row][col] = 2; // mark rotten on ENQUEUE, else siblings re-enqueue it\n                    freshOranges--;\n                    queue.add(new Position(row, col));\n                }\n            }\n        }\n        minutes++;\n    }\n    return freshOranges == 0 ? minutes : -1;\n}\n\nprivate boolean isValidCell(int x, int y, int m, int n) {\n    return x >= 0 && y >= 0 && x < m && y < n;\n}\n\nprivate static class Position {\n    int row, col;\n\n    Position(int row, int col) {\n        this.row = row;\n        this.col = col;\n    }\n}"
+      }
+    ]
+  },
+  {
+    "num": 288,
+    "id": "s4-graphs-construction-cost",
+    "title": "Construction Cost",
+    "subTopic": "Prim's MST with modulo and long accumulation",
+    "tags": [
+      "Graphs",
+      "MST",
+      "Prim's",
+      "Priority Queue",
+      "Modulo"
+    ],
+    "description": "Problem Description\n\nFlipkart has 'A' local distribution centers located across a large metropolitan city. Each distribution center needs to be interconnected through roads to facilitate efficient movement of goods. The cost of constructing a road between any two distribution centers is represented by the weight of the edge connecting them.\n\nGiven a graph with 'A' nodes representing the distribution centers and C weighted edges representing the possible roads between them, your task is to find the minimum total cost of constructing roads such that every distribution center can be reached from the first distribution center.\n\nCost Calculation:\nThe cost of constructing the roads is the sum of the weights of the edges selected for the construction.\n\nNOTE: Return the answer modulo 10^9+7 as the answer can be large.\n\nProblem Constraints\n1 <= A <= 100000\n0 <= C <= 100000\n1 <= B[i][0], B[i][1] <= N\n1 <= B[i][2] <= 10^9\n\nInput Format\nFirst argument is an integer A.\nSecond argument is a 2-D integer array B of size C×3 denoting edges. B[i][0] and B[i][1] are the distribution centers connected by the ith edge with construction cost B[i][2].\n\nOutput Format\nReturn an integer denoting the minimum construction cost.\n\nExample Input\nInput 1:\nA = 3\nB = [   [1, 2, 14]\n        [2, 3, 7]\n        [3, 1, 2]   ]\nInput 2:\nA = 3\nB = [   [1, 2, 20]\n        [2, 3, 17]  ]\n\nExample Output\nOutput 1:\n9\nOutput 2:\n37\n\nExample Explanation\nExplanation 1:\nTo connect the distribution centers, we can select only two roads: from center 2 to center 3 (cost\n7) and\nfrom center 3 to center 1 (cost 2). This allows us to reach the first distribution center from both\ncenter 2 and center 3,",
+    "sampleInput": "A = 3, B = [[1, 2, 14], [2, 3, 7], [3, 1, 2]]",
+    "sampleOutput": "9",
+    "story": "Same Prim's MST as Commutable Islands, but weights reach 10^9 so the running sum must be a long taken mod 10^9+7.",
+    "plain": "Build an undirected adjacency map of Road(node, cost) from the C edges. Seed a cost-ordered min-heap with Road(1, 0) so center 1 joins free, then repeatedly poll the cheapest road. Skip any road landing on an already-visited center; otherwise mark it visited, fold its cost into a long running total taken modulo 10^9+7, decrement the remaining-centers counter, and push every unvisited neighbour. Stop as soon as the counter hits zero or the heap empties. Handle A == 1 up front, since a single center needs no roads.",
+    "howToThink": [
+      "Prim's MST again — identical skeleton to Commutable Islands, only the arithmetic changes.",
+      "\"Every center reachable from the first\" plus \"minimum total weight\" is the MST definition; the phrasing about center 1 is a red herring since an MST spans every node anyway.",
+      "Weights hit 10^9 and there are up to 10^5 edges, so the raw sum reaches ~10^14 — accumulate in `long` and `% MOD` each step.",
+      "`C` can be 0, so `A == 1` must short-circuit to 0 and `map.getOrDefault` must cover isolated nodes.",
+      "Cast back with `(int) totalCost` only after the final modulo."
+    ],
+    "pitfalls": [
+      "Declaring `totalCost` as `int` — 10^5 edges at 10^9 each overflows long before the modulo lands.",
+      "Applying `% MOD` only at the return instead of inside the loop still overflows if the accumulator is int; keep it `long` and reduce every iteration.",
+      "Pushing `cost + neighbour.cost` (Dijkstra-style relaxation) instead of the raw `neighbour.cost`.",
+      "`map.get(node)` NPEs when C == 0 or a center is isolated — use `getOrDefault(node, new ArrayList<>())`.",
+      "Forgetting the `A == 1` guard, which would otherwise return 0 anyway but only by accident of the heap seeding."
+    ],
+    "solutions": [
+      {
+        "label": "Optimal — Prim's with lazy min-heap, long + modulo",
+        "complexity": {
+          "time": "O(C log C)",
+          "space": "O(A + C) — adjacency list plus up to C heap entries"
+        },
+        "plain": "Identical Prim's loop to Commutable Islands with two changes. First, `totalCost` is a `long` reduced by MOD on every accepted edge, because a single weight can be 10^9. Second, a `centersToVisit` counter lets the loop exit the moment the tree spans all A centers rather than draining the whole heap. The A == 1 guard covers the degenerate no-edge case.",
+        "approach": [
+          "Return 0 immediately if `A == 1`.",
+          "Build `map`: for each `[s, d, cost]` add `Road(d, cost)` under `s` and `Road(s, cost)` under `d`.",
+          "Seed a min-heap ordered by `cost` with `new Road(1, 0)`; set `centersToVisit = A`.",
+          "Poll; if `visited[node]`, continue.",
+          "Mark visited, do `totalCost = (totalCost + cost) % MOD`, decrement `centersToVisit`.",
+          "Push a fresh `Road` for every unvisited neighbour.",
+          "Exit when `centersToVisit == 0` or the heap drains; return `(int) totalCost`."
+        ],
+        "pseudocode": "A == 1 -> return 0\nadj = undirected adjacency list of (node, cost)\nheap = min-heap by cost, seeded with (1, 0)\nvisited = boolean[A + 1]; total = 0L; left = A\n\nwhile heap not empty AND left > 0:\n    (node, cost) = heap.poll()\n    visited[node] ? -> continue\n    visited[node] = true\n    total = (total + cost) % MOD\n    left--\n    for (nb, w) in adj[node]:\n        !visited[nb] -> heap.push((nb, w))\n\nreturn (int) total",
+        "story": "MST cost, but the sum is big enough that long + mod is part of the algorithm, not an afterthought.",
+        "code": "public int constructionCostMinimum(int A, int[][] B) {\n    final int MOD = 1_000_000_007;\n    if (A == 1) {\n        return 0;\n    }\n\n    HashMap<Integer, ArrayList<Road>> map = buildAdj(B);\n    PriorityQueue<Road> minHeap = new PriorityQueue<>(Comparator.comparingInt(x -> x.cost));\n    minHeap.add(new Road(1, 0));\n    boolean[] visited = new boolean[A + 1];\n    long totalCost = 0;\n    int centersToVisit = A;\n\n    while (!minHeap.isEmpty() && centersToVisit > 0) {\n        Road current = minHeap.poll();\n        int node = current.node;\n        int cost = current.cost;\n\n        if (visited[node]) {\n            continue;\n        }\n\n        visited[node] = true;\n        totalCost = (totalCost + (long) cost) % MOD; // long accumulator — weights reach 10^9\n        centersToVisit--;\n\n        for (Road neighbour : map.getOrDefault(node, new ArrayList<>())) {\n            if (!visited[neighbour.node]) {\n                minHeap.add(new Road(neighbour.node, neighbour.cost));\n            }\n        }\n    }\n\n    return (int) totalCost;\n}\n\nprivate HashMap<Integer, ArrayList<Road>> buildAdj(int[][] B) {\n    HashMap<Integer, ArrayList<Road>> map = new HashMap<>();\n    for (int[] x : B) {\n        int s = x[0];\n        int d = x[1];\n        int cost = x[2];\n        map.computeIfAbsent(s, y -> new ArrayList<>()).add(new Road(d, cost));\n        map.computeIfAbsent(d, y -> new ArrayList<>()).add(new Road(s, cost));\n    }\n    return map;\n}\n\nprivate static class Road {\n    int node, cost;\n\n    Road(int node, int cost) {\n        this.node = node;\n        this.cost = cost;\n    }\n}"
+      }
+    ]
+  },
+  {
+    "num": 289,
+    "id": "s4-graphs-capture-regions-on-board",
+    "title": "Capture Regions on Board",
+    "subTopic": "Border flood fill, invert the question",
+    "tags": [
+      "Graphs",
+      "DFS",
+      "BFS",
+      "Flood Fill",
+      "Matrix"
+    ],
+    "description": "[Screenshot is scrolled past the Problem Description, Problem Constraints, Input Format and Output Format sections — only the sections below were legible.]\n\nExample Input\nInput 1:\nA = [\n    [X, X, X, X],\n    [X, O, O, X],\n    [X, X, O, X],\n    [X, O, X, X]\n    ]\nInput 2:\nA = [\n    [X, O, O],\n    [X, O, X],\n    [O, O, O]\n    ]\n\nExample Output\nOutput 1:\nAfter running your function, the board should be:\nA = [\n    [X, X, X, X],\n    [X, X, X, X],\n    [X, X, X, X],\n    [X, O, X, X]\n    ]\nOutput 2:\nAfter running your function, the board should be:\nA = [\n    [X, O, O],\n    [X, O, X],\n    [O, O, O]\n    ]\n\nExample Explanation\nExplanation 1:\nO in (4,2) is not surrounded by X from below.\nExplanation 2:\nNo O's are surrounded.\n\nExpected Output\nEnter your input as per the following guideline:\nThere are 1 lines in the input\nLine 1 ( Corresponds to arg 1 ) : 2-D array. First 2 integers R, C are the number of rows and columns. Then R * C characters follow corresponding to the rowwise characters in the 2D array\n    For example, Array: [\"XO\", \"OX\"] will be written as \"2 2 XOOX\"(without quotes).",
+    "sampleInput": "A = [[X, X, X, X], [X, O, O, X], [X, X, O, X], [X, O, X, X]]",
+    "sampleOutput": "A = [[X, X, X, X], [X, X, X, X], [X, X, X, X], [X, O, X, X]]",
+    "story": "Don't hunt for surrounded O regions — flood the border O's and flip whatever the flood never touched.",
+    "plain": "Deciding directly whether a region is fully enclosed is awkward, so invert it: any O connected to a border O escapes and must survive. Run a flood fill (BFS or DFS) from every O sitting on row 0, row n-1, column 0 or column m-1, temporarily rewriting those cells to a sentinel like '#'. After the fill, sweep the whole board: any remaining 'O' was unreachable from the border, so it was surrounded — flip it to 'X'. Any '#' was border-connected, so restore it to 'O'. The board is mutated in place; the function returns nothing.",
+    "howToThink": [
+      "Border flood fill: mark every O reachable from the boundary, then flip the unmarked O's.",
+      "The direct test \"is this region enclosed?\" needs you to finish the whole component before deciding — inverting to \"does it touch the border?\" makes it a plain reachability question.",
+      "Only the 4 sides seed the fill; that is `2 * (n + m)` starting cells, not the whole grid.",
+      "Use a third sentinel character ('#') so the final sweep can tell survivor-O from captured-O in one pass.",
+      "Prefer an iterative BFS queue over recursion — a 1000 x 1000 board of O's would blow a recursive DFS stack."
+    ],
+    "pitfalls": [
+      "Marking a cell only when you dequeue it, so the same cell gets enqueued by several neighbours — mark BEFORE enqueue.",
+      "Recursive DFS on a large all-O board overflows the call stack; use an explicit queue.",
+      "Forgetting to restore '#' back to 'O' in the final sweep, which erases the regions that should have survived.",
+      "The function mutates `board` in place; returning a new array leaves the caller's board unchanged (Java passes the reference by value, so reassigning the local parameter does nothing)."
+    ],
+    "solutions": [
+      {
+        "label": "Optimal — border BFS flood fill with a sentinel",
+        "complexity": {
+          "time": "O(N * M)",
+          "space": "O(N * M) — BFS queue in the worst case, board reused as visited"
+        },
+        "plain": "Seed a queue with every border cell holding 'O', rewriting each to '#' as it goes in. BFS outward, converting each newly reached 'O' to '#' at enqueue time so no cell is queued twice. When the queue drains, '#' exactly marks the escaping regions. One final sweep turns leftover 'O' into 'X' and '#' back into 'O'.",
+        "approach": [
+          "For every row `i`, try to seed `(i, 0)` and `(i, m - 1)`.",
+          "For every column `j`, try to seed `(0, j)` and `(n - 1, j)`.",
+          "Seeding means: if in bounds and the cell is 'O', set it to '#' and enqueue it.",
+          "BFS: poll a cell and try to seed its 4 neighbours the same way.",
+          "Sweep the board: 'O' becomes 'X' (it was surrounded), '#' becomes 'O' (it escaped).",
+          "No return value — the board is modified in place."
+        ],
+        "pseudocode": "queue = empty\nfor i in 0..n-1: seed(i, 0), seed(i, m-1)\nfor j in 0..m-1: seed(0, j), seed(n-1, j)\n\nwhile queue not empty:\n    cell = queue.poll()\n    for d in {up, down, left, right}: seed(cell + d)\n\nfor every cell:\n    'O' -> 'X'        (never reached from the border)\n    '#' -> 'O'        (reached — restore)\n\nseed(r, c):\n    out of bounds OR board[r][c] != 'O' -> return\n    board[r][c] = '#'        // mark BEFORE enqueue\n    queue.push((r, c))",
+        "story": "Everything touching the edge is safe; capture the rest.",
+        "code": "public void captureRegionsOnBoard(char[][] board) {\n    int n = board.length;\n    int m = board[0].length;\n    Queue<int[]> queue = new LinkedList<>();\n\n    for (int i = 0; i < n; i++) {\n        seedIfOpen(board, queue, i, 0);\n        seedIfOpen(board, queue, i, m - 1);\n    }\n    for (int j = 0; j < m; j++) {\n        seedIfOpen(board, queue, 0, j);\n        seedIfOpen(board, queue, n - 1, j);\n    }\n\n    int[][] directions = {{-1, 0}, {1, 0}, {0, -1}, {0, 1}};\n    while (!queue.isEmpty()) {\n        int[] cell = queue.poll();\n        for (int[] direction : directions) {\n            seedIfOpen(board, queue, cell[0] + direction[0], cell[1] + direction[1]);\n        }\n    }\n\n    for (int i = 0; i < n; i++) {\n        for (int j = 0; j < m; j++) {\n            if (board[i][j] == 'O') {\n                board[i][j] = 'X';\n            } else if (board[i][j] == '#') {\n                board[i][j] = 'O';\n            }\n        }\n    }\n}\n\nprivate void seedIfOpen(char[][] board, Queue<int[]> queue, int row, int col) {\n    if (row < 0 || col < 0 || row >= board.length || col >= board[0].length) {\n        return;\n    }\n    if (board[row][col] != 'O') {\n        return;\n    }\n    board[row][col] = '#'; // mark BEFORE enqueue, else the same cell is queued repeatedly\n    queue.add(new int[] {row, col});\n}"
+      }
+    ]
+  },
+  {
+    "num": 290,
+    "id": "s4-graphs-black-shapes",
+    "title": "Black Shapes",
+    "subTopic": "Count connected components in a grid",
+    "tags": [
+      "Graphs",
+      "BFS",
+      "Flood Fill",
+      "Matrix",
+      "Connected Components"
+    ],
+    "description": "Problem Description\n\nGiven character matrix A of dimensions NxM consisting of O's and X's, where O = white, X = black.\nReturn the number of black shapes. A black shape consists of one or more adjacent X's (diagonals not included)\n\nProblem Constraints\n1 <= N, M <= 1000\nA[i][j] = 'X' or 'O'\n\nInput Format\nThe First and only argument is character matrix A.\n\nOutput Format\nReturn a single integer denoting number of black shapes.\n\nExample Input\nInput 1:\nA = [ [X, X, X], [X, X, X], [X, X, X] ]\nInput 2:\nA = [ [X, O], [O, X] ]\n\nExample Output\nOutput 1:\n1\nOutput 2:\n2\n\nExample Explanation\nExplanation 1:\nAll X's belong to single shapes\nExplanation 2:\nBoth X's belong to different shapes",
+    "sampleInput": "A = [[X, X, X], [X, X, X], [X, X, X]]",
+    "sampleOutput": "1",
+    "story": "Every unvisited X starts a new shape; flood fill wipes out the rest of that shape.",
+    "plain": "Walk the grid cell by cell. When you hit an 'X' that has not been visited yet, that cell must belong to a shape nobody has counted, so increment the shape counter and flood fill its whole connected component with BFS over the 4 orthogonal directions, marking every cell visited. Cells reached by that fill are never counted again, so each shape contributes exactly one increment. The answer is the number of times the outer scan had to start a fresh fill.",
+    "howToThink": [
+      "Connected components on an implicit grid graph: the outer double loop counts components, the flood fill consumes one.",
+      "\"Adjacent, diagonals not included\" fixes the direction array to the 4 orthogonal moves.",
+      "Input is a `String[]`, so read cells with `A[i].charAt(j)` and keep a separate `boolean[][] visited` — you cannot mutate a String in place.",
+      "BFS or DFS is irrelevant to the count; use BFS to avoid a 10^6-deep recursion on a fully black grid.",
+      "Mark `visited` at enqueue time so a cell reached from two neighbours is queued once."
+    ],
+    "pitfalls": [
+      "Marking `visited` on dequeue instead of enqueue — the same cell then gets queued by every adjacent X and the queue blows up.",
+      "Recursive DFS on a 1000 x 1000 all-X grid overflows the stack; the iterative queue is the safe default.",
+      "Including the 4 diagonal directions, which merges shapes the problem keeps separate.",
+      "Using `A[0].length()` as the width without checking that the strings are uniform, or confusing `length` (array) with `length()` (String)."
+    ],
+    "solutions": [
+      {
+        "label": "Optimal — BFS flood fill per unvisited X",
+        "complexity": {
+          "time": "O(N * M)",
+          "space": "O(N * M) — visited matrix plus queue"
+        },
+        "plain": "A `boolean[][] visited` matches the grid. The outer scan looks for an 'X' that is still unvisited; each such cell increments `shapes` and triggers one BFS. The BFS pushes the seed, marks it visited, and then expands orthogonally, marking each new 'X' visited as it enters the queue. Every cell is enqueued at most once, so total work is linear in the grid size.",
+        "approach": [
+          "Allocate `visited` of size `n x m` where `n = A.length`, `m = A[0].length()`.",
+          "Scan `(i, j)` in row-major order.",
+          "If `A[i].charAt(j) == 'X'` and `!visited[i][j]`, increment `shapes` and call the flood fill.",
+          "Flood fill: mark the seed visited, enqueue it.",
+          "Poll a cell, try the 4 orthogonal neighbours; if in bounds, unvisited and 'X', mark visited and enqueue.",
+          "Return `shapes` after the scan completes."
+        ],
+        "pseudocode": "visited = boolean[n][m]; shapes = 0\n\nfor i in 0..n-1:\n  for j in 0..m-1:\n    A[i][j] == 'X' AND !visited[i][j] ->\n        shapes++\n        bfs(i, j)\n\nreturn shapes\n\nbfs(r, c):\n    visited[r][c] = true; queue.push((r, c))\n    while queue not empty:\n        cell = queue.poll()\n        for d in {up, down, left, right}:\n            (nr, nc) = cell + d\n            in-bounds AND !visited[nr][nc] AND A[nr][nc] == 'X' ->\n                visited[nr][nc] = true       // mark on ENQUEUE\n                queue.push((nr, nc))",
+        "story": "Count how many times you have to start a fill, not how many X's you see.",
+        "code": "public int blackShapesCount(String[] A) {\n    int n = A.length;\n    int m = A[0].length();\n    boolean[][] visited = new boolean[n][m];\n    int shapes = 0;\n\n    for (int i = 0; i < n; i++) {\n        for (int j = 0; j < m; j++) {\n            if (A[i].charAt(j) == 'X' && !visited[i][j]) {\n                shapes++;\n                floodFillShape(A, visited, i, j);\n            }\n        }\n    }\n    return shapes;\n}\n\nprivate void floodFillShape(String[] A, boolean[][] visited, int row, int col) {\n    int n = A.length;\n    int m = A[0].length();\n    int[][] directions = {{-1, 0}, {1, 0}, {0, -1}, {0, 1}};\n    Queue<int[]> queue = new LinkedList<>();\n    visited[row][col] = true;\n    queue.add(new int[] {row, col});\n\n    while (!queue.isEmpty()) {\n        int[] cell = queue.poll();\n        for (int[] direction : directions) {\n            int r = cell[0] + direction[0];\n            int c = cell[1] + direction[1];\n            if (r >= 0 && c >= 0 && r < n && c < m && !visited[r][c] && A[r].charAt(c) == 'X') {\n                visited[r][c] = true; // mark on ENQUEUE, not on dequeue\n                queue.add(new int[] {r, c});\n            }\n        }\n    }\n}"
+      }
+    ]
+  },
+  {
+    "num": 291,
+    "id": "s4-graphs-knight-on-chess-board",
+    "title": "Knight On Chess Board",
+    "subTopic": "BFS on an implicit graph with 8 knight moves",
+    "tags": [
+      "Graphs",
+      "BFS",
+      "Matrix",
+      "Shortest Path"
+    ],
+    "description": "Problem Description\n\nGiven any source point, (C, D) and destination point, (E, F) on a chess board of size A x B, we need to find whether Knight can move to the destination or not.\n\n[figure: a chess board showing the 8 squares a knight can reach from its current square]\n\nThe above figure details the movements for a knight ( 8 possibilities ).\nIf yes, then what would be the minimum number of steps for the knight to move to the said point. If knight can not move from the source point to the destination point, then return -1.\nNOTE: A knight cannot go out of the board.\n\nProblem Constraints\n1 <= A, B <= 500\n\nInput Format\nThe first argument of input contains an integer A.\nThe second argument of input contains an integer B.\nThe third argument of input contains an integer C.\nThe fourth argument of input contains an integer D.\nThe fifth argument of input contains an integer E.\nThe sixth argument of input contains an integer F.\n\nOutput Format\nIf it is possible to reach the destination point, return the minimum number of moves.\nElse return -1.\n\nExample Input\nInput 1:\nA = 8\nB = 8\nC = 1\nD = 1\nE = 8\nF = 8\nInput 2:\nA = 2\nB = 4\nC = 2\nD = 1\nE = 4\nF = 4\n\nExample Output\nOutput 1:\n6",
+    "sampleInput": "A = 8, B = 8, C = 1, D = 1, E = 8, F = 8",
+    "sampleOutput": "6",
+    "story": "Every knight move costs 1, so plain BFS from the source gives the minimum number of moves.",
+    "plain": "Treat each square as a node and each legal knight move as an unweighted edge, so the shortest path is a plain BFS. Seed the queue with the source square and mark it visited. Process the queue one level at a time: each level is one extra move. When a popped square equals the destination, return the current level count. Any neighbour that lands inside the A x B board and is unvisited gets marked and enqueued. If the queue empties without hitting the destination, the square is unreachable, so return -1.",
+    "howToThink": [
+      "BFS on an implicit graph: nodes are board squares, edges are the 8 knight offsets, all edges weight 1.",
+      "Unit edge weights rule out Dijkstra — BFS level count IS the shortest distance.",
+      "Coordinates are 1-indexed here, so size the `visited` array `[A + 1][B + 1]` and bound-check with `>= 1` and `<= A` / `<= B`.",
+      "Hardcode the 8 offsets `{±1, ±2}` and `{±2, ±1}`; forgetting sign combinations silently loses reachable squares.",
+      "Mark visited at enqueue time, otherwise the same square enters the queue from several predecessors and the level counting breaks."
+    ],
+    "pitfalls": [
+      "Mixing 0-indexed arrays with the problem's 1-indexed coordinates — off-by-one in the bounds check drops the last row or column.",
+      "Incrementing the step counter per popped square instead of per BFS level.",
+      "Marking `visited` on dequeue, which lets the same square sit in the queue at two different levels.",
+      "Missing the `source == destination` case: the check must happen when the square is popped (returning 0), not only after a move."
+    ],
+    "solutions": [
+      {
+        "label": "Optimal — level-order BFS over the 8 knight moves",
+        "complexity": {
+          "time": "O(A * B)",
+          "space": "O(A * B) — visited matrix plus queue"
+        },
+        "plain": "A `visited[A + 1][B + 1]` array keeps the 1-indexed coordinates honest. The BFS drains the queue level by level; `steps` is incremented only after a whole level is consumed, so it equals the number of knight moves made. The destination check happens on pop, which naturally returns 0 when the source already is the destination. Each square enters the queue at most once, so the whole board is touched a constant number of times.",
+        "approach": [
+          "Define the 8 offsets `{{-2,-1},{-2,1},{-1,-2},{-1,2},{1,-2},{1,2},{2,-1},{2,1}}`.",
+          "Allocate `visited = new boolean[A + 1][B + 1]`; mark `visited[C][D] = true` and enqueue `(C, D)`.",
+          "While the queue is non-empty, snapshot `levelSize = queue.size()`.",
+          "Pop that many squares; if a popped square equals `(E, F)`, return `steps`.",
+          "For each of the 8 offsets, if the target is inside the board and unvisited, mark and enqueue it.",
+          "After the level, `steps++`.",
+          "Return -1 once the queue drains."
+        ],
+        "pseudocode": "moves = 8 knight offsets\nvisited = boolean[A+1][B+1]\nvisited[C][D] = true; queue = [(C, D)]; steps = 0\n\nwhile queue not empty:\n    size = queue.size()\n    repeat size times:\n        (r, c) = queue.poll()\n        (r, c) == (E, F) -> return steps\n        for (dr, dc) in moves:\n            (nr, nc) = (r + dr, c + dc)\n            1 <= nr <= A AND 1 <= nc <= B AND !visited[nr][nc] ->\n                visited[nr][nc] = true; queue.push((nr, nc))\n    steps++\n\nreturn -1",
+        "story": "Unweighted graph, so the BFS wavefront depth is the move count.",
+        "code": "public int knightOnChessBoardMinimumMoves(int A, int B, int C, int D, int E, int F) {\n    int[][] moves = {{-2, -1}, {-2, 1}, {-1, -2}, {-1, 2}, {1, -2}, {1, 2}, {2, -1}, {2, 1}};\n    boolean[][] visited = new boolean[A + 1][B + 1]; // 1-indexed board\n    Queue<int[]> queue = new LinkedList<>();\n    queue.add(new int[] {C, D});\n    visited[C][D] = true;\n    int steps = 0;\n\n    while (!queue.isEmpty()) {\n        int levelSize = queue.size(); // one level == one knight move\n        for (int i = 0; i < levelSize; i++) {\n            int[] cell = queue.poll();\n            if (cell[0] == E && cell[1] == F) {\n                return steps; // checked on POP so source == destination returns 0\n            }\n            for (int[] move : moves) {\n                int row = cell[0] + move[0];\n                int col = cell[1] + move[1];\n                if (isInsideBoard(row, col, A, B) && !visited[row][col]) {\n                    visited[row][col] = true; // mark on ENQUEUE\n                    queue.add(new int[] {row, col});\n                }\n            }\n        }\n        steps++;\n    }\n    return -1;\n}\n\nprivate boolean isInsideBoard(int row, int col, int A, int B) {\n    return row >= 1 && col >= 1 && row <= A && col <= B;\n}"
+      }
+    ]
+  },
+  {
+    "num": 292,
+    "id": "s4-graphs-damaged-roads",
+    "title": "Damaged Roads",
+    "subTopic": "Kruskal on a grid — merge two sorted cost lists",
+    "tags": [
+      "Graphs",
+      "MST",
+      "Kruskal",
+      "Greedy",
+      "Sorting"
+    ],
+    "description": "Problem Description\n\nYou are the Prime Minister of a country and once you went for a world tour.\nAfter 5 years, when you returned to your country, you were shocked to see the condition of the roads between the cities. So, you plan to repair them, but you cannot afford to spend a lot of money.\nThe country can be represented as a (N+1) x (M+1) grid, where Country(i, j) is a city.\nThe cost of repairing a road between (i, j) and (i + 1, j) is A[i]. The cost of repairing a road between (i, j) and (i, j + 1) is B[j].\nReturn the minimum cost of repairing the roads such that all cities can be visited from city indexed (0, 0).\nAs the cost can be large, return the cost modulo 10^9+7.\n\nProblem Constraints\n1 <= N, M <= 10^5\n1 <= A[i], B[i] <= 10^3\n\nInput Format\nThe first argument will be an integer array, A, of size N.\nThe second argument will be an integer array, B, of size M.\n\nOutput Format\nReturn an integer representing the minimum possible cost.\n\nExample Input\nInput 1:\nA = [1, 1, 1]\nB = [1, 1, 2]\nInput 2:\nA = [1, 2, 3]\nB = [4, 5, 6]\n\nExample Output\nOutput 1:\n16\nOutput 2:\n39\n\nExample Explanation\nExplanation 1:\nThe minimum cost will be 16 if we repair the roads in the following way:\n Repair the roads from the all cities in row 0 to row 1 i.e. (0, j) to (1, j) (0 <= j <= 3), so that the cost will be 4 (A[0] * 4).\n Repair the roads from the all cities in row 1 to row 2 i.e. (1, j) to (2, j) (0 <= j <= 3), so that the cost will be 4 (A[1] * 4).\n Repair the roads from the all cities in row 2 to row 3 i.e. (2, j) to (3, j) (0 <= j <= 3), so that the cost will be 4 (A[2] * 4).\n Repair the roads (0, 0) to (0, 1), (0, 1) to (0, 2), (0, 2) to (0, 3), so that the cost will be",
+    "sampleInput": "A = [1, 1, 1], B = [1, 1, 2]",
+    "sampleOutput": "16",
+    "story": "Kruskal on a grid: pick costs in sorted order, and each pick has to be laid across every component still standing on the other axis.",
+    "plain": "There are only N + M distinct road prices, so run Kruskal over those prices instead of over the O(N*M) individual roads. Sort A and B ascending and merge-walk them. Keep `rowGroups = N + 1` (row bands not yet stitched together) and `colGroups = M + 1` (column bands not yet stitched). Taking a horizontal-direction price A[i] means laying that road once in every surviving column band, so it costs A[i] * colGroups and drops rowGroups by one; taking B[j] costs B[j] * rowGroups and drops colGroups by one. Accumulate in a long and reduce by 10^9+7 each step.",
+    "howToThink": [
+      "Kruskal's MST on a compressed grid: sort the N + M prices and take them cheapest-first; the multiplier is the number of components still on the other axis.",
+      "Spotting the compression is the whole problem — every road between row i and i+1 has the same cost A[i], so all M+1 copies of it are interchangeable.",
+      "Maintain the two counters as component counts: `rowGroups` starts at N+1 and `colGroups` at M+1, each dropping by 1 per accepted price.",
+      "Cross-multiply, don't self-multiply: A[i] is scaled by `colGroups`, B[j] by `rowGroups`.",
+      "Sanity-check on Input 1: 1*4 + 1*4 + 1*4 + 1*1 + 1*1 + 2*1 = 16."
+    ],
+    "pitfalls": [
+      "Scaling A[i] by `rowGroups` instead of `colGroups` (or vice versa) — the multiplier always comes from the *other* axis.",
+      "Decrementing the counter before using it in the multiplication; multiply first, then decrement.",
+      "`(long)` cast missing on the product — A[i] up to 10^3 times colGroups up to 10^5+1 still fits int, but the running sum does not, so the accumulator must be `long` with `% MOD` each step.",
+      "Forgetting to drain the leftover tail of A or B after one list is exhausted.",
+      "Ties: when A[i] == B[j] either order gives the same total, so a simple `<=` is fine — no tie-breaking logic needed."
+    ],
+    "solutions": [
+      {
+        "label": "Optimal — sort both cost arrays, greedy merge (Kruskal)",
+        "complexity": {
+          "time": "O(N log N + M log M)",
+          "space": "O(1) auxiliary — sorts in place"
+        },
+        "plain": "Sort A and B, then walk both with two pointers always consuming the cheaper head. `rowGroups` and `colGroups` are the live component counts on each axis and start at N+1 and M+1. Every price consumed merges one band on its own axis and must be paid once per surviving band on the other axis, which is exactly what Kruskal would do edge by edge. The loop runs N + M times and the total is kept modulo 10^9+7.",
+        "approach": [
+          "Sort `A` and `B` ascending.",
+          "Set `rowGroups = A.length + 1`, `colGroups = B.length + 1`, `totalCost = 0L`, pointers `i = j = 0`.",
+          "While either pointer is in range, pick the cheaper head (prefer A on a tie).",
+          "If A[i] is chosen: `totalCost += (long) A[i] * colGroups`, then `rowGroups--`, `i++`.",
+          "If B[j] is chosen: `totalCost += (long) B[j] * rowGroups`, then `colGroups--`, `j++`.",
+          "Reduce `totalCost % MOD` after every addition.",
+          "Return `(int) totalCost`."
+        ],
+        "pseudocode": "sort A asc; sort B asc\nrowGroups = N + 1; colGroups = M + 1\ntotal = 0L; i = 0; j = 0\n\nwhile i < N OR j < M:\n    take A[i] when j exhausted OR (i < N AND A[i] <= B[j]):\n        total = (total + A[i] * colGroups) % MOD\n        rowGroups--; i++\n    else:\n        total = (total + B[j] * rowGroups) % MOD\n        colGroups--; j++\n\nreturn (int) total",
+        "story": "Cheapest price first, multiplied by however many bands on the other axis still need stitching.",
+        "code": "public int damagedRoadsMinimumCost(int[] A, int[] B) {\n    final int MOD = 1_000_000_007;\n    int n = A.length;\n    int m = B.length;\n    Arrays.sort(A);\n    Arrays.sort(B);\n\n    long totalCost = 0;\n    long rowGroups = n + 1; // row bands not yet stitched together\n    long colGroups = m + 1; // column bands not yet stitched together\n    int i = 0;\n    int j = 0;\n\n    while (i < n || j < m) {\n        if (j == m || (i < n && A[i] <= B[j])) {\n            totalCost = (totalCost + (long) A[i] * colGroups) % MOD; // multiplier from the OTHER axis\n            rowGroups--;\n            i++;\n        } else {\n            totalCost = (totalCost + (long) B[j] * rowGroups) % MOD;\n            colGroups--;\n            j++;\n        }\n    }\n\n    return (int) totalCost;\n}"
+      }
+    ]
+  },
+  {
+    "num": 293,
+    "id": "s4-graphs-edge-in-mst",
+    "title": "Edge in MST",
+    "subTopic": "Kruskal by weight groups + DSU",
+    "tags": [
+      "Graphs",
+      "MST",
+      "Kruskal",
+      "Union Find",
+      "Sorting"
+    ],
+    "description": "Problem Description\n\nGiven an undirected weighted graph with A nodes labelled from 1 to A with M edges given in a form of 2D-matrix B of size M * 3 where B[i][0] and B[i][1] denotes the two nodes connected by an edge of weight B[i][2].\nFor each edge check whether it belongs to any of the possible minimum spanning tree or not , return 1 if it belongs else return 0.\nReturn an one-dimensional binary array of size M denoting answer for each edge.\nNOTE:\n\n    The graph may be disconnected in that case consider mst for each component.\n    No self-loops and no multiple edges present.\n    Answers in output array must be in order with the input array B output[i] must denote the answer of edge B[i][0] to B[i][1].\n\nProblem Constraints\n1 <= A, M <= 3*10^5\n1 <= B[i][0], B[i][1] <= A\n1 <= B[i][1] <= 10^3\n\nInput Format\nThe first argument given is an integer A representing the number of nodes in the graph.\nThe second argument given is a matrix B of size M x 3 which represents the M edges such that there is a edge between node B[i][0] and node B[i][1] with weight B[i][2].\n\nOutput Format\nReturn an one-dimensional binary array of size M denoting answer for each edge.\n\nExample Input\nInput 1:\nA = 3\nB = [ [1, 2, 2]\n      [1, 3, 2]\n      [2, 3, 3]\n    ]\n\nExample Output\nOutput 1:\n[1, 1, 0]\n\nExample Explanation\nExplanation 1:\nEdge (1, 2) with weight 2 is included in the MST          1\n                                                         / \\\n                                                        2   3\nEdge (1, 3) with weight 2 is included in the same MST mentioned above.\nEdge (2,3) with weight 3 cannot be included in any of the mst possible.\nSo we will return [1, 1, 0]",
+    "sampleInput": "A = 3, B = [[1, 2, 2], [1, 3, 2], [2, 3, 3]]",
+    "sampleOutput": "[1, 1, 0]",
+    "story": "Run Kruskal but decide a whole equal-weight batch before unioning any of it: an edge is usable iff its endpoints are still separate under all strictly lighter edges.",
+    "plain": "Sort the edge indices by weight, keeping the original index so the answer can be written back in input order. Process the sorted list in blocks of equal weight. For each block, do two passes over it with a DSU. The first pass only asks `find(u) != find(v)` and records answer[originalIndex] = 1 when true — at this point the DSU contains only strictly lighter edges, so this exactly tests whether the edge could start a component merge in some MST. The second pass then unions every edge of the block. Doing the deciding pass before any union inside the block is what makes equal-weight alternatives all get marked.",
+    "howToThink": [
+      "Kruskal grouped by weight plus DSU: an edge of weight w is in some MST iff `find(u) != find(v)` after processing all edges of weight strictly less than w.",
+      "\"Any possible MST\" means at least one, so equal-weight edges are alternatives — you must not let one of them union away another's chance.",
+      "Hence the two-pass-per-weight-block structure: decide the whole block first, then union the whole block.",
+      "Sort an index array (`Integer[] order`) rather than the edge rows, so `answer[order[k]]` lands in input order.",
+      "Disconnected graphs need no special handling — Kruskal naturally builds a spanning forest."
+    ],
+    "pitfalls": [
+      "Unioning as you go inside a weight block: the first edge merges the components and every other equal-weight edge is then wrongly reported as 0.",
+      "Sorting `B` in place and losing the original index mapping — the output must be in input order.",
+      "Path compression without union by rank (or vice versa) is still fine, but a naive `find` that walks a degenerate chain turns 3*10^5 edges into O(M * A).",
+      "Sizing `parent` as `new int[A]` when nodes are labelled 1..A — it needs `A + 1` slots.",
+      "This criterion answers \"is in SOME MST\", not \"is in EVERY MST\"; the latter needs a strict `<` comparison against cycle maxima instead."
+    ],
+    "solutions": [
+      {
+        "label": "Optimal — Kruskal over equal-weight blocks with DSU",
+        "complexity": {
+          "time": "O(M log M) — sort dominates the near-constant DSU work",
+          "space": "O(A + M) — parent/rank arrays plus the index order array"
+        },
+        "plain": "Sort edge indices by weight so equal-weight edges land contiguously. Scan the sorted list and delimit each maximal block of equal weight. Pass one over the block marks every edge whose endpoints are in different DSU components as a 1, using only the merges from strictly lighter blocks. Pass two unions all of the block's edges so the next block sees the correct component structure. Answers are written through `order[k]` so they stay aligned with the input rows.",
+        "approach": [
+          "Build `Integer[] order` = 0..M-1 and sort it by `B[i][2]`.",
+          "Initialise DSU `parent[i] = i` for `i` in `0..A` and a `rank` array.",
+          "Walk `start` over the sorted list; advance `end` while `B[order[end]][2] == B[order[start]][2]`.",
+          "First pass `k` in `[start, end)`: if `find(u) != find(v)`, set `answer[order[k]] = 1`.",
+          "Second pass `k` in `[start, end)`: `union(u, v)` for every edge in the block.",
+          "Set `start = end` and repeat.",
+          "Return `answer`."
+        ],
+        "pseudocode": "order = indices 0..M-1 sorted by weight B[i][2]\nparent[v] = v for v in 0..A; answer = int[M]\n\nstart = 0\nwhile start < M:\n    end = start\n    while end < M and weight(order[end]) == weight(order[start]): end++\n\n    // pass 1 — decide the whole block against STRICTLY lighter edges only\n    for k in [start, end):\n        (u, v) = endpoints(order[k])\n        find(u) != find(v) -> answer[order[k]] = 1\n\n    // pass 2 — now merge the block\n    for k in [start, end):\n        (u, v) = endpoints(order[k])\n        union(u, v)\n\n    start = end\n\nreturn answer",
+        "story": "Freeze the DSU while judging a weight class, then let the whole class merge at once.",
+        "code": "public int[] edgeInMinimumSpanningTree(int A, int[][] B) {\n    int m = B.length;\n    Integer[] order = new Integer[m];\n    for (int i = 0; i < m; i++) {\n        order[i] = i;\n    }\n    Arrays.sort(order, Comparator.comparingInt(i -> B[i][2]));\n\n    int[] parent = new int[A + 1]; // nodes are 1..A\n    int[] rank = new int[A + 1];\n    for (int i = 0; i <= A; i++) {\n        parent[i] = i;\n    }\n\n    int[] answer = new int[m];\n    int start = 0;\n    while (start < m) {\n        int end = start;\n        while (end < m && B[order[end]][2] == B[order[start]][2]) {\n            end++;\n        }\n\n        for (int k = start; k < end; k++) {\n            int[] edge = B[order[k]];\n            if (find(parent, edge[0]) != find(parent, edge[1])) {\n                answer[order[k]] = 1; // decide BEFORE any union inside this weight block\n            }\n        }\n\n        for (int k = start; k < end; k++) {\n            int[] edge = B[order[k]];\n            union(parent, rank, edge[0], edge[1]);\n        }\n\n        start = end;\n    }\n    return answer;\n}\n\nprivate int find(int[] parent, int x) {\n    while (parent[x] != x) {\n        parent[x] = parent[parent[x]]; // path halving\n        x = parent[x];\n    }\n    return x;\n}\n\nprivate void union(int[] parent, int[] rank, int x, int y) {\n    int rootX = find(parent, x);\n    int rootY = find(parent, y);\n    if (rootX == rootY) {\n        return;\n    }\n    if (rank[rootX] < rank[rootY]) {\n        parent[rootX] = rootY;\n    } else if (rank[rootX] > rank[rootY]) {\n        parent[rootY] = rootX;\n    } else {\n        parent[rootY] = rootX;\n        rank[rootX]++;\n    }\n}"
+      }
+    ]
+  },
+  {
+    "num": 294,
+    "id": "s4-graphs-possibility-of-finishing",
+    "title": "Possibility of Finishing",
+    "subTopic": "Cycle detection in a directed graph (Kahn's BFS)",
+    "tags": [
+      "Graphs",
+      "Topological Sort",
+      "BFS",
+      "Indegree"
+    ],
+    "description": "There are a total of A courses you have to take, labeled from 1 to A.\nSome courses may have prerequisites, for example to take course 2 you have to first take course 1, which is expressed as a pair: [1,2].\nSo you are given two integer array B and C of same size where for each i (B[i], C[i]) denotes a pair.\nGiven the total number of courses and a list of prerequisite pairs, is it possible for you to finish all courses?\nReturn 1 if it is possible to finish all the courses, or 0 if it is not possible to finish all the courses.\n\nProblem Constraints\n1 <= A <= 6*10^4\n1 <= length(B) = length(C) <= 10^5\n1 <= B[i], C[i] <= A\n\nInput Format\nThe first argument of input contains an integer A, representing the number of courses.\nThe second argument of input contains an integer array, B.\nThe third argument of input contains an integer array, C.\n\nOutput Format\nReturn 1 if it is possible to finish all the courses, or 0 if it is not possible to finish all the courses.\n\nExample Input\nInput 1:\nA = 3\nB = [1, 2]\nC = [2, 3]\nInput 2:\nA = 2\nB = [1, 2]\nC = [2, 1]\n\nExample Output\nOutput 1:\n1\nOutput 2:\n0\n\nExample Explanation\nExplanation 1:\nIt is possible to complete the courses in the following order:\n    1 -> 2 -> 3\nExplanation 2:\nIt is not possible to complete all the courses.",
+    "sampleInput": "A = 3, B = [1, 2], C = [2, 3]",
+    "sampleOutput": "1",
+    "story": "All courses are finishable exactly when the prerequisite digraph has no cycle.",
+    "plain": "Build a directed graph where an edge B[i] -> C[i] means C[i] depends on B[i], and count the indegree of every course. Push every course with indegree 0 into a queue - those have no pending prerequisites. Repeatedly pop a course, mark it done, and decrement the indegree of each of its dependents, pushing any that drop to 0. If the number of courses popped equals A, every course was reachable in dependency order; otherwise a cycle held some courses back forever. Return 1 in the first case, 0 in the second.",
+    "howToThink": [
+      "Kahn's BFS topological sort - a DAG can be fully peeled by indegree, a cyclic graph cannot.",
+      "Restate the prerequisite pair `(B[i], C[i])` as a directed edge `B[i] -> C[i]`; \"can I finish all courses\" is literally \"is this digraph acyclic\".",
+      "Indegree 0 means \"no unmet prerequisite\" - that is the only safe thing to take next, so the frontier is exactly the zero-indegree set.",
+      "Never check for a cycle explicitly. Just count how many nodes you managed to pop; `visitedNodes != A` is the cycle test.",
+      "Courses are 1-indexed but arrays are 0-indexed, so every array touch is `node - 1`."
+    ],
+    "pitfalls": [
+      "Off-by-one: nodes are labeled `1..A` while `dependencies[]` and `visited[]` are `0..A-1`. Mixing the two silently corrupts indegrees.",
+      "Decrementing indegree inside the neighbour loop without the `== 0` guard re-pushes the same node many times - keep the `visited` check on pop as a safety net.",
+      "Using DFS colours here is fine but heavier; with `length(B)` up to 1e5 the recursion can blow the stack. Kahn's BFS is iterative.",
+      "`map.getOrDefault(node, new ArrayList<>())` is required - a sink course has no outgoing list and `map.get` would NPE."
+    ],
+    "solutions": [
+      {
+        "label": "Optimal - Kahn's BFS on indegrees",
+        "complexity": {
+          "time": "O(A + M) where M = length(B)",
+          "space": "O(A + M) - adjacency map, indegree and visited arrays, queue"
+        },
+        "plain": "Store the adjacency as a map from course to the list of courses that depend on it, and keep an indegree array sized A. Seed a queue with every 1-indexed course whose indegree is 0. Pop nodes one at a time, mark visited, bump a counter, and decrement each dependent's indegree, enqueueing it the moment it hits 0. At the end compare the counter against A: equal means a full topological order existed, less means a cycle.",
+        "approach": [
+          "Allocate `dependencies[A]` (indegree) and `visited[A]`.",
+          "For every i, add edge `B[i] -> C[i]` into the map and do `dependencies[C[i] - 1]++`.",
+          "Enqueue every course `j` in `1..A` with `dependencies[j - 1] == 0`.",
+          "Pop a node, skip if already visited, else mark visited and increment `visitedNodes`.",
+          "For each neighbour, decrement its indegree and enqueue it when it reaches 0.",
+          "Return 1 if `visitedNodes == A`, else 0."
+        ],
+        "pseudocode": "indeg[1..A] = 0\nfor each i: adj[B[i]].add(C[i]); indeg[C[i]]++\n\nqueue = { j : indeg[j] == 0 }\ndone = 0\n\nwhile queue not empty:\n    node = queue.poll()\n    if visited[node] -> continue\n    visited[node] = true\n    done++\n    for child in adj[node]:\n        indeg[child]--\n        if indeg[child] == 0 -> queue.add(child)\n\ndone == A -> return 1\nelse       -> return 0",
+        "story": "Peel off whatever has nothing blocking it; whatever is left over is stuck in a cycle.",
+        "code": "public int courseScheduler(int A, int[] B, int[] C) {\n    int[] dependencies = new int[A];\n    boolean[] visited = new boolean[A];\n    int visitedNodes = 0;\n    HashMap<Integer, ArrayList<Integer>> map = new HashMap<>();\n\n    for (int i = 0; i < B.length; i++) {\n        int u = B[i];\n        int v = C[i];\n        map.computeIfAbsent(u, x -> new ArrayList<>()).add(v);\n        dependencies[v - 1]++;\n    }\n\n    Queue<Integer> queue = new LinkedList<>();\n    for (int j = 1; j <= A; j++) {\n        if (dependencies[j - 1] == 0) {\n            queue.add(j);\n        }\n    }\n\n    while (!queue.isEmpty()) {\n        int node = queue.poll();\n        if (visited[node - 1]) {\n            continue;\n        }\n        visited[node - 1] = true;\n        visitedNodes++;\n        for (int neighbour : map.getOrDefault(node, new ArrayList<>())) {\n            dependencies[neighbour - 1]--;\n            if (dependencies[neighbour - 1] == 0) {\n                queue.add(neighbour);\n            }\n        }\n    }\n\n    if (visitedNodes != A) {\n        return 0;\n    }\n    return 1;\n}"
+      }
+    ]
+  },
+  {
+    "num": 295,
+    "id": "s4-graphs-dijkstra",
+    "title": "Dijkstra",
+    "subTopic": "Single-source shortest path with a min-heap",
+    "tags": [
+      "Graphs",
+      "Dijkstra",
+      "Priority Queue",
+      "Shortest Path"
+    ],
+    "description": "Given a weighted undirected graph having A nodes and M weighted edges, and a source node C.\nYou have to find an integer array D of size A such that:\n\nD[i]: Shortest distance from the C node to node i.\nIf node i is not reachable from C then -1.\n\nNote:\n\nThere are no self-loops in the graph.\nThere are no multiple edges between two pairs of vertices.\nThe graph may or may not be connected.\nNodes are numbered from 0 to A-1.\nYour solution will run on multiple test cases. If you are using global variables, make sure to clear them.\n\nProblem Constraints\n1 <= A <= 1e5\n0 <= B[i][0],B[i][1] < A\n0 <= B[i][2] <= 1e3\n0 <= C < A\n\nInput Format\nThe first argument is an integer A, representing the number of nodes in the graph.\nThe second argument is a matrix B of size M x 3, where each row represents an edge in the graph. The three columns of each row denote the source node B[i][0], the destination node B[i][1], and the weight of the edge B[i][2].\nThe third argument is an integer C, representing the source node for which the shortest distance to all other nodes needs to be found.\n\nOutput Format\nReturn the integer array D.\n\nExample Input\nInput 1:\nA = 6\nB = [    [0, 4, 9]\n         [3, 4, 6]\n         [1, 2, 1]\n         [2, 5, 1]\n         [2, 4, 5]\n         [0, 3, 7]\n         [0, 1, 1]\n         [4, 5, 7]\n         [0, 5, 1] ]\nC = 4\nInput 2:\nA = 5\nB = [    [0, 3, 4]\n         [2, 3, 3]\n         [0, 1, 9]\n         [3, 4, 10]\n         [1, 3, 8]   ]\nC = 4",
+    "sampleInput": "A = 6, B = [[0,4,9],[3,4,6],[1,2,1],[2,5,1],[2,4,5],[0,3,7],[0,1,1],[4,5,7],[0,5,1]], C = 4",
+    "sampleOutput": "D = [7, 6, 5, 6, 0, 6]",
+    "story": "Expand nodes in increasing distance order from the source using a min-heap.",
+    "plain": "Build an undirected adjacency map of (neighbour, weight) pairs. Keep a distance array initialised to -1 meaning unreached, set distance[C] = 0, and push (C, 0) into a min-heap ordered by distance. Repeatedly pop the closest unfinalised node, mark it visited, and for each neighbour relax the edge: if the neighbour is unreached or the new distance beats its current one, update it and push the new state. Because every weight is non-negative, the first time a node is popped its distance is already final. Nodes never popped keep -1.",
+    "howToThink": [
+      "Dijkstra with a min-heap - non-negative weights, so the smallest tentative distance popped is always final.",
+      "Weights are `0 <= w <= 1e3` and not all 1, so plain BFS is wrong; you need the heap ordering.",
+      "`-1` doubles as \"unreachable\" and as the \"infinity\" sentinel, which is exactly what the output format asks for - no separate `Integer.MAX_VALUE` array needed.",
+      "The graph is undirected, so every row of `B` adds two entries to the adjacency.",
+      "`visited[node]` on pop is what keeps the lazy-deletion heap correct - stale heavier copies of a node get skipped."
+    ],
+    "pitfalls": [
+      "Forgetting to add the reverse edge - the problem says undirected, so `u -> v` and `v -> u` both go in.",
+      "Using `-1` as infinity and then writing `dist + weight < distance[child]` without the `distance[child] == -1` guard: `-1` compares as smaller than everything and nothing ever relaxes.",
+      "Not marking `visited` on pop (or not skipping stale entries) - the heap holds duplicates, and re-expanding blows the complexity up.",
+      "Global state across test cases: the problem explicitly warns about it, so allocate `distance`, `visited` and the adjacency fresh each call."
+    ],
+    "solutions": [
+      {
+        "label": "Optimal - Dijkstra with a binary min-heap",
+        "complexity": {
+          "time": "O((A + M) log A)",
+          "space": "O(A + M) - adjacency, distance, visited and the heap"
+        },
+        "plain": "Construct an adjacency map where each edge contributes a State(neighbour, weight) on both endpoints. Fill the distance array with -1, set the source to 0, and push State(C, 0). On each pop, skip already-visited nodes, otherwise finalise the node and relax its outgoing edges. A neighbour is relaxed when it is still -1 or when the candidate distance is strictly smaller, in which case the improved state goes back into the heap. Return the distance array unchanged - unreached nodes are still -1.",
+        "approach": [
+          "Build `adj` as HashMap<Integer, ArrayList<State>>, adding both directions for every edge.",
+          "`Arrays.fill(distance, -1)` then `distance[C] = 0`.",
+          "Push `new State(C, 0)` into a PriorityQueue ordered by `weight`.",
+          "Pop the head; if `visited[node]` continue, else set `visited[node] = true`.",
+          "For each unvisited neighbour: if `distance[child] == -1 || dist + weight < distance[child]`, update and push.",
+          "Return `distance`."
+        ],
+        "pseudocode": "adj = build undirected adjacency from B\ndist[0..A-1] = -1\ndist[C] = 0\nheap = minHeap by weight; heap.add((C, 0))\n\nwhile heap not empty:\n    (node, d) = heap.poll()\n    if visited[node] -> continue\n    visited[node] = true\n    for (child, w) in adj[node]:\n        if visited[child] -> continue\n        if dist[child] == -1 or d + w < dist[child]:\n            dist[child] = d + w\n            heap.add((child, d + w))\n\nreturn dist",
+        "story": "Always finalise the nearest frontier node; with non-negative weights nothing can come back cheaper.",
+        "code": "public int[] minimumDistanceForEachNodeUsingDijkstra(int A, int[][] B, int C) {\n    HashMap<Integer, ArrayList<State>> adj = build(A, B);\n    int[] distance = new int[A];\n    boolean[] visited = new boolean[A];\n    Arrays.fill(distance, -1);\n    PriorityQueue<State> minHeap = new PriorityQueue<>(Comparator.comparingInt(a -> a.weight));\n    distance[C] = 0;\n    minHeap.add(new State(C, 0));\n\n    while (!minHeap.isEmpty()) {\n        State current = minHeap.poll();\n        int node = current.node;\n        int dist = current.weight;\n        if (visited[node]) {\n            continue; // stale heavier copy left in the heap\n        }\n        visited[node] = true;\n\n        for (State neighbour : adj.getOrDefault(node, new ArrayList<>())) {\n            int child = neighbour.node;\n            if (visited[child]) {\n                continue;\n            }\n            int weight = neighbour.weight;\n            if (distance[child] == -1 || dist + weight < distance[child]) {\n                distance[child] = dist + weight;\n                minHeap.add(new State(child, dist + weight));\n            }\n        }\n    }\n\n    return distance;\n}\n\nprivate HashMap<Integer, ArrayList<State>> build(int A, int[][] B) {\n    HashMap<Integer, ArrayList<State>> map = new HashMap<>();\n    for (int[] s : B) {\n        int u = s[0];\n        int v = s[1];\n        int w = s[2];\n        map.computeIfAbsent(u, x -> new ArrayList<>()).add(new State(v, w));\n        map.computeIfAbsent(v, x -> new ArrayList<>()).add(new State(u, w));\n    }\n    return map;\n}\n\nprivate class State {\n    int node;\n    int weight;\n\n    State(int n, int w) {\n        this.node = n;\n        this.weight = w;\n    }\n}"
+      }
+    ]
+  },
+  {
+    "num": 296,
+    "id": "s4-graphs-another-bfs",
+    "title": "Another BFS",
+    "subTopic": "Shortest path with weights restricted to 1 or 2",
+    "tags": [
+      "Graphs",
+      "BFS",
+      "Dijkstra",
+      "Shortest Path"
+    ],
+    "description": "Given a weighted undirected graph having A nodes, a source node C and destination node D.\nFind the shortest distance from C to D and if it is impossible to reach node D from C then return -1.\nYou are expected to do it in Time Complexity of O(A + M).\nNote:\nThere are no self-loops in the graph.\nNo multiple edges between two pair of vertices.\nThe graph may or may not be connected.\nNodes are Numbered from 0 to A-1.\nYour solution will run on multiple testcases. If you are using global variables make sure to clear them.\n\nProblem Constraints\n1 <= A <= 10^5\n0 <= B[i][0], B[i][1] < A\n1 <= B[i][2] <= 2\n0 <= C < A\n0 <= D < A\n\nInput Format\nThe first argument given is an integer A, representing the number of nodes.\nThe second argument given is the matrix B, where B[i][0] and B[i][1] are connected through an edge of weight B[i][2].\nThe third argument given is an integer C, representing the source node.\nThe fourth argument given is an integer D, representing the destination node.\nNote: B[i][2] will be either 1 or 2.\n\nOutput Format\nReturn the shortest distance from C to D. If it is impossible to reach node D from C then return -1.\n\nExample Input\nInput 1:\nA = 6\nB = [    [2, 5, 1]\n         [1, 3, 1]\n         [0, 5, 2]\n         [0, 2, 2]\n         [1, 4, 1]\n         [0, 1, 1] ]\nC = 3\nD = 2\nInput 2:\nA = 2\nB = [    [0, 1, 1]\n    ]\nC = 0\nD = 1",
+    "sampleInput": "A = 6, B = [[2,5,1],[1,3,1],[0,5,2],[0,2,2],[1,4,1],[0,1,1]], C = 3, D = 2",
+    "sampleOutput": "4",
+    "story": "Weights are only 1 or 2, so a weight-2 edge is just two unit edges and plain BFS suffices.",
+    "plain": "Every edge weighs 1 or 2, so instead of a heap you can make every edge cost the same. Replace each weight-2 edge u-v by a fresh dummy node m plus two unit edges u-m and m-v; now the whole graph is unweighted. Run a plain BFS from C over the expanded graph, which has A + M nodes and 2M edges. The BFS layer number of D is exactly the original shortest distance, because a weight-2 edge now contributes exactly 2 layers. Return -1 if D was never reached.",
+    "howToThink": [
+      "Bounded-weight shortest path: split a weight-2 edge into two unit edges and run plain BFS - O(A + M), which is the bound the problem demands.",
+      "The constraint `1 <= B[i][2] <= 2` is the whole hint; with only two distinct weights a heap is overkill.",
+      "Splitting adds at most one dummy node per edge, so the expanded graph is still `A + M` nodes - linear.",
+      "A min-heap Dijkstra also passes here at `O((A + M) log A)`; it is the safe fallback if you cannot see the split.",
+      "You can stop the BFS the moment `D` is dequeued, but it does not change the asymptotic bound."
+    ],
+    "pitfalls": [
+      "Running plain BFS on the original graph without splitting - it counts edges, not weight, and silently returns the wrong number.",
+      "Sizing the expanded arrays as `A` instead of `A + B.length`; dummy ids start at `A` and overflow the array.",
+      "Forgetting the graph is undirected - both `u -> mid` and `mid -> u` must go in, otherwise some paths vanish.",
+      "Returning `0` instead of `-1` for an unreachable `D` - keep the `-1` sentinel in the distance array and return it directly.",
+      "Global adjacency reused across testcases; the problem calls this out explicitly."
+    ],
+    "solutions": [
+      {
+        "label": "Optimal - split weight-2 edges, plain BFS, O(A + M)",
+        "complexity": {
+          "time": "O(A + M)",
+          "space": "O(A + M) - expanded adjacency, distance array and queue"
+        },
+        "plain": "Allocate room for A real nodes plus one dummy per edge. A weight-1 edge goes in as-is; a weight-2 edge u-v allocates a new dummy id and inserts u-mid and mid-v, both of weight 1. Now every edge costs 1, so a single BFS from C computes exact shortest distances as layer numbers. Read off distance[D], which is -1 when unreachable.",
+        "approach": [
+          "Size the graph at `A + B.length` to leave room for one dummy per split edge.",
+          "For an edge of weight 1, add `u <-> v` directly.",
+          "For an edge of weight 2, take the next dummy id `mid`, add `u <-> mid` and `mid <-> v`.",
+          "Fill `dist` with -1, set `dist[C] = 0`, push `C` into a queue.",
+          "Standard BFS: pop, and for each neighbour still at -1 set `dist[node] + 1` and enqueue.",
+          "Return `dist[D]`."
+        ],
+        "pseudocode": "total = A + M\nnext  = A\n\nfor each (u, v, w) in B:\n    w == 1 -> add u<->v\n    w == 2 -> mid = next++; add u<->mid; add mid<->v\n\ndist[0..total-1] = -1\ndist[C] = 0\nqueue = [C]\n\nwhile queue not empty:\n    node = queue.poll()\n    for child in adj[node]:\n        if dist[child] == -1:\n            dist[child] = dist[node] + 1\n            queue.add(child)\n\nreturn dist[D]",
+        "story": "Turn the only awkward weight into two ordinary steps and the problem becomes plain BFS.",
+        "code": "public int anotherBfsShortestPath(int A, int[][] B, int C, int D) {\n    int total = A + B.length;\n    List<List<Integer>> graph = new ArrayList<>();\n    for (int i = 0; i < total; i++) {\n        graph.add(new ArrayList<>());\n    }\n\n    int next = A;\n    for (int[] edge : B) {\n        int u = edge[0];\n        int v = edge[1];\n        if (edge[2] == 1) {\n            graph.get(u).add(v);\n            graph.get(v).add(u);\n        } else {\n            int mid = next++; // split the weight-2 edge into two unit edges\n            graph.get(u).add(mid);\n            graph.get(mid).add(u);\n            graph.get(mid).add(v);\n            graph.get(v).add(mid);\n        }\n    }\n\n    int[] dist = new int[total];\n    Arrays.fill(dist, -1);\n    dist[C] = 0;\n    Queue<Integer> queue = new LinkedList<>();\n    queue.add(C);\n\n    while (!queue.isEmpty()) {\n        int node = queue.poll();\n        for (int neighbour : graph.get(node)) {\n            if (dist[neighbour] == -1) {\n                dist[neighbour] = dist[node] + 1;\n                queue.add(neighbour);\n            }\n        }\n    }\n\n    return dist[D];\n}"
+      },
+      {
+        "label": "Accepted - Dijkstra with a min-heap",
+        "complexity": {
+          "time": "O((A + M) log A)",
+          "space": "O(A + M) - adjacency, dist array and the heap"
+        },
+        "plain": "Ignore the weight restriction and treat it as a generic non-negative shortest path. Build the undirected weighted adjacency, fill dist with Integer.MAX_VALUE, set dist[C] = 0, and run a lazy-deletion Dijkstra. Break out early when D is popped, since its distance is final at that moment. Return -1 if dist[D] is still MAX_VALUE.",
+        "approach": [
+          "Build `List<List<Node>> graph` adding both directions for each edge.",
+          "`Arrays.fill(dist, Integer.MAX_VALUE)`, `dist[C] = 0`, push `Node(C, 0)`.",
+          "Pop the smallest; break if it is `D`, skip it if `node.weight > dist[u]` (stale copy).",
+          "Relax every neighbour and push the improved state.",
+          "Return `dist[D] == Integer.MAX_VALUE ? -1 : dist[D]`."
+        ],
+        "pseudocode": "dist[0..A-1] = INF; dist[C] = 0\nheap = minHeap by weight; heap.add((C, 0))\n\nwhile heap not empty:\n    (u, d) = heap.poll()\n    u == D      -> break\n    d > dist[u] -> continue\n    for (v, w) in adj[u]:\n        if dist[u] + w < dist[v]:\n            dist[v] = dist[u] + w\n            heap.add((v, dist[v]))\n\ndist[D] == INF -> return -1\nelse           -> return dist[D]",
+        "story": "The generic tool still fits; it just pays a log factor the constraints did not require.",
+        "code": "public int shortestPath(int A, int[][] B, int C, int D) {\n    List<List<Node>> graph = new ArrayList<>();\n    for (int i = 0; i < A; i++) {\n        graph.add(new ArrayList<>());\n    }\n\n    for (int[] edge : B) {\n        int u = edge[0];\n        int v = edge[1];\n        int w = edge[2];\n        graph.get(u).add(new Node(v, w));\n        graph.get(v).add(new Node(u, w));\n    }\n\n    int[] dist = new int[A];\n    Arrays.fill(dist, Integer.MAX_VALUE);\n    dist[C] = 0;\n\n    PriorityQueue<Node> pq = new PriorityQueue<>(Comparator.comparingInt(node -> node.weight));\n    pq.offer(new Node(C, 0));\n\n    while (!pq.isEmpty()) {\n        Node node = pq.poll();\n        int u = node.id;\n\n        if (u == D) {\n            break;\n        }\n        if (node.weight > dist[u]) {\n            continue; // stale entry, already finalised cheaper\n        }\n\n        for (Node neighbor : graph.get(u)) {\n            int v = neighbor.id;\n            int weight = neighbor.weight;\n            if (dist[u] + weight < dist[v]) {\n                dist[v] = dist[u] + weight;\n                pq.offer(new Node(v, dist[v]));\n            }\n        }\n    }\n\n    return dist[D] == Integer.MAX_VALUE ? -1 : dist[D];\n}\n\nprivate class Node {\n    int id;\n    int weight;\n\n    Node(int id, int weight) {\n        this.id = id;\n        this.weight = weight;\n    }\n}"
+      }
+    ]
+  },
+  {
+    "num": 297,
+    "id": "s4-graphs-topological-sort",
+    "title": "Topological Sort",
+    "subTopic": "Lexicographically smallest topological order",
+    "tags": [
+      "Graphs",
+      "Topological Sort",
+      "Priority Queue",
+      "Indegree"
+    ],
+    "description": "Given an directed acyclic graph having A nodes. A matrix B of size M x 2 is given which represents the M edges such that there is a edge directed from node B[i][0] to node B[i][1].\nTopological sorting for Directed Acyclic Graph (DAG) is a linear ordering of vertices such that for every directed edge uv, vertex u comes before v in the ordering. Topological Sorting for a graph is not possible if the graph is not a DAG.\nReturn the topological ordering of the graph and if it doesn't exist then return an empty array.\nIf there is a solution return the correct ordering. If there are multiple solutions print the lexographically smallest one.\nOrdering (a, b, c) is said to be lexographically smaller than ordering (e, f, g) if a < e or if(a==e) then b < f and so on.\nNOTE:\n\nThere are no self-loops in the graph.\nThe graph may or may not be connected.\nNodes are numbered from 1 to A.\nYour solution will run on multiple test cases. If you are using global variables make sure to clear them.\n\nProblem Constraints\n2 <= A <= 10^4\n1 <= M <= min(100000,A*(A-1))\n1 <= B[i][0], B[i][1] <= A\n\nInput Format\nThe first argument given is an integer A representing the number of nodes in the graph.\nThe second argument given a matrix B of size M x 2 which represents the M edges such that there is a edge directed from node B[i][0] to node B[i][1].\n\nOutput Format\nReturn a one-dimensional array denoting the topological ordering of the graph and it it doesn't exist then return empty array.\n\nExample Input\nInput 1:\nA = 6\nB = [  [6, 3]\n       [6, 1]\n       [5, 1]\n       [5, 2]\n       [3, 4]\n       [4, 2] ]\nInput 2:\nA = 3\nB = [  [1, 2]\n       [2, 3]\n       [3, 1] ]\n\nExample Output\nOutput 1:\n[5, 6, 1, 3, 4, 2]\nOutput 2:\n[]",
+    "sampleInput": "A = 6, B = [[6,3],[6,1],[5,1],[5,2],[3,4],[4,2]]",
+    "sampleOutput": "[5, 6, 1, 3, 4, 2]",
+    "story": "Kahn's BFS, but pull the smallest available node instead of any available node.",
+    "plain": "Build the adjacency list and the indegree array over nodes 1..A. Seed a min-heap with every node of indegree 0 instead of a plain queue - that is the only change that buys lexicographic minimality. Pop the smallest ready node, append it to the result, and decrement each neighbour's indegree, pushing any that reach 0. Since the heap always hands you the smallest node that is legal right now, the greedy choice is globally optimal for lexicographic order. If the result holds fewer than A nodes, the graph had a cycle, so return an empty array.",
+    "howToThink": [
+      "Kahn's BFS with a PriorityQueue instead of a Queue - the min-heap is what makes the order lexicographically smallest.",
+      "Greedy is safe: among the zero-indegree set, picking the smallest can never block a smaller node later, because the others stay available.",
+      "The cycle case is free - `result.size() != A` after the drain means some node never hit indegree 0.",
+      "Nodes are `1..A`, so size `indegree` as `A + 1` and index it directly rather than shifting.",
+      "DFS-based topological sort produces *a* valid order but not the smallest one; do not reach for it here."
+    ],
+    "pitfalls": [
+      "Using a plain `Queue` - it passes the DAG check but fails the lexicographic requirement.",
+      "Allocating `indegree` and `graph` with size `A` while nodes run to `A`; you need `A + 1` slots for the 1-based labels.",
+      "Returning `null` or a partially filled array on a cycle instead of `new int[0]`.",
+      "Enqueuing a neighbour on every decrement instead of only when it hits exactly 0 - duplicates corrupt the order.",
+      "Leftover global `graph` / `indegree` state between test cases."
+    ],
+    "solutions": [
+      {
+        "label": "Optimal - Kahn's BFS driven by a min-heap",
+        "complexity": {
+          "time": "O(M + A log A)",
+          "space": "O(A + M) - adjacency, indegree array, heap and result"
+        },
+        "plain": "Create A + 1 adjacency buckets and an indegree array of the same size. For every edge add B[i][1] to B[i][0]'s bucket and bump the target's indegree. Push all indegree-0 nodes into a PriorityQueue, then repeatedly poll the smallest, append it to the result, and relax its outgoing edges. When the heap drains, a result of size A is the answer; anything shorter means a cycle, so return an empty array.",
+        "approach": [
+          "Build `graph` with `A + 1` empty lists and `indegree` of length `A + 1`.",
+          "For each edge `[u, v]`: `graph.get(u).add(v)` and `indegree[v]++`.",
+          "Push every `i` in `1..A` with `indegree[i] == 0` into a PriorityQueue.",
+          "Poll the smallest, append to `result`, and for each neighbour decrement indegree, pushing it when it becomes 0.",
+          "If `result.size() != A` return `new int[0]`; else copy `result` into an int array."
+        ],
+        "pseudocode": "indeg[1..A] = 0\nfor each (u, v) in B: adj[u].add(v); indeg[v]++\n\npq = minHeap of { i : indeg[i] == 0 }\nresult = []\n\nwhile pq not empty:\n    node = pq.poll()          // smallest legal node right now\n    result.add(node)\n    for child in adj[node]:\n        indeg[child]--\n        if indeg[child] == 0 -> pq.add(child)\n\nresult.size() != A -> return []\nelse               -> return result",
+        "story": "Same peel as Kahn's, but a heap decides which peeled node goes first.",
+        "code": "public int[] topologicalSort(int A, int[][] B) {\n    List<List<Integer>> graph = new ArrayList<>();\n    for (int i = 0; i <= A; i++) {\n        graph.add(new ArrayList<>());\n    }\n\n    int[] indegree = new int[A + 1];\n    for (int[] edge : B) {\n        graph.get(edge[0]).add(edge[1]);\n        indegree[edge[1]]++;\n    }\n\n    PriorityQueue<Integer> pq = new PriorityQueue<>();\n    for (int i = 1; i <= A; i++) {\n        if (indegree[i] == 0) {\n            pq.add(i);\n        }\n    }\n\n    List<Integer> result = new ArrayList<>();\n    while (!pq.isEmpty()) {\n        int node = pq.poll(); // smallest node whose prerequisites are all done\n        result.add(node);\n        for (int neighbor : graph.get(node)) {\n            indegree[neighbor]--;\n            if (indegree[neighbor] == 0) {\n                pq.add(neighbor);\n            }\n        }\n    }\n\n    if (result.size() != A) {\n        return new int[0]; // cycle detected\n    }\n\n    int[] ans = new int[A];\n    for (int i = 0; i < A; i++) {\n        ans[i] = result.get(i);\n    }\n    return ans;\n}"
+      }
+    ]
+  },
+  {
+    "num": 298,
+    "id": "s4-graphs-largest-distance-between-nodes-of-a-tree",
+    "title": "Largest Distance between nodes of a Tree",
+    "subTopic": "Tree diameter by double BFS",
+    "tags": [
+      "Graphs",
+      "Trees",
+      "BFS",
+      "Diameter"
+    ],
+    "description": "Find largest distance Given an arbitrary unweighted rooted tree which consists of N (2 <= N <= 40000) nodes.\nThe goal of the problem is to find largest distance between two nodes in a tree. Distance between two nodes is a number of edges on a path between the nodes (there will be a unique path between any pair of nodes since it is a tree).\nThe nodes will be numbered 0 through N - 1.\nThe tree is given as an array A, there is an edge between nodes A[i] and i (0 <= i < N). Exactly one of the i's will have A[i] equal to -1, it will be root node.\n\nProblem Constraints\n2 <= |A| <= 40000\n\nInput Format\nFirst and only argument is vector A\n\nOutput Format\nReturn the length of the longest path\n\nExample Input\nInput 1:\nA = [-1, 0]\nInput 2:\nA = [-1, 0, 0]\n\nExample Output\nOutput 1:\n1\nOutput 2:\n2\n\nExample Explanation\nExplanation 1:\nPath is 0 -> 1.\nExplanation 2:\nPath is 1 -> 0 -> 2.",
+    "sampleInput": "A = [-1, 0]",
+    "sampleOutput": "1",
+    "story": "The longest path in a tree is its diameter, found by two BFS sweeps.",
+    "plain": "The parent array gives an edge between i and A[i] for every non-root i; store it undirected, because the longest path does not have to pass through the root. BFS from any node, say 0, and record the farthest node u - that node is provably an endpoint of some diameter. BFS again from u and take the largest distance found; that value is the diameter, counted in edges. Both sweeps are plain queue-based BFS, so nothing recurses and the 40000-node bound is safe.",
+    "howToThink": [
+      "Tree diameter via double BFS: farthest node from anywhere is a diameter endpoint, then farthest from it is the diameter.",
+      "The rooting is a red herring - the longest path is between two nodes, not necessarily through the root, so treat edges as undirected.",
+      "Parent array to adjacency: for every `i` with `A[i] != -1`, add both `i -> A[i]` and `A[i] -> i`.",
+      "Distance is edge count, so BFS layer numbers are the answer directly - no weights involved.",
+      "`N` up to 40000 in a possibly path-shaped tree means recursion depth 40000; use an iterative BFS, not DFS."
+    ],
+    "pitfalls": [
+      "Adding only the child -> parent direction; BFS then cannot walk down from the first endpoint and the answer is too small.",
+      "Recursive DFS on a degenerate chain of 40000 nodes blows the Java stack.",
+      "Skipping the root edge: the `-1` entry is the root marker, not a node id - guard with `A[i] != -1` before indexing.",
+      "Returning node count instead of edge count - the sample `[-1, 0]` must give 1, not 2.",
+      "Reusing the `dist` array between the two BFS runs without refilling it with -1."
+    ],
+    "solutions": [
+      {
+        "label": "Optimal - double BFS for the diameter",
+        "complexity": {
+          "time": "O(N)",
+          "space": "O(N) - adjacency, distance array and queue"
+        },
+        "plain": "Convert the parent array into an undirected adjacency list. Run a BFS from node 0 that returns both the farthest node and its distance. Feed that farthest node back into the same BFS helper; the distance it returns is the tree diameter. Because BFS visits each node and edge once, both sweeps are linear.",
+        "approach": [
+          "Build `tree` with N buckets; for each `i` where `A[i] != -1`, add `i <-> A[i]`.",
+          "Run `bfsFarthest(tree, 0)` and keep the returned node id as `endpoint`.",
+          "Run `bfsFarthest(tree, endpoint)` and keep the returned distance.",
+          "Return that distance."
+        ],
+        "pseudocode": "adj = undirected edges { i <-> A[i] : A[i] != -1 }\n\n(u, _) = bfsFarthest(adj, 0)\n(_, d) = bfsFarthest(adj, u)\nreturn d\n\nbfsFarthest(adj, src):\n    dist[*] = -1; dist[src] = 0; queue = [src]; far = src\n    while queue not empty:\n        node = queue.poll()\n        dist[node] > dist[far] -> far = node\n        for child in adj[node]:\n            dist[child] == -1 -> dist[child] = dist[node] + 1; queue.add(child)\n    return (far, dist[far])",
+        "story": "Walk as far as you can, then walk as far as you can again - that second walk is the diameter.",
+        "code": "public int largestDistanceBetweenNodes(int[] A) {\n    int n = A.length;\n    List<List<Integer>> tree = new ArrayList<>();\n    for (int i = 0; i < n; i++) {\n        tree.add(new ArrayList<>());\n    }\n\n    for (int i = 0; i < n; i++) {\n        if (A[i] != -1) {\n            tree.get(i).add(A[i]);\n            tree.get(A[i]).add(i); // undirected - the diameter need not pass the root\n        }\n    }\n\n    int[] first = bfsFarthest(tree, 0, n);\n    int[] second = bfsFarthest(tree, first[0], n);\n    return second[1];\n}\n\nprivate int[] bfsFarthest(List<List<Integer>> tree, int src, int n) {\n    int[] dist = new int[n];\n    Arrays.fill(dist, -1);\n    dist[src] = 0;\n    Queue<Integer> queue = new LinkedList<>();\n    queue.add(src);\n    int far = src;\n\n    while (!queue.isEmpty()) {\n        int node = queue.poll();\n        if (dist[node] > dist[far]) {\n            far = node;\n        }\n        for (int neighbour : tree.get(node)) {\n            if (dist[neighbour] == -1) {\n                dist[neighbour] = dist[node] + 1;\n                queue.add(neighbour);\n            }\n        }\n    }\n\n    return new int[] { far, dist[far] };\n}"
+      }
+    ]
+  },
+  {
+    "num": 299,
+    "id": "s4-graphs-shortest-distance-in-a-maze",
+    "title": "Shortest Distance in a Maze",
+    "subTopic": "Weighted grid BFS with distance relaxation",
+    "tags": [
+      "Graphs",
+      "BFS",
+      "Matrix",
+      "Shortest Path"
+    ],
+    "description": "Given a matrix of integers A of size N x M describing a maze. The maze consists of empty locations and walls.\n1 represents a wall in a matrix and 0 represents an empty location in a wall.\nThere is a ball trapped in a maze. The ball can go through empty spaces by rolling up, down, left or right, but it won't stop rolling until hitting a wall (maze boundary is also considered as a wall). When the ball stops, it could choose the next direction.\nGiven two array of integers of size B and C of size 2 denoting the starting and destination position of the ball.\nFind the shortest distance for the ball to stop at the destination. The distance is defined by the number of empty spaces traveled by the ball from the starting position (excluded) to the destination (included). If the ball cannot stop at the destination, return -1.\n\nProblem Constraints\n2 <= N, M <= 100\n0 <= A[i] <= 1\n0 <= B[i][0], C[i][0] < N\n0 <= B[i][1], C[i][1] < M\n\nInput Format\nThe first argument given is the integer matrix A.\nThe second argument given is an array of integer B.\nThe third argument if an array of integer C.\n\nOutput Format\nReturn a single integer, the minimum distance required to reach destination\n\nExample Input\nInput 1:\nA = [ [0, 0],\n      [0, 0] ]\nB = [0, 0]\nC = [0, 1]\nInput 2:\nA = [ [0, 1],\n      [1, 0] ]\nB = [0, 0]\nC = [1, 1]\n\nExample Output\nOutput 1:\n1\nOutput 2:\n-1\n\nExample Explanation\nExplanation 1:\nGo directly from start to destination in distance 1.\nExplanation 2:\nIt is impossible to reach the destination from (0, 0) to (1, 1) as there are walls at (1, 0) and (0, 1)",
+    "sampleInput": "A = [[0, 0], [0, 0]], B = [0, 0], C = [0, 1]",
+    "sampleOutput": "1",
+    "story": "The ball only stops at walls, so the graph nodes are stopping cells and every edge carries the roll length as its weight.",
+    "plain": "Treat every cell the ball can come to rest on as a graph node. From a node, roll in each of the four directions until the next cell is a wall or out of bounds; the cell you halt on is the neighbour and the number of cells crossed is the edge weight. Because those weights differ, plain layered BFS does not give the shortest distance, so keep a `dist` matrix and push a neighbour back onto the queue only when its distance strictly improves. Seed `dist[B] = 0` and relax until the queue drains. The answer is `dist[C]`, or -1 if it is still infinity.",
+    "howToThink": [
+      "Weighted shortest path on a grid: nodes are stop positions, edge weight is the roll length — BFS with distance relaxation (Dijkstra also works, a plain BFS does not).",
+      "The ball cannot be halted mid-roll, so intermediate cells are never nodes; only the cell where the next step would hit a wall is.",
+      "From `cur`, a single `while (isValid(x+dx, y+dy) && A[x+dx][y+dy] == 0)` loop yields both the neighbour `(x, y)` and the weight `count`.",
+      "Push only when `dist[cur] + count < dist[x][y]`; that strict guard is what makes the relaxation terminate and what makes it correct under unequal weights.",
+      "If a direction is blocked immediately, `count` is 0 and the neighbour is `cur` itself — the strict `<` rejects it, so there is no self-loop."
+    ],
+    "pitfalls": [
+      "Plain visited-BFS is wrong here: edge weights are roll lengths, not 1, so the first arrival is not necessarily the cheapest.",
+      "Marking cells `visited` instead of comparing distances permanently prunes a genuinely shorter path found later.",
+      "The rolling `while` must test the NEXT cell (`x + d[0]`), not the current one — testing the current cell either walks through walls or stops one cell short.",
+      "The destination only counts if the ball can STOP there; rolling over it is not an answer. Return -1 while `dist[C]` is still `Integer.MAX_VALUE`."
+    ],
+    "solutions": [
+      {
+        "label": "Optimal — BFS with distance relaxation over rolling edges",
+        "complexity": {
+          "time": "O(N * M * max(N, M)) — each of the N*M stop states expands 4 directions and each roll scans up to max(N, M) cells",
+          "space": "O(N * M) — dist matrix plus the queue"
+        },
+        "plain": "Initialise every `dist` entry to infinity and set the start to 0. Pop a cell, and for each of the four directions roll until the next cell is a wall or outside the grid, counting the cells crossed. If reaching that stop cell through the current one is cheaper than its stored distance, overwrite the distance and enqueue it. When the queue empties, read `dist` at the destination.",
+        "approach": [
+          "Build an `n x m` `dist` matrix filled with `Integer.MAX_VALUE`; set `dist[B[0]][B[1]] = 0`.",
+          "Push the start cell onto a queue.",
+          "Pop a cell `cur`. For each direction `d`, advance `(x, y)` while the next cell is in bounds and is a 0, counting the steps in `count`.",
+          "If `dist[cur] + count < dist[x][y]`, set `dist[x][y] = dist[cur] + count` and enqueue `(x, y)`.",
+          "After the queue drains, return `dist[C[0]][C[1]]`, or -1 if it is still `Integer.MAX_VALUE`."
+        ],
+        "pseudocode": "dist[][] = INF; dist[start] = 0\nqueue = [start]\nwhile queue not empty:\n    cur = queue.poll()\n    for d in 4 directions:\n        x, y = cur; count = 0\n        while inBounds(x+d) and maze[x+d] == 0:\n            x, y = x+d; count++\n        if dist[cur] + count < dist[x][y]:\n            dist[x][y] = dist[cur] + count\n            queue.add((x, y))\nreturn dist[dest] == INF → -1, else dist[dest]",
+        "story": "Collapse each uninterruptible roll into one weighted edge, then relax distances until nothing improves.",
+        "code": "public int shortestDistanceInAMaze(int[][] A, int[] B, int[] C) {\n    int n = A.length, m = A[0].length;\n    int[][] dist = new int[n][m];\n    for (int[] row : dist) {\n        Arrays.fill(row, Integer.MAX_VALUE);\n    }\n    dist[B[0]][B[1]] = 0;\n\n    Queue<int[]> queue = new LinkedList<>();\n    queue.add(new int[]{B[0], B[1]});\n\n    int[][] dirs = {{-1, 0}, {1, 0}, {0, -1}, {0, 1}};\n    while (!queue.isEmpty()) {\n        int[] cur = queue.poll();\n        for (int[] d : dirs) {\n            int x = cur[0], y = cur[1], count = 0;\n            while (isValid(n, m, x + d[0], y + d[1]) && A[x + d[0]][y + d[1]] == 0) {\n                x += d[0];\n                y += d[1];\n                count++;\n            }\n            // strict improvement only, else a blocked direction re-pushes cur forever\n            if (dist[cur[0]][cur[1]] + count < dist[x][y]) {\n                dist[x][y] = dist[cur[0]][cur[1]] + count;\n                queue.add(new int[]{x, y});\n            }\n        }\n    }\n\n    return dist[C[0]][C[1]] == Integer.MAX_VALUE ? -1 : dist[C[0]][C[1]];\n}\n\nprivate boolean isValid(int n, int m, int x, int y) {\n    return x >= 0 && y >= 0 && x < n && y < m;\n}"
+      }
+    ]
+  },
+  {
+    "num": 300,
+    "id": "s4-graphs-number-of-islands",
+    "title": "Number of Islands",
+    "subTopic": "8-directional flood fill component count",
+    "tags": [
+      "Graphs",
+      "DFS",
+      "Matrix",
+      "Connected Components"
+    ],
+    "description": "Given a matrix of integers A of size N x M consisting of 0 and 1. A group of connected 1's forms an island. From a cell (i, j) such that A[i][j] = 1 you can visit any cell that shares a corner with (i, j) and value in that cell is 1.\nMore formally, from any cell (i, j) if A[i][j] = 1 you can visit:\n(i-1, j) if (i-1, j) is inside the matrix and A[i-1][j] = 1.\n(i, j-1) if (i, j-1) is inside the matrix and A[i][j-1] = 1.\n(i+1, j) if (i+1, j) is inside the matrix and A[i+1][j] = 1.\n(i, j+1) if (i, j+1) is inside the matrix and A[i][j+1] = 1.\n(i-1, j-1) if (i-1, j-1) is inside the matrix and A[i-1][j-1] = 1.\n(i+1, j+1) if (i+1, j+1) is inside the matrix and A[i+1][j+1] = 1.\n(i-1, j+1) if (i-1, j+1) is inside the matrix and A[i-1][j+1] = 1.\n(i+1, j-1) if (i+1, j-1) is inside the matrix and A[i+1][j-1] = 1.\nReturn the number of islands.\nNOTE: Rows are numbered from top to bottom and columns are numbered from left to right.\n\nProblem Constraints\n1 <= N, M <= 100\n0 <= A[i] <= 1\n\nInput Format\nThe only argument given is the integer matrix A.\n\nOutput Format\nReturn the number of islands.\n\nExample Input\nInput 1:\nA = [\n     [0, 1, 0]\n     [0, 0, 1]\n     [1, 0, 0]\n    ]\nInput 2:\nA = [\n     [1, 1, 0, 0, 0]\n     [0, 1, 0, 0, 0]\n     [1, 0, 0, 1, 1]\n     [0, 0, 0, 0, 0]\n     [1, 0, 1, 0, 1]\n    ]\n\nExample Output\nOutput 1:\n2\nOutput 2:\n5\n\nExample Explanation\nExplanation 1:\nThe 1's at position A[0][1] and A[1][2] forms one island.",
+    "sampleInput": "A = [[0, 1, 0], [0, 0, 1], [1, 0, 0]]",
+    "sampleOutput": "2",
+    "story": "Count how many times you have to start a fresh flood fill over unvisited 1 cells, with diagonals included.",
+    "plain": "Scan every cell of the matrix in row-major order. When you hit a 1 that has not been visited, increment the island counter and launch a DFS from it. The DFS walks the eight neighbour offsets — four orthogonal plus four diagonal — and marks every reachable 1 as visited, consuming the whole connected blob in one traversal. Every later cell of that blob is skipped by the visited check, so it can never start a second count. The counter ends up equal to the number of connected components.",
+    "howToThink": [
+      "Connected components on a grid: DFS/BFS flood fill with 8 directions; the answer is the number of traversals you had to start.",
+      "Diagonals count here, so the direction array has 8 entries, not 4 — corner-touching 1s belong to the same island.",
+      "Mark `visited[x][y] = true` at the moment the cell is entered, before recursing, so a cell can never be queued twice.",
+      "The outer guard `A[i][j] == 1 && !visited[i][j]` is what guarantees each component is counted exactly once."
+    ],
+    "pitfalls": [
+      "Using only the 4 orthogonal directions — this problem is 8-connected and that alone breaks the first sample.",
+      "Marking `visited` AFTER the recursive call rather than before: the cell re-enters the stack and the recursion never settles.",
+      "Recursion can reach depth `N*M` = 10000 on a full grid; it survives here, but the iterative BFS rewrite is the safe version if bounds grow.",
+      "Do not overwrite `A` in place to mark visits unless mutation is allowed; keep a separate `visited` matrix."
+    ],
+    "solutions": [
+      {
+        "label": "Optimal — DFS flood fill over 8 neighbours",
+        "complexity": {
+          "time": "O(N * M) — every cell is visited once, with 8 constant-time neighbour checks",
+          "space": "O(N * M) — visited matrix, plus up to O(N * M) recursion stack"
+        },
+        "plain": "Keep a boolean `visited` matrix. Sweep all cells; on an unvisited 1, bump the island count, mark it, and DFS. The DFS tries all eight offsets, and for each in-bounds, unvisited cell holding a 1 it marks the cell and recurses. Once the sweep ends, the count is the number of islands.",
+        "approach": [
+          "Allocate `visited[n][m]` and set `islands = 0`.",
+          "For each cell `(i, j)`: if `A[i][j] == 1` and it is unvisited, increment `islands`, mark it visited, and call `dfs(i, j, ...)`.",
+          "In `dfs`, loop over the 8 direction offsets to get `(xAxis, yAxis)`.",
+          "If that neighbour is in bounds, unvisited and equal to 1, mark it visited and recurse into it.",
+          "Return `islands` after the full sweep."
+        ],
+        "pseudocode": "islands = 0\nfor i in 0..n-1:\n    for j in 0..m-1:\n        if A[i][j] == 1 and not visited[i][j]:\n            islands++\n            visited[i][j] = true\n            dfs(i, j)\nreturn islands\n\ndfs(x, y):\n    for each of 8 offsets (dx, dy):\n        nx, ny = x+dx, y+dy\n        if inBounds(nx, ny) and not visited[nx][ny] and A[nx][ny] == 1:\n            visited[nx][ny] = true\n            dfs(nx, ny)",
+        "story": "One traversal eats an entire island, so the number of traversals is the number of islands.",
+        "code": "private final int[][] directions = {{-1, 0}, {1, 0}, {0, -1}, {0, 1}, {-1, -1}, {1, 1}, {-1, 1}, {1, -1}};\n\npublic int numberOfIslandsPresent(int[][] A) {\n    int n = A.length, m = A[0].length;\n    boolean[][] visited = new boolean[n][m];\n    int islands = 0;\n    for (int i = 0; i < n; i++) {\n        for (int j = 0; j < m; j++) {\n            if (A[i][j] == 1 && !visited[i][j]) {\n                islands++;\n                visited[i][j] = true;\n                dfs(i, j, A, n, m, visited);\n            }\n        }\n    }\n    return islands;\n}\n\nprivate void dfs(int x, int y, int[][] A, int n, int m, boolean[][] visited) {\n    for (int i = 0; i < 8; i++) {\n        int xAxis = x + directions[i][0];\n        int yAxis = y + directions[i][1];\n        if (isValid(n, m, xAxis, yAxis) && !visited[xAxis][yAxis] && A[xAxis][yAxis] == 1) {\n            visited[xAxis][yAxis] = true;   // mark BEFORE recursing, else the cell re-enters the stack\n            dfs(xAxis, yAxis, A, n, m, visited);\n        }\n    }\n}\n\nprivate boolean isValid(int n, int m, int x, int y) {\n    return x >= 0 && y >= 0 && x < n && y < m;\n}"
+      }
+    ]
+  },
+  {
+    "num": 301,
+    "id": "s4-graphs-jump-game-2",
+    "title": "Jump Game 2",
+    "subTopic": "Greedy BFS frontier over indices",
+    "tags": [
+      "Arrays",
+      "Greedy",
+      "BFS"
+    ],
+    "description": "You are given an array of non-negative integers A, where each element in the array represents the maximum number of steps you can jump forward from that position.\n\nA jump means moving from the current index to another index further in the array within the allowed range of steps defined by the value at the current index. For instance, if A[i] = 3, you can jump to any of the next 3 positions from index i (i.e., i+1, i+2, or i+3), provided these positions are within the bounds of the array.\n\nYour task is to determine the minimum number of jumps required to reach the last index of the array, starting from the first index.\n\nIf it's not possible to reach the last index, return -1.\n\nProblem Constraints\n1 ≤ |A| ≤ 10^5\n0 ≤ A[i] ≤ 10^5\n\nInput Format\nA single argument: an Integer array A of size N\n\nOutput Format\nReturn an integer representing the minimum number of jumps needed to reach the last index of the array.\nIf it's not possible to reach the last index, return -1.\n\nExample Input\nInput 1:\nA = [2, 3, 1, 1, 4]\nInput 2:\nA = [0, 1, 1, 4]\n\nExample Output\nOutput 1:\n2\nOutput 2:\n-1\n\nExample Explanation\nExplanation 1:\nThe first element A[0] = 2 means you can jump to index 1 or index 2.\nFrom index 1 (A[1] = 3), you can jump to index 2, index 3, or index 4.\nThe optimal strategy is:\nJump from index 0 to index 1.\nFrom index 1, jump directly to index 4 (the last index).\nTherefore, the minimum number of jumps required is 2.\nExplanation 2:\nSince the first index has a value of 0, meaning you cannot move forward from there.",
+    "sampleInput": "A = [2, 3, 1, 1, 4]",
+    "sampleOutput": "2",
+    "story": "Each jump count is a BFS level over index ranges, so track the end of the current level and the farthest index the next level can reach.",
+    "plain": "Sweep left to right holding three values: `jumps`, `currEnd` (the last index reachable using the jumps counted so far) and `farthest` (the last index reachable with one more jump). At index `i`, update `farthest = max(farthest, i + A[i])`. When `i` reaches `currEnd` the current level is exhausted, so increment `jumps` and set `currEnd = farthest`. The moment `currEnd` covers the last index you are done. If `i` ever moves past `farthest`, nothing can reach it and the answer is -1.",
+    "howToThink": [
+      "Greedy BFS levels on an array: `jumps` is the BFS depth, the block ending at `currEnd` is the current frontier, and `farthest` is the right edge of the next frontier.",
+      "You never pick a specific landing index — only the farthest reach of the entire current frontier matters, which is why one linear pass suffices.",
+      "Iterate `i` to `n - 2` only: standing on the last index needs no further jump, and going one step further over-counts.",
+      "Unreachable is detected by `i > farthest` (a run of zeros the frontier cannot clear) — return -1 there rather than continuing the sweep.",
+      "The `O(N^2)` DP (`dp[j] = min(dp[i]+1)`) is the obvious first idea but dies at `|A| = 1e5`."
+    ],
+    "pitfalls": [
+      "`n == 1` must return 0, not 1 — you already stand on the last index.",
+      "Looping `i < n` instead of `i < n - 1` adds a phantom jump when the last index happens to equal `currEnd`.",
+      "Forgetting the -1 branch entirely: a 0 the frontier cannot jump over freezes `farthest`, and a naive loop still returns a number.",
+      "`farthest` must be updated before the `i == currEnd` check, or the level boundary is set from stale information."
+    ],
+    "solutions": [
+      {
+        "label": "Optimal — greedy frontier (BFS levels)",
+        "complexity": {
+          "time": "O(N)",
+          "space": "O(1)"
+        },
+        "plain": "Run one pass over indices 0 to n-2. Keep `farthest` as the best reach seen in the current level and `currEnd` as where that level ends. When the index catches up to `currEnd`, one more jump has been spent, so bump `jumps` and extend `currEnd` to `farthest`. Return `jumps` as soon as `currEnd` covers the last index, and -1 if the index ever overtakes `farthest`.",
+        "approach": [
+          "If `n == 1`, return 0.",
+          "Initialise `jumps = 0`, `currEnd = 0`, `farthest = 0`.",
+          "For `i` from 0 to `n - 2`: if `i > farthest`, return -1 (index `i` is unreachable).",
+          "Update `farthest = max(farthest, i + A[i])`.",
+          "If `i == currEnd`, increment `jumps`, set `currEnd = farthest`, and return `jumps` when `currEnd >= n - 1`.",
+          "If the loop finishes without covering the last index, return -1."
+        ],
+        "pseudocode": "if n == 1 → return 0\njumps = 0; currEnd = 0; farthest = 0\nfor i = 0 .. n-2:\n    if i > farthest → return -1\n    farthest = max(farthest, i + A[i])\n    if i == currEnd:\n        jumps++\n        currEnd = farthest\n        if currEnd >= n-1 → return jumps\nreturn currEnd >= n-1 → jumps, else -1",
+        "story": "Spend a jump only when the current reachable block runs out, and always spend it on the block's farthest reach.",
+        "code": "public int jumpGameMinimumJumps(int[] A) {\n    int n = A.length;\n    if (n == 1) {\n        return 0;\n    }\n    int jumps = 0, currEnd = 0, farthest = 0;\n    for (int i = 0; i < n - 1; i++) {\n        if (i > farthest) {\n            return -1;              // no jump sequence lands on or past i\n        }\n        farthest = Math.max(farthest, i + A[i]);\n        if (i == currEnd) {         // current BFS level exhausted, pay one jump\n            jumps++;\n            currEnd = farthest;\n            if (currEnd >= n - 1) {\n                return jumps;\n            }\n        }\n    }\n    return currEnd >= n - 1 ? jumps : -1;\n}"
+      }
+    ]
+  },
+  {
+    "num": 302,
+    "id": "s4-graphs-valid-path",
+    "title": "Valid Path",
+    "subTopic": "Grid BFS over circle-blocked cells",
+    "tags": [
+      "Graphs",
+      "BFS",
+      "Matrix",
+      "Geometry"
+    ],
+    "description": "There is a rectangle with left bottom as (0, 0) and right up as (x, y).\nThere are N circles such that their centers are inside the rectangle.\nRadius of each circle is R. Now we need to find out if it is possible that we can move from (0, 0) to (x, y) without touching any circle.\nNote : We can move from any cell to any of its 8 adjecent neighbours and we cannot move outside the boundary of the rectangle at any point of time.\n\nProblem Constraints\n0 <= x , y, R <= 100\n1 <= N <= 1000\nCenter of each circle would lie within the grid\n\nInput Format\n1st argument given is an Integer x , denoted by A in input.\n2nd argument given is an Integer y, denoted by B in input.\n3rd argument given is an Integer N, number of circles, denoted by C in input.\n4th argument given is an Integer R, radius of each circle, denoted by D in input.\n5th argument given is an Array A of size N, denoted by E in input, where A[i] = x cordinate of ith circle\n6th argument given is an Array B of size N, denoted by F in input, where B[i] = y cordinate of ith circle\n\nOutput Format\nReturn YES or NO depending on weather it is possible to reach cell (x,y) or not starting from (0,0).\n\nExample Input\nInput 1:\nx = 2\ny = 3\nN = 1\nR = 1\nA = [2]\nB = [3]\nInput 2:\nx = 3\ny = 3\nN = 1\nR = 1\nA = [0]\nB = [3]\n\nExample Output\nOutput 1:\nNO\nOutput 2:\nYES\n\nExample Explanation\nExplanation 1:\nThere is NO valid path in this case",
+    "sampleInput": "x = 2, y = 3, N = 1, R = 1, A = [2], B = [3]",
+    "sampleOutput": "NO",
+    "story": "Turn every lattice point within radius R of a circle centre into a wall, then it is plain 8-directional grid reachability from (0,0) to (x,y).",
+    "plain": "The rectangle is a grid of (x+1) by (y+1) integer points. First build a `blocked` matrix: a point is blocked when its squared distance to some circle centre is at most `R*R`, since touching a circle is forbidden. Then run a plain 8-directional BFS from (0, 0) over points that are neither blocked nor already visited. If (x, y) is reached the answer is YES, otherwise NO. Check (0, 0) and (x, y) up front so the search never starts or ends inside a circle.",
+    "howToThink": [
+      "Grid BFS/DFS reachability: the circles only switch cells off, after which it is ordinary 8-directional connectivity from (0,0) to (x,y).",
+      "Compare squared distances, `dx*dx + dy*dy <= R*R`, never `Math.sqrt` — floating point on the exact boundary is where this problem breaks.",
+      "'Without touching' makes the comparison `<=`, not `<`: a point exactly on the circumference is blocked.",
+      "Precompute `blocked` once in `O(x*y*N)` (1e7 at the limits); re-testing all N circles inside the BFS neighbour loop repeats that work for every visit.",
+      "The grid is points, so its dimensions are `x+1` by `y+1`."
+    ],
+    "pitfalls": [
+      "Using `<` instead of `<=` lets the path graze a circle — the given samples expose it.",
+      "Sizing the grid `x` by `y` instead of `x+1` by `y+1` drops the destination row and column entirely.",
+      "Start or destination sitting inside a circle: return NO immediately instead of BFS-ing out of a blocked cell.",
+      "`Math.sqrt` comparisons for the radius test; keep everything in integer squared distance (widen to `long` if bounds grow)."
+    ],
+    "solutions": [
+      {
+        "label": "Optimal — precompute blocked cells, then 8-directional BFS",
+        "complexity": {
+          "time": "O(x * y * N) — the blocking pass dominates; the BFS itself is O(x * y) with 8 edges per cell",
+          "space": "O(x * y) — blocked and visited matrices plus the queue"
+        },
+        "plain": "Allocate a `(x+1) x (y+1)` boolean grid and mark each point that lies within `R` of any centre, using squared distances. Bail out with NO if either endpoint is marked. Otherwise BFS from (0, 0) using the eight offsets, enqueueing only unvisited, unblocked points. Return YES if the destination is dequeued, NO when the queue empties.",
+        "approach": [
+          "Create `blocked[A + 1][B + 1]`.",
+          "For every point `(i, j)`, test each circle `k`: if `(i - E[k])^2 + (j - F[k])^2 <= D*D`, mark it blocked and break out of the circle loop.",
+          "If `blocked[0][0]` or `blocked[A][B]`, return \"NO\".",
+          "BFS from `(0, 0)` with the 8 direction offsets, marking `visited` as cells are enqueued.",
+          "Return \"YES\" when `(A, B)` is dequeued; return \"NO\" once the queue drains."
+        ],
+        "pseudocode": "blocked[i][j] = any circle k with (i-Ek)^2 + (j-Fk)^2 <= R*R\nif blocked[0][0] or blocked[x][y] → return \"NO\"\nqueue = [(0,0)]; visited[0][0] = true\nwhile queue not empty:\n    (cx, cy) = queue.poll()\n    if (cx, cy) == (x, y) → return \"YES\"\n    for each of 8 offsets:\n        (nx, ny) = (cx+dx, cy+dy)\n        if inBounds and not visited and not blocked:\n            visited[nx][ny] = true\n            queue.add((nx, ny))\nreturn \"NO\"",
+        "story": "Geometry only decides which cells are walls; everything after that is a textbook grid BFS.",
+        "code": "public String validPathExists(int A, int B, int C, int D, int[] E, int[] F) {\n    int rows = A + 1, cols = B + 1;\n    long radius = D;\n    boolean[][] blocked = new boolean[rows][cols];\n    for (int i = 0; i < rows; i++) {\n        for (int j = 0; j < cols; j++) {\n            for (int k = 0; k < C; k++) {\n                long dx = i - E[k];\n                long dy = j - F[k];\n                if (dx * dx + dy * dy <= radius * radius) {   // <= : touching is not allowed\n                    blocked[i][j] = true;\n                    break;\n                }\n            }\n        }\n    }\n\n    if (blocked[0][0] || blocked[A][B]) {\n        return \"NO\";\n    }\n\n    int[][] dirs = {{-1, 0}, {1, 0}, {0, -1}, {0, 1}, {-1, -1}, {1, 1}, {-1, 1}, {1, -1}};\n    boolean[][] visited = new boolean[rows][cols];\n    Queue<int[]> queue = new LinkedList<>();\n    queue.add(new int[]{0, 0});\n    visited[0][0] = true;\n\n    while (!queue.isEmpty()) {\n        int[] curr = queue.poll();\n        if (curr[0] == A && curr[1] == B) {\n            return \"YES\";\n        }\n        for (int[] d : dirs) {\n            int x = curr[0] + d[0];\n            int y = curr[1] + d[1];\n            if (isValid(rows, cols, x, y) && !visited[x][y] && !blocked[x][y]) {\n                visited[x][y] = true;\n                queue.add(new int[]{x, y});\n            }\n        }\n    }\n\n    return \"NO\";\n}\n\nprivate boolean isValid(int n, int m, int x, int y) {\n    return x >= 0 && y >= 0 && x < n && y < m;\n}"
+      }
+    ]
+  }
+]

@@ -1,0 +1,97 @@
+{
+  "topic": "Mixed Interview Problems",
+  "summary": "Four problems from the interview-lab days that belong to no single Section 4 topic. They are here so the Heaps and Graphs chapters stay clean, not because they share a technique. Each one is a different reflex: a hash map remembering the last position of a value, a sliding window with character counts, a greedy that sums every upward move, and a construction that reads a binary counter as a palindrome. Recognising which reflex applies from the problem statement is the whole exercise.",
+  "thoughtProcess": [
+    {
+      "title": "1. 'Closest / nearest equal pair' -> hash map of last seen index.",
+      "body": "One pass, and for each value keep the most recent index you saw it at. The closest pair ending at i always uses the LAST occurrence before i, never an older one, so a single map entry per value is enough. O(N) time, O(N) space."
+    },
+    {
+      "title": "2. 'Smallest window containing all of X' -> two pointers with counts.",
+      "body": "Expand the right edge until the window is valid, then shrink the left edge while it stays valid, recording the best. A single 'how many required characters are still missing' counter is cheaper and less bug-prone than comparing two maps every step."
+    },
+    {
+      "title": "3. Unlimited buy/sell -> add up every upward move.",
+      "body": "With no limit on transactions, the maximum profit is the sum of all positive consecutive differences. You never need to find peaks and valleys explicitly -- every rise is capturable and every fall is skippable."
+    },
+    {
+      "title": "4. 'A-th thing in a generated sequence' -> look for a bijection, not a search.",
+      "body": "When the A-th object has structure (a palindrome built from a binary counter), construct it directly from A instead of enumerating and filtering. Enumeration is exponential; the construction is O(log A)."
+    },
+    {
+      "title": "5. Read what the counts are actually keyed on.",
+      "body": "These problems all hinge on one bookkeeping decision: last index vs first index, characters remaining vs characters seen, difference vs absolute value. Getting that wrong produces code that passes the samples and fails the edges."
+    }
+  ],
+  "keyPatterns": [
+    {
+      "name": "Last-seen index map (closest equal pair)",
+      "when": "Minimum distance between two equal values, or 'has a duplicate within K'.",
+      "template": "Map<Integer, Integer> lastSeen = new HashMap<>();\nint best = Integer.MAX_VALUE;\nfor (int i = 0; i < A.length; i++) {\n    if (lastSeen.containsKey(A[i])) {\n        best = Math.min(best, i - lastSeen.get(A[i]));\n    }\n    lastSeen.put(A[i], i);   // always overwrite: the nearest one is the useful one\n}\nreturn best == Integer.MAX_VALUE ? -1 : best;",
+      "examples": [
+        "Shaggy and Distances"
+      ]
+    },
+    {
+      "name": "Sliding window with a 'missing' counter",
+      "when": "Smallest / longest window satisfying a multiset condition.",
+      "template": "int[] need = new int[256];\nfor (char c : B.toCharArray()) {\n    need[c]++;\n}\nint missing = B.length();\nint left = 0, bestLen = Integer.MAX_VALUE, bestStart = -1;\nfor (int right = 0; right < A.length(); right++) {\n    if (need[A.charAt(right)] > 0) {\n        missing--;              // only required chars reduce the deficit\n    }\n    need[A.charAt(right)]--;\n    while (missing == 0) {\n        if (right - left + 1 < bestLen) {\n            bestLen = right - left + 1;\n            bestStart = left;\n        }\n        need[A.charAt(left)]++;\n        if (need[A.charAt(left)] > 0) {\n            missing++;\n        }\n        left++;\n    }\n}",
+      "examples": [
+        "Minimum Window Substring"
+      ]
+    },
+    {
+      "name": "Sum of positive differences (unlimited transactions)",
+      "when": "Buy/sell any number of times, maximise profit.",
+      "template": "int profit = 0;\nfor (int i = 1; i < A.length; i++) {\n    if (A[i] > A[i - 1]) {\n        profit += A[i] - A[i - 1];\n    }\n}\nreturn profit;",
+      "examples": [
+        "Best Time to Buy and Sell Stocks II"
+      ]
+    },
+    {
+      "name": "Construct the A-th object from its index",
+      "when": "The sequence has structure; enumerating it would be exponential.",
+      "template": "// the A-th palindrome of this family = binary of (A + 1) with its\n// leading bit dropped, mirrored around the centre\nStringBuilder half = new StringBuilder(Integer.toBinaryString(A + 1));\nhalf.deleteCharAt(0);\nStringBuilder full = new StringBuilder(half);\nfull.append(new StringBuilder(half).reverse());\nreturn full.toString();",
+      "examples": [
+        "Perfect Numbers"
+      ]
+    }
+  ],
+  "commonMistakes": [
+    {
+      "title": "Keeping the FIRST index instead of the last",
+      "wrong": "lastSeen.putIfAbsent(A[i], i);",
+      "right": "lastSeen.put(A[i], i);",
+      "why": "For a minimum distance you want the nearest previous occurrence. Holding the first index makes every later comparison measure to the wrong end and reports a distance that is too large."
+    },
+    {
+      "title": "Decrementing the window deficit for characters you do not need",
+      "wrong": "need[c]--;\nmissing--;",
+      "right": "if (need[c] > 0) {\n    missing--;\n}\nneed[c]--;",
+      "why": "Characters outside the target, or extra copies beyond what is required, must not reduce the deficit. If they do, the window reports itself valid early and you return a window that is too short."
+    },
+    {
+      "title": "Hunting for explicit peaks and valleys in the stock problem",
+      "wrong": "find each local min, find the next local max, add the difference",
+      "right": "for (i = 1..n-1) if (A[i] > A[i-1]) profit += A[i] - A[i-1];",
+      "why": "The telescoping sum of consecutive rises equals the peak-minus-valley total, and the one-liner has no edge cases at the ends of the array or on plateaus."
+    },
+    {
+      "title": "Comparing two frequency maps on every window step",
+      "wrong": "if (windowMap.equals(needMap)) { ... }",
+      "right": "maintain a single integer 'missing' counter",
+      "why": "Map equality is O(alphabet) per step, turning an O(N) scan into O(N * 256). A scalar deficit counter keeps each step O(1)."
+    }
+  ],
+  "edgeCases": [
+    "No duplicate at all in Shaggy -- return -1 rather than Integer.MAX_VALUE.",
+    "Adjacent duplicates give distance 1, the smallest possible; do not skip i - 1.",
+    "Window source shorter than the target string -- return an empty string immediately.",
+    "Target containing repeated characters: the window needs that many copies, not one.",
+    "Strictly decreasing prices -- profit is 0, never negative.",
+    "Single-element price array -- the loop body never runs, return 0.",
+    "A = 1 for Perfect Numbers -- the smallest member of the family, check it by hand.",
+    "Very large A where the constructed string exceeds int range -- build a string, never a number.",
+    "Empty input array or string in any of the four -- guard before the first index access."
+  ]
+}

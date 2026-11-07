@@ -1,0 +1,202 @@
+[
+  {
+    "num": 303,
+    "id": "s4-mixed-shaggy-and-distances",
+    "title": "Shaggy and Distances",
+    "subTopic": "HashMap last-seen index",
+    "tags": [
+      "Hashing",
+      "HashMap",
+      "Arrays",
+      "Single Pass"
+    ],
+    "description": "Shaggy has an array A consisting of N elements. We call a pair of distinct indices in that array a special if elements at those indices in the array are equal.\nShaggy wants you to find a special pair such that the distance between that pair is minimum. Distance between two indices is defined as |i-j|. If there is no special pair in the array, then return -1.\n\nProblem Constraints\n1 <= |A| <= 10^5\n\nInput Format\nThe first and only argument is an integer array A.\n\nOutput Format\nReturn one integer corresponding to the minimum possible distance between a special pair.\n\nExample Input\nInput 1:\nA = [7, 1, 3, 4, 1, 7]\nInput 2:\nA = [1, 1]\n\nExample Output\nOutput 1:\n3\nOutput 2:\n1\n\nExample Explanation\nExplanation 1:\nHere we have 2 options:\n1. A[1] and A[4] are both 1 so (1,4) is a special pair and |1-4|=3.\n2. A[0] and A[5] are both 7 so (0,5) is a special pair and |0-5|=5.\nTherefore the minimum possible distance is 3.\nExplanation 2:\nOnly possibility is choosing A[1] and A[2].",
+    "sampleInput": "A = [7, 1, 3, 4, 1, 7]",
+    "sampleOutput": "3",
+    "story": "Minimum gap between two equal values in an array.",
+    "plain": "Walk the array left to right keeping a map from value to the index where you last saw it. At index `i`, if `A[i]` is already in the map, the closest earlier occurrence is exactly the stored one, so `i - map.get(A[i])` is the best distance achievable with `i` as the right end. Take the running minimum of that. Then overwrite the map entry with `i` so the next occurrence compares against the nearest previous one, not the first. If no value ever repeats, return -1.",
+    "howToThink": [
+      "HashMap of value to last-seen index, single pass — the closest match for the current index is always the most recent earlier duplicate.",
+      "For a fixed right index `i`, minimising `|i - j|` means maximising `j`, so only the latest previous index of `A[i]` matters. Everything older is strictly worse.",
+      "That collapses the O(N^2) all-pairs scan into one pass: read the stored index, score it, then overwrite.",
+      "Sentinel `minDistance = Integer.MAX_VALUE`, and map it back to -1 at the end to signal no special pair."
+    ],
+    "pitfalls": [
+      "Storing the FIRST index instead of overwriting with the latest — `map.put(A[i], i)` must run on the duplicate branch too, not only on the else branch.",
+      "Returning `Integer.MAX_VALUE` when nothing repeats. Convert the sentinel to -1 before returning.",
+      "Sorting index pairs or doing a nested loop over all equal values — correct but O(N^2), it TLEs at `|A| = 10^5`.",
+      "Using `HashSet` instead of `HashMap`: a set tells you a duplicate exists but not where, so you lose the distance."
+    ],
+    "solutions": [
+      {
+        "label": "Optimal — HashMap of last-seen index",
+        "complexity": {
+          "time": "O(N)",
+          "space": "O(N) — map holds up to N distinct values"
+        },
+        "plain": "One pass with a value to last-index map. On each element, if it was seen before, compute the gap to that stored index and keep the running minimum. Always write the current index back so future duplicates measure against the nearest occurrence. Return -1 if the minimum was never updated.",
+        "approach": [
+          "Create `map` from value to its most recent index, and `minDistance = Integer.MAX_VALUE`.",
+          "Loop `i` from 0 to N-1.",
+          "If `map` contains `A[i]`, set `currentDistance = i - map.get(A[i])` and take `min` into `minDistance`.",
+          "Put `A[i] -> i` in the map either way, overwriting the older index.",
+          "After the loop, return -1 if `minDistance` is still the sentinel, else `minDistance`."
+        ],
+        "pseudocode": "map = {}                        // value -> last index\nminDistance = INF\nfor i in 0..N-1:\n    if A[i] in map:\n        minDistance = min(minDistance, i - map[A[i]])\n    map[A[i]] = i               // always refresh to the latest index\nreturn minDistance == INF -> -1 else minDistance",
+        "story": "Only the nearest previous copy of a value can ever win, so keep just that one.",
+        "code": "public int shaggySpecialIndexMinimumDistance(int[] A) {\n    HashMap<Integer, Integer> map = new HashMap<>();\n    int minDistance = Integer.MAX_VALUE;\n    for (int i = 0; i < A.length; i++) {\n        if (map.containsKey(A[i])) {\n            int currentDistance = i - map.get(A[i]);\n            minDistance = Math.min(minDistance, currentDistance);\n        }\n        map.put(A[i], i); // always overwrite: nearest previous index wins\n    }\n    return minDistance == Integer.MAX_VALUE ? -1 : minDistance;\n}"
+      }
+    ]
+  },
+  {
+    "num": 304,
+    "id": "s4-mixed-minimum-window-substring",
+    "title": "Minimum Window Substring",
+    "subTopic": "Two-pointer sliding window with frequency map",
+    "tags": [
+      "Sliding Window",
+      "Hashing",
+      "Strings",
+      "Two Pointers"
+    ],
+    "description": "Given two strings A and B of lengths m and n respectively, return the minimum window substring of A such that every character in B (including duplicates) is included in the window. If there is no such substring, return \"-1\".\n\nWhen there are multiple answers, return the one which appears first in A.\n\nProblem Constraints\nm == A.length\nn == B.length\n1 <= m, n <= 10^5\nA and B consist of uppercase and lowercase English letters.\n\nInput Format\nFirst argument is a string A and second argument is a string B.\n\nOutput Format\nReturn a string.\n\nExample Input\nInput 1:\nA = \"ADOBECODEBANC\"\nB = \"ABC\"\nInput 2:\nA = \"abaca\"\nB = \"aa\"\nInput 3:\nA = \"a\"\nB = \"aa\"\n\nExample Output\nOutput 1:\n\"BANC\"\nOutput 2:\n\"aba\"\nOutput 3:\n\"-1\"\n\nExample Explanation\nExplanation 1:\nThe minimum window substring \"BANC\" includes 'A', 'B', and 'C' from string B.\nExplanation 2:\nBoth \"aba\" and \"aca\" are the shortest substrings of A that contain all characters of B.\nHowever, since \"aba\" appears before \"aca\" in A, we return \"aba\".\nExplanation 3:\nBoth 'a's from B must be included in the window.\nSince the largest window of A only has one 'a', return \"-1\".",
+    "sampleInput": "A = \"ADOBECODEBANC\", B = \"ABC\"",
+    "sampleOutput": "\"BANC\"",
+    "story": "Shortest substring of A that covers every character of B with multiplicity.",
+    "plain": "Build a frequency map `target` of B and track `required = target.size()` distinct characters. Expand `right` over A, incrementing `currentWindow` counts; when a character's window count exactly equals its target count, increment `formed`. While `formed == required` the window is valid, so record it if it beats the best length, then shrink from `left`: decrement the leaving character and, if that drops it below its target, decrement `formed`. Each index enters and leaves the window once, so the whole sweep is linear. If no valid window was ever seen, return \"-1\".",
+    "howToThink": [
+      "Two-pointer sliding window with a frequency map and a `formed` counter — expand right until valid, then shrink left while still valid.",
+      "\"Including duplicates\" means counts, not presence: a set of characters is not enough, you need `target` frequencies.",
+      "Comparing full maps on every step would be O(52) per index; `formed` reduces validity to one integer by counting how many characters have hit their exact required count.",
+      "Use `==` (not `>=`) when bumping `formed` and `<` (not `<=`) when dropping it, so each character flips the counter exactly once per crossing.",
+      "Record `start` and `minLength` inside the shrink loop, which naturally keeps the earliest of equally short windows since it is reached first."
+    ],
+    "pitfalls": [
+      "`currentWindow.get(c) == target.get(c)` compares `Integer` object references, which breaks above 127. Use `.intValue()` on both sides, or `Objects.equals`.",
+      "Bumping `formed` with `>=` instead of `==`, which double-counts a character on every extra copy and makes the window look valid too early.",
+      "Shrinking with `if` instead of `while` — you must keep contracting as long as the window is still valid, not just once.",
+      "Forgetting the early exit when `A.length() < B.length()`, and mis-slicing the answer — it is `A.substring(start, start + minLength)`."
+    ],
+    "solutions": [
+      {
+        "label": "Optimal — sliding window with formed counter",
+        "complexity": {
+          "time": "O(m + n) — each index of A enters and leaves the window once",
+          "space": "O(1) — both maps are bounded by the 52-letter alphabet"
+        },
+        "plain": "Count B's characters into `target` and set `required` to its distinct count. Slide `right` across A, updating `currentWindow`; each time a character's count exactly reaches its target, `formed` goes up. Whenever `formed == required`, the current window covers B, so record it if shorter and then advance `left`, decrementing `formed` when a character falls below its requirement. The best `start` and `minLength` seen give the answer.",
+        "approach": [
+          "Return `\"-1\"` immediately if `A.length() < B.length()`.",
+          "Build `target` as a character-to-count map over B; set `required = target.size()`, `formed = 0`.",
+          "Initialise `minLength = Integer.MAX_VALUE`, `start = 0`, `left = 0`, `right = 0`.",
+          "Expand: take `c = A.charAt(right)`, increment its count in `currentWindow`; if `c` is in `target` and its window count now equals its target count, increment `formed`.",
+          "While `formed == required`: if `right - left + 1 < minLength`, update `minLength` and `start`.",
+          "Still inside that loop, decrement the count of `A.charAt(left)`; if it is a target character and its count fell below the target, decrement `formed`. Advance `left`.",
+          "Advance `right`; at the end return `\"-1\"` if `minLength` is untouched, else `A.substring(start, start + minLength)`."
+        ],
+        "pseudocode": "if len(A) < len(B) -> return \"-1\"\n\ntarget = freq(B); required = distinct chars of B; formed = 0\ncurrentWindow = {}; minLength = INF; start = 0; left = 0\n\nfor right in 0..len(A)-1:\n    c = A[right]; currentWindow[c]++\n    if c in target and currentWindow[c] == target[c]:\n        formed++                              // == , not >=\n\n    while formed == required:                 // while, not if\n        if right - left + 1 < minLength:\n            minLength = right - left + 1\n            start = left\n        lc = A[left]; currentWindow[lc]--\n        if lc in target and currentWindow[lc] < target[lc]:\n            formed--\n        left++\n\nreturn minLength == INF -> \"-1\" else A[start .. start+minLength)",
+        "story": "Collapse window validity into one integer so the two pointers never backtrack.",
+        "code": "public String minWindow(String A, String B) {\n    if (A.length() < B.length()) {\n        return \"-1\";\n    }\n\n    HashMap<Character, Integer> target = new HashMap<>();\n    for (char c : B.toCharArray()) {\n        target.put(c, target.getOrDefault(c, 0) + 1);\n    }\n\n    HashMap<Character, Integer> currentWindow = new HashMap<>();\n    int required = target.size();\n    int formed = 0;\n    int left = 0;\n    int right = 0;\n\n    int minLength = Integer.MAX_VALUE;\n    int start = 0;\n\n    while (right < A.length()) {\n        char c = A.charAt(right);\n        currentWindow.put(c, currentWindow.getOrDefault(c, 0) + 1);\n\n        // .intValue() on both sides: Integer == Integer breaks past the 127 cache\n        if (target.containsKey(c) &&\n                currentWindow.get(c).intValue() == target.get(c).intValue()) {\n            formed++;\n        }\n\n        while (formed == required) {\n            if (right - left + 1 < minLength) {\n                minLength = right - left + 1;\n                start = left;\n            }\n\n            char leftChar = A.charAt(left);\n            currentWindow.put(leftChar, currentWindow.get(leftChar) - 1);\n\n            if (target.containsKey(leftChar) &&\n                    currentWindow.get(leftChar).intValue() < target.get(leftChar).intValue()) {\n                formed--;\n            }\n\n            left++;\n        }\n\n        right++;\n    }\n\n    return minLength == Integer.MAX_VALUE ? \"-1\" : A.substring(start, start + minLength);\n}"
+      }
+    ]
+  },
+  {
+    "num": 305,
+    "id": "s4-mixed-perfect-numbers",
+    "title": "Perfect Numbers",
+    "subTopic": "Direct construction from a binary index",
+    "tags": [
+      "Math",
+      "Bit Manipulation",
+      "Strings",
+      "Constructive"
+    ],
+    "description": "Given an integer A, you have to find the A-th Perfect Number.\nA Perfect Number has the following properties:\n\nIt comprises only 1 and 2.\nThe number of digits in a Perfect number is even.\nIt is a palindrome number.\n\nFor example, 11, 22, 112211 are Perfect numbers, where 123, 121, 782, 1 are not.\n\nProblem Constraints\n1 <= A <= 100000\n\nInput Format\nThe only argument given is an integer A.\n\nOutput Format\nReturn a string that denotes the A-th Perfect Number.\n\nExample Input\nInput 1:\nA = 2\nInput 2:\nA = 3\n\nExample Output\nOutput 1:\n22\nOutput 2:\n1111\n\nExample Explanation\nExplanation 1:\nFirst four perfect numbers are:\n1. 11\n2. 22\n3. 1111\n4. 1221\nReturn the 2nd Perfect number.\nExplanation 2:\nFirst four perfect numbers are:\n1. 11\n2. 22\n3. 1111\n4. 1221\nReturn the 3rd Perfect number.",
+    "sampleInput": "A = 2",
+    "sampleOutput": "22",
+    "story": "A perfect number is fully determined by its first half, and the halves enumerate exactly like binary counting over {1,2}.",
+    "plain": "Every perfect number is a palindrome of even length over the alphabet {1,2}, so it is completely determined by its first half. Halves of length k number 2^k, and the ordering in the problem is by length first, then lexicographic within a length - which is precisely binary counting with 0 mapped to '1' and 1 mapped to '2'. Find the half-length block that contains index A by accumulating 2, 4, 8, ..., then compute the 0-based offset inside that block. Write that offset as a k-bit binary string under the digit mapping to get the half, and append its reverse. No enumeration needed.",
+    "howToThink": [
+      "Constructive indexing: the A-th half is just `A` written in binary with `0 -> '1'`, `1 -> '2'`, then mirrored.",
+      "Even length plus palindrome means the second half is forced, so only halves need to be counted - there are exactly `2^k` of length `k`.",
+      "Order is by total length, then lexicographic, so accumulate block sizes `2, 4, 8, ...` until the running total covers `A`.",
+      "The offset inside the block is `A - consumed - 1` (0-based), and its k-bit binary expansion gives the digits most-significant first.",
+      "`A <= 100000` needs at most `k = 16`, so the answer is at most 32 digits - way past `long`, hence the String return type."
+    ],
+    "pitfalls": [
+      "Returning a number type - a 32-digit perfect number overflows `long`; the output format explicitly asks for a String.",
+      "Off-by-one in the block scan: the offset is 0-based, so it is `A - consumed - 1`, not `A - consumed`.",
+      "`StringBuilder.reverse()` mutates in place, so build the mirrored half from a fresh copy instead of reversing the one you already appended.",
+      "Emitting bits least-significant first - loop `bit` from `len - 1` down to 0 so the half reads in the right order.",
+      "Using `int` for the running block size; with `k` up to 16 it fits, but keeping `count` as `long` removes the doubt entirely."
+    ],
+    "solutions": [
+      {
+        "label": "Optimal - map the index to the half in binary",
+        "complexity": {
+          "time": "O(log A)",
+          "space": "O(log A) - the half string"
+        },
+        "plain": "Start with half-length 1, which holds 2 perfect numbers, and keep doubling the block size until the accumulated total reaches A. That fixes the half-length len. The 0-based position inside the block is A - consumed - 1. Read that position as a len-bit binary number, emitting '1' for a 0 bit and '2' for a 1 bit, most significant first, to get the half. Concatenate the half with its reverse and return the string.",
+        "approach": [
+          "`len = 1`, `count = 2` (halves of length 1), `consumed = 0`.",
+          "While `consumed + count < A`: `consumed += count`, `count *= 2`, `len++`.",
+          "`index = A - consumed - 1` is the 0-based rank inside this block.",
+          "For `bit` from `len - 1` down to 0, append '1' if that bit of `index` is 0, else '2'.",
+          "Return the half followed by a reversed copy of the half."
+        ],
+        "pseudocode": "len = 1; count = 2; consumed = 0\n\nwhile consumed + count < A:\n    consumed += count\n    count *= 2\n    len++\n\nindex = A - consumed - 1          // 0-based inside this block\n\nhalf = \"\"\nfor bit = len-1 down to 0:\n    ((index >> bit) & 1) == 0 -> half += '1'\n    else                      -> half += '2'\n\nreturn half + reverse(half)",
+        "story": "Count in binary over the digits {1,2} and mirror - the A-th perfect number falls out directly.",
+        "code": "public String findAthPerfectNumber(int A) {\n    int len = 1;\n    long count = 2;    // number of halves of this length\n    long consumed = 0; // perfect numbers with a shorter half\n\n    while (consumed + count < A) {\n        consumed += count;\n        count *= 2;\n        len++;\n    }\n\n    long index = A - consumed - 1; // 0-based rank within this half-length block\n    StringBuilder half = new StringBuilder();\n    for (int bit = len - 1; bit >= 0; bit--) {\n        if (((index >> bit) & 1) == 0) {\n            half.append('1');\n        } else {\n            half.append('2');\n        }\n    }\n\n    String first = half.toString();\n    String second = new StringBuilder(first).reverse().toString();\n    return first + second;\n}"
+      }
+    ]
+  },
+  {
+    "num": 306,
+    "id": "s4-mixed-best-time-to-buy-and-sell-stocks-ii",
+    "title": "Best Time to Buy and Sell Stocks II",
+    "subTopic": "Greedy sum of positive diffs",
+    "tags": [
+      "Arrays",
+      "Greedy",
+      "Single Pass"
+    ],
+    "description": "Say you have an array, A, for which the ith element is the price of a given stock on day i.\nDesign an algorithm to find the maximum profit.\nYou may complete as many transactions as you like (i.e., buy one and sell one share of the stock multiple times).\nHowever, you may not engage in multiple transactions at the same time (ie, you must sell the stock before you buy again).\n\nProblem Constraints\n0 <= len(A) <= 1e5\n1 <= A[i] <= 1e7\n\nInput Format\nThe first and the only argument is an array of integer, A.\n\nOutput Format\nReturn an integer, representing the maximum possible profit.\n\nExample Input\nInput 1:\nA = [1, 2, 3]\nInput 2:\nA = [5, 2, 10]\n\nExample Output\nOutput 1:\n2\nOutput 2:\n8\n\nExample Explanation\nExplanation 1:\n => Buy a stock on day 0.\n => Sell the stock on day 1. (Profit +1)\n => Buy a stock on day 1.\n => Sell the stock on day 2. (Profit +1)\n\n Overall profit = 2\nExplanation 2:\n => Buy a stock on day 1.\n => Sell the stock on on day 2. (Profit +8)\n\n Overall profit = 8",
+    "sampleInput": "A = [1, 2, 3]",
+    "sampleOutput": "2",
+    "story": "With unlimited transactions you can pocket every upward price move, so the answer is just the sum of positive consecutive differences.",
+    "plain": "Walk the array once and compare each price with the one before it. Whenever today's price is higher than yesterday's, add the difference to the running profit. Because the number of transactions is unlimited, buying at every valley and selling at every peak collapses into exactly this sum. Downward steps are skipped, not subtracted, since you simply hold nothing across them. Return the accumulated total.",
+    "howToThink": [
+      "Greedy: add every positive consecutive difference `A[i] - A[i-1]`. Unlimited transactions make each upward step independently collectable.",
+      "A long rise telescopes: `(A[i+1]-A[i]) + (A[i+2]-A[i+1]) = A[i+2]-A[i]`, so valley-to-peak pairing and diff-summing produce the same number.",
+      "No DP state machine (hold / not-hold) is needed here — that is only required when the transaction count is capped.",
+      "Constraint `0 <= len(A)` means an empty or single-element array is legal and must return 0 before the loop starts."
+    ],
+    "pitfalls": [
+      "`0 <= len(A)` — guard the empty and length-1 cases; starting the loop at `i = 0` and reading `A[i-1]` is an immediate out-of-bounds.",
+      "Only add when `A[i] > A[i-1]`; subtracting the negative diffs turns the answer into `A[n-1] - A[0]`.",
+      "This is not the 'at most one transaction' variant — tracking one running min and one best profit is the wrong problem.",
+      "At the constraint limits (`N = 1e5`, `A[i] = 1e7`) the sum can exceed int range; accumulate in `long`."
+    ],
+    "solutions": [
+      {
+        "label": "Optimal — greedy sum of positive consecutive differences",
+        "complexity": {
+          "time": "O(N)",
+          "space": "O(1)"
+        },
+        "plain": "Iterate from index 1 to the end. For each i, if `A[i]` is greater than `A[i-1]`, add the gap to the profit. That single pass captures every profitable buy-sell pair without ever tracking which day you bought on. Return the total.",
+        "approach": [
+          "Return 0 if the array is null or shorter than 2 elements.",
+          "Initialise `profit = 0` as a long.",
+          "Loop `i` from 1 to `n - 1`.",
+          "If `A[i] > A[i - 1]`, add `A[i] - A[i - 1]` to `profit`.",
+          "Return `profit`."
+        ],
+        "pseudocode": "if n < 2 → return 0\nprofit = 0\nfor i = 1 .. n-1:\n    if A[i] > A[i-1] → profit += A[i] - A[i-1]\nreturn profit",
+        "story": "Every rising step is money you can take; every falling step is money you simply do not touch.",
+        "code": "public int bestTimeToBuyAndSellStocksII(int[] A) {\n    if (A == null || A.length < 2) {\n        return 0;\n    }\n    long profit = 0;\n    for (int i = 1; i < A.length; i++) {\n        if (A[i] > A[i - 1]) {\n            profit += A[i] - A[i - 1];\n        }\n    }\n    return (int) profit;\n}"
+      }
+    ]
+  }
+]

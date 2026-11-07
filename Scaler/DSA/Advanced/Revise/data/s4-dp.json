@@ -1,0 +1,1470 @@
+[
+  {
+    "num": 255,
+    "id": "s4-dp-stairs",
+    "title": "Stairs",
+    "subTopic": "Fibonacci recurrence",
+    "tags": [
+      "Dynamic Programming",
+      "1D DP",
+      "Fibonacci",
+      "Modular Arithmetic"
+    ],
+    "description": "You are climbing a staircase and it takes A steps to reach the top.\nEach time you can either climb 1 or 2 steps. In how many distinct ways can you climb to the top?\nReturn the number of distinct ways modulo 1000000007\n\nProblem Constraints\n1 <= A <= 10^5\n\nInput Format\nThe first and the only argument contains an integer A, the number of steps.\n\nOutput Format\nReturn an integer, representing the number of ways to reach the top.\n\nExample Input\nInput 1:\nA = 2\nInput 2:\nA = 3\n\nExample Output\nOutput 1:\n2\nOutput 2:\n3\n\nExample Explanation\nExplanation 1:\nDistinct ways to reach top: [1, 1], [2].\nExplanation 2:\nDistinct ways to reach top: [1 1 1], [1 2], [2 1].",
+    "sampleInput": "A = 2",
+    "sampleOutput": "2",
+    "story": "The number of ways to reach step A is the sum of the ways to reach A-1 and A-2.",
+    "plain": "Every path to step `A` ends with either a 1-step or a 2-step, so the last move splits all paths into two disjoint groups. That gives f(A) = f(A-1) + f(A-2), which is Fibonacci shifted by one. Base cases are f(1) = 1 and f(2) = 2. Iterate upward from 3 to `A` carrying only the previous two values, taking the result mod 1000000007 at every addition. Return the final value.",
+    "howToThink": [
+      "Fibonacci recurrence: f(A) = f(A-1) + f(A-2), computed bottom-up with two rolling variables.",
+      "Classify paths by the LAST move. It is either 1 or 2, and those two sets never overlap, so counts just add.",
+      "Base cases are f(1) = 1 and f(2) = 2 — enumerate them once and never recurse below that.",
+      "`A` goes to 10^5 so the answer is astronomically large; the `% MOD` is not decoration, it is part of the recurrence.",
+      "No memo array is needed — only `prev1` and `prev2` feed the next term, so space drops to O(1)."
+    ],
+    "pitfalls": [
+      "Off-by-one on base cases: f(2) = 2, not 1. Seeding the Fibonacci as 1, 1 shifts the whole answer by one term.",
+      "Forgetting `% MOD` inside the loop. Applying it only to the final value overflows long after a few dozen iterations.",
+      "Adding two values already near MOD in `int` overflows — keep the running values in `long` and cast back only at return.",
+      "Plain recursion without memo is O(2^A) and times out immediately at A = 10^5; recursion also blows the stack at that depth.",
+      "The top-down solution recurses to depth `A`; at the constraint ceiling `A = 10^5` that overflows the default JVM stack. The bottom-up rolling version has no such limit — prefer it when `A` is large."
+    ],
+    "solutions": [
+      {
+        "label": "Optimal — bottom-up rolling Fibonacci",
+        "complexity": {
+          "time": "O(A)",
+          "space": "O(1)"
+        },
+        "plain": "Handle A = 1 and A = 2 directly since they equal A itself. Otherwise seed `prev2` = f(1) = 1 and `prev1` = f(2) = 2. Loop i from 3 to `A`, set `current` = (prev1 + prev2) % MOD, then shift the window forward. After the loop `prev1` holds f(A).",
+        "approach": [
+          "If `A` is 1 or 2, return `A` (1 way and 2 ways respectively).",
+          "Set `prev2` = 1 for f(1) and `prev1` = 2 for f(2), both as `long`.",
+          "For i from 3 to `A`: `current` = (prev1 + prev2) % MOD.",
+          "Shift: `prev2` = `prev1`, `prev1` = `current`.",
+          "Return `prev1` cast to `int`."
+        ],
+        "pseudocode": "MOD = 1000000007\nif A <= 2 → return A\nprev2 = 1        // f(1)\nprev1 = 2        // f(2)\nfor i = 3 .. A:\n    curr  = (prev1 + prev2) % MOD\n    prev2 = prev1\n    prev1 = curr\nreturn prev1",
+        "story": "Two rolling longs replace the whole DP table because each term only ever looks back two steps.",
+        "code": "public int climbStairsDistinctWays(int A) {\n    final int MOD = 1000000007;\n    if (A == 1 || A == 2) {\n        return A;\n    }\n\n    long prev2 = 1; // f(1)\n    long prev1 = 2; // f(2)\n\n    for (int i = 3; i <= A; i++) {\n        long curr = (prev1 + prev2) % MOD;\n        prev2 = prev1;\n        prev1 = curr;\n    }\n\n    return (int) prev1;\n}"
+      },
+      {
+        "label": "Top-down — memoised recursion",
+        "complexity": {
+          "time": "O(A)",
+          "space": "O(A) — memo, plus O(A) call stack"
+        },
+        "plain": "Recurse on `A` with a memo array seeded to -1. If `A` is 1 or 2 return `A`. Otherwise return the memo hit, else compute f(A-1) + f(A-2) under the mod and store it. Same recurrence, but it costs an O(A) array and an O(A) call stack, which is why the iterative form is preferred here.",
+        "approach": [
+          "Allocate `memory` of size A+1 and fill with -1 as the 'not computed' sentinel.",
+          "Base: A == 1 or A == 2 returns `A`.",
+          "If `memory[A]` != -1, return it.",
+          "Else `memory[A]` = (f(A-1) + f(A-2)) % MOD, widening to `long` before the add.",
+          "Return `memory[A]`."
+        ],
+        "pseudocode": "solve(A):\n    if A <= 2 → return A\n    if memo[A] != -1 → return memo[A]\n    memo[A] = ((long) solve(A-1) + solve(A-2)) % MOD\n    return memo[A]",
+        "story": "Same recurrence written as recursion, with the memo table paying for the convenience.",
+        "code": "public int climbStairsDistinctWaysTopDown(int A) {\n    int[] memory = new int[A + 1];\n    Arrays.fill(memory, -1);\n    return climbStairsMemo(A, memory);\n}\n\nprivate int climbStairsMemo(int A, int[] memory) {\n    final int MOD = 1000000007;\n    if (A == 1 || A == 2) {\n        return A;\n    }\n    if (memory[A] != -1) {\n        return memory[A];\n    }\n    memory[A] = (int) (((long) climbStairsMemo(A - 1, memory)\n                      + (long) climbStairsMemo(A - 2, memory)) % MOD);\n    return memory[A];\n}"
+      }
+    ]
+  },
+  {
+    "num": 256,
+    "id": "s4-dp-minimum-number-of-squares",
+    "title": "Minimum Number of Squares",
+    "subTopic": "Unbounded coin-change on squares",
+    "tags": [
+      "Dynamic Programming",
+      "1D DP",
+      "Memoization",
+      "Unbounded Knapsack"
+    ],
+    "description": "Given an integer A. Return minimum count of numbers, sum of whose squares is equal to A.\n\nProblem Constraints\n1 <= A <= 10^5\n\nInput Format\nFirst and only argument is an integer A.\n\nOutput Format\nReturn an integer denoting the minimum count.\n\nExample Input\nInput 1:\nA = 6\nInput 2:\nA = 5\n\nExample Output\nOutput 1:\n3\nOutput 2:\n2\n\nExample Explanation\nExplanation 1:\nPossible combinations are : (1^2 + 1^2 + 1^2 + 1^2 + 1^2 + 1^2) and (1^2 + 1^2 + 2^2).\nMinimum count of numbers, sum of whose squares is 6 is 3.\nExplanation 2:\nWe can represent 5 using only 2 numbers i.e. 1^2 + 2^2 = 5",
+    "sampleInput": "A = 6",
+    "sampleOutput": "3",
+    "story": "Pick one square to subtract, recurse on the remainder, and keep the cheapest choice.",
+    "plain": "Define f(n) as the minimum count of squares summing to n. To build n you must use some square i*i with i*i <= n, which leaves n - i*i to solve the same way. So f(n) = 1 + min over all valid i of f(n - i*i), with f(0) = 0. Every n from 0 to `A` is a distinct state and each state tries about sqrt(n) squares. Memoise on n so each state is computed once.",
+    "howToThink": [
+      "Unbounded coin change where the coins are the perfect squares 1, 4, 9, 16, ... — minimise coin count for target `A`.",
+      "State is a single integer, the remaining amount. That is what makes it 1D DP.",
+      "Transition: for every i with i*i <= n, try f(n - i*i) + 1 and keep the minimum.",
+      "f(0) = 0 is the real base case — it means the remainder was consumed exactly, contributing no extra number.",
+      "Squares are reusable without limit (6 = 1+1+4 uses 1 twice), so this is unbounded, not 0/1."
+    ],
+    "pitfalls": [
+      "Memoising the WRONG index: store the answer at `memory[A]` (the state you just solved), not at `memory[nextNum]` inside the loop — writing the child's slot mid-loop and returning early on a memo hit skips the remaining square choices and yields a non-minimal answer.",
+      "Returning early on `memory[nextNum] != -1` inside the for-loop short-circuits the min; the memo check belongs at the TOP of the function, keyed on `A`.",
+      "Leaving `minCount` at `Integer.MAX_VALUE` and then doing `minCount + 1` overflows to a negative. Guard by returning 0 at A == 0 so the loop always finds at least i = 1.",
+      "Using 0 as the uninitialised memo sentinel collides with the valid answer f(0) = 0 — use -1.",
+      "Loop condition must be `i * i <= A`, not `i <= A`; and with A up to 10^5, `i * i` stays inside int only because i <= 317.",
+      "The memoised solution recurses to depth ~`A` through the `i = 1` branch, so it overflows the default JVM stack at `A = 10^5`. The bottom-up table computes the same answer iteratively."
+    ],
+    "solutions": [
+      {
+        "label": "Optimal — memoised min over square choices",
+        "complexity": {
+          "time": "O(A * sqrt(A))",
+          "space": "O(A) — memo, plus O(A) call stack worst case"
+        },
+        "plain": "Allocate a memo of size A+1 filled with -1 and recurse. At n <= 0 return 0. If the memo holds n, return it. Otherwise iterate i while i*i <= n, recurse on n - i*i, and track the smallest result + 1. Store that minimum at `memory[n]` before returning so each amount is solved once.",
+        "approach": [
+          "Create `memory` of size A+1, fill with -1.",
+          "Base: if `A` <= 0 return 0 — nothing left to cover.",
+          "If `memory[A]` != -1, return it.",
+          "Init `minCount` = Integer.MAX_VALUE.",
+          "For i = 1 while i*i <= A: `nextNum` = A - i*i; `result` = solve(nextNum); `minCount` = min(minCount, result + 1).",
+          "Store `memory[A]` = `minCount` and return it."
+        ],
+        "pseudocode": "solve(n):\n    if n <= 0 → return 0\n    if memo[n] != -1 → return memo[n]\n    best = INF\n    for i = 1 while i*i <= n:\n        best = min(best, solve(n - i*i) + 1)\n    memo[n] = best\n    return best",
+        "story": "Each amount asks every square that fits which remainder is cheapest, then remembers its own answer.",
+        "code": "public int minimumNumberOfSquares(int A) {\n    int[] memory = new int[A + 1];\n    Arrays.fill(memory, -1);\n    return minimumNumberOfSquares(A, memory);\n}\n\nprivate int minimumNumberOfSquares(int A, int[] memory) {\n    if (A <= 0) {\n        return 0;\n    }\n    if (memory[A] != -1) {\n        return memory[A];\n    }\n\n    int minCount = Integer.MAX_VALUE;\n    for (int i = 1; i * i <= A; i++) {\n        int nextNum = A - (i * i);\n        int result = minimumNumberOfSquares(nextNum, memory);\n        minCount = Math.min(minCount, result + 1);\n    }\n\n    memory[A] = minCount; // memoise the state just solved, not the child\n    return minCount;\n}"
+      },
+      {
+        "label": "Bottom-up — iterative table",
+        "complexity": {
+          "time": "O(A * sqrt(A))",
+          "space": "O(A)"
+        },
+        "plain": "Same recurrence filled forward so there is no recursion stack. Set dp[0] = 0 and every other entry to a large sentinel. For each n from 1 to `A`, try every square i*i <= n and take dp[n - i*i] + 1. dp[A] is the answer, and it is always reachable because 1 is a square.",
+        "approach": [
+          "Allocate `dp` of size A+1, set dp[0] = 0 and the rest to Integer.MAX_VALUE.",
+          "For n = 1 to A: for i = 1 while i*i <= n, set dp[n] = min(dp[n], dp[n - i*i] + 1).",
+          "Return dp[A]."
+        ],
+        "pseudocode": "dp[0] = 0\nfor n = 1 .. A:\n    dp[n] = INF\n    for i = 1 while i*i <= n:\n        dp[n] = min(dp[n], dp[n - i*i] + 1)\nreturn dp[A]",
+        "story": "Fill amounts in increasing order so every subproblem it needs is already final.",
+        "code": "public int minimumNumberOfSquaresBottomUp(int A) {\n    int[] dp = new int[A + 1];\n    dp[0] = 0;\n\n    for (int n = 1; n <= A; n++) {\n        dp[n] = Integer.MAX_VALUE;\n        for (int i = 1; i * i <= n; i++) {\n            dp[n] = Math.min(dp[n], dp[n - (i * i)] + 1);\n        }\n    }\n\n    return dp[A];\n}"
+      }
+    ]
+  },
+  {
+    "num": 257,
+    "id": "s4-dp-fibonacci-number",
+    "title": "Fibonacci Number",
+    "subTopic": "Memoised linear recurrence",
+    "tags": [
+      "Dynamic Programming",
+      "1D DP",
+      "Memoization",
+      "Recursion"
+    ],
+    "description": "Given a positive integer A, write a program to find the Ath Fibonacci number.\nIn a Fibonacci series, each term is the sum of the previous two terms and the first two terms of the series are 0 and 1. i.e. f(0) = 0 and f(1) = 1. Hence, f(2) = 1, f(3) = 2, f(4) = 3 and so on.\nNOTE: 0th term is 0. 1th term is 1 and so on.\n\nProblem Constraints\n0 <= A <= 44\n\nInput Format\nFirst and only argument is an integer A.\n\nOutput Format\nReturn an integer denoting the Ath Fibonacci number.\n\nExample Input\nInput 1:\nA = 4\nInput 2:\nA = 6\n\nExample Output\nOutput 1:\n3\nOutput 2:\n8\n\nExample Explanation\nExplanation 1:\nTerms of Fibonacci series are: 0, 1, 1, 2, 3, 5, 8, 13, 21 and so on.\n0th term is 0 So, 4th term of Fibonacci series is 3.\nExplanation 2:\n6th term of Fibonacci series is 8.",
+    "sampleInput": "A = 4",
+    "sampleOutput": "3",
+    "story": "f(A) = f(A-1) + f(A-2) with f(0) = 0, f(1) = 1 — memoise so each term is computed once.",
+    "plain": "The recurrence is given outright: each term is the sum of the previous two. Naive recursion recomputes the same terms exponentially many times, so cache f(n) in an array indexed by n. Base cases are f(0) = 0 and f(1) = 1. Every state from 0 to `A` is then evaluated once and looked up thereafter. With A capped at 44 the answer fits comfortably in a signed 32-bit int.",
+    "howToThink": [
+      "Memoised linear recurrence: f(A) = f(A-1) + f(A-2), cached in a 1D array indexed by n.",
+      "Draw the naive recursion tree — f(A-2) is reached from two branches. Overlapping subproblems is the memo trigger.",
+      "Two base cases are required because the recurrence reaches back two steps; one base case leaves f(1) undefined.",
+      "The DP is a straight line of states 0..A with in-degree 2, so bottom-up with two rolling variables is equally valid and uses O(1) space.",
+      "A <= 44 caps f(A) at 701408733, which still fits in int — no `long` or MOD needed here."
+    ],
+    "pitfalls": [
+      "Indexing convention: this problem is 0-indexed (f(0) = 0, f(1) = 1), unlike Stairs. Seeding f(1) = f(2) = 1 returns the wrong term.",
+      "Using 0 as the memo sentinel is wrong because f(0) = 0 is a legitimate answer — fill with -1.",
+      "A = 0 must return 0. If `memory` is sized A+1 = 1 and the base case is missing, you index out of bounds or recurse to negative n.",
+      "Plain recursion with no memo is O(2^A); at A = 44 that is billions of calls."
+    ],
+    "solutions": [
+      {
+        "label": "Optimal — memoised recursion (top-down)",
+        "complexity": {
+          "time": "O(A)",
+          "space": "O(A) — memo, plus O(A) call stack"
+        },
+        "plain": "Allocate `memory` of size A+1 filled with -1. Return `A` directly for A == 0 or A == 1 since those equal their own index. On a memo hit return the stored value. Otherwise store f(A-1) + f(A-2) into `memory[A]` and return it. Each index is computed once, so the recursion tree collapses to a chain.",
+        "approach": [
+          "Allocate `memory` of size A+1 and fill with -1.",
+          "Base: if `A` is 0 or 1, return `A`.",
+          "If `memory[A]` != -1, return it.",
+          "`memory[A]` = solve(A-1) + solve(A-2).",
+          "Return `memory[A]`."
+        ],
+        "pseudocode": "solve(n):\n    if n <= 1 → return n\n    if memo[n] != -1 → return memo[n]\n    memo[n] = solve(n-1) + solve(n-2)\n    return memo[n]",
+        "story": "The memo turns an exponential tree into a single pass down the chain of indices.",
+        "code": "public int fibonacciNumber(int A) {\n    int[] memory = new int[A + 1];\n    Arrays.fill(memory, -1);\n    return fibonacciNumber(A, memory);\n}\n\nprivate int fibonacciNumber(int A, int[] memory) {\n    if (A == 0 || A == 1) {\n        return A;\n    }\n    if (memory[A] != -1) {\n        return memory[A];\n    }\n\n    memory[A] = fibonacciNumber(A - 1, memory) + fibonacciNumber(A - 2, memory);\n    return memory[A];\n}"
+      },
+      {
+        "label": "Bottom-up — two rolling variables",
+        "complexity": {
+          "time": "O(A)",
+          "space": "O(1)"
+        },
+        "plain": "Skip the array entirely. Hold f(n-2) and f(n-1) in two variables seeded to 0 and 1, then step forward A-1 times. No recursion means no stack and no memo, which is strictly better when only f(A) is needed.",
+        "approach": [
+          "If `A` <= 1, return `A`.",
+          "Set `prev2` = 0 and `prev1` = 1.",
+          "For i = 2 to A: `curr` = prev1 + prev2, then shift `prev2` = `prev1`, `prev1` = `curr`.",
+          "Return `prev1`."
+        ],
+        "pseudocode": "if A <= 1 → return A\nprev2 = 0, prev1 = 1\nfor i = 2 .. A:\n    curr  = prev1 + prev2\n    prev2 = prev1\n    prev1 = curr\nreturn prev1",
+        "story": "Only the last two terms matter, so the table shrinks to two ints.",
+        "code": "public int fibonacciNumberBottomUp(int A) {\n    if (A <= 1) {\n        return A;\n    }\n\n    int prev2 = 0;\n    int prev1 = 1;\n\n    for (int i = 2; i <= A; i++) {\n        int curr = prev1 + prev2;\n        prev2 = prev1;\n        prev1 = curr;\n    }\n\n    return prev1;\n}"
+      }
+    ]
+  },
+  {
+    "num": 258,
+    "id": "s4-dp-max-product-subarray",
+    "title": "Max Product Subarray",
+    "subTopic": "Track running max and min",
+    "tags": [
+      "Dynamic Programming",
+      "1D DP",
+      "Arrays",
+      "Kadane"
+    ],
+    "description": "Given an integer array A of size N. Find the contiguous subarray within the given array (containing at least one number) which has the largest product.\nReturn an integer corresponding to the maximum product possible.\nNOTE: Answer will fit in 32-bit integer value.\n\nProblem Constraints\n1 <= N <= 5 * 10^5\n-100 <= A[i] <= 100\n\nInput Format\nFirst and only argument is an integer array A.\n\nOutput Format\nReturn an integer corresponding to the maximum product possible.\n\nExample Input\nInput 1:\nA = [4, 2, -5, 1]\nInput 2:\nA = [-3, 0, -5, 0]\n\nExample Output\nOutput 1:\n8\nOutput 2:\n0\n\nExample Explanation\nExplanation 1:\nWe can choose the subarray [4, 2] such that the maximum product is 8.\nExplanation 2:\n0 will be the maximum product possible.",
+    "sampleInput": "A = [4, 2, -5, 1]",
+    "sampleOutput": "8",
+    "story": "Carry both the max and the min product ending at each index, because a negative flips them.",
+    "plain": "For each index i track two values: the largest product of a subarray ending at i and the smallest one. A negative A[i] turns the previous smallest into the new largest, so both must be carried. At each step the candidates are A[i] alone, maxEndingHere * A[i], and minEndingHere * A[i]; take the max of the three for the new max and the min of the three for the new min. A zero collapses both to zero, which correctly restarts the subarray at the next index. The answer is the running maximum over all i.",
+    "howToThink": [
+      "Kadane with two states: keep both `maxEnd` and `minEnd` at every index, because multiplying by a negative swaps their roles.",
+      "Sum-Kadane fails here — with products, a very negative prefix is an asset, not a liability, once another negative arrives.",
+      "The three candidates at index i are `A[i]`, `maxEnd * A[i]`, `minEnd * A[i]`. Including `A[i]` alone is what lets the subarray restart.",
+      "Compute the new `maxEnd` and `minEnd` from the OLD pair — snapshot `maxEnd` before overwriting it.",
+      "Zero needs no special case: all three candidates become 0 or `A[i]`, so the window naturally restarts."
+    ],
+    "pitfalls": [
+      "Overwriting `maxEnd` before computing `minEnd` — the min then uses the already-updated max. Stash the previous max in a temp.",
+      "Initialising `maxEnd`/`minEnd`/`answer` to 0 instead of `A[0]`. An all-negative array like [-2, -3] then wrongly returns 0; there must be at least one element in the subarray.",
+      "Dropping the bare `A[i]` candidate. Without it the subarray can never restart after a zero.",
+      "The final answer fits in int, but the running `maxEnd`/`minEnd` products can exceed int on adversarial data — keep them in `long` and cast only at return.",
+      "Two passes (one left-to-right, one right-to-left, taking prefix products) also works, but forgetting to reset the running product to 1 after a zero breaks it."
+    ],
+    "solutions": [
+      {
+        "label": "Optimal — dual Kadane on max and min",
+        "complexity": {
+          "time": "O(N)",
+          "space": "O(1)"
+        },
+        "plain": "Seed `maxEnd`, `minEnd`, and `answer` all to A[0]. Walk i from 1 to N-1. Save the old `maxEnd`, then set `maxEnd` to the max of A[i], oldMax * A[i], and `minEnd` * A[i]; set `minEnd` to the min of the same three using oldMax. Update `answer` with the new `maxEnd` each step and return it.",
+        "approach": [
+          "Handle the single-element case implicitly by seeding from `A[0]`.",
+          "Set `maxEnd` = `minEnd` = `answer` = A[0], all as `long` for `maxEnd`/`minEnd`.",
+          "For i = 1 to N-1: snapshot `prevMax` = `maxEnd`.",
+          "`maxEnd` = max(A[i], max(prevMax * A[i], minEnd * A[i])).",
+          "`minEnd` = min(A[i], min(prevMax * A[i], minEnd * A[i])).",
+          "`answer` = max(answer, maxEnd).",
+          "Return `answer` cast to `int`."
+        ],
+        "pseudocode": "maxEnd = minEnd = answer = A[0]\nfor i = 1 .. N-1:\n    prevMax = maxEnd\n    maxEnd  = max(A[i], prevMax * A[i], minEnd * A[i])\n    minEnd  = min(A[i], prevMax * A[i], minEnd * A[i])\n    answer  = max(answer, maxEnd)\nreturn answer",
+        "story": "The smallest product is kept alive because the next negative promotes it to the largest.",
+        "code": "public int maxProductSubarray(final int[] A) {\n    long maxEnd = A[0];\n    long minEnd = A[0];\n    long answer = A[0];\n\n    for (int i = 1; i < A.length; i++) {\n        long prevMax = maxEnd; // snapshot BEFORE overwriting, minEnd needs the old value\n        long byMax = prevMax * A[i];\n        long byMin = minEnd * A[i];\n\n        maxEnd = Math.max(A[i], Math.max(byMax, byMin));\n        minEnd = Math.min(A[i], Math.min(byMax, byMin));\n\n        answer = Math.max(answer, maxEnd);\n    }\n\n    return (int) answer;\n}"
+      }
+    ]
+  },
+  {
+    "num": 259,
+    "id": "s4-dp-maximum-sum-value",
+    "title": "Maximum Sum Value",
+    "subTopic": "Prefix max and suffix max",
+    "tags": [
+      "Dynamic Programming",
+      "1D DP",
+      "Prefix Sum",
+      "Arrays"
+    ],
+    "description": "You are given an array A of N integers and three integers B, C, and D.\nYou have to find the maximum value of A[i]*B + A[j]*C + A[k]*D, where 1 <= i <= j <= k <= N.\n\nProblem Constraints\n1 <= N <= 10^5\n-10000 <= A[i], B, C, D <= 10000\n\nInput Format\nFirst argument is an array A\nSecond argument is an integer B\nThird argument is an integer C\nFourth argument is an integer D\n\nOutput Format\nReturn an Integer S, i.e maximum value of (A[i] * B + A[j] * C + A[k] * D), where 1 <= i <= j <= k <= N.\n\nExample Input\nInput 1:\nA = [1, 5, -3, 4, -2]\nB = 2\nC = 1\nD = -1\nInput 2:\nA = [3, 2, 1]\nB = 1\nC = -10\nD = 3\n\nExample Output\nOutput 1:\n18\nOutput 2:\n-4\n\nExample Explanation\nExplanation 1:\nIf you choose i = 2, j = 2, and k = 3 then we will get\nA[2]*B + A[2]*C + A[3]*D = 5*2 + 5*1 + (-3)*(-1) = 10 + 5 + 3 = 18\nExplanation 2:\nIf you choose i = 1, j = 3, and k = 3 then we will get\nA[1]*B + A[3]*C + A[3]*D = (3*1) + (-10*1) + (3*3) = 3 - 10 + 3 = -4",
+    "sampleInput": "A = [1, 5, -3, 4, -2], B = 2, C = 1, D = -1",
+    "sampleOutput": "18",
+    "story": "Fix the middle index j, then take the best A[i]*B to its left and the best A[k]*D to its right.",
+    "plain": "The three indices are only coupled by the ordering i <= j <= k, so fix the middle index `j` and the other two become independent. For each `j` you want the largest A[i]*B over all i <= j and the largest A[k]*D over all k >= j. Build `prefixMax[j]` = max of A[i]*B for i in 0..j with a left-to-right scan, and `suffixMax[j]` = max of A[k]*D for k in j..N-1 with a right-to-left scan. Then the answer is the maximum over all `j` of prefixMax[j] + A[j]*C + suffixMax[j]. Three linear passes, no nested loops.",
+    "howToThink": [
+      "Fix the middle: iterate `j`, and the constraint i <= j <= k splits into an independent prefix max and suffix max.",
+      "Note that i, j, k may coincide — the bounds are <=, not <, so `prefixMax` and `suffixMax` must both INCLUDE index j.",
+      "B, C, D can be negative, so 'best A[i]*B' is not 'largest A[i]' — always maximise the PRODUCT, never the raw element.",
+      "prefixMax[j] = max(prefixMax[j-1], A[j]*B) and suffixMax[j] = max(suffixMax[j+1], A[j]*D) — two trivial 1D DP recurrences.",
+      "The O(N^3) triple loop and even the O(N^2) fixed-j-with-inner-scan both die at N = 10^5; the prefix/suffix split is the whole trick."
+    ],
+    "pitfalls": [
+      "Excluding index `j` from the prefix or suffix. Example 1's answer uses i = j = 2, so both arrays must be inclusive of `j`.",
+      "Initialising the running max to 0 instead of `Long.MIN_VALUE` (or the first product). Example 2's answer is -4, so a 0 floor silently produces a wrong non-negative result.",
+      "Maximising `A[i]` and multiplying by B afterwards. With B negative the smallest element gives the largest product — multiply first, then take the max.",
+      "A[i] and B both reach 10000, so each term is up to 10^8 and the sum up to 3*10^8. That fits in int here, but keep the accumulators in `long` so a wider constraint does not silently overflow.",
+      "The statement is 1-indexed; the array in code is 0-indexed. Translate the bounds once and stay consistent."
+    ],
+    "solutions": [
+      {
+        "label": "Optimal — prefix max of A[i]*B and suffix max of A[k]*D",
+        "complexity": {
+          "time": "O(N)",
+          "space": "O(N) — two auxiliary arrays"
+        },
+        "plain": "Build `prefixMax` in one left-to-right pass where prefixMax[j] is the best A[i]*B for i <= j. Build `suffixMax` in one right-to-left pass where suffixMax[j] is the best A[k]*D for k >= j. Then sweep `j` once and take the maximum of prefixMax[j] + A[j]*C + suffixMax[j]. Both auxiliary arrays include index j itself, which is what allows i = j = k.",
+        "approach": [
+          "Let n = A.length; allocate `prefixMax` and `suffixMax` of size n as `long[]`.",
+          "prefixMax[0] = (long) A[0] * B; for j = 1..n-1: prefixMax[j] = max(prefixMax[j-1], (long) A[j] * B).",
+          "suffixMax[n-1] = (long) A[n-1] * D; for j = n-2..0: suffixMax[j] = max(suffixMax[j+1], (long) A[j] * D).",
+          "Init `answer` = Long.MIN_VALUE.",
+          "For j = 0..n-1: `answer` = max(answer, prefixMax[j] + (long) A[j] * C + suffixMax[j]).",
+          "Return `answer` cast to `int`."
+        ],
+        "pseudocode": "n = len(A)\nprefixMax[0]   = A[0] * B\nfor j = 1 .. n-1:\n    prefixMax[j] = max(prefixMax[j-1], A[j] * B)\n\nsuffixMax[n-1] = A[n-1] * D\nfor j = n-2 .. 0:\n    suffixMax[j] = max(suffixMax[j+1], A[j] * D)\n\nanswer = -INF\nfor j = 0 .. n-1:\n    answer = max(answer, prefixMax[j] + A[j] * C + suffixMax[j])\nreturn answer",
+        "story": "Pinning the middle term decouples the other two, turning a triple loop into three linear scans.",
+        "code": "public int maximumSumValue(int[] A, int B, int C, int D) {\n    int n = A.length;\n    long[] prefixMax = new long[n];\n    long[] suffixMax = new long[n];\n\n    prefixMax[0] = (long) A[0] * B;\n    for (int j = 1; j < n; j++) {\n        prefixMax[j] = Math.max(prefixMax[j - 1], (long) A[j] * B);\n    }\n\n    suffixMax[n - 1] = (long) A[n - 1] * D;\n    for (int j = n - 2; j >= 0; j--) {\n        suffixMax[j] = Math.max(suffixMax[j + 1], (long) A[j] * D);\n    }\n\n    long answer = Long.MIN_VALUE;\n    for (int j = 0; j < n; j++) {\n        // prefixMax and suffixMax both include j, so i == j == k is allowed\n        long curr = prefixMax[j] + (long) A[j] * C + suffixMax[j];\n        answer = Math.max(answer, curr);\n    }\n\n    return (int) answer;\n}"
+      }
+    ]
+  },
+  {
+    "num": 260,
+    "id": "s4-dp-unique-paths-in-a-grid",
+    "title": "Unique Paths in a Grid",
+    "subTopic": "Grid path counting with blocked cells",
+    "tags": [
+      "Dynamic Programming",
+      "2D DP",
+      "Grid",
+      "Counting"
+    ],
+    "description": "Given a grid of size n * m, lets assume you are starting at (1,1) and your goal is to reach (n, m).\nAt any instance, if you are on (x, y), you can either go to (x, y + 1) or (x + 1, y).\n\nNow consider if some obstacles are added to the grids.\nReturn the total number unique paths from (1, 1) to (n, m).\n\nNote:\n1. An obstacle is marked as 1 and empty space is marked 0 respectively in the grid.\n2. Given Source Point and Destination points are 1-based index.\n\nProblem Constraints\n1 <= n, m <= 100\nA[i][j] = 0 or 1\n\nInput Format\nFirts and only argument A is a 2D array of size n * m.\n\nOutput Format\nReturn an integer denoting the number of unique paths from (1, 1) to (n, m).\n\nExample Input\nInput 1:\nA = [\n     [0, 0, 0]\n     [0, 1, 0]\n     [0, 0, 0]\n    ]\nInput 2:\nA = [\n     [0, 0, 0]\n     [1, 1, 1]\n     [0, 0, 0]\n    ]\n\nExample Output\nOutput 1:\n2\nOutput 2:\n0\n\nExample Explanation\nExplanation 1:\n Possible paths to reach (n, m): {(1, 1), (1, 2), (1, 3), (2, 3), (3, 3)} and {(1 ,1), (2, 1), (3, 1), (3, 2), (3, 3)}\n So, the total number of unique paths is 2.",
+    "sampleInput": "A = [[0, 0, 0], [0, 1, 0], [0, 0, 0]]",
+    "sampleOutput": "2",
+    "story": "Count right/down paths through a grid where 1-cells are walls.",
+    "plain": "The number of ways to land on a cell is the number of ways to land on the cell above it plus the number of ways to land on the cell to its left, because those are the only two moves that reach it. A cell holding an obstacle contributes 0 ways. Seed the start cell with 1 and sweep the grid row by row, left to right, so both predecessors are already final when you read them. The answer sits in the bottom-right cell. If either the start or the end cell is blocked the answer is 0.",
+    "howToThink": [
+      "2D grid counting DP: `dp[i][j] = dp[i-1][j] + dp[i][j-1]`, obstacle cell forces 0.",
+      "Moves are only right and down, so every path into `(i, j)` arrives from exactly one of two cells — no cycles, which is what makes a plain row-major sweep legal.",
+      "Recursion from `(n-1, m-1)` backwards is the natural first write, but it re-explores the same cell exponentially; the state is just `(i, j)`, so memoise or tabulate.",
+      "Obstacles need no extra state — they just zero out a cell, and the zero propagates forward on its own.",
+      "First row and first column have a single predecessor; guard with `i > 0` / `j > 0` instead of padding."
+    ],
+    "pitfalls": [
+      "Plain recursion with no memo is O(2^(n+m)) — it may squeak past weak tests but is the wrong answer to give in an interview.",
+      "Forgetting the blocked-start / blocked-end case: if `A[0][0] == 1` the seed must not be 1.",
+      "Writing the obstacle check after the additions — a blocked cell must be zeroed, not summed.",
+      "Reading `dp[i-1][j]` or `dp[i][j-1]` without the `i > 0` / `j > 0` guard on the border rows.",
+      "`dp` is `int[]`, and an obstacle-free 100x100 grid has C(198,99) paths — far past int range. The statement specifies no modulo so this matches the reference behaviour, but say so out loud in an interview rather than letting it pass silently."
+    ],
+    "solutions": [
+      {
+        "label": "Optimal — bottom-up grid DP",
+        "complexity": {
+          "time": "O(n * m)",
+          "space": "O(n * m) — can be cut to O(m) with a rolling row"
+        },
+        "plain": "Allocate a dp grid the same shape as A. Seed dp[0][0] with 1 when the start is free. Sweep rows top to bottom, columns left to right: a blocked cell gets 0, any other cell gets the sum of the cell above and the cell to the left, treating out-of-grid predecessors as 0. The bottom-right entry is the answer.",
+        "approach": [
+          "If `A[0][0] == 1` or `A[n-1][m-1] == 1`, return 0 immediately.",
+          "Create `dp[n][m]` and set `dp[0][0] = 1`.",
+          "For each cell in row-major order: if `A[i][j] == 1` set `dp[i][j] = 0` and move on.",
+          "Otherwise `dp[i][j] = (i > 0 ? dp[i-1][j] : 0) + (j > 0 ? dp[i][j-1] : 0)`.",
+          "Return `dp[n-1][m-1]`."
+        ],
+        "pseudocode": "if A[0][0] == 1 or A[n-1][m-1] == 1 → return 0\ndp[0][0] = 1\nfor i in 0..n-1:\n    for j in 0..m-1:\n        if A[i][j] == 1 → dp[i][j] = 0; continue\n        if i == 0 and j == 0 → continue\n        top  = i > 0 ? dp[i-1][j] : 0\n        left = j > 0 ? dp[i][j-1] : 0\n        dp[i][j] = top + left\nreturn dp[n-1][m-1]",
+        "story": "Ways into a cell = ways into the cell above + ways into the cell left; a wall contributes nothing.",
+        "code": "public int uniquePathsWithObstaclesInGrid(int[][] A) {\n    int n = A.length;\n    int m = A[0].length;\n    if (A[0][0] == 1 || A[n - 1][m - 1] == 1) {\n        return 0;\n    }\n\n    int[][] dp = new int[n][m];\n    dp[0][0] = 1;\n\n    for (int i = 0; i < n; i++) {\n        for (int j = 0; j < m; j++) {\n            if (A[i][j] == 1) {\n                dp[i][j] = 0;\n                continue;\n            }\n            if (i == 0 && j == 0) {\n                continue;\n            }\n            int top = (i > 0) ? dp[i - 1][j] : 0;\n            int left = (j > 0) ? dp[i][j - 1] : 0;\n            dp[i][j] = top + left;\n        }\n    }\n    return dp[n - 1][m - 1];\n}"
+      }
+    ]
+  },
+  {
+    "num": 261,
+    "id": "s4-dp-unique-binary-search-trees-ii",
+    "title": "Unique Binary Search Trees II",
+    "subTopic": "Catalan number via root split",
+    "tags": [
+      "Dynamic Programming",
+      "Catalan",
+      "Binary Search Tree",
+      "Memoization"
+    ],
+    "description": "Given an integer A, how many structurally unique BST's (binary search trees) exist that can store values 1...A?\n\nProblem Constraints\n1 <= A <=18\n\nInput Format\nFirst and only argument is the integer A\n\nOutput Format\nReturn a single integer, the answer to the problem\n\nExample Input\nInput 1:\n1\nInput 2:\n2\n\nExample Output\nOutput 1:\n1\nOutput 2:\n2\n\nExample Explanation\nExplanation 1:\nOnly single node tree is possible.\nExplanation 2:\n2 trees are possible, one rooted at 1 and other rooted at 2.",
+    "sampleInput": "A = 1",
+    "sampleOutput": "1",
+    "story": "Count BST shapes on A nodes by fixing each value as the root.",
+    "plain": "Fix which of the A values is the root. Everything smaller goes into the left subtree and everything larger into the right subtree, so if the root is the (i+1)-th value the left holds i nodes and the right holds A-i-1 nodes. The two sides are independent, so the count for that root is the product of the two sub-counts. Sum that product over every choice of root. The count depends only on how many nodes a subtree has, never on which values they are, so a one-dimensional memo on the node count is enough.",
+    "howToThink": [
+      "Catalan recurrence: `f(A) = sum over i of f(i) * f(A - i - 1)` — pick the root, multiply the two sides.",
+      "The key observation is that the shape count depends only on the subtree SIZE, not on the actual values — `1..i` and `i+2..A` both collapse to \"a set of k sorted keys\".",
+      "Base cases `f(0) = 1` and `f(1) = 1`; the empty tree counting as one shape is what makes the product form work.",
+      "State is a single integer, so a `int[A+1]` memo turns the exponential recursion into `O(A^2)` — A values, an A-length loop each."
+    ],
+    "pitfalls": [
+      "Setting `f(0) = 0` instead of 1 — the whole product collapses to zero for every skewed tree.",
+      "Adding the two sides instead of multiplying: left and right choices are independent, so it is a product.",
+      "Uninitialised memo sentinel — fill with `-1`, not 0, since 0 is never a valid answer here but a default-0 array reads as \"already computed\".",
+      "Catalan(18) = 477638700 fits in int, but A = 19 would overflow — the `A <= 18` bound is doing real work."
+    ],
+    "solutions": [
+      {
+        "label": "Optimal — memoised Catalan recurrence",
+        "complexity": {
+          "time": "O(A^2)",
+          "space": "O(A) — memo, plus O(A) call stack"
+        },
+        "plain": "Recurse on the node count. For n nodes, loop i from 0 to n-1 treating the (i+1)-th smallest value as root, and add f(i) * f(n-i-1). Cache each n in an int array pre-filled with -1 so every node count is computed once. n = 0 and n = 1 both return 1.",
+        "approach": [
+          "Allocate `int[] memory` of size `A + 1` and fill it with `-1`.",
+          "Base: `A == 0` or `A == 1` returns 1.",
+          "If `memory[A] != -1`, return it.",
+          "Loop `i` from 0 to `A - 1`: add `f(i) * f(A - i - 1)` to `count`.",
+          "Store `memory[A] = count` and return it."
+        ],
+        "pseudocode": "f(n):\n    if n == 0 or n == 1 → return 1\n    if memory[n] != -1 → return memory[n]\n    count = 0\n    for i in 0..n-1:\n        count += f(i) * f(n - i - 1)      # i nodes left, n-i-1 nodes right\n    memory[n] = count\n    return count",
+        "story": "Every value gets a turn as root; the two halves never interact, so multiply and sum.",
+        "code": "public int numUniqueBSTrees(int A) {\n    int[] memory = new int[A + 1];\n    Arrays.fill(memory, -1);\n    return numUniqueBSTrees(A, memory);\n}\n\nprivate int numUniqueBSTrees(int A, int[] memory) {\n    if (A == 0 || A == 1) {\n        return 1;\n    }\n    if (memory[A] != -1) {\n        return memory[A];\n    }\n\n    int count = 0;\n    for (int i = 0; i < A; i++) {\n        count += numUniqueBSTrees(i, memory) * numUniqueBSTrees(A - (i + 1), memory);\n    }\n    memory[A] = count;\n    return memory[A];\n}"
+      }
+    ]
+  },
+  {
+    "num": 262,
+    "id": "s4-dp-max-sum-without-adjacent-elements",
+    "title": "Max Sum Without Adjacent Elements",
+    "subTopic": "House robber on a 2 x N grid",
+    "tags": [
+      "Dynamic Programming",
+      "1D DP",
+      "Memoization",
+      "Grid"
+    ],
+    "description": "Given a 2 x N grid of integers, A, your task is to choose numbers from the grid such that sum of these numbers is maximized.\nHowever, you cannot choose two numbers that are adjacent horizontally, vertically, or diagonally.\n\nReturn the maximum possible sum.\n\nNote: You are allowed to choose more than 2 numbers from the grid.\n\nProblem Constraints\n1 <= N <= 20000\n1 <= A[i] <= 2000\n\nInput Format\nThe first and the only argument of input contains a 2d matrix, A.\n\nOutput Format\nReturn an integer, representing the maximum possible sum.\n\nExample Input\nInput 1:\nA = [\n     [1]\n     [2]\n    ]\nInput 2:\nA = [\n     [1, 2, 3, 4]\n     [2, 3, 4, 5]\n    ]\n\nExample Output\nOutput 1:\n2\nOutput 2:\n8\n\nExample Explanation\nExplanation 1:\nWe will choose 2 (From 2nd row 1st column).\nExplanation 2:\nWe will choose 3 (From 2nd row 2nd column) and 5 (From 2nd row 4th column).",
+    "sampleInput": "A = [[1], [2]]",
+    "sampleOutput": "2",
+    "story": "Collapse the 2 x N grid to one array of column maxima, then run house robber.",
+    "plain": "Because adjacency covers horizontal, vertical and diagonal, picking any cell in a column rules out the whole of the neighbouring columns and the other cell of the same column. So at most one cell per column is ever chosen, and if you use a column you always take the larger of its two values. That reduces the grid to a single array where entry c is max(A[0][c], A[1][c]), and the rule becomes: no two chosen entries may be adjacent. From column c you either take the column and jump to c-2, or skip it and move to c-1. Take the better of the two.",
+    "howToThink": [
+      "House robber on one array: `f(c) = max(best(col c) + f(c-2), f(c-1))`, where `best(col c) = max(A[0][c], A[1][c])`.",
+      "Diagonal adjacency is the whole trick — it means the two cells of a column and the two cells of the next column are all mutually adjacent, so a column contributes at most one value.",
+      "Once that collapses, state is a single index `col`, so an `int[N]` memo is enough — no 2D table.",
+      "All values are positive (`1 <= A[i] <= 2000`), so you never want to skip a column for free; the skip branch only exists to let a bigger neighbour win.",
+      "`col < 0` returns 0 and `col == 0` returns `max(A[0][0], A[1][0])` — both base cases are needed because the pick branch jumps two columns at a time."
+    ],
+    "pitfalls": [
+      "Missing that diagonal adjacency forbids picking both rows of neighbouring columns — treating the two rows as independent house-robber runs gives a wrong, larger answer.",
+      "Only one base case: jumping `col - 2` from `col == 1` lands on `-1`, so you need the `col < 0` guard as well as `col == 0`.",
+      "Memo sentinel — `Arrays.fill(memory, -1)` is required; values here are always positive so `-1` is a safe sentinel, but a default-0 array would silently return 0.",
+      "N up to 20000 means recursion depth up to 20000 — if the stack is tight, flip to an iterative left-to-right sweep with two running variables.",
+      "The memoised recursion goes about `N` frames deep, ~10^4 at the constraint ceiling. It survives the default stack here, but an iterative two-variable sweep removes the call-stack space entirely."
+    ],
+    "solutions": [
+      {
+        "label": "Optimal — memoised pick-or-skip on columns",
+        "complexity": {
+          "time": "O(N)",
+          "space": "O(N) — memo, plus O(N) call stack"
+        },
+        "plain": "Recurse on the rightmost column index. At column c there are three moves worth writing: take the top cell and recurse to c-2, take the bottom cell and recurse to c-2, or skip the column and recurse to c-1. Cache the best of the three in memory[c]. Base cases return 0 for a negative index and max of the two cells for column 0.",
+        "approach": [
+          "Allocate `int[] memory` sized `A[0].length`, fill with `-1`.",
+          "Call the helper with `col = A[0].length - 1`.",
+          "`col < 0` returns 0; `col == 0` returns `Math.max(A[0][0], A[1][0])`.",
+          "Return the memo entry if already computed.",
+          "Compute `A[0][col] + f(col-2)`, `A[1][col] + f(col-2)` and `f(col-1)`; store the max."
+        ],
+        "pseudocode": "f(col):\n    if col < 0  → return 0\n    if col == 0 → return max(A[0][0], A[1][0])\n    if memory[col] != -1 → return memory[col]\n\n    pickTop    = A[0][col] + f(col - 2)     # using a column kills col-1 entirely\n    pickBottom = A[1][col] + f(col - 2)\n    skip       = f(col - 1)\n\n    memory[col] = max(pickTop, pickBottom, skip)\n    return memory[col]",
+        "story": "A used column blocks its neighbour outright, so the choice is take-and-jump-two or skip-one.",
+        "code": "public int maxSumWithoutAdjacentElements(int[][] A) {\n    int[] memory = new int[A[0].length];\n    Arrays.fill(memory, -1);\n    return maxSum(A, A[0].length - 1, memory);\n}\n\nprivate int maxSum(int[][] A, int col, int[] memory) {\n    if (col < 0) {\n        return 0;\n    }\n    if (col == 0) {\n        return Math.max(A[0][0], A[1][0]);\n    }\n    if (memory[col] != -1) {\n        return memory[col];\n    }\n\n    int pickTop = A[0][col] + maxSum(A, col - 2, memory);\n    int pickBottom = A[1][col] + maxSum(A, col - 2, memory);\n    int skip = maxSum(A, col - 1, memory);\n\n    memory[col] = Math.max(Math.max(pickTop, pickBottom), skip);\n    return memory[col];\n}"
+      }
+    ]
+  },
+  {
+    "num": 263,
+    "id": "s4-dp-n-digit-numbers",
+    "title": "N digit numbers",
+    "subTopic": "Digit DP on (position, remaining sum)",
+    "tags": [
+      "Dynamic Programming",
+      "Digit DP",
+      "2D DP",
+      "Modulo"
+    ],
+    "description": "Find out the number of A digit positive numbers, whose digits on being added equals to a given number B.\nNote that a valid number starts from digits 1-9 except the number 0 itself. i.e. leading zeroes are not allowed.\nSince the answer can be large, output answer modulo 1000000007\n\nProblem Constraints\n1 <= A <= 1000\n1 <= B <= 10000\n\nInput Format\nFirst argument is the integer A\nSecond argument is the integer B\n\nOutput Format\nReturn a single integer, the answer to the problem\n\nExample Input\nInput 1:\nA = 2\nB = 4\nInput 2:\nA = 1\nB = 3\n\nExample Output\nOutput 1:\n4\nOutput 2:\n1\n\nExample Explanation\nExplanation 1:\nValid numbers are {22, 31, 13, 40}\nHence output 4.\nExplanation 2:\nOnly valid number is 3",
+    "sampleInput": "A = 2, B = 4",
+    "sampleOutput": "4",
+    "story": "Count A-digit numbers whose digits sum to B, no leading zero.",
+    "plain": "Build the number one position at a time from the least significant end, tracking how much of the target sum is still unplaced. At an ordinary position you may place any digit 0..9 that does not exceed the remaining sum, and each choice recurses with the sum reduced. The last position filled is the leading digit, and it is the only one restricted to 1..9, which is exactly what the leading-zero rule demands. The state is just (position, remaining sum), so a 2D memo of size (A+1) x (B+1) collapses the branching. Everything is accumulated modulo 1000000007.",
+    "howToThink": [
+      "Digit DP on `(pos, sum)`: `f(pos, sum) = sum over d in 0..9 of f(pos-1, sum-d)`, memoised on a 2D table.",
+      "Put the leading-digit restriction in the BASE case, not in the loop — when `pos == 1` the position being filled is the most significant one, so it returns 1 only if `1 <= sum <= 9`.",
+      "`sum <= 0` with `pos > 1` is dead: remaining positions still have to absorb something, and every digit is non-negative, so return 0.",
+      "Guard the digit loop with `if (sum >= i)` so you never index a negative remaining sum.",
+      "Size the memo `(A+1) x (B+1)`; `A * B` up to 10^7 states with 10 work each is the honest cost."
+    ],
+    "pitfalls": [
+      "Applying the 1..9 restriction to the FIRST recursive call instead of the base case — it must land on the most significant digit.",
+      "Filling the memo with 0 instead of `-1`: 0 is a legitimate count here, so a default-0 table returns wrong answers instantly.",
+      "Forgetting `% MOD` inside the accumulation loop — `count` overflows int before the return.",
+      "Letting `sum - i` go negative and indexing the memo with it; the `sum >= i` check is not optional.",
+      "Treating `B > 9 * A` as anything but 0 — the recursion handles it, but a hand-rolled closed form usually does not."
+    ],
+    "solutions": [
+      {
+        "label": "Optimal — memoised digit DP on (pos, sum)",
+        "complexity": {
+          "time": "O(A * B * 10) = O(A * B)",
+          "space": "O(A * B) — memo, plus O(A) call stack"
+        },
+        "plain": "Pre-fill an (A+1) x (B+1) int table with -1. The helper takes the number of positions still to fill and the sum still to distribute. When one position is left, return 1 if the remaining sum is a single non-zero digit and 0 otherwise. When the remaining sum is non-positive with more positions left, return 0. Otherwise loop digits 0..9, skip those larger than the remaining sum, add the recursive counts modulo 1000000007, and cache.",
+        "approach": [
+          "Allocate `int[A+1][B+1]` and set every cell to `-1`.",
+          "Call `nDigitNumbers(A, B, memory)`.",
+          "Base 1: `pos == 1` returns 1 if `sum >= 1 && sum <= 9`, else 0 — this is the leading-digit rule.",
+          "Base 2: `sum <= 0` returns 0.",
+          "Return the cached value when it is not `-1`.",
+          "Loop `i` from 0 to 9; when `sum >= i`, accumulate `f(pos-1, sum-i)` into `count` with `% MOD`.",
+          "Store and return `memory[pos][sum]`."
+        ],
+        "pseudocode": "f(pos, sum):\n    if pos == 1 → return (1 <= sum <= 9) ? 1 : 0    # leading digit, no zero\n    if sum <= 0 → return 0\n    if memory[pos][sum] != -1 → return memory[pos][sum]\n\n    count = 0\n    for d in 0..9:\n        if sum >= d:\n            count = (count + f(pos - 1, sum - d)) % MOD\n    memory[pos][sum] = count\n    return count",
+        "story": "Spend the target sum digit by digit; the last position spent is the one that may not be zero.",
+        "code": "private static final int MOD = 1000000007;\n\npublic int nDigitNumbersWithDigitSum(int A, int B) {\n    int[][] memory = new int[A + 1][B + 1];\n    for (int i = 0; i <= A; i++) {\n        for (int j = 0; j <= B; j++) {\n            memory[i][j] = -1;\n        }\n    }\n    return nDigitNumbers(A, B, memory);\n}\n\nprivate int nDigitNumbers(int pos, int sum, int[][] memory) {\n    if (pos == 1) {\n        if (sum >= 1 && sum <= 9) {   // leading digit: 1-9 only\n            return 1;\n        } else {\n            return 0;\n        }\n    }\n    if (sum <= 0) {\n        return 0;\n    }\n    if (memory[pos][sum] != -1) {\n        return memory[pos][sum];\n    }\n\n    int count = 0;\n    for (int i = 0; i <= 9; i++) {\n        if (sum >= i) {\n            count = (count + nDigitNumbers(pos - 1, sum - i, memory)) % MOD;\n        }\n    }\n    memory[pos][sum] = count;\n    return memory[pos][sum];\n}"
+      }
+    ]
+  },
+  {
+    "num": 264,
+    "id": "s4-dp-max-rectangle-in-binary-matrix",
+    "title": "Max Rectangle in Binary Matrix",
+    "subTopic": "Row-wise histogram + monotonic stack",
+    "tags": [
+      "Dynamic Programming",
+      "Stack",
+      "Matrix",
+      "Monotonic Stack"
+    ],
+    "description": "Given a 2-D binary matrix A of size N x M filled with 0's and 1's, find the largest rectangle containing only ones and return its area.\n\nProblem Constraints\n1 <= N, M <= 100\n\nInput Format\nThe first argument is a 2-D binary array A.\n\nOutput Format\nReturn an integer denoting the area of the largest rectangle containing only ones.\n\nExample Input\nInput 1:\nA = [\n      [1, 1, 1]\n      [0, 1, 1]\n      [1, 0, 0]\n    ]\nInput 2:\nA = [\n      [0, 1, 0]\n      [1, 1, 1]\n    ]\n\nExample Output\nOutput 1:\n4\nOutput 2:\n3\n\nExample Explanation\nExplanation 1:\nAs the max area rectangle is created by the 2x2 rectangle created by (0, 1), (0, 2), (1, 1) and (1, 2).\nExplanation 2:\nAs the max area rectangle is created by the 1x3 rectangle created by (1, 0), (1, 1) and (1, 2).",
+    "sampleInput": "A = [[1, 1, 1], [0, 1, 1], [1, 0, 0]]",
+    "sampleOutput": "4",
+    "story": "Treat every row as the base of a histogram of consecutive ones above it.",
+    "plain": "Every all-ones rectangle has a bottom row. Fix that row and describe the matrix above it as a histogram: bar j is the number of consecutive ones ending at this row in column j. That count carries forward incrementally — add one if the cell is 1, reset to 0 if it is 0. The largest all-ones rectangle with this row as its base is exactly the largest rectangle in that histogram, which a monotonic increasing stack solves in one linear pass by finding, for each bar, how far left and right it can extend before hitting a shorter bar. Sweep every row as a base and keep the maximum.",
+    "howToThink": [
+      "Row-wise histogram + largest-rectangle-in-histogram with a monotonic stack — the DP part is the height array, the stack part is the area scan.",
+      "Every valid rectangle has a unique bottom row, so iterating over bottom rows enumerates all of them without double work.",
+      "Height update is the incremental DP: `heights[j] = (A[i][j] == 1) ? heights[j] + 1 : 0` — a zero cell kills the column, it does not decrement it.",
+      "In the histogram scan, a bar popped at index `i` spans from `stack.peek() + 1` to `i - 1`, so width is `i - left - 1` with `left = -1` when the stack empties.",
+      "Push a virtual bar of height 0 at index `M` so every bar still on the stack gets flushed and measured."
+    ],
+    "pitfalls": [
+      "Decrementing the height on a 0 cell instead of resetting to 0 — the run of ones is broken, not shortened.",
+      "Forgetting the sentinel pass at `i == M`; bars left on the stack are never measured and tall trailing rectangles are missed.",
+      "Width computed as `i - stack.peek()` instead of `i - stack.peek() - 1` — a classic off-by-one that inflates every area.",
+      "Reusing the same `heights` array across rows is correct and intended, but resetting it per row loses the whole point — do not clear it."
+    ],
+    "solutions": [
+      {
+        "label": "Optimal — histogram per row with monotonic stack",
+        "complexity": {
+          "time": "O(N * M)",
+          "space": "O(M) — heights array plus the stack"
+        },
+        "plain": "Keep one heights array of length M across all rows. For each row, update every column's height in place: increment on a 1, reset to 0 on a 0. Then run a largest-rectangle-in-histogram pass over heights using an index stack kept increasing in height. Each pop yields a candidate area equal to the popped height times the span between the new stack top and the current index. Track the global max across all rows.",
+        "approach": [
+          "Allocate `int[] heights` of size `M`, and `max = 0`.",
+          "For each row `i`: update `heights[j]` to `heights[j] + 1` when `A[i][j] == 1`, else `0`.",
+          "Call the histogram helper on `heights` and fold the result into `max`.",
+          "Histogram helper: iterate `i` from 0 to `M` inclusive, treating `curr = 0` at `i == M`.",
+          "While the stack is non-empty and the bar at its top is `>= curr`, pop it, compute `height * (i - left - 1)` with `left` the new top (or `-1`), and update the max.",
+          "Push `i` and continue; return the helper's max."
+        ],
+        "pseudocode": "heights[0..M-1] = 0\nfor each row i:\n    for j in 0..M-1:\n        heights[j] = (A[i][j] == 1) ? heights[j] + 1 : 0\n    max = max(max, largestRectangle(heights))\nreturn max\n\nlargestRectangle(h):\n    stack empty, best = 0\n    for i in 0..M:                       # i == M is a virtual zero bar\n        curr = (i == M) ? 0 : h[i]\n        while stack not empty and h[stack.top] >= curr:\n            height = h[stack.pop()]\n            left   = stack empty ? -1 : stack.top\n            best   = max(best, height * (i - left - 1))\n        stack.push(i)\n    return best",
+        "story": "Each row is the floor of a skyline; the biggest rectangle under that skyline is the answer for that floor.",
+        "code": "public int maximalRectangleInBinaryMatrix(int[][] A) {\n    int n = A.length;\n    int m = A[0].length;\n    int[] heights = new int[m];\n    int max = 0;\n\n    for (int i = 0; i < n; i++) {\n        for (int j = 0; j < m; j++) {\n            if (A[i][j] == 1) {\n                heights[j] = heights[j] + 1;\n            } else {\n                heights[j] = 0;   // a zero breaks the column run, reset — never decrement\n            }\n        }\n        max = Math.max(max, largestRectangleInHistogram(heights));\n    }\n    return max;\n}\n\nprivate int largestRectangleInHistogram(int[] heights) {\n    int m = heights.length;\n    Stack<Integer> stack = new Stack<>();\n    int best = 0;\n\n    for (int i = 0; i <= m; i++) {\n        int curr = (i == m) ? 0 : heights[i];   // virtual zero bar flushes the stack\n        while (!stack.isEmpty() && heights[stack.peek()] >= curr) {\n            int height = heights[stack.pop()];\n            int left = stack.isEmpty() ? -1 : stack.peek();\n            best = Math.max(best, height * (i - left - 1));\n        }\n        stack.push(i);\n    }\n    return best;\n}"
+      }
+    ]
+  },
+  {
+    "num": 265,
+    "id": "s4-dp-min-sum-path-in-matrix",
+    "title": "Min Sum Path in Matrix",
+    "subTopic": "Grid DP with a rolling row",
+    "tags": [
+      "Dynamic Programming",
+      "2D DP",
+      "Grid",
+      "Space Optimization"
+    ],
+    "description": "Given a M x N grid A of integers, find a path from top left to bottom right which minimizes the sum of all numbers along its path.\nReturn the minimum sum of the path.\nNOTE: You can only move either down or right at any point in time.\n\nProblem Constraints\n1 <= M, N <= 2000\n-1000 <= A[i][j] <= 1000\n\nInput Format\nFirst and only argument is a 2-D grid A.\n\nOutput Format\nReturn an integer denoting the minimum sum of the path.\n\nExample Input\nInput 1:\nA = [\n     [1, 3, 2]\n     [4, 3, 1]\n     [5, 6, 1]\n    ]\nInput 2:\nA = [\n     [1, -3, 2]\n     [2, 5, 10]\n     [5, -5, 1]\n    ]\n\nExample Output\nOutput 1:\n8\nOutput 2:\n-1\n\nExample Explanation\nExplanation 1:\nThe path will be: 1 -> 3 -> 2 -> 1 -> 1.\nInput 2:\nThe path will be: 1 -> -3 -> 5 -> -5 -> 1.",
+    "sampleInput": "A = [[1, 3, 2], [4, 3, 1], [5, 6, 1]]",
+    "sampleOutput": "8",
+    "story": "Cheapest right/down walk from the top-left cell to the bottom-right cell.",
+    "plain": "The cheapest way to reach a cell is its own value plus the cheaper of the two cells you could have come from: the one above and the one to the left. Fill the grid row by row, left to right, so both of those are already final when you need them. The first row can only be reached from the left and the first column only from above, so those get single-parent handling. The bottom-right entry is the answer. Since a row only ever reads the row directly above it, one array of length N is enough if you overwrite it in place.",
+    "howToThink": [
+      "Grid DP: `dp[i][j] = A[i][j] + min(dp[i-1][j], dp[i][j-1])`, filled row-major.",
+      "Only down and right moves means the dependency graph is acyclic and left-to-right/top-to-bottom is already a valid topological order — no recursion needed.",
+      "Collapse to one row: when you write `dp[j]` in place, `dp[j]` still holds the value from the row above and `dp[j-1]` already holds this row — exactly the two parents you want.",
+      "Negatives are allowed but change nothing: `min` is still `min`, and there are no cycles, so no negative-cycle concern.",
+      "`M * N` up to 4,000,000 cells — the O(N) rolling row matters more than the time here."
+    ],
+    "pitfalls": [
+      "Initialising `dp` to 0 and letting the first row/column pick up a phantom `min(0, ...)` — handle `i == 0` and `j == 0` explicitly.",
+      "Seeding with `Integer.MAX_VALUE` and then adding `A[i][j]` — that overflows; guard the border instead of using an infinity sentinel.",
+      "Assuming all values are positive and short-circuiting early; `A[i][j]` can be as low as -1000, so no greedy shortcut is valid.",
+      "Mixing up M and N: the grid is `M x N` in the statement but `A.length x A[0].length` in code — read the dimensions off the array, not the prose."
+    ],
+    "solutions": [
+      {
+        "label": "Optimal — bottom-up grid DP, single rolling row",
+        "complexity": {
+          "time": "O(M * N)",
+          "space": "O(N) — one rolling row"
+        },
+        "plain": "Keep one array dp of width N. Walk rows top to bottom and, within a row, columns left to right, overwriting dp in place. At (0,0) dp[0] is just the cell value. On the first row each cell adds to its left neighbour. In the first column each cell adds to the value already in dp[0], which is the cell above. Everywhere else take the min of dp[j] (above) and dp[j-1] (left) and add the cell. dp[N-1] after the last row is the answer.",
+        "approach": [
+          "Read `n = A.length`, `m = A[0].length`; allocate `int[] dp = new int[m]`.",
+          "For each row `i` top to bottom, for each column `j` left to right:",
+          "`i == 0 && j == 0` → `dp[0] = A[0][0]`.",
+          "`i == 0` → `dp[j] = dp[j-1] + A[i][j]` (only the left parent exists).",
+          "`j == 0` → `dp[j] = dp[j] + A[i][j]` (`dp[j]` still holds the row above).",
+          "otherwise → `dp[j] = Math.min(dp[j], dp[j-1]) + A[i][j]`.",
+          "Return `dp[m-1]`."
+        ],
+        "pseudocode": "dp[0..m-1] = 0\nfor i in 0..n-1:\n    for j in 0..m-1:\n        if i == 0 and j == 0 → dp[j] = A[0][0]\n        else if i == 0       → dp[j] = dp[j-1] + A[i][j]        # left only\n        else if j == 0       → dp[j] = dp[j]   + A[i][j]        # dp[j] = row above\n        else                 → dp[j] = min(dp[j], dp[j-1]) + A[i][j]\nreturn dp[m-1]",
+        "story": "Cost to stand on a cell is its value plus the cheaper of its two possible predecessors.",
+        "code": "public int minSumPathInMatrix(int[][] A) {\n    int n = A.length;\n    int m = A[0].length;\n    int[] dp = new int[m];\n\n    for (int i = 0; i < n; i++) {\n        for (int j = 0; j < m; j++) {\n            if (i == 0 && j == 0) {\n                dp[j] = A[0][0];\n            } else if (i == 0) {\n                dp[j] = dp[j - 1] + A[i][j];\n            } else if (j == 0) {\n                dp[j] = dp[j] + A[i][j];   // dp[j] still holds the row above\n            } else {\n                dp[j] = Math.min(dp[j], dp[j - 1]) + A[i][j];\n            }\n        }\n    }\n    return dp[m - 1];\n}"
+      }
+    ]
+  },
+  {
+    "num": 266,
+    "id": "s4-dp-min-sum-path-in-triangle",
+    "title": "Min Sum Path in Triangle",
+    "subTopic": "Bottom-up triangle relaxation",
+    "tags": [
+      "Dynamic Programming",
+      "2D DP",
+      "Triangle",
+      "Space Optimization"
+    ],
+    "description": "Given a triangle, find the minimum path sum from top to bottom. Each step you may move to adjacent numbers on the row below.\nAdjacent numbers for jth column of ith row is jth and (j+1)th column of (i + 1)th row\n\nProblem Constraints\n|A| <= 1000\nA[i] <= 1000\n\nInput Format\nFirst and only argument is the vector of vector A defining the given triangle\n\nOutput Format\nReturn the minimum sum\n\nExample Input\nInput 1:\nA = [\n         [2],\n        [3, 4],\n       [6, 5, 7],\n      [4, 1, 8, 3]\n    ]\nInput 2:\nA = [ [1] ]\n\nExample Output\nOutput 1:\n11\nOutput 2:\n1\n\nExample Explanation\nExplanation 1:\nThe minimum path sum from top to bottom is 11 (i.e., 2 + 3 + 5 + 1 = 11).\nExplanation 2:\nOnly 2 can be collected.",
+    "sampleInput": "A = [[2], [3, 4], [6, 5, 7], [4, 1, 8, 3]]",
+    "sampleOutput": "11",
+    "story": "Minimum top-to-bottom sum in a triangle, stepping to index j or j+1 in the next row.",
+    "plain": "From cell (i, j) you may step to (i+1, j) or (i+1, j+1). Working top-down forces you to track two parents per cell and still scan the last row at the end. Working bottom-up is cleaner: seed the answer array with the last row, then for each row above replace entry j with A[i][j] plus the smaller of the two entries below it. After processing row 0 the single remaining entry is the minimum total. The array is only ever read at j and j+1 while writing j, so the in-place left-to-right overwrite is safe.",
+    "howToThink": [
+      "Bottom-up triangle DP: `dp[j] = A[i][j] + min(dp[j], dp[j+1])`, sweeping rows from the second-last up to row 0.",
+      "Going bottom-up removes the final \"scan the last row for the minimum\" step and the ragged index guards a top-down pass needs.",
+      "Row `i` has exactly `i + 1` entries, so the inner loop runs `j` from 0 to `i` — never to the array length.",
+      "In-place overwrite is safe because writing `dp[j]` only consumes `dp[j]` and `dp[j+1]`, both still holding the row below.",
+      "Answer is `dp[0]` after the outer loop, because every path starts at the single apex cell."
+    ],
+    "pitfalls": [
+      "Running the inner loop to `dp.length - 1` instead of `i` — you read stale entries from the row below and get a wrong minimum.",
+      "Sweeping rows top-down in place: writing `dp[j]` then needing the old `dp[j]` for `dp[j+1]` clobbers it, so bottom-up (or a temp array) is required.",
+      "Assuming every row has the same length; the triangle is jagged, so use `A[i].length` or `i + 1`, never `A[0].length`.",
+      "Initialising `dp` to 0 and skipping the last-row seed — the deepest row then contributes nothing."
+    ],
+    "solutions": [
+      {
+        "label": "Optimal — bottom-up in-place relaxation",
+        "complexity": {
+          "time": "O(N^2) over the ~N^2/2 cells",
+          "space": "O(N) — one dp row"
+        },
+        "plain": "Copy the last row of the triangle into a dp array of length N. Then move upward one row at a time. For row i, for each j from 0 to i, set dp[j] to A[i][j] plus the smaller of dp[j] and dp[j+1], which are the two cells reachable from (i, j). When the loop finishes, dp[0] holds the minimum path sum from the apex.",
+        "approach": [
+          "Let `n = A.length`; allocate `int[] dp = new int[n]`.",
+          "Seed `dp[j] = A[n-1][j]` for every j in the last row.",
+          "For `i` from `n - 2` down to 0, for `j` from 0 to `i`:",
+          "`dp[j] = A[i][j] + Math.min(dp[j], dp[j + 1])`.",
+          "Return `dp[0]`."
+        ],
+        "pseudocode": "dp[j] = A[n-1][j]  for all j in last row\n\nfor i from n-2 down to 0:\n    for j in 0..i:                       # row i has exactly i+1 cells\n        dp[j] = A[i][j] + min(dp[j], dp[j+1])\n\nreturn dp[0]",
+        "story": "Fold the triangle upward: each cell absorbs the cheaper of the two cells beneath it.",
+        "code": "public int minimumSumPathInTriangle(int[][] A) {\n    int n = A.length;\n    int[] dp = new int[n];\n\n    for (int j = 0; j < A[n - 1].length; j++) {\n        dp[j] = A[n - 1][j];\n    }\n\n    for (int i = n - 2; i >= 0; i--) {\n        for (int j = 0; j <= i; j++) {   // row i has exactly i+1 cells\n            dp[j] = A[i][j] + Math.min(dp[j], dp[j + 1]);\n        }\n    }\n    return dp[0];\n}"
+      }
+    ]
+  },
+  {
+    "num": 267,
+    "id": "s4-dp-intersecting-chords-in-a-circle",
+    "title": "Intersecting Chords in a Circle",
+    "subTopic": "Catalan number with modulo",
+    "tags": [
+      "Dynamic Programming",
+      "Catalan",
+      "Combinatorics",
+      "Modulo"
+    ],
+    "description": "Given a number A, return number of ways you can draw A chords in a circle with 2 x A points such that no 2 chords intersect.\nTwo ways are different if there exists a chord which is present in one way and not in other.\nReturn the answer modulo 10^9 + 7.\n\nProblem Constraints\n1 <= A <= 10^3\n\nInput Format\nThe first and the only argument contains the integer A.\n\nOutput Format\nReturn an integer answering the query as described in the problem statement.\n\nExample Input\nInput 1:\nA = 1\nInput 2:\nA = 2\n\nExample Output\nOutput 1:\n1\nOutput 2:\n2\n\nExample Explanation\nExplanation 1:\nIf points are numbered 1 to 2 in clockwise direction, then different ways to draw chords are: {(1-2)} only. So, we return 1.\nExplanation 2:\nIf points are numbered 1 to 4 in clockwise direction, then different ways to draw chords are:{(1-2), (3-4)} and {(1-4), (2-3)}.\nSo, we return 2.",
+    "sampleInput": "A = 1",
+    "sampleOutput": "1",
+    "story": "Count non-crossing perfect matchings of 2A points on a circle.",
+    "plain": "Fix point 1 and decide which point it pairs with. That chord cuts the circle into two arcs, and no chord may cross it, so every remaining point must pair inside its own arc. For both arcs to be pairable they must each hold an even number of points, so point 1 can only connect to an even-numbered point. If one side gets 2j points the other gets 2(A-j-1), and the two sides are solved independently, so multiply their counts. Summing over all valid partners gives dp[i] = sum of dp[j] * dp[i-j-1], the Catalan recurrence, which you fill iteratively up to A under the modulus.",
+    "howToThink": [
+      "Catalan again: `dp[i] = sum over j of dp[j] * dp[i-j-1]`, same recurrence as unique BSTs — recognise it and stop deriving.",
+      "The chord from point 1 partitions the circle; non-crossing means the two arcs never interact, which is exactly what licenses the product.",
+      "Both arcs must have even size, so the split is over chord-counts `j` and `i-j-1`, not over point counts.",
+      "`dp[0] = 1` — an empty arc has exactly one (empty) matching, and that 1 is what makes the outermost chord count correctly.",
+      "A up to 1000 so `O(A^2)` = 10^6 operations; iterate bottom-up rather than recursing to avoid a 1000-deep stack."
+    ],
+    "pitfalls": [
+      "Multiplying two `int` values already reduced mod 10^9+7 — the product reaches ~10^18, so use `long` for the accumulator and the operands.",
+      "`dp[0] = 0` instead of 1 kills every term that has an empty arc, which is most of them.",
+      "Taking `% MOD` only at the end of the inner loop rather than each addition — with A = 1000 the running sum overflows even `long` is close; reduce every step.",
+      "Splitting on point indices instead of chord counts — the off-by-one in `i - j - 1` (the chord you just placed) is the usual slip."
+    ],
+    "solutions": [
+      {
+        "label": "Optimal — iterative Catalan with modulo",
+        "complexity": {
+          "time": "O(A^2)",
+          "space": "O(A)"
+        },
+        "plain": "Build a long array dp of size A+1 with dp[0] = 1. For each i from 1 to A, sum dp[j] * dp[i-j-1] over j from 0 to i-1, reducing modulo 1000000007 on every addition. dp[i] is the number of non-crossing matchings on 2i points. Return dp[A] cast back to int.",
+        "approach": [
+          "Allocate `long[] dp` of size `A + 1`; set `dp[0] = 1`.",
+          "For `i` from 1 to A, reset `count = 0`.",
+          "For `j` from 0 to `i - 1`: `count = (count + dp[j] * dp[i - j - 1]) % MOD`.",
+          "Assign `dp[i] = count`.",
+          "Return `(int) dp[A]`."
+        ],
+        "pseudocode": "dp[0] = 1\nfor i in 1..A:\n    count = 0\n    for j in 0..i-1:\n        # chord from point 1 leaves 2j points on one arc, 2(i-j-1) on the other\n        count = (count + dp[j] * dp[i-j-1]) % MOD\n    dp[i] = count\nreturn dp[A]",
+        "story": "The first chord splits the circle into two independent, self-contained sub-problems.",
+        "code": "public int intersectingChordsInCircle(int A) {\n    final long MOD = 1000000007L;\n    long[] dp = new long[A + 1];\n    dp[0] = 1;\n\n    for (int i = 1; i <= A; i++) {\n        long count = 0;\n        for (int j = 0; j < i; j++) {\n            // long product: two values near MOD multiply to ~10^18, overflows int instantly\n            count = (count + dp[j] * dp[i - j - 1]) % MOD;\n        }\n        dp[i] = count;\n    }\n    return (int) dp[A];\n}"
+      }
+    ]
+  },
+  {
+    "num": 268,
+    "id": "s4-dp-0-1-knapsack",
+    "title": "0-1 Knapsack",
+    "subTopic": "0/1 knapsack memoisation",
+    "tags": [
+      "Dynamic Programming",
+      "Knapsack",
+      "Memoization",
+      "2D DP"
+    ],
+    "description": "Problem Description\nGiven two integer arrays A and B of size N each which represent values and weights associated with N items respectively.\nAlso given an integer C which represents knapsack capacity.\nFind out the maximum value subset of A such that sum of the weights of this subset is smaller than or equal to C.\nNOTE:\n\n- You cannot break an item, either pick the complete item, or don't pick it (0-1 property).\n\nProblem Constraints\n1 <= N <= 10^3\n1 <= C <= 10^3\n1 <= A[i], B[i] <= 10^3\n\nInput Format\nFirst argument is an integer array A of size N denoting the values on N items.\nSecond argument is an integer array B of size N denoting the weights on N items.\nThird argument is an integer C denoting the knapsack capacity.\n\nOutput Format\nReturn a single integer denoting the maximum value subset of A such that sum of the weights of this subset is smaller than or equal to C.\n\nExample Input\nInput 1:\nA = [60, 100, 120]\nB = [10, 20, 30]\nC = 50\nInput 2:\nA = [10, 20, 30, 40]\nB = [12, 13, 15, 19]\nC = 10\n\nExample Output\nOutput 1:\n220\nOutput 2:\n0\n\nExample Explanation\nExplanation 1:\nTaking items with weight 20 and 30 will give us the maximum value i.e 100 + 120 = 220\nExplanation 2:\nKnapsack capacity is 10 but each item has weight greater than 10 so no items can be considered in the knapsack therefore answer is 0.",
+    "sampleInput": "A = [60, 100, 120], B = [10, 20, 30], C = 50",
+    "sampleOutput": "220",
+    "story": "Each item is pick-or-skip; the only thing that carries forward is how much capacity is left.",
+    "plain": "Walk the items from the last index down to the first, carrying the capacity still available. At every item you have exactly two choices: skip it and move to the previous index with the same capacity, or take it (only if its weight fits) and move to the previous index with capacity reduced by its weight, collecting its value. The answer is the max of the two. The state is fully described by `(index, capacity)`, so memoise on a 2D table to collapse the exponential recursion into N*C distinct states.",
+    "howToThink": [
+      "0/1 knapsack - pick-or-skip recursion on `(index, capacity)`, memoised.",
+      "Greedy on value/weight fails here because you cannot break an item, so you must actually explore both branches.",
+      "Ask what changes between recursive calls: only `index` and remaining `capacity`. Two changing parameters means a 2D memo of size `(N+1) x (C+1)`.",
+      "Guard the pick branch with `capacity >= weights[index]` - a pick that does not fit is not a valid branch at all.",
+      "Base case at `index == 0`: return `values[0]` if `weights[0] <= capacity`, else `0`."
+    ],
+    "pitfalls": [
+      "Memo sentinel: initialise the table to `-1`, not `0`. `0` is a legitimate answer (example 2 returns 0), so a `0`-filled memo silently short-circuits real work.",
+      "Do not index `memory[index][capacity]` before checking that `capacity` is in range - always subtract the weight inside the `capacity >= weights[index]` guard, never before it.",
+      "Starting `ans` at `Integer.MIN_VALUE` is only safe because the skip branch always runs afterwards and overwrites it with a real value. If you ever return `ans` without the skip branch, you leak `MIN_VALUE`.",
+      "Recursion depth is `N`, not `C` - the index is what decreases monotonically; the capacity branch keeps the same index only in the unbounded variant, not here."
+    ],
+    "solutions": [
+      {
+        "label": "Optimal - top-down memoised pick/skip",
+        "complexity": {
+          "time": "O(N * C)",
+          "space": "O(N * C) - memo, plus O(N) call stack"
+        },
+        "plain": "Recurse on `(index, capacity)` from the last item backwards. Skip branch: same capacity, previous index. Pick branch: add `values[index]` and recurse with `capacity - weights[index]` at the previous index, allowed only when the item fits. Take the max, cache it in `memory[index][capacity]`. Every distinct state is computed once, so total work is N*C.",
+        "approach": [
+          "Allocate `memory[N+1][C+1]` and fill it with `-1`.",
+          "Start the recursion at `index = N - 1` with the full capacity `C`.",
+          "Base case `index == 0`: return `values[0]` when `weights[0] <= capacity`, else `0`.",
+          "If `memory[index][capacity] != -1`, return the cached value.",
+          "Pick branch (only if `capacity >= weights[index]`): `values[index] + solve(capacity - weights[index], index - 1)`.",
+          "Skip branch: `solve(capacity, index - 1)`; answer is the max of the two.",
+          "Store the max in `memory[index][capacity]` and return it."
+        ],
+        "pseudocode": "solve(index, capacity):\n  if index == 0 -> return (weights[0] <= capacity) ? values[0] : 0\n  if memo[index][capacity] != -1 -> return memo[index][capacity]\n\n  ans = -INF\n  if capacity >= weights[index] -> ans = values[index] + solve(index - 1, capacity - weights[index])\n  ans = max(ans, solve(index - 1, capacity))\n\n  memo[index][capacity] = ans\n  return ans",
+        "story": "Two branches per item, one cache keyed by (item, capacity left).",
+        "code": "public int maxValueForKnapsack(int[] A, int[] B, int C) {\n    int[][] memory = new int[A.length + 1][C + 1];\n    for (int i = 0; i <= A.length; i++) {\n        for (int j = 0; j <= C; j++) {\n            memory[i][j] = -1;\n        }\n    }\n    return maxValueForKnapsack(A, B, C, A.length - 1, memory);\n}\n\nprivate int maxValueForKnapsack(int[] values, int[] weights, int capacity, int index, int[][] memory) {\n    if (index == 0) {\n        if (weights[0] <= capacity) {\n            return values[0];\n        } else {\n            return 0;\n        }\n    }\n    if (memory[index][capacity] != -1) {\n        return memory[index][capacity];\n    }\n\n    int ans = Integer.MIN_VALUE;\n    if (capacity >= weights[index]) {\n        ans = values[index] + maxValueForKnapsack(values, weights, capacity - weights[index], index - 1, memory);\n    }\n    ans = Math.max(ans, maxValueForKnapsack(values, weights, capacity, index - 1, memory));\n\n    memory[index][capacity] = ans;\n    return memory[index][capacity];\n}"
+      }
+    ]
+  },
+  {
+    "num": 269,
+    "id": "s4-dp-unbounded-knapsack",
+    "title": "Unbounded Knapsack",
+    "subTopic": "Unbounded knapsack memoisation",
+    "tags": [
+      "Dynamic Programming",
+      "Knapsack",
+      "Memoization",
+      "Unbounded"
+    ],
+    "description": "Problem Description\nGiven a knapsack weight A and a set of items with certain value B[i] and weight C[i], we need to calculate maximum amount that could fit in this quantity.\nThis is different from classical Knapsack problem, here we are allowed to use unlimited number of instances of an item.\n\nProblem Constraints\n1 <= A <= 1000\n1 <= |B| <= 1000\n1 <= B[i] <= 1000\n1 <= C[i] <= 1000\n\nInput Format\nFirst argument is the Weight of knapsack A\nSecond argument is the vector of values B\nThird argument is the vector of weights C\n\nOutput Format\nReturn the maximum value that fills the knapsack completely\n\nExample Input\nInput 1:\nA = 10\nB = [5]\nC = [10]\nInput 2:\nA = 10\nB = [6, 7]\nC = [5, 5]\n\nExample Output\nOutput 1:\n5\nOutput 2:\n14\n\nExample Explanation\nExplanation 1:\nOnly valid possibility is to take the given item.\nExplanation 2:\nTake the second item twice.",
+    "sampleInput": "A = 10, B = [5], C = [10]",
+    "sampleOutput": "5",
+    "story": "Same pick-or-skip recursion as 0/1, except picking does not consume the item.",
+    "plain": "Recurse on `(index, capacity)` exactly like 0/1 knapsack, with one change: when you pick item `index`, you stay at `index` instead of moving to `index - 1`, because the item can be reused. Skipping still moves to `index - 1`, which is what guarantees termination. Capacity strictly decreases on every pick, so the recursion still bottoms out. Memoise on the same `(index, capacity)` 2D table - the state space is unchanged at N*C, only the transition differs.",
+    "howToThink": [
+      "Unbounded knapsack - pick-or-skip on `(index, capacity)`, but the pick branch recurses on the SAME `index`.",
+      "Compare against 0/1: the only structural difference is `index` vs `index - 1` in the take branch. Everything else - memo shape, base case, guard - is identical.",
+      "Termination still holds because every pick strictly reduces `capacity` by `weights[index] >= 1`.",
+      "Base case at `index == 0` must allow repeats too: the answer is `(capacity / weights[0]) * values[0]`, not just `values[0]`.",
+      "State count is still `N * C`, and each state does O(1) work, so time is `O(N * C)` - the repetition does not multiply the complexity."
+    ],
+    "pitfalls": [
+      "The base case is the trap. Returning `values[0]` once (as the raw submission does) silently caps item 0 at a single copy; it only passes when capacity cannot hold two. Use `(capacity / weights[0]) * values[0]`.",
+      "Writing `index - 1` in the pick branch turns this back into 0/1 knapsack and quietly returns a smaller answer.",
+      "Memo sentinel must be `-1`; `0` is a reachable answer when no item fits.",
+      "A `HashMap<String, Integer>` keyed by `index + \",\" + capacity` works but the string building dominates runtime - prefer the `int[][]` memo when `A` and `|B|` are both bounded by 1000."
+    ],
+    "solutions": [
+      {
+        "label": "Optimal - memoised recursion, pick stays at same index",
+        "complexity": {
+          "time": "O(N * C) where N = |B|, C = A",
+          "space": "O(N * C) - memo, plus O(N + C) call stack"
+        },
+        "plain": "Build an `(N+1) x (A+1)` memo filled with `-1` and recurse from the last index with full capacity. Skip: `(index - 1, capacity)`. Pick, guarded by `capacity >= weights[index]`: `values[index] + solve(index, capacity - weights[index])` - same index, so the item stays available. Cache and return the max. The base case at index 0 divides the remaining capacity by `weights[0]` to take as many copies of the first item as fit.",
+        "approach": [
+          "Allocate `memory[|B|+1][A+1]` and fill with `-1`.",
+          "Recurse starting at `index = |B| - 1`, `capacity = A`.",
+          "Base case `index == 0`: return `(capacity / weights[0]) * values[0]`.",
+          "Return the cached value if `memory[index][capacity] != -1`.",
+          "Skip branch: `solve(capacity, index - 1)`.",
+          "Pick branch (only if `capacity >= weights[index]`): `values[index] + solve(capacity - weights[index], index)`.",
+          "Cache `max(skip, pick)` in `memory[index][capacity]` and return it."
+        ],
+        "pseudocode": "solve(index, capacity):\n  if index == 0 -> return (capacity / weights[0]) * values[0]\n  if memo[index][capacity] != -1 -> return memo[index][capacity]\n\n  ans = solve(index - 1, capacity)                                  // not select\n  if capacity >= weights[index] ->\n      ans = max(ans, values[index] + solve(index, capacity - weights[index]))   // select, index unchanged\n\n  memo[index][capacity] = ans\n  return ans",
+        "story": "Keep the index when you take, drop it when you skip - that single difference makes items reusable.",
+        "code": "public int unboundedKnapsack(int A, int[] B, int[] C) {\n    int[][] memory = new int[B.length + 1][A + 1];\n    for (int i = 0; i <= B.length; i++) {\n        for (int j = 0; j <= A; j++) {\n            memory[i][j] = -1;\n        }\n    }\n    return unboundedKnapsack(A, B.length - 1, B, C, memory);\n}\n\nprivate int unboundedKnapsack(int capacity, int index, int[] values, int[] weights, int[][] memory) {\n    if (index == 0) {\n        // unbounded: item 0 may be repeated, so take every copy that fits\n        return (capacity / weights[0]) * values[0];\n    }\n    if (memory[index][capacity] != -1) {\n        return memory[index][capacity];\n    }\n\n    // Option 1 : Not Select\n    int ans = unboundedKnapsack(capacity, index - 1, values, weights, memory);\n    // Option 2 : Select -> stay on the same index, the item is still available\n    if (capacity >= weights[index]) {\n        ans = Math.max(ans, values[index] + unboundedKnapsack(capacity - weights[index], index, values, weights, memory));\n    }\n\n    memory[index][capacity] = ans;\n    return memory[index][capacity];\n}"
+      }
+    ]
+  },
+  {
+    "num": 270,
+    "id": "s4-dp-fractional-knapsack",
+    "title": "Fractional Knapsack",
+    "subTopic": "Greedy on value/weight ratio",
+    "tags": [
+      "Greedy",
+      "Sorting",
+      "Knapsack",
+      "Dynamic Programming"
+    ],
+    "description": "Problem Description\nGiven two integer arrays A and B of size N each which represent values and weights associated with N items respectively.\nAlso given an integer C which represents knapsack capacity.\nFind out the maximum total value that we can fit in the knapsack. If the maximum total value is ans, then return ⌊ans × 100⌋ , i.e., floor of (ans × 100).\nNOTE:\n\n- You can break an item for maximizing the total value of the knapsack\n\nProblem Constraints\n1 <= N <= 10^5\n1 <= A[i], B[i] <= 10^3\n1 <= C <= 10^3\n\nInput Format\nFirst argument is an integer array A of size N denoting the values on N items.\nSecond argument is an integer array B of size N denoting the weights on N items.\nThird argument is an integer C denoting the knapsack capacity.\n\nOutput Format\nReturn a single integer denoting the maximum total value of A such that sum of the weights of this subset is smaller than or equal to C.\n\nExample Input\nInput 1:\nA = [60, 100, 120]\nB = [10, 20, 30]\nC = 50\nInput 2:\nA = [10, 20, 30, 40]\nB = [12, 13, 15, 19]\nC = 10\n\nExample Output\nOutput 1:\n24000\nOutput 2:\n2105\n\nExample Explanation\nExplanation 1:\nTaking the full items with weight 10 and 20 and 2/3 of the item with weight 30 will give us the maximum value i.e 60 + 100 + 80 = 240. So we return 24000.\nExplanation 2:\nTaking 10/19 the fourth item gives us the maximum value i.e. 21.0526. So we return 2105.",
+    "sampleInput": "A = [60, 100, 120], B = [10, 20, 30], C = 50",
+    "sampleOutput": "24000",
+    "story": "Fractions are allowed, so greedy by value-per-unit-weight is provably optimal - no DP needed.",
+    "plain": "Compute `value / weight` for every item and sort descending on that ratio. Walk the sorted list taking each item whole while it still fits, subtracting its weight from the remaining capacity. The first item that does not fit is taken fractionally: add `(remainingCapacity / itemWeight) * itemValue` and stop. Finally multiply the accumulated double by 100 and floor it, nudging by a tiny epsilon first so a value that is mathematically 240.0 does not floor to 23999 from binary representation error.",
+    "howToThink": [
+      "Greedy by value/weight ratio, descending - breaking items is allowed, so there is no pick-or-skip decision to memoise.",
+      "Why greedy is valid here and not in 0/1: with fractions you can always swap any unit of weight for a unit from a higher-ratio item, so the optimum has no gap.",
+      "Sorting dominates the cost at `O(N log N)`; the fill pass is a single linear sweep.",
+      "The `× 100` then floor is an output convention to avoid floating-point answers - do the arithmetic in `double` and convert only at the very end.",
+      "Only one item is ever split: the moment the remaining capacity is smaller than an item's weight, you take the fraction and the loop is done."
+    ],
+    "pitfalls": [
+      "Floating-point floor: `Math.floor(240.0000000001 * 100)` is fine but `Math.floor(239.99999999 * 100)` gives 23999. Add an epsilon like `1e-9` before flooring.",
+      "Sort on `value / weight`, not on value alone and not on weight alone - both lose to the ratio on the sample.",
+      "Do not integer-divide when computing the ratio. `A[i] / B[i]` on two `int` values truncates; cast to `double` first.",
+      "Break out of the loop once `remainingCapacity` hits 0, otherwise a later zero-capacity fraction can add noise."
+    ],
+    "solutions": [
+      {
+        "label": "Optimal - greedy by descending value/weight ratio",
+        "complexity": {
+          "time": "O(N log N) - dominated by the sort",
+          "space": "O(N) - the (value, weight, ratio) triples"
+        },
+        "plain": "Pack each item as a `{value, weight, value/weight}` triple and sort descending on the ratio. Sweep the sorted list with a running `remainingCapacity`: whole items are added outright while they fit; the first item that overflows contributes `fraction * itemValue` where `fraction = remainingCapacity / itemWeight`, and capacity drops to zero. Return `floor(totalValue * 100 + epsilon)`.",
+        "approach": [
+          "Build a list of `double[]{value, weight, value / weight}` for all N items.",
+          "Sort the list descending on index 2 (the ratio).",
+          "Initialise `totalValue = 0.0` and `remainingCapacity = C`.",
+          "For each item: stop if `remainingCapacity <= 0`.",
+          "If `itemWeight <= remainingCapacity`, add the full `itemValue` and decrement the capacity.",
+          "Otherwise add `(remainingCapacity / itemWeight) * itemValue` and set the capacity to 0.",
+          "Return `(int) Math.floor(totalValue * 100 + 1e-9)`."
+        ],
+        "pseudocode": "items = [(A[i], B[i], A[i] / B[i]) for i in 0..N-1]\nsort items by ratio descending\n\ntotal = 0.0\nleft  = C\nfor (value, weight, ratio) in items:\n  if left <= 0 -> break\n  if weight <= left -> total += value; left -= weight\n  else              -> total += (left / weight) * value; left = 0\n\nreturn floor(total * 100 + 1e-9)",
+        "story": "Spend every unit of capacity on the densest value available.",
+        "code": "public int fractionalKnapsackMaxValue(int[] A, int[] B, int C) {\n    int N = A.length;\n    List<double[]> items = new ArrayList<>();\n\n    for (int i = 0; i < N; i++) {\n        items.add(new double[]{(double) A[i], (double) B[i], (double) A[i] / B[i]});\n    }\n\n    Collections.sort(items, new Comparator<double[]>() {\n        @Override\n        public int compare(double[] item1, double[] item2) {\n            if (item2[2] > item1[2]) {\n                return 1;\n            } else if (item2[2] < item1[2]) {\n                return -1;\n            } else {\n                return 0;\n            }\n        }\n    });\n\n    double totalValue = 0.0;\n    double remainingCapacity = (double) C;\n\n    for (double[] item : items) {\n        if (remainingCapacity <= 0) {\n            break;\n        }\n\n        double itemValue = item[0];\n        double itemWeight = item[1];\n\n        if (itemWeight <= remainingCapacity) {\n            totalValue += itemValue;\n            remainingCapacity -= itemWeight;\n        } else {\n            double fraction = remainingCapacity / itemWeight;\n            totalValue += (fraction * itemValue);\n            remainingCapacity = 0;\n        }\n    }\n\n    double epsilon = 1e-9; // counter binary rounding before flooring\n    return (int) Math.floor(totalValue * 100 + epsilon);\n}"
+      }
+    ]
+  },
+  {
+    "num": 271,
+    "id": "s4-dp-tushars-birthday-party",
+    "title": "Tushar's Birthday Party",
+    "subTopic": "Unbounded knapsack - min cost exact fill",
+    "tags": [
+      "Dynamic Programming",
+      "Knapsack",
+      "Unbounded",
+      "Bottom-up DP"
+    ],
+    "description": "Problem Description\nAs it is Tushar's Birthday on March 1st, he decided to throw a party to all his friends at TGI Fridays in Pune. Given are the eating capacity of each friend, filling capacity of each dish and cost of each dish. A friend is satisfied if the sum of the filling capacity of dishes he ate is equal to his capacity.\nFind the minimum cost such that all of Tushar's friends are satisfied (reached their eating capacity).\nNOTE:\nEach dish is supposed to be eaten by only one person. Sharing is not allowed.\nEach friend can take any dish unlimited number of times.\nThere always exists a dish with filling capacity 1 so that a solution always exists.\n\nProblem Constraints\n|A| <= 1000\n|B| <= 1000\n|C| <= 1000\n\nInput Format\nFirst Argument is vector A, denoting eating capacities\nSecond Argument is vector B, denoting filling capacities\nThird Argument is vector C, denoting cost\n\nOutput Format\nReturn a single integer, the answer to the problem\n\nExample Input\nInput 1:\nA = [2, 4, 6]\nB = [2, 1, 3]\nC = [2, 5, 3]\nInput 2:\nA = [2]\nB = [1]\nC = [2]\n\nExample Output\nOutput 1:\n12\nOutput 2:\n4\n\nExample Explanation\nExplanation 1:\nFirst friend takes dish 1, Second friend takes dish 1 twice and third friend takes dish 3 twice.\nSo 2 + 2*2 + 3*2 = 12.\nExplanation 2:\nOnly way is to take 2 dishes of cost 2, hence 4.",
+    "sampleInput": "A = [2, 4, 6], B = [2, 1, 3], C = [2, 5, 3]",
+    "sampleOutput": "12",
+    "story": "Friends are independent, so compute the min cost to fill every capacity once and just read the answers off.",
+    "plain": "Every friend's requirement is identical in shape: reach exactly his eating capacity using dishes of unlimited supply, at minimum cost. Because the dish list is shared and nothing is consumed, the answer for capacity `w` does not depend on which friend asked. So build one bottom-up array `minCost[0..maxA]` where `minCost[w] = min over dishes i of minCost[w - B[i]] + C[i]`, with `minCost[0] = 0`. Then sum `minCost[A[j]]` over all friends. One DP pass serves everybody.",
+    "howToThink": [
+      "Unbounded knapsack, minimisation variant - min cost to hit an EXACT target weight, solved bottom-up once and reused per friend.",
+      "Spot the independence first: dishes are unlimited and not shared, so friends never compete. Do not try to model all friends in one state.",
+      "\"Equal to his capacity\", not \"at most\" - this is exact-fill, so unreachable capacities must stay at infinity rather than falling back to 0.",
+      "The guarantee that a dish of filling capacity 1 exists is what makes every capacity reachable, so the infinity case never survives to the final sum.",
+      "Cost is `O(maxA * |B|)` to build the table plus `O(|A|)` to sum - far cheaper than running a separate DP per friend."
+    ],
+    "pitfalls": [
+      "Exact fill vs at-most fill: initialising `minCost[w] = 0` for all `w` gives 0 for every friend. Only `minCost[0]` is 0; the rest start at infinity.",
+      "Use `Integer.MAX_VALUE / 2` (or a `long`) as the infinity sentinel - plain `Integer.MAX_VALUE` overflows to negative the moment you add `C[i]` to it.",
+      "Size the table by `max(A)`, not by `A.length`. The array length is the friend count; the capacities are the values inside it.",
+      "Loop capacity in the outer loop and dishes inner, both ascending - that ordering is what permits reusing a dish any number of times."
+    ],
+    "solutions": [
+      {
+        "label": "Optimal - one bottom-up min-cost table, summed per friend",
+        "complexity": {
+          "time": "O(maxA * |B| + |A|) where maxA = max eating capacity",
+          "space": "O(maxA)"
+        },
+        "plain": "Find the largest eating capacity `maxA`. Build `minCost[0..maxA]` with `minCost[0] = 0` and everything else at a large sentinel. For each capacity `w` ascending, relax over every dish `i` with `B[i] <= w`: `minCost[w] = min(minCost[w], minCost[w - B[i]] + C[i])`. Ascending order means `minCost[w - B[i]]` is already final and may itself contain the same dish, which is exactly the unlimited-reuse semantics. Sum `minCost[A[j]]` for every friend.",
+        "approach": [
+          "Scan `A` for `maxCapacity`, the largest eating capacity.",
+          "Allocate `minCost[maxCapacity + 1]`, set `minCost[0] = 0` and all other entries to a large sentinel.",
+          "For `cap` from 1 to `maxCapacity`, for each dish `i`: if `B[i] <= cap`, relax `minCost[cap]` against `minCost[cap - B[i]] + C[i]`.",
+          "Sum `minCost[A[j]]` over every friend `j`.",
+          "Return the sum."
+        ],
+        "pseudocode": "maxCap = max(A)\nminCost[0] = 0\nminCost[1..maxCap] = INF\n\nfor cap = 1 .. maxCap:\n  for each dish i:\n    if B[i] <= cap ->\n        minCost[cap] = min(minCost[cap], minCost[cap - B[i]] + C[i])\n\ntotal = 0\nfor each friend capacity a in A:\n  total += minCost[a]\n\nreturn total",
+        "story": "Solve the capacity, not the friend - then look each friend up.",
+        "code": "public int tusharsBirthdayPartyMinCost(int[] A, int[] B, int[] C) {\n    int maxCapacity = 0;\n    for (int capacity : A) {\n        if (capacity > maxCapacity) {\n            maxCapacity = capacity;\n        }\n    }\n\n    int inf = Integer.MAX_VALUE / 2; // /2 so inf + cost never overflows\n    int[] minCost = new int[maxCapacity + 1];\n    for (int cap = 1; cap <= maxCapacity; cap++) {\n        minCost[cap] = inf;\n    }\n    minCost[0] = 0;\n\n    for (int cap = 1; cap <= maxCapacity; cap++) {\n        for (int i = 0; i < B.length; i++) {\n            if (B[i] <= cap && minCost[cap - B[i]] + C[i] < minCost[cap]) {\n                minCost[cap] = minCost[cap - B[i]] + C[i];\n            }\n        }\n    }\n\n    int total = 0;\n    for (int capacity : A) {\n        total += minCost[capacity];\n    }\n    return total;\n}"
+      }
+    ]
+  },
+  {
+    "num": 272,
+    "id": "s4-dp-ways-to-send-the-signal",
+    "title": "Ways to send the signal",
+    "subTopic": "Linear DP with Fibonacci recurrence",
+    "tags": [
+      "Dynamic Programming",
+      "Combinatorics",
+      "Modular Arithmetic",
+      "Space Optimization"
+    ],
+    "description": "Problem Description\nYou are trying to send signals to aliens using a linear array of A laser lights. You don't know much about how the aliens are going to percieve the signals, but what you know is that if two consecutive lights are on then the aliens might take it as a sign of danger and destroy the earth.\nFind and return the total number of ways in which you can send a signal without compromising the safty of the earth. Return the ans % 10^9 + 7.\n\nProblem Constraints\n1 <= A <= 10^5\n\nInput Format\nThe only argument given is integer A.\n\nOutput Format\nReturn the ans%(10^9+7).\n\nExample Input\nInput 1:\nA = 2\nInput 2:\nA = 3\n\nExample Output\nOutput 1:\n3\nOutput 2:\n5\n\nExample Explanation\nExplanation 1:\nOFF OFF\nOFF ON\nON OFF\nAll lights off is also a valid signal which probably means 'bye'\nExplanation 2:\nOFF OFF OFF\nOFF OFF ON\nOFF ON OFF\nON OFF OFF\nON OFF ON",
+    "sampleInput": "A = 2",
+    "sampleOutput": "3",
+    "story": "Count binary strings of length A with no two adjacent 1s - that is a Fibonacci shift.",
+    "plain": "Let `f(i)` be the number of valid arrangements of the first `i` lights. If light `i` is OFF, the preceding `i-1` lights can be anything valid, contributing `f(i-1)`. If light `i` is ON, light `i-1` must be OFF and the first `i-2` can be anything valid, contributing `f(i-2)`. So `f(i) = f(i-1) + f(i-2)` with `f(1) = 2` and `f(2) = 3`. Only the last two values matter, so roll two `long` variables forward and take `% 10^9 + 7` at every step.",
+    "howToThink": [
+      "Linear DP with the Fibonacci recurrence `f(i) = f(i-1) + f(i-2)`, seeded `f(1) = 2`, `f(2) = 3`, rolled in O(1) space.",
+      "Case-split on the LAST light: OFF leaves `f(i-1)` free arrangements, ON forces the previous OFF and leaves `f(i-2)`.",
+      "Hand-check the seeds: length 1 gives {OFF, ON} = 2, length 2 gives {OFF OFF, OFF ON, ON OFF} = 3. All-off counts as valid.",
+      "Since only `f(i-1)` and `f(i-2)` are read, an array is waste - two scalars suffice at `A <= 10^5`.",
+      "Recognise it as counting binary strings with no two adjacent 1s, which is `Fib(A + 2)` on the standard indexing."
+    ],
+    "pitfalls": [
+      "Modulo every iteration, not only at the end. `f(10^5)` has tens of thousands of digits; without `% MOD` inside the loop it overflows immediately.",
+      "Use `long` accumulators. `(a + b)` of two values just under `10^9 + 7` exceeds `Integer.MAX_VALUE` before the mod is applied.",
+      "Handle `A == 1` and `A == 2` before the loop - the loop starts at `i = 3` and `c` would otherwise be returned as 0.",
+      "Do not seed with the textbook `1, 1` Fibonacci. This problem starts at `2, 3`; an off-by-one in the seed shifts every answer."
+    ],
+    "solutions": [
+      {
+        "label": "Optimal - rolling two-variable Fibonacci mod 1e9+7",
+        "complexity": {
+          "time": "O(A)",
+          "space": "O(1)"
+        },
+        "plain": "Return 2 for `A == 1` and 3 for `A == 2` directly. Otherwise hold `a = f(i-2)` and `b = f(i-1)` as `long` values seeded to 2 and 3, and step `i` from 3 to `A` computing `c = (a + b) % MOD`, then sliding `a = b`, `b = c`. After the loop `c` is `f(A)`. Cast back to `int` on return since the value is already reduced modulo 1e9+7.",
+        "approach": [
+          "Set `MOD = 1000000007`.",
+          "Return 2 if `A == 1`; return 3 if `A == 2`.",
+          "Seed `long a = 2` (for length 1) and `long b = 3` (for length 2).",
+          "Loop `i` from 3 to `A`: `c = (a + b) % MOD`, then `a = b`, `b = c`.",
+          "Return `(int) c`."
+        ],
+        "pseudocode": "MOD = 1e9 + 7\nif A == 1 -> return 2\nif A == 2 -> return 3\n\na = 2      // f(1)\nb = 3      // f(2)\nfor i = 3 .. A:\n  c = (a + b) % MOD\n  a = b\n  b = c\n\nreturn c",
+        "story": "Last light ON or OFF - the split is the recurrence.",
+        "code": "public int waysToSendSignal(int A) {\n    int MOD = 1000000007;\n    if (A == 1) {\n        return 2;\n    }\n    if (A == 2) {\n        return 3;\n    }\n\n    long a = 2, b = 3, c = 0;\n\n    for (int i = 3; i <= A; i++) {\n        c = (a + b) % MOD;\n        a = b;\n        b = c;\n    }\n\n    return (int) c;\n}"
+      }
+    ]
+  },
+  {
+    "num": 273,
+    "id": "s4-dp-buying-candies",
+    "title": "Buying Candies",
+    "subTopic": "Unbounded knapsack on budget",
+    "tags": [
+      "Dynamic Programming",
+      "Knapsack",
+      "Unbounded",
+      "Bottom-up DP"
+    ],
+    "description": "Problem Description\nRishik likes candies a lot. So, he went to a candy-shop to buy candies.\n\nThe shopkeeper showed him N packets each containing A[i] candies for cost of C[i] nibbles, each candy in that packet has a sweetness B[i]. The shopkeeper puts the condition that Rishik can buy as many complete candy-packets as he wants but he can't buy a part of the packet.\n\nRishik has D nibbles, can you tell him the maximum amount of sweetness he can get from candy-packets he will buy?\n\nProblem Constraints\n1 <= N <= 700\n1 <= A[i] <= 1000\n1 <= B[i] <= 1000\n1 <= C[i],D <= 1000\n\nInput Format\nFirst argument of input is an integer array A\nSecond argument of input is an integer array B\nThird argument of input is an integer array C\nFourth argument of input is an integer D\n\nOutput Format\nReturn a single integer denoting maximum sweetness of the candies that he can buy\n\nExample Input\nInput 1:\nA = [1, 2, 3]\nB = [2, 2, 10]\nC = [2, 3, 9]\nD = 8\nInput 2:\nA = [2]\nB = [5]\nC = [10]\nD = 99\n\nExample Output\nOutput 1:\n10\nOutput 2:\n90\n\nExample Explanation\nExplanation 1:\nChoose 1 Packet of kind 1 = 1 Candy of 2 Sweetness = 2 Sweetness\nChoose 2 Packet of kind 2 = 2 Candy of 2 Sweetness = 8 Sweetness\nExplanation 2:\nBuy 9 Packet of kind 1. 18 Candy each of 5 Sweetness = 90 Sweetness",
+    "sampleInput": "A = [1, 2, 3], B = [2, 2, 10], C = [2, 3, 9], D = 8",
+    "sampleOutput": "10",
+    "story": "Collapse each packet to one (cost, sweetness) pair and it is plain unbounded knapsack on the budget.",
+    "plain": "A packet of kind `i` costs `C[i]` and delivers `A[i] * B[i]` total sweetness, since it holds `A[i]` candies each worth `B[i]`. Packets are indivisible and unlimited, so this is unbounded knapsack where the capacity is the budget `D`. Build `best[0..D]` where `best[d]` is the maximum sweetness affordable with exactly `d` or fewer nibbles, starting from all zeros. For each budget `d` ascending, relax over every packet kind that costs at most `d`. The answer is `best[D]`.",
+    "howToThink": [
+      "Unbounded knapsack on the budget `D` - weight is `C[i]`, value is the packet's total sweetness `A[i] * B[i]`.",
+      "First reduction: a packet is one atomic item worth `A[i] * B[i]`, not `A[i]` separate candies. Collapsing it kills the extra dimension.",
+      "\"As many complete packets as he wants\" is the unbounded signal; \"can't buy a part\" rules out the fractional/greedy shortcut.",
+      "Leftover budget is allowed (nothing forces an exact spend), so `best[]` starts at 0 everywhere rather than at infinity.",
+      "Ascending budget with the packet loop inside gives reuse for free: `best[d - C[i]]` may already include packet `i`."
+    ],
+    "pitfalls": [
+      "Do not treat sweetness as `B[i]` alone - it is `A[i] * B[i]` per packet. Sample 1 breaks immediately if you forget the multiply.",
+      "This is at-most, not exact-fill: seed the table with 0, not with a negative infinity sentinel, or a budget that cannot be spent exactly returns garbage.",
+      "Guard `C[i] <= d` before indexing `best[d - C[i]]` - otherwise a negative index throws.",
+      "Max total is about `1000 * 10^6 = 10^9`, which fits in `int` but sits close to the limit; switch the accumulator to `long` if you extend the constraints."
+    ],
+    "solutions": [
+      {
+        "label": "Optimal - bottom-up unbounded knapsack over the budget",
+        "complexity": {
+          "time": "O(N * D)",
+          "space": "O(D)"
+        },
+        "plain": "Allocate `best[D + 1]` initialised to 0, meaning any budget can always achieve at least zero sweetness by buying nothing. Sweep `budget` from 1 to `D`; for each packet kind `i` that costs at most `budget`, consider `best[budget - C[i]] + A[i] * B[i]` and keep the maximum. Because the subproblem `best[budget - C[i]]` was already finalised and may itself contain packet `i`, unlimited copies are handled with no extra state. Return `best[D]`.",
+        "approach": [
+          "Allocate `best[D + 1]`, all zeros.",
+          "For `budget` from 1 to `D`:",
+          "  For each packet `i`, skip it when `C[i] > budget`.",
+          "  Compute `sweetness = A[i] * B[i]`.",
+          "  Relax `best[budget] = max(best[budget], best[budget - C[i]] + sweetness)`.",
+          "Return `best[D]`."
+        ],
+        "pseudocode": "best[0..D] = 0\n\nfor budget = 1 .. D:\n  for each packet i:\n    if C[i] <= budget ->\n        sweetness = A[i] * B[i]\n        best[budget] = max(best[budget], best[budget - C[i]] + sweetness)\n\nreturn best[D]",
+        "story": "One packet, one price, one sweetness number - the rest is textbook unbounded knapsack.",
+        "code": "public int buyingCandiesMaxSweetness(int[] A, int[] B, int[] C, int D) {\n    int[] best = new int[D + 1];\n\n    for (int budget = 1; budget <= D; budget++) {\n        best[budget] = best[budget - 1]; // leftover budget is allowed\n        for (int i = 0; i < A.length; i++) {\n            if (C[i] <= budget) {\n                int sweetness = A[i] * B[i];\n                if (best[budget - C[i]] + sweetness > best[budget]) {\n                    best[budget] = best[budget - C[i]] + sweetness;\n                }\n            }\n        }\n    }\n\n    return best[D];\n}"
+      }
+    ]
+  },
+  {
+    "num": 274,
+    "id": "s4-dp-coin-sum-infinite",
+    "title": "Coin Sum Infinite",
+    "subTopic": "Unbounded knapsack — counting combinations",
+    "tags": [
+      "Dynamic Programming",
+      "Knapsack",
+      "Unbounded Knapsack",
+      "Counting",
+      "Modular Arithmetic"
+    ],
+    "description": "You are given a set of coins A. In how many ways can you make sum B assuming you have infinite amount of each coin in the set.\nNOTE:\n\nCoins in set A will be unique. Expected space complexity of this problem is O(B).\nThe answer can overflow. So, return the answer % (10^6 + 7).\n\nProblem Constraints\n1 <= A <= 500\n1 <= A[i] <= 1000\n1 <= B <= 50000\n\nInput Format\nFirst argument is an integer array A representing the set.\nSecond argument is an integer B.\n\nOutput Format\nReturn an integer denoting the number of ways.\n\nExample Input\nInput 1:\nA = [1, 2, 3]\nB = 4\nInput 2:\nA = [10]\nB = 10\n\nExample Output\nOutput 1:\n4\nOutput 2:\n1\n\nExample Explanation\nExplanation 1:\nThe 4 possible ways are:\n{1, 1, 1, 1}\n{1, 1, 2}\n{2, 2}\n{1, 3}\nExplanation 2:\nThere is only 1 way to make sum 10.",
+    "sampleInput": "A = [1, 2, 3]\nB = 4",
+    "sampleOutput": "4",
+    "story": "Count the distinct multisets of coins summing to B when every coin has unlimited supply.",
+    "plain": "Order does not matter, so you fix a processing order over the coins and never go back to an earlier coin. Keep dp[s] = number of ways to build sum s using only the coins processed so far, seeded with dp[0] = 1. For each coin, sweep s from that coin's value up to B and add dp[s - coin] into dp[s]. Because the coin loop is outer and the sum sweep is ascending, dp[s - coin] already includes this coin, which is exactly the infinite-supply behaviour, while each combination is generated in one canonical coin order and never double counted. The answer is dp[B] reduced by the stated modulus.",
+    "howToThink": [
+      "Unbounded knapsack counting: coin loop OUTER, sum loop ascending — that loop ordering is the entire problem.",
+      "`dp[0] = 1` is the empty-selection base; every other cell starts at 0.",
+      "The ascending inner sweep lets `dp[s - coin]` already contain this coin, which is what 'infinite amount of each coin' means.",
+      "Swap the loops (sum outer, coin inner) and you count ordered sequences instead: `{1,3}` and `{3,1}` both land in the total.",
+      "Recursive framing if you prefer it: `f(index, remaining) = f(index, remaining - A[index]) + f(index + 1, remaining)` — `index` stays put on include."
+    ],
+    "pitfalls": [
+      "Loop order. Sum-outer/coin-inner counts permutations; `A = [1,2,3], B = 4` then gives 7 instead of 4.",
+      "The modulus here is `10^6 + 7`, NOT the usual `10^9 + 7`. Read the statement before autopiloting.",
+      "Memo sentinel: a memoised version must fill with `-1`. `0` is a valid way-count, so a zero-initialised memo mis-caches silently.",
+      "The statement demands `O(B)` space. A `[N][B+1]` memo is `O(N·B)` — 500 × 50001 ints — and misses the stated bound.",
+      "The memoised recursion shown as the second solution recurses roughly `B / min(coin)` deep AND allocates `int[N][B+1]` — about 100 MB at `N = 500, B = 50000` — which breaks the statement's stated O(B) space budget. The 1-D counting DP is the one to reproduce."
+    ],
+    "solutions": [
+      {
+        "label": "Optimal — 1D unbounded-knapsack counting DP",
+        "complexity": {
+          "time": "O(N * B)",
+          "space": "O(B)"
+        },
+        "plain": "Allocate one array of size B + 1 and set dp[0] = 1. Process coins one at a time in the outer loop. For the current coin, walk sum from coin up to B and fold dp[sum - coin] into dp[sum]. After every coin has been processed, dp[B] holds the number of distinct combinations. Reduce modulo 10^6 + 7 on every addition so nothing overflows.",
+        "approach": [
+          "Allocate `dp` of length `B + 1`, all zero, then set `dp[0] = 1`.",
+          "Outer loop over each `coin` in `A`.",
+          "Inner loop `sum` from `coin` up to `B`, ascending.",
+          "`dp[sum] = (dp[sum] + dp[sum - coin]) % MOD`.",
+          "Return `dp[B]`."
+        ],
+        "pseudocode": "dp[0..B] = 0\ndp[0] = 1\nfor coin in A:\n    for sum = coin .. B:          # ascending → coin reusable\n        dp[sum] = (dp[sum] + dp[sum - coin]) % MOD\nreturn dp[B]",
+        "story": "Commit to a coin order once; each combination is then produced exactly once, in that order.",
+        "code": "public int coinSumInfiniteWays(int[] A, int B) {\n    final int MOD = 1_000_007;\n    int[] dp = new int[B + 1];\n    dp[0] = 1;\n    for (int c = 0; c < A.length; c++) {\n        int coin = A[c];\n        for (int sum = coin; sum <= B; sum++) {\n            // ascending sweep → dp[sum - coin] already used this coin, giving infinite supply\n            dp[sum] = (dp[sum] + dp[sum - coin]) % MOD;\n        }\n    }\n    return dp[B];\n}"
+      },
+      {
+        "label": "Memoised pick-or-skip recursion",
+        "complexity": {
+          "time": "O(N * B)",
+          "space": "O(N * B) — memo, plus O(N + B) call stack"
+        },
+        "plain": "State is (index, remaining). Including the current coin keeps index the same so the coin can be reused; excluding it advances index by one. Sum the two branches and cache on (index, remaining). Remaining hitting 0 is one valid way; running negative or exhausting the coin list is zero ways. Correct but it uses O(N * B) memory, which violates the statement's O(B) target.",
+        "approach": [
+          "Fill an `[N][B + 1]` memo with `-1`.",
+          "Base: `remaining == 0` → 1 way; `remaining < 0` or `index == N` → 0 ways.",
+          "Include branch: recurse on `(index, remaining - coins[index])` — index does NOT advance.",
+          "Exclude branch: recurse on `(index + 1, remaining)`.",
+          "Cache `include + exclude` under `% MOD` and return it."
+        ],
+        "pseudocode": "f(index, remaining):\n    remaining == 0            → 1\n    remaining < 0 or index==N → 0\n    memo[index][remaining] != -1 → memo hit\n    include = f(index, remaining - coins[index])   # stay on index\n    exclude = f(index + 1, remaining)\n    memo[index][remaining] = (include + exclude) % MOD",
+        "story": "Staying on the same index after a pick is what turns 0/1 knapsack into unbounded.",
+        "code": "public int coinSumInfiniteWaysMemo(int[] A, int B) {\n    int[][] memory = new int[A.length][B + 1];\n    for (int i = 0; i < A.length; i++) {\n        for (int j = 0; j <= B; j++) {\n            memory[i][j] = -1;  // 0 is a valid answer, so -1 must be the sentinel\n        }\n    }\n    return coinSumInfiniteWaysMemo(A, B, 0, memory);\n}\n\nprivate int coinSumInfiniteWaysMemo(int[] coins, int remaining, int index, int[][] memory) {\n    if (remaining == 0) {\n        return 1;\n    }\n    if (remaining < 0 || index == coins.length) {\n        return 0;\n    }\n    if (memory[index][remaining] != -1) {\n        return memory[index][remaining];\n    }\n\n    int include = coinSumInfiniteWaysMemo(coins, remaining - coins[index], index, memory);\n    int exclude = coinSumInfiniteWaysMemo(coins, remaining, index + 1, memory);\n\n    memory[index][remaining] = (include + exclude) % 1_000_007;\n    return memory[index][remaining];\n}"
+      }
+    ]
+  },
+  {
+    "num": 275,
+    "id": "s4-dp-cutting-a-rod",
+    "title": "Cutting a Rod",
+    "subTopic": "Unbounded knapsack — max-value partition of a length",
+    "tags": [
+      "Dynamic Programming",
+      "Knapsack",
+      "Unbounded Knapsack",
+      "Memoization"
+    ],
+    "description": "Given a rod of length N units and an array A of size N denotes prices that contains prices of all pieces of size 1 to N.\nFind and return the maximum value that can be obtained by cutting up the rod and selling the pieces.\n\nProblem Constraints\n1 <= N <= 1000\n0 <= A[i] <= 10^6\n\nInput Format\nFirst and only argument is an integer array A of size N.\n\nOutput Format\nReturn an integer denoting the maximum value that can be obtained by cutting up the rod and selling the pieces.\n\nExample Input\nInput 1:\nA = [3, 4, 1, 6, 2]\nInput 2:\nA = [1, 5, 2, 5, 6]\n\nExample Output\nOutput 1:\n15\nOutput 2:\n11\n\nExample Explanation\nExplanation 1:\nCut the rod of length 5 into 5 rods of length (1, 1, 1, 1, 1) and sell them for (3 + 3 + 3 + 3 + 3) = 15.\nExplanation 2:\nCut the rod of length 5 into 3 rods of length (2, 2, 1) and sell them for (5 + 5 + 1) = 11.",
+    "sampleInput": "A = [3, 4, 1, 6, 2]",
+    "sampleOutput": "15",
+    "story": "Partition a rod of length N into pieces to maximise total price, with every piece size reusable.",
+    "plain": "A[i - 1] is the price of a piece of length i, and any piece size may be used any number of times. Define best(L) as the maximum revenue from a rod of remaining length L. For every possible first cut i from 1 to L, the revenue is A[i - 1] + best(L - i); take the maximum over all i. best(0) = 0 anchors the recursion. Memoise on L alone, so each of the N lengths is computed once with an O(L) inner scan, and return best(N).",
+    "howToThink": [
+      "Unbounded knapsack: piece length is the weight, price is the value, capacity is `N`, and every piece size stays available forever.",
+      "State is a single integer — the remaining length. No `(index, length)` pair is needed because you never exhaust a piece size.",
+      "Transition: try every first cut `i` in `1..L`, pay `A[i - 1]`, recurse on `L - i`, keep the max.",
+      "`memory[L - 1]` stores the answer for length `L` — the shift exists only because the array is sized `N`, not `N + 1`.",
+      "Bottom-up equivalent: `dp[L] = max over i of (A[i - 1] + dp[L - i])`, sweeping `L` ascending."
+    ],
+    "pitfalls": [
+      "Off-by-one on the price lookup: a piece of length `i` costs `A[i - 1]`, not `A[i]`.",
+      "Memo sentinel must be `-1`. `0` is a legitimate profit (length-0 rod), so a zero-filled memo returns stale zeros.",
+      "The `index == 0` base must return BEFORE any `memory[index - 1]` access, otherwise you index `-1`.",
+      "Max revenue reaches `1000 × 10^6 = 10^9`, which still fits `int` — but any extra accumulation on top of that needs `long`."
+    ],
+    "solutions": [
+      {
+        "label": "Optimal — memoised rod cutting on remaining length",
+        "complexity": {
+          "time": "O(N^2)",
+          "space": "O(N) — memo, plus O(N) call stack"
+        },
+        "plain": "Fill a memo array of size N with -1. The recursion takes the remaining length index and returns 0 once it reaches 0. For each length, loop the first-cut size i from 1 to index, add the price A[i - 1] to the recursive result for index - i, and track the maximum. Cache under memory[index - 1] before returning. Every length is expanded once and each expansion is an O(N) scan, so the whole thing is O(N^2).",
+        "approach": [
+          "Allocate `memory` of length `N`, fill with `-1`.",
+          "Call the helper with `index = N`.",
+          "Base: `index == 0` → return 0.",
+          "Memo hit: `memory[index - 1] != -1` → return it.",
+          "Loop `i = 1 .. index`: `currentProfit = A[i - 1] + solve(index - i)`, keep the running max.",
+          "Store the max in `memory[index - 1]` and return it."
+        ],
+        "pseudocode": "solve(L):\n    L == 0 → 0\n    memory[L-1] != -1 → memory[L-1]\n    best = 0\n    for i = 1 .. L:\n        best = max(best, A[i-1] + solve(L - i))\n    memory[L-1] = best\n    return best",
+        "story": "Fix only the first cut; the rest of the rod is the same problem on a shorter length.",
+        "code": "public int maxProfitFromRodCutting(int[] A) {\n    int[] memory = new int[A.length];\n    for (int i = 0; i < memory.length; i++) {\n        memory[i] = -1;  // 0 is a valid profit, so -1 is the only safe sentinel\n    }\n    return maxProfitFromRodCutting(A, A.length, memory);\n}\n\nprivate int maxProfitFromRodCutting(int[] A, int index, int[] memory) {\n    if (index == 0) {\n        return 0;\n    }\n    if (memory[index - 1] != -1) {\n        return memory[index - 1];\n    }\n\n    int maxProfit = 0;\n    for (int i = 1; i <= index; i++) {\n        int currentProfit = A[i - 1] + maxProfitFromRodCutting(A, index - i, memory);\n        maxProfit = Math.max(maxProfit, currentProfit);\n    }\n\n    memory[index - 1] = maxProfit;\n    return memory[index - 1];\n}"
+      }
+    ]
+  },
+  {
+    "num": 276,
+    "id": "s4-dp-0-1-knapsack-ii",
+    "title": "0-1 Knapsack II",
+    "subTopic": "0/1 knapsack — capacity DP vs value DP",
+    "tags": [
+      "Dynamic Programming",
+      "Knapsack",
+      "0/1 Knapsack",
+      "Space Optimization"
+    ],
+    "description": "Given two integer arrays A and B of size N each which represent values and weights associated with N items respectively.\nAlso given an integer C which represents knapsack capacity.\nFind out the maximum value subset of A such that sum of the weights of this subset is smaller than or equal to C.\nNOTE: You cannot break an item, either pick the complete item, or don't pick it (0-1 property).\n\nProblem Constraints\n1 <= N <= 500\n1 <= C, B[i] <= 10^6\n1 <= A[i] <= 50\n\nInput Format\nFirst argument is an integer array A of size N denoting the values on N items.\nSecond argument is an integer array B of size N denoting the weights on N items.\nThird argument is an integer C denoting the knapsack capacity.\n\nOutput Format\nReturn a single integer denoting the maximum value subset of A such that sum of the weights of this subset is smaller than or equal to C.\n\nExample Input\nInput 1:\nA = [6, 10, 12]\nB = [10, 20, 30]\nC = 50\nInput 2:\nA = [1, 3, 2, 4]\nB = [12, 13, 15, 19]\nC = 10\n\nExample Output\nOutput 1:\n22\nOutput 2:\n0\n\nExample Explanation\nExplanation 1:\nTaking items with weight 20 and 30 will give us the maximum value i.e 10 + 12 = 22\nExplanation 2:\nKnapsack capacity is 10 but each item has weight greater than 10 so no items can be considered in the knapsack therefore answer is 0.",
+    "sampleInput": "A = [6, 10, 12]\nB = [10, 20, 30]\nC = 50",
+    "sampleOutput": "22",
+    "story": "Pick a subset of items whose weights fit the capacity and whose values sum to the maximum.",
+    "plain": "Every item is pick-or-skip. Keep dp[w] = the best value achievable using capacity at most w with the items processed so far. For each item, sweep w from C down to B[i] and set dp[w] = max(dp[w], A[i] + dp[w - B[i]]). The descending sweep guarantees dp[w - B[i]] still holds the state before this item, which is what enforces at-most-one use. The answer is dp[C]. When capacity dwarfs the total value, flip the state: dp[v] = minimum total weight needed to reach value v, then report the largest v whose dp[v] is within C.",
+    "howToThink": [
+      "0/1 knapsack — pick-or-skip recursion on `(index, capacity)`, rolled down to a 1D array swept descending.",
+      "Descending `w` is the only thing that makes it 0/1; ascending `w` is the unbounded variant.",
+      "Read the constraints: `C <= 10^6` but `A[i] <= 50` and `N <= 500`, so total value never exceeds 25000 — the value axis is two orders of magnitude smaller than the capacity axis.",
+      "Value-DP state: `dp[v] = min weight to achieve exactly value v`; the answer is the largest `v` with `dp[v] <= C`.",
+      "Pick whichever axis is smaller — the pattern is the same, only the dimension you index by changes."
+    ],
+    "pitfalls": [
+      "Ascending `w` in the 1D capacity DP reuses the same item multiple times — it silently becomes unbounded knapsack.",
+      "`int[] dp = new int[C + 1]` with `C = 10^6` is 4 MB and `O(N·C) = 5 × 10^8` transitions; workable but at the edge.",
+      "The value DP needs an INF sentinel for unreachable values — guard `dp[v - A[i]] != INF` before adding, otherwise the weight sum overflows.",
+      "`0` is a legal answer (Example 2: every weight exceeds `C`); don't special-case it into `-1` or an exception."
+    ],
+    "solutions": [
+      {
+        "label": "Optimal — 1D capacity knapsack, descending sweep",
+        "complexity": {
+          "time": "O(N * C)",
+          "space": "O(C)"
+        },
+        "plain": "Allocate dp over capacities 0..C, all zeros. For each item in turn, walk w downward from C to B[i] and relax dp[w] against A[i] + dp[w - B[i]]. Going downward means dp[w - B[i]] has not yet been touched by the current item, so each item enters at most one time. After all items, dp[C] is the answer; unreachable cases naturally stay at 0.",
+        "approach": [
+          "Allocate `dp` of length `C + 1`, all zero — zero value is always achievable.",
+          "Outer loop over items `i = 0 .. n - 1`.",
+          "Inner loop `w` from `C` down to `weights[i]`.",
+          "`dp[w] = max(dp[w], values[i] + dp[w - weights[i]])`.",
+          "Return `dp[C]`."
+        ],
+        "pseudocode": "dp[0..C] = 0\nfor i = 0 .. n-1:\n    for w = C down to weights[i]:      # descending → item used at most once\n        dp[w] = max(dp[w], values[i] + dp[w - weights[i]])\nreturn dp[C]",
+        "story": "Sweeping capacity backwards is the whole trick that keeps a 1D array honest about the 0/1 rule.",
+        "code": "public int knapsackTwoMaxValue(int[] A, int[] B, int C) {\n    int n = A.length;\n    int[] dp = new int[C + 1];\n\n    for (int i = 0; i < n; i++) {\n        for (int w = C; w >= B[i]; w--) {\n            // descend so dp[w - B[i]] is still the row BEFORE item i (0/1, not unbounded)\n            dp[w] = Math.max(dp[w], A[i] + dp[w - B[i]]);\n        }\n    }\n    return dp[C];\n}"
+      },
+      {
+        "label": "Alternative — min-weight-per-value DP (better when C is huge)",
+        "complexity": {
+          "time": "O(N * sum(A))",
+          "space": "O(sum(A))"
+        },
+        "plain": "Index the DP by value instead of capacity, because sum(A) is at most 500 * 50 = 25000 while C can be 10^6. dp[v] is the minimum total weight needed to reach value exactly v, initialised to INF except dp[0] = 0. For each item, sweep v downward and relax dp[v] against dp[v - A[i]] + B[i]. Finally scan v from the top and return the first value whose minimum weight is within C.",
+        "approach": [
+          "Compute `totalValue = sum(A)` — at most 25000 under these constraints.",
+          "Allocate `long[] dp` of length `totalValue + 1`, fill with INF, set `dp[0] = 0`.",
+          "For each item, sweep `v` from `totalValue` down to `A[i]`.",
+          "If `dp[v - A[i]]` is reachable, relax `dp[v] = min(dp[v], dp[v - A[i]] + B[i])`.",
+          "Scan `v` from `totalValue` down to 0 and return the first `v` with `dp[v] <= C`."
+        ],
+        "pseudocode": "total = sum(A)\ndp[0] = 0; dp[1..total] = INF\nfor i = 0 .. n-1:\n    for v = total down to A[i]:\n        if dp[v - A[i]] != INF:\n            dp[v] = min(dp[v], dp[v - A[i]] + B[i])\nfor v = total down to 0:\n    if dp[v] <= C → return v\nreturn 0",
+        "story": "When one axis is 10^6 and the other is 25000, index by the small one.",
+        "code": "public int knapsackTwoMaxValueByValue(int[] A, int[] B, int C) {\n    int n = A.length;\n    int totalValue = 0;\n    for (int i = 0; i < n; i++) {\n        totalValue += A[i];\n    }\n\n    final long INF = Long.MAX_VALUE / 4;\n    long[] dp = new long[totalValue + 1];\n    for (int v = 1; v <= totalValue; v++) {\n        dp[v] = INF;\n    }\n    dp[0] = 0;\n\n    for (int i = 0; i < n; i++) {\n        for (int v = totalValue; v >= A[i]; v--) {\n            if (dp[v - A[i]] != INF) {  // guard: INF + weight would overflow\n                dp[v] = Math.min(dp[v], dp[v - A[i]] + B[i]);\n            }\n        }\n    }\n\n    for (int v = totalValue; v >= 0; v--) {\n        if (dp[v] <= C) {\n            return v;\n        }\n    }\n    return 0;\n}"
+      }
+    ]
+  },
+  {
+    "num": 277,
+    "id": "s4-dp-distinct-subsequences",
+    "title": "Distinct Subsequences",
+    "subTopic": "2D string DP — subsequence counting",
+    "tags": [
+      "Dynamic Programming",
+      "Strings",
+      "Subsequence",
+      "Counting",
+      "Modular Arithmetic"
+    ],
+    "description": "Given two strings A and B, count the number of unique ways in string A to form a subsequence that is identical to string B.\n\nA subsequence of a string is a new string formed from the original string by deleting some (can be none) of the characters without disturbing the relative positions of the remaining characters. (ie, \"ACE\" is a subsequence of \"ABCDE\" while \"AEC\" is not).\n\nSince the answer can be very large, return the result modulo 10^9 + 7.\n\nProblem Constraints\n1 <= |A|, |B| <= 1000\n\nInput Format\nThe first argument is a string A.\nThe second argument is a string B.\n\nOutput Format\nReturn an integer representing the number of distinct subsequences of A which equal B, modulo 10^9 + 7.\n\nExample Input\nInput 1:\nA = \"abc\"\nB = \"abc\"\nInput 2:\nA = \"rabbbit\"\nB = \"rabbit\"\n\nExample Output\nOutput 1:\n1\nOutput 2:\n3\n\nExample Explanation\nExplanation 1:\n    Both strings are equal. There is exactly 1 way to form \"abc\"\n    as a subsequence of \"abc\" - take all characters.\n\n    Result: 1\nExplanation 2:\n    The string A = \"rabbbit\" has 3 'b' characters.\n    To form B = \"rabbit\", we need exactly 2 'b' characters.\n    We can remove any one of the 3 'b' characters:\n\n    1. \"ra_bbit\" (remove 1st 'b')\n    2. \"rab_bit\" (remove 2nd 'b')\n    3. \"rabb_it\" (remove 3rd 'b')\n\n    \"_\" marks the removed character.",
+    "sampleInput": "A = \"abc\"\nB = \"abc\"",
+    "sampleOutput": "1",
+    "story": "Count how many index sets of A spell out B in order.",
+    "plain": "Let dp[i][j] be the number of ways to form the first j characters of B out of the first i characters of A. Skipping A[i-1] always carries over dp[i-1][j]. If A[i-1] equals B[j-1] you may additionally consume it, adding dp[i-1][j-1]. The base is dp[i][0] = 1 for every i, since the empty prefix of B is formed exactly one way, and dp[0][j] = 0 for j > 0. Roll the table down to a single array over j and sweep j from m down to 1, so dp[j-1] still carries the previous row while you write dp[j]. The answer is dp[m] taken modulo 10^9 + 7.",
+    "howToThink": [
+      "2D subsequence-count DP over `(prefix of A, prefix of B)` — the LCS/edit-distance skeleton, but you SUM the branches instead of maxing them.",
+      "At `A[i-1]`: skipping is always available; matching is available only when `A[i-1] == B[j-1]`. Add the two counts.",
+      "Base row: `dp[i][0] = 1` (one way to form the empty string), `dp[0][j] = 0` for `j > 0`.",
+      "Rolling to 1D requires the inner loop to run `j = m .. 1` so `dp[j - 1]` is still row `i - 1`.",
+      "Only the 'equal characters' case writes anything — the skip branch is already sitting in `dp[j]` from the previous row."
+    ],
+    "pitfalls": [
+      "Ascending inner `j` in the 1D version reads a `dp[j - 1]` that this same row already updated, double-counting one character of `A`.",
+      "Forgetting `% 1_000_000_007` — with `|A| = 1000` the counts blow past `int` fast.",
+      "The base must be `dp[0] = 1`, not `0`; seeding it to 0 zeroes the entire table.",
+      "This problem's modulus is `10^9 + 7`, unlike Coin Sum Infinite in the same set which uses `10^6 + 7`."
+    ],
+    "solutions": [
+      {
+        "label": "Optimal — 1D rolling subsequence-count DP",
+        "complexity": {
+          "time": "O(|A| * |B|)",
+          "space": "O(|B|)"
+        },
+        "plain": "Keep one array dp of length m + 1 with dp[0] = 1. Walk i through A. For each i, walk j from m down to 1, and whenever A[i-1] matches B[j-1], add dp[j-1] into dp[j] under the modulus. The descending j guarantees dp[j-1] is still the value from the previous character of A. After the outer loop dp[m] holds the count.",
+        "approach": [
+          "Let `n = A.length()`, `m = B.length()`; allocate `dp` of length `m + 1`.",
+          "Set `dp[0] = 1` — one way to form the empty prefix of `B`.",
+          "Outer loop `i = 1 .. n` over characters of `A`.",
+          "Inner loop `j = m` down to `1`.",
+          "If `A.charAt(i - 1) == B.charAt(j - 1)`, do `dp[j] = (dp[j] + dp[j - 1]) % MOD`.",
+          "Return `dp[m]`."
+        ],
+        "pseudocode": "dp[0] = 1; dp[1..m] = 0\nfor i = 1 .. n:\n    for j = m down to 1:          # descending → dp[j-1] is still row i-1\n        if A[i-1] == B[j-1]:\n            dp[j] = (dp[j] + dp[j-1]) % MOD\nreturn dp[m]",
+        "story": "Each character of A either contributes nothing or forks every partial match that was waiting for it.",
+        "code": "public int numDistinctSubsequences(String A, String B) {\n    final int MOD = 1_000_000_007;\n    int n = A.length();\n    int m = B.length();\n\n    int[] dp = new int[m + 1];\n    dp[0] = 1;  // empty prefix of B is formed exactly one way\n\n    for (int i = 1; i <= n; i++) {\n        for (int j = m; j >= 1; j--) {\n            // descend so dp[j - 1] still holds the count for A's previous prefix\n            if (A.charAt(i - 1) == B.charAt(j - 1)) {\n                dp[j] = (dp[j] + dp[j - 1]) % MOD;\n            }\n        }\n    }\n    return dp[m];\n}"
+      }
+    ]
+  },
+  {
+    "num": 278,
+    "id": "s4-dp-lets-party",
+    "title": "Let's Party",
+    "subTopic": "Linear recurrence — alone-or-pair counting",
+    "tags": [
+      "Dynamic Programming",
+      "Combinatorics",
+      "Recurrence",
+      "Modular Arithmetic"
+    ],
+    "description": "In Danceland, one person can party either alone or can pair up with another person.\nCan you find in how many ways they can party if there are A people in Danceland?\nNote: Return your answer modulo 10003, as the answer can be large.\n\nProblem Constraints\n1 <= A <= 10^5\n\nInput Format\nGiven only argument A of type Integer, number of people in Danceland.\n\nOutput Format\nReturn an integer denoting the number of ways people of Danceland can party.\n\nExample Input\nInput 1:\nA = 3\nInput 2:\nA = 5\n\nExample Output\nOutput 1:\n4\nOutput 2:\n26\n\nExample Explanation\nExplanation 1:\nLet suppose three people are A, B, and C. There are only 4 ways to party\n(A, B, C) All party alone\n(AB, C) A and B party together and C party alone\n(AC, B) A and C party together and B party alone\n(BC, A) B and C party together and A\nhere 4 % 10003 = 4, so answer is 4.\nExplanation 2:\nNumber of ways they can party are: 26.",
+    "sampleInput": "A = 3",
+    "sampleOutput": "4",
+    "story": "Count the ways to split A people into singles and unordered pairs.",
+    "plain": "Fix attention on the last person, number i. Either they party alone, which leaves the remaining i - 1 people to arrange in f(i - 1) ways, or they pair with exactly one of the other i - 1 people, and after removing both you are left with f(i - 2) ways. That gives f(i) = f(i - 1) + (i - 1) * f(i - 2), anchored at f(0) = 1 and f(1) = 1. Iterate i from 2 to A carrying only the last two values, reducing by 10003 at each step, and return the final value.",
+    "howToThink": [
+      "Linear recurrence `f(i) = f(i-1) + (i-1) * f(i-2)` — fix one person and split on alone versus paired.",
+      "The `(i - 1)` factor is the number of partner choices; once paired, BOTH leave, hence `f(i - 2)`.",
+      "Bases: `f(0) = 1` (empty set has one arrangement) and `f(1) = 1`.",
+      "Only the two previous values matter, so keep two scalars — no `O(A)` array needed.",
+      "Verify by hand: `f(2) = 1 + 1 = 2`, `f(3) = 2 + 2 = 4`, `f(4) = 4 + 6 = 10`, `f(5) = 10 + 16 = 26`."
+    ],
+    "pitfalls": [
+      "`(i - 1) * f(i - 2)` overflows `int` before the mod when `i` approaches `10^5` — promote to `long` first, then reduce.",
+      "The modulus is `10003` (not `10^9 + 7`); apply it at every step, never once at the end.",
+      "`A = 1` must return 1 — the loop body never executes, so the seeds themselves must already be right.",
+      "Don't multiply by `i` instead of `i - 1`; the chosen person cannot pair with themselves, and a pair is unordered."
+    ],
+    "solutions": [
+      {
+        "label": "Optimal — O(1)-space linear recurrence",
+        "complexity": {
+          "time": "O(A)",
+          "space": "O(1)"
+        },
+        "plain": "Seed prev = f(0) = 1 and curr = f(1) = 1. Loop i from 2 to A computing next = curr + (i - 1) * prev, all in long, reduced modulo 10003. Shift prev to curr and curr to next each iteration. When A is 1 the loop never runs and curr is already the right answer. Return curr cast back to int.",
+        "approach": [
+          "Seed `prev = 1` (that is `f(0)`) and `curr = 1` (that is `f(1)`).",
+          "Loop `i` from 2 up to `A`.",
+          "`next = (curr + (long)(i - 1) * prev) % MOD`.",
+          "Shift: `prev = curr`, `curr = next`.",
+          "Return `curr`."
+        ],
+        "pseudocode": "prev = 1            # f(0)\ncurr = 1            # f(1)\nfor i = 2 .. A:\n    next = (curr + (i-1) * prev) % 10003\n    prev = curr\n    curr = next\nreturn curr",
+        "story": "One person decides alone-or-paired; the rest of the crowd is the same problem, one or two smaller.",
+        "code": "public int letsPartyWays(int A) {\n    final int MOD = 10003;\n    long prev = 1;  // f(0)\n    long curr = 1;  // f(1)\n\n    for (int i = 2; i <= A; i++) {\n        // cast to long BEFORE multiplying: (i-1) * prev exceeds int for large i\n        long next = (curr + (long) (i - 1) * prev) % MOD;\n        prev = curr;\n        curr = next;\n    }\n    return (int) curr;\n}"
+      }
+    ]
+  },
+  {
+    "num": 279,
+    "id": "s4-dp-length-of-longest-fibonacci-subsequence",
+    "title": "Length of Longest Fibonacci Subsequence",
+    "subTopic": "Pair-state DP on a sorted array",
+    "tags": [
+      "Dynamic Programming",
+      "Arrays",
+      "Binary Search",
+      "Subsequence"
+    ],
+    "description": "Given a strictly increasing array A of positive integers forming a sequence.\nA sequence X1, X2, X3, ..., XN is fibonacci like if\nN > =3\nXi + Xi+1 = Xi+2 for all i+2 <= N\nFind and return the length of the longest Fibonacci-like subsequence of A.\nIf one does not exist, return 0.\nNOTE: A subsequence is derived from another sequence A by deleting any number of elements (including none) from A, without changing the order of the remaining elements.\n\nProblem Constraints\n3 <= length of the array <= 1000\n1 <= A[i] <= 10^9\n\nInput Format\nThe only argument given is the integer array A.\n\nOutput Format\nReturn the length of the longest Fibonacci-like subsequence of A.\nIf one does not exist, return 0.\n\nExample Input\nInput 1:\nA = [1, 2, 3, 4, 5, 6, 7, 8]\nInput 2:\nA = [1, 3, 7, 11, 12, 14, 18]\n\nExample Output\nOutput 1:\n5\nOutput 2:\n3\n\nExample Explanation\nExplanation 1:\nThe longest subsequence that is fibonacci-like: [1, 2, 3, 5, 8].\nExplanation 2:\nThe longest subsequence that is fibonacci-like: [1, 11, 12], [3, 11, 14] or [7, 11, 18].\nThe length will be 3.",
+    "sampleInput": "A = [1, 2, 3, 4, 5, 6, 7, 8]",
+    "sampleOutput": "5",
+    "story": "Find the longest subsequence where every term is the sum of the two before it.",
+    "plain": "A Fibonacci-like chain is completely determined by its last two elements, so make the DP state a pair of indices. Let dp[j][k] be the length of the longest such subsequence whose final two terms are A[j] and A[k]. For a fixed pair, the required predecessor value is forced to be A[k] - A[j], and because A is strictly increasing that predecessor must be strictly smaller than A[j], so you binary search for it inside A[0..j-1]. If it is found at index i, then dp[j][k] is dp[i][j] + 1 when (i, j) already extends a chain, and 3 otherwise since you have just the three terms. Track the running maximum and return 0 if nothing ever reaches length 3.",
+    "howToThink": [
+      "Pair-state DP: `dp[j][k]` keyed on the LAST TWO elements — one index is not enough because the next term depends on two.",
+      "Given `A[j]` and `A[k]`, the predecessor value is forced: `A[k] - A[j]`. You look it up, you never search over it.",
+      "`A` is strictly increasing, so the predecessor must satisfy `A[k] - A[j] < A[j]` — that prunes half the pairs and makes binary search valid.",
+      "`dp[i][j] == 0` means `(i, j)` is not yet part of any chain, so the new chain length is exactly 3, not 2 + 1.",
+      "Swap the binary search for a value→index hash map and it drops to `O(N^2)` time."
+    ],
+    "pitfalls": [
+      "Returning 2. Anything shorter than 3 is not Fibonacci-like, so the base jump is straight to 3 and the default answer stays 0.",
+      "Skipping the `A[k] - A[j] < A[j]` guard lets you match an index `i >= j` and build a bogus non-increasing chain.",
+      "`A[i] <= 10^9`, so a forward formulation that computes `A[j] + A[k]` overflows `int`; the backward `A[k] - A[j]` lookup sidesteps it entirely.",
+      "`dp` is `N × N` = 10^6 ints at `N = 1000` — fine once, but never reallocate it inside the outer loop."
+    ],
+    "solutions": [
+      {
+        "label": "Optimal — pair-state DP with binary-searched predecessor",
+        "complexity": {
+          "time": "O(N^2 log N)",
+          "space": "O(N^2)"
+        },
+        "plain": "Allocate an N by N table of zeros. Iterate k from 2 upward and j from 1 to k - 1, treating (A[j], A[k]) as the final pair. Compute target = A[k] - A[j] and skip immediately if it is not strictly less than A[j], since the array is strictly increasing. Otherwise binary search target inside A[0..j-1]; if index i is found, set dp[j][k] to dp[i][j] + 1 when dp[i][j] is non-zero and to 3 otherwise. Keep the running maximum and return it, which is 0 when no triple exists.",
+        "approach": [
+          "Allocate `int[n][n] dp`, all zeros, and `best = 0`.",
+          "Outer loop `k = 2 .. n - 1`, inner loop `j = 1 .. k - 1`.",
+          "`target = A[k] - A[j]`; if `target >= A[j]`, skip — no valid earlier index can hold it.",
+          "Binary search `target` in `A[0 .. j - 1]`; skip if absent.",
+          "`dp[j][k] = (dp[i][j] == 0) ? 3 : dp[i][j] + 1`, then `best = max(best, dp[j][k])`.",
+          "Return `best` (naturally 0 when nothing reaches length 3)."
+        ],
+        "pseudocode": "dp[n][n] = 0; best = 0\nfor k = 2 .. n-1:\n    for j = 1 .. k-1:\n        target = A[k] - A[j]\n        if target >= A[j] → skip        # strictly increasing ⇒ predecessor < A[j]\n        i = binarySearch(A, target, 0, j-1)\n        if i < 0 → skip\n        dp[j][k] = (dp[i][j] == 0) ? 3 : dp[i][j] + 1\n        best = max(best, dp[j][k])\nreturn best",
+        "story": "The last two terms pin the whole chain, so the state is a pair and the predecessor is arithmetic, not search.",
+        "code": "public int lengthOfLongestFibonacciSubsequence(int[] A) {\n    int n = A.length;\n    int[][] dp = new int[n][n];\n    int best = 0;\n\n    for (int k = 2; k < n; k++) {\n        for (int j = 1; j < k; j++) {\n            int target = A[k] - A[j];\n            if (target >= A[j]) {\n                continue;  // strictly increasing ⇒ the earlier term must be < A[j]\n            }\n            int i = indexOfValue(A, target, j - 1);\n            if (i < 0) {\n                continue;\n            }\n            dp[j][k] = (dp[i][j] == 0) ? 3 : dp[i][j] + 1;\n            best = Math.max(best, dp[j][k]);\n        }\n    }\n    return best;\n}\n\nprivate int indexOfValue(int[] A, int target, int high) {\n    int low = 0;\n    while (low <= high) {\n        int mid = low + (high - low) / 2;\n        if (A[mid] == target) {\n            return mid;\n        }\n        if (A[mid] < target) {\n            low = mid + 1;\n        } else {\n            high = mid - 1;\n        }\n    }\n    return -1;\n}"
+      }
+    ]
+  },
+  {
+    "num": 280,
+    "id": "s4-dp-ways-to-decode",
+    "title": "Ways to Decode",
+    "subTopic": "Linear DP over string prefixes",
+    "tags": [
+      "Dynamic Programming",
+      "Strings",
+      "Fibonacci-style DP",
+      "Modular Arithmetic"
+    ],
+    "description": "A message containing letters from A-Z is being encoded to numbers using the following mapping:\n\n'A' -> 1\n'B' -> 2\n...\n'Z' -> 26\n\nGiven an encoded message denoted by string A containing digits, determine the total number of ways to decode it modulo 10^9 + 7.\n\nProblem Constraints\n1 <= length(A) <= 10^5\n\nInput Format\nThe first and the only argument is a string A.\n\nOutput Format\nReturn an integer, representing the number of ways to decode the string modulo 10^9 + 7.\n\nExample Input\nInput 1:\nA = \"12\"\nInput 2:\nA = \"8\"\n\nExample Output\nOutput 1:\n2\nOutput 2:\n1\n\nExample Explanation\nExplanation 1:\nGiven encoded message \"12\", it could be decoded as \"AB\" (1, 2) or \"L\" (12).\nThe number of ways decoding \"12\" is 2.\nExplanation 2:\nGiven encoded message \"8\", it could be decoded as only \"H\" (8).\nThe number of ways decoding \"8\" is 1.",
+    "sampleInput": "A = \"12\"",
+    "sampleOutput": "2",
+    "story": "Each position either consumes one digit or two, giving a Fibonacci-shaped recurrence with validity guards.",
+    "plain": "Let dp[i] be the number of decodings of the first i characters. To extend to position i you either take A[i-1] alone, which is legal when that digit is not '0', contributing dp[i-1]; or you take A[i-2..i-1] as a two-digit letter, which is legal when that pair reads between 10 and 26, contributing dp[i-2]. Sum the legal options mod 1e9+7. dp[0] = 1 (the empty prefix has one decoding) and dp[1] = 1 provided the first character is not '0'. Only the last two values are ever needed, so roll them in two variables.",
+    "howToThink": [
+      "Linear DP on prefixes: `dp[i] = dp[i-1] (if single digit valid) + dp[i-2] (if the two-digit pair is 10..26)`.",
+      "Every decoding is a sequence of 1-digit and 2-digit cuts, so the count only depends on the two previous prefix counts - that is the Fibonacci skeleton.",
+      "'0' is the whole difficulty: it can never stand alone, and it is only decodable as the tail of \"10\" or \"20\".",
+      "The pair guard must be `10 <= two <= 26`, not `two <= 26` - \"06\" is not a valid 'F'.",
+      "Since only `dp[i-1]` and `dp[i-2]` matter, drop the array and keep `prev1` / `prev2`."
+    ],
+    "pitfalls": [
+      "Allowing a leading-zero pair like \"06\" by testing only `two <= 26`.",
+      "Returning 1 for a string starting with '0' - it has zero decodings, so bail out immediately.",
+      "Forgetting `% MOD` - with length up to 1e5 the count overflows int long before the end.",
+      "Setting `dp[0] = 0`; the empty prefix must be 1 or the two-digit branch never contributes."
+    ],
+    "solutions": [
+      {
+        "label": "Optimal - rolling two-variable DP",
+        "complexity": {
+          "time": "O(N)",
+          "space": "O(1) - two rolling counters"
+        },
+        "plain": "Reject immediately if the string is empty or begins with '0'. Initialise prev2 = 1 for the empty prefix and prev1 = 1 for the first character. Walk i from 2 to N, adding prev1 when A[i-1] is a non-zero digit and adding prev2 when the two characters ending at i form a number in [10, 26]. Reduce mod 1e9+7 at every step and shift the two counters forward. prev1 holds the answer at the end.",
+        "approach": [
+          "If `A` is empty or `A.charAt(0) == '0'`, return 0.",
+          "`prev2 = 1` (dp[0]), `prev1 = 1` (dp[1]).",
+          "For `i` from 2 to `n`: start `curr = 0`.",
+          "If `A.charAt(i - 1) != '0'`, add `prev1`.",
+          "Compute `two` from characters `i-2` and `i-1`; if `10 <= two <= 26`, add `prev2` and take `% MOD`.",
+          "Shift: `prev2 = prev1`, `prev1 = curr`. Return `prev1`."
+        ],
+        "pseudocode": "A empty or A[0] == '0' -> return 0\n\nprev2 = 1     // dp[0], empty prefix\nprev1 = 1     // dp[1]\n\nfor i = 2 .. n:\n    curr = 0\n    A[i-1] != '0'        -> curr += prev1\n    two = A[i-2]*10 + A[i-1]\n    10 <= two <= 26      -> curr += prev2\n    curr %= MOD\n    prev2 = prev1\n    prev1 = curr\n\nreturn prev1",
+        "story": "Count cuts, not letters: each step is a Fibonacci sum gated by two validity checks.",
+        "code": "public int numDecodings(String A) {\n    final int MOD = 1000000007;\n    int n = A.length();\n    if (n == 0 || A.charAt(0) == '0') {\n        return 0;\n    }\n\n    int prev2 = 1; // dp[0] - the empty prefix has exactly one decoding\n    int prev1 = 1; // dp[1]\n\n    for (int i = 2; i <= n; i++) {\n        int curr = 0;\n        if (A.charAt(i - 1) != '0') {\n            curr = prev1;\n        }\n        int two = (A.charAt(i - 2) - '0') * 10 + (A.charAt(i - 1) - '0');\n        if (two >= 10 && two <= 26) { // 10..26 rejects \"06\" style pairs\n            curr = (curr + prev2) % MOD;\n        }\n        prev2 = prev1;\n        prev1 = curr % MOD;\n    }\n\n    return prev1;\n}"
+      }
+    ]
+  },
+  {
+    "num": 281,
+    "id": "s4-dp-flip-array",
+    "title": "Flip Array",
+    "subTopic": "Subset-sum DP minimising element count",
+    "tags": [
+      "Dynamic Programming",
+      "Subset Sum",
+      "Knapsack",
+      "Arrays"
+    ],
+    "description": "Given an array A of positive elements, you have to flip the sign of some of its elements such that the resultant sum of the elements of array should be minimum non-negative(as close to zero as possible).\nReturn the minimum number of elements whose sign needs to be flipped such that the resultant sum is minimum non-negative.\n\nProblem Constraints\n1 <= length of(A) <= 100\nSum of all the elements will not exceed 10,000.\n\nInput Format\nFirst and only argument is an integer array A.\n\nOutput Format\nReturn an integer denoting the minimum number of elements whose sign needs to be flipped.\n\nExample Input\nInput 1:\nA = [15, 10, 6]\nInput 2:\nA = [14, 10, 4]\n\nExample Output\nOutput 1:\n1\nOutput 2:\n1\n\nExample Explanation\nExplanation 1:\nHere, we will flip the sign of 15 and the resultant sum will be 1.\nExplanation 2:\nHere, we will flip the sign of 14 and the resultant sum will be 0.\nNote that flipping the sign of 10 and 4 also gives the resultant sum 0 but flippings there sign are not minimum.",
+    "sampleInput": "A = [15, 10, 6]",
+    "sampleOutput": "1",
+    "story": "Flipping a subset S makes the sum total - 2*sum(S), so maximise sum(S) under total/2 with fewest elements.",
+    "plain": "If you flip the subset S, the resultant sum is total - 2*sum(S). Keeping it non-negative means sum(S) <= total/2, and making it minimal means pushing sum(S) as high as possible under that cap. So run a 0/1 knapsack over sums 0..total/2 where dp[s] is the minimum number of elements needed to hit exactly s, initialised to infinity except dp[0] = 0. Process each element once, iterating s downward so each element is used at most once. Then scan s from total/2 downward and return the first dp[s] that is reachable.",
+    "howToThink": [
+      "0/1 subset-sum knapsack on the flipped set: `dp[s]` = fewest elements summing to exactly `s`, capped at `total / 2`.",
+      "Do the algebra first - flipping subset `S` gives `total - 2*sum(S)`, which reframes the whole problem as \"get `sum(S)` as close to `total/2` from below\".",
+      "The cap comes straight from the constraint `Sum <= 10000`, so the DP table is at most 5001 wide and `O(N * sum)` is fine.",
+      "Two objectives stacked: first maximise `s`, then minimise the count at that `s` - scanning `s` downward and returning the first reachable `dp[s]` handles both.",
+      "Iterate `s` from `half` down to `value` so each element is consumed once (classic 0/1 direction)."
+    ],
+    "pitfalls": [
+      "Iterating `s` upward, which turns it into unbounded knapsack and reuses an element many times.",
+      "Minimising `|total - 2s|` over all `s` instead of restricting to `s <= total / 2` - the result must be non-negative.",
+      "`Integer.MAX_VALUE` as the sentinel then doing `dp[s - value] + 1` without a reachability guard - that overflows to a negative count.",
+      "Forgetting `dp[0] = 0`, which leaves the whole table unreachable.",
+      "Using integer `total / 2` is correct here, but do not then compare against `total / 2.0` anywhere."
+    ],
+    "solutions": [
+      {
+        "label": "Optimal - 0/1 knapsack on subset sums, minimising count",
+        "complexity": {
+          "time": "O(N * S) where S = total/2 <= 5000",
+          "space": "O(S) - one rolling dp row"
+        },
+        "plain": "Compute total and half = total / 2. Build dp over 0..half with Integer.MAX_VALUE everywhere except dp[0] = 0. For each element, sweep s from half down to the element's value and relax dp[s] = min(dp[s], dp[s - value] + 1), skipping unreachable sources. Finally walk s from half downward and return the first dp[s] that is not the sentinel - that is the largest achievable subset sum under the cap, with the fewest elements.",
+        "approach": [
+          "Sum the array into `total`; set `half = total / 2`.",
+          "Allocate `dp[half + 1]`, fill with `Integer.MAX_VALUE`, set `dp[0] = 0`.",
+          "For each `value` in A, loop `s` from `half` down to `value`.",
+          "If `dp[s - value]` is reachable, relax `dp[s] = min(dp[s], dp[s - value] + 1)`.",
+          "Scan `s` from `half` down to 0 and return the first reachable `dp[s]`."
+        ],
+        "pseudocode": "total = sum(A)\nhalf  = total / 2\n\ndp[0..half] = INF\ndp[0] = 0\n\nfor value in A:\n    for s = half down to value:\n        dp[s - value] != INF -> dp[s] = min(dp[s], dp[s - value] + 1)\n\nfor s = half down to 0:\n    dp[s] != INF -> return dp[s]\n\nreturn 0",
+        "story": "Rewrite the sum as total - 2*sum(S) and the sign puzzle collapses into a knapsack.",
+        "code": "public int flipArrayMinimumElements(int[] A) {\n    int total = 0;\n    for (int value : A) {\n        total += value;\n    }\n\n    int half = total / 2;\n    int[] dp = new int[half + 1];\n    Arrays.fill(dp, Integer.MAX_VALUE);\n    dp[0] = 0;\n\n    for (int value : A) {\n        for (int s = half; s >= value; s--) { // downward keeps it 0/1\n            if (dp[s - value] != Integer.MAX_VALUE) {\n                dp[s] = Math.min(dp[s], dp[s - value] + 1);\n            }\n        }\n    }\n\n    for (int s = half; s >= 0; s--) {\n        if (dp[s] != Integer.MAX_VALUE) {\n            return dp[s];\n        }\n    }\n\n    return 0;\n}"
+      }
+    ]
+  }
+]

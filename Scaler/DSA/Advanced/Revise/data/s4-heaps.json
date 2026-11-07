@@ -1,0 +1,1016 @@
+[
+  {
+    "num": 235,
+    "id": "s4-heaps-connect-ropes",
+    "title": "Connect Ropes",
+    "subTopic": "Min-heap greedy merge",
+    "tags": [
+      "Heaps",
+      "Priority Queue",
+      "Greedy",
+      "Huffman"
+    ],
+    "description": "You are given an array A of integers that represent the lengths of ropes.\nYou need to connect these ropes into one rope. The cost of joining two ropes equals the sum of their lengths.\nFind and return the minimum cost to connect these ropes into one rope.\n\nProblem Constraints\n1 <= length of the array <= 100000\n1 <= A[i] <= 1000\n\nInput Format\nThe only argument given is the integer array A.\n\nOutput Format\nReturn an integer denoting the minimum cost to connect these ropes into one rope.\n\nExample Input\nInput 1:\nA = [1, 2, 3, 4, 5]\nInput 2:\nA = [5, 17, 100, 11]\n\nExample Output\nOutput 1:\n33\nOutput 2:\n182",
+    "sampleInput": "A = [1, 2, 3, 4, 5]",
+    "sampleOutput": "33",
+    "story": "Always merge the two currently shortest ropes; their length then re-enters the pool.",
+    "plain": "Push every rope length into a min-heap. Repeatedly pop the two smallest lengths, add their sum to the running total, and push that sum back as a new rope. Stop when one rope remains. The total accumulated is the minimum cost. Merging the two smallest first is optimal because every merge cost is paid again by every later merge that contains it, so the largest lengths must sit at the shallowest merge depth.",
+    "howToThink": [
+      "Min-heap greedy: always merge the two smallest available ropes — this is Huffman coding.",
+      "Cost of a rope of length `L` is counted once per merge it participates in, i.e. `L * depth` in the merge tree. Minimising total cost means giving big `L` a small depth.",
+      "That forces small lengths to be merged earliest (deepest), which is exactly popping the two minimums each round.",
+      "The merged length must go back into the pool — it is a real rope competing for the next merge, not a dead value.",
+      "Loop while `minHeap.size() > 1`; `N - 1` merges produce the answer."
+    ],
+    "pitfalls": [
+      "Sorting once and sweeping left-to-right is wrong — the merged sum has to be re-inserted in sorted position, which only a heap gives you cheaply.",
+      "Forgetting to push `cost` back into the heap: you would then just sum adjacent sorted pairs and get a smaller, incorrect answer.",
+      "`totalCost` can reach roughly `sum(A) * log N` (~1.7e9 at the constraint ceiling) — accumulate in `long` rather than `int`.",
+      "Do not add the final merged rope's length as an extra cost; the total is only the sum of merge costs, and the loop already stops at size 1."
+    ],
+    "solutions": [
+      {
+        "label": "Optimal — min-heap greedy (Huffman)",
+        "complexity": {
+          "time": "O(N log N)",
+          "space": "O(N) — the heap"
+        },
+        "plain": "Build a min-heap of all N lengths in O(N log N). Each round pops two minimums and pushes one sum, so the heap shrinks by one per round and there are exactly N - 1 rounds. Each round is O(log N). The running total of every merge cost is the answer.",
+        "approach": [
+          "Insert every element of `A` into a `PriorityQueue<Integer>` (natural order = min-heap).",
+          "While `minHeap.size() > 1`: poll `x`, poll `y`.",
+          "`cost = x + y`; add `cost` to `totalCost`.",
+          "Push `cost` back into the heap.",
+          "Return `totalCost` once a single rope remains."
+        ],
+        "pseudocode": "minHeap <- all lengths of A\ntotalCost <- 0\nwhile size(minHeap) > 1:\n    x <- poll(minHeap)\n    y <- poll(minHeap)\n    cost <- x + y\n    totalCost <- totalCost + cost\n    push(minHeap, cost)\nreturn totalCost",
+        "story": "The two cheapest ropes should sit deepest in the merge tree, so pay for them first.",
+        "code": "public int connectingRopesMinimumCost(int[] A) {\n    PriorityQueue<Integer> minHeap = new PriorityQueue<>();\n    for (int len : A) {\n        minHeap.add(len);\n    }\n    long totalCost = 0;\n    while (minHeap.size() > 1) {\n        int x = minHeap.poll();\n        int y = minHeap.poll();\n        int cost = x + y;\n        totalCost = totalCost + cost;\n        minHeap.add(cost); // the merged rope competes for the next merge\n    }\n    return (int) totalCost;\n}"
+      }
+    ]
+  },
+  {
+    "num": 236,
+    "id": "s4-heaps-build-a-heap",
+    "title": "Build a Heap",
+    "subTopic": "Bottom-up heapify",
+    "tags": [
+      "Heaps",
+      "Arrays",
+      "Heapify",
+      "Implementation"
+    ],
+    "description": "Given an array A of N integers, convert that array into a min heap and return the array.\nNOTE: A min heap is a binary tree where every node has a value less than or equal to its children.\n\nProblem Constraints\n1 <= N <= 10^5\n0 <= A[i] <= 10^9\n\nInput Format\nFirst and only argument of input contains a single integer array A of length N.\n\nOutput Format\nReturn the reordered array A such that it forms a min heap.\n\nExample Input\nInput:\nA = [5, 13, -2, 11, 27, 31, 0, 19]\n\nExample Output\nOutput:\nA = [-2, 5, 0, 13, 11, 19, 27, 31]\n\nExample Explanation\nOne possible Heap is\n\n                -2\n               /    \\\n             5       0\n            / \\    /  \\\n          13  11  19   27\n          /\n        31\n\nIt can be seen that each parent has a value smaller than its children. Hence it is a Valid Heap.\n\nThe Heap in the Array format is [-2, 5, 0, 13, 11, 19, 27, 31].\n\nSome more possible heaps are  [-2, 0, 5, 13, 11, 27, 19, 31], [-2, 5, 0, 11, 27, 13, 19, 31], etc.\nYou can return any possible Valid Heap Structure.",
+    "sampleInput": "A = [5, 13, -2, 11, 27, 31, 0, 19]",
+    "sampleOutput": "A = [-2, 5, 0, 13, 11, 19, 27, 31]",
+    "story": "Sift down every internal node from the last one up to the root, in place.",
+    "plain": "Treat the array as a complete binary tree where node `i` has children `2i + 1` and `2i + 2`. Every index from `n/2` onward is a leaf and is already a valid heap of size one. Walk `i` from `n/2 - 1` down to `0` and sift-down (heapify) each node: compare it with its two children, swap it with the smaller child if that child is smaller, then recurse into the position it moved to. Going bottom-up guarantees both subtrees are already heaps when you fix a node, so one sift-down per node suffices. The result is in place, so return the same array.",
+    "howToThink": [
+      "Bottom-up heapify: run sift-down from index `n/2 - 1` down to `0` — that is Floyd's build-heap, O(N), not O(N log N).",
+      "Index arithmetic is the whole problem: `left = 2i + 1`, `right = 2i + 2`, `parent = (i - 1) / 2`.",
+      "Indices `n/2 .. n - 1` are leaves, so they need no work — start the loop just below them.",
+      "Sift-down must recurse to the index the value moved into (`smallest`), not stop after one swap — the value can keep sinking.",
+      "The loop must run downward (`i--`); going upward would fix parents before their subtrees are heaps and break the invariant."
+    ],
+    "pitfalls": [
+      "Guarding children with `left < n` / `right < n` is mandatory — omitting it is an `ArrayIndexOutOfBoundsException` on the last internal node.",
+      "Calling `heapify` only once per node while iterating top-down (`i = 0 .. n-1`) does not produce a heap; the direction of the loop is load-bearing.",
+      "After swapping, recursing on `i` instead of `smallest` gives an infinite loop or a silently broken heap.",
+      "Sift-down compares against BOTH children and picks the smaller; comparing only with `left` breaks the heap when the right child is the smallest.",
+      "The array is mutated in place — return `A` itself; building a fresh array and forgetting to copy back loses the work."
+    ],
+    "solutions": [
+      {
+        "label": "Optimal — Floyd bottom-up build-heap",
+        "complexity": {
+          "time": "O(N)",
+          "space": "O(1) auxiliary — in place, plus O(log N) recursion stack for sift-down"
+        },
+        "plain": "Only the internal nodes need fixing, and a node at height h costs O(h). Summing N/2^(h+1) nodes times h over all heights telescopes to O(N), not O(N log N). Each sift-down swaps the node with its smaller child and continues from the new position until the heap property holds or a leaf is reached.",
+        "approach": [
+          "Set `n = A.length`.",
+          "For `i` from `n / 2 - 1` down to `0`, call `heapify(A, n, i)`.",
+          "In `heapify`: compute `left = 2i + 1`, `right = 2i + 2`, start `smallest = i`.",
+          "If `left < n` and `A[left] < A[smallest]`, set `smallest = left`; same check for `right`.",
+          "If `smallest != i`, swap and recurse into `heapify(A, n, smallest)`.",
+          "Return `A`."
+        ],
+        "pseudocode": "buildMinHeap(A):\n    n <- length(A)\n    for i from n/2 - 1 down to 0:\n        heapify(A, n, i)\n    return A\n\nheapify(A, n, i):\n    smallest <- i\n    left <- 2i + 1\n    right <- 2i + 2\n    if left  < n and A[left]  < A[smallest] -> smallest <- left\n    if right < n and A[right] < A[smallest] -> smallest <- right\n    if smallest != i:\n        swap(A[i], A[smallest])\n        heapify(A, n, smallest)",
+        "story": "Fix the small subtrees first; then every parent only has to sink once.",
+        "code": "public int[] buildMinHeapFromArray(int[] A) {\n    int n = A.length;\n    for (int i = n / 2 - 1; i >= 0; i--) {\n        heapify(A, n, i);\n    }\n    return A;\n}\n\nprivate void heapify(int[] heap, int n, int i) {\n    int smallest = i;\n    int left = 2 * i + 1;\n    int right = 2 * i + 2;\n    if (left < n && heap[left] < heap[smallest]) {\n        smallest = left;\n    }\n    if (right < n && heap[right] < heap[smallest]) {\n        smallest = right;\n    }\n    if (smallest != i) {\n        swap(heap, i, smallest);\n        heapify(heap, n, smallest); // keep sinking from the NEW index\n    }\n}\n\nprivate void swap(int[] arr, int i, int j) {\n    int temp = arr[i];\n    arr[i] = arr[j];\n    arr[j] = temp;\n}"
+      }
+    ]
+  },
+  {
+    "num": 237,
+    "id": "s4-heaps-heap-queries",
+    "title": "Heap Queries",
+    "subTopic": "Priority queue simulation",
+    "tags": [
+      "Heaps",
+      "Priority Queue",
+      "Simulation",
+      "Arrays"
+    ],
+    "description": "You have an empty min heap. You are given an array A consisting of N queries. Let P denote A[i][0] and Q denote A[i][1]. There are two types of queries:\n\nP = 1, Q = -1 : Pop the minimum element from the heap.\nP = 2, 1 <= Q <= 10^9 : Insert Q into the heap.\nReturn an integer array containing the answer for all the extract min operation. If the size of heap is 0, then extract min should return -1.\n\nProblem Constraints\n1 <= N <= 10^5\n1 <= A[i][0] <= 2\n1 <= A[i][1] <= 10^9 or A[i][1] = -1\n\nInput Format\nThe only argument A is a 2D integer array\n\nOutput Format\nReturn an integer array\n\nExample Input\nInput 1:\nA = [[1, -1], [2, 2], [2, 1], [1, -1]]\nInput 2:\nA = [[2, 5], [2, 3], [2, 1], [1, -1], [1, -1]]\n\nExample Output\nOutput 1:\n[-1, 1]\nOutput 2:\n[1, 3]\n\nExample Explanation\nExplanation 1:\nFor the first extract operation the heap is empty so it gives -1. For the second extract operation the heap contains the elements 2 and 1. Extract min returns the element 1.\nExplanation 2:\nThe heap contains the elements 5, 3 and 1. The first extract min operation gets the element 1 and the second operation gets the element 3.",
+    "sampleInput": "A = [[1, -1], [2, 2], [2, 1], [1, -1]]",
+    "sampleOutput": "[-1, 1]",
+    "story": "Replay the query list against a PriorityQueue, recording only the pop results.",
+    "plain": "Keep one `PriorityQueue<Integer>` in natural order. Walk the query rows in order: if `P == 2`, push `Q`; if `P == 1`, pop the minimum and record it, or record `-1` when the heap is empty. Collect the recorded values in an `ArrayList` because you do not know upfront how many type-1 queries there are. At the end copy the list into an `int[]` and return it. Only pop queries contribute an output element.",
+    "howToThink": [
+      "Direct min-heap simulation: one `PriorityQueue`, one pass over the queries, output only on pops.",
+      "The output length is the count of `P == 1` rows, not `N` — an `ArrayList<Integer>` sized dynamically is the clean way to collect.",
+      "`Q` is meaningless (`-1`) for pop queries; read `P` first and only touch `Q` on insert.",
+      "Empty-heap pop is a defined case returning `-1`, not an error — guard with `minHeap.size() > 0` before `poll()`.",
+      "Order matters: the queries are a stream, so a pop sees exactly the elements inserted before it."
+    ],
+    "pitfalls": [
+      "Calling `minHeap.poll()` on an empty queue returns `null`, and unboxing that `Integer` throws `NullPointerException` — check size first.",
+      "Allocating `int[] res = new int[A.length]` and filling only the pop slots leaves stray zeros; the answer array must be exactly as long as the number of pops.",
+      "`ArrayList<Integer>` does not auto-convert to `int[]` — the explicit copy loop (or a stream) is required.",
+      "`Q` up to 10^9 fits `int`, but do not sum or accumulate these values anywhere; this problem only stores them."
+    ],
+    "solutions": [
+      {
+        "label": "Optimal — PriorityQueue simulation",
+        "complexity": {
+          "time": "O(N log N)",
+          "space": "O(N) — heap plus output list"
+        },
+        "plain": "Each of the N queries is a single heap insert or extract, both O(log N) on a binary heap. The heap holds at most N elements. The answer list grows only on pop queries and is copied once into an int[] at the end.",
+        "approach": [
+          "Create `PriorityQueue<Integer> minHeap` and `ArrayList<Integer> list`.",
+          "For each row: read `P = row[0]`, `Q = row[1]`.",
+          "If `P == 1`: if `minHeap.size() > 0` add `minHeap.poll()` to `list`, else add `-1`.",
+          "If `P == 2`: `minHeap.add(Q)`.",
+          "Copy `list` into `int[] res` of the same size and return it."
+        ],
+        "pseudocode": "minHeap <- empty min-heap\nlist    <- empty list\nfor each row (P, Q) in A:\n    if P == 1:\n        size(minHeap) > 0 -> list.add(poll(minHeap))\n        else              -> list.add(-1)\n    else:\n        push(minHeap, Q)\nres <- int[size(list)]\ncopy list into res\nreturn res",
+        "story": "Nothing clever — the heap already is the data structure the problem describes.",
+        "code": "public int[] heapQueriesExtractMin(int[][] A) {\n    PriorityQueue<Integer> minHeap = new PriorityQueue<>();\n    ArrayList<Integer> list = new ArrayList<>();\n    for (int[] row : A) {\n        int P = row[0];\n        int Q = row[1];\n        if (P == 1) {\n            if (minHeap.size() > 0) {\n                list.add(minHeap.poll());\n            } else {\n                list.add(-1);\n            }\n        } else {\n            minHeap.add(Q);\n        }\n    }\n    int[] res = new int[list.size()];\n    for (int i = 0; i < res.length; i++) {\n        res[i] = list.get(i);\n    }\n    return res;\n}"
+      }
+    ]
+  },
+  {
+    "num": 238,
+    "id": "s4-heaps-minimum-largest-element",
+    "title": "Minimum Largest Element",
+    "subTopic": "Min-heap merge of multiple-chains",
+    "tags": [
+      "Heaps",
+      "Priority Queue",
+      "Greedy",
+      "Arrays"
+    ],
+    "description": "Given an array A of N numbers, you have to perform B operations. In each operation, you have to pick any one of the N elements and add original value(value stored at the index before we did any operations) to its current value. You can choose any of the N elements in each operation.\nPerform B operations in such a way that the largest element of the modified array(after B operations) is minimized.\nFind the minimum possible largest element after B operations.\n\nProblem Constraints\n1 <= N <= 10^4\n0 <= B <= 10^4\n1 <= A[i] <= 10^4\n\nInput Format\nThe first argument is an integer array A.\nThe second argument is an integer B.\n\nOutput Format\nReturn an integer denoting the minimum possible largest element after B operations.\n\nExample Input\nInput 1:\nA = [1, 2, 3, 4]\nB = 3\nInput 2:\nA = [5, 1, 4, 2]\nB = 5\n\nExample Output\nOutput 1:\n4\nOutput 2:\n5\n\nExample Explanation\nExplanation 1:\nApply operation on element at index 0, the array would change to [2, 2, 3, 4]\nApply operation on element at index 0, the array would change to [3, 2, 3, 4]\nApply operation on element at index 0, the array would change to [4, 2, 3, 4]\nMinimum possible largest element after 3 operations is 4.\nExplanation 2:\nApply operation on element at index 1, the array would change to [5, 2, 4, 2]\nApply operation on element at index 1, the array would change to [5, 3, 4, 2]\nApply operation on element at index 1, the array would change to [5, 4, 4, 2]\nApply operation on element at index 1, the array would change to [5, 5, 4, 2]\nApply operation on element at index 3, the array would change to [5, 5, 4, 4]\nMinimum possible largest element after 5 operations is 5.",
+    "sampleInput": "A = [1, 2, 3, 4], B = 3",
+    "sampleOutput": "4",
+    "story": "The answer is the (N+B)-th smallest value among all multiples of the elements, never below the largest original.",
+    "plain": "After B operations element i holds `A[i] * c[i]`, where every `c[i]` is at least 1 and the c's add up to `N + B` — each element starts with one copy of itself and the B operations hand out one more copy each. Making the largest value as small as possible therefore means taking the `N + B` cheapest values out of the combined multiset of every element's multiples `{A[i], 2*A[i], 3*A[i], ...}`. A min-heap produces them in sorted order: poll the smallest, then push that element's next multiple. The answer is the largest value you polled, floored at `max(A)` — every element keeps at least its own original value even if that value is far bigger than anything you polled.",
+    "howToThink": [
+      "Min-heap merge over multiple-chains: the answer is the (N+B)-th smallest value of the multiset `{A[i]*k : k >= 1}`, floored at `max(A)`.",
+      "Reframe the operations first. The end state is `A[i]*c[i]` with `c[i] >= 1` and `sum(c) = N + B`, so minimising the maximum is exactly 'take the N+B cheapest multiples'.",
+      "Polling the smallest and pushing `current + original` enumerates all the chains in sorted order — it is the same k-way merge as Merge K Sorted Lists, just with arithmetic progressions instead of lists.",
+      "The heap entry has to carry `original` next to `current`, because each step adds the ORIGINAL value, never the current one.",
+      "Floor the answer at `max(A)`: with `A = [1, 1000]` and `B = 0` the two smallest multiples are 1 and 2, but the 1000 still sits in the array and is the real maximum."
+    ],
+    "pitfalls": [
+      "Polling only B times and then taking the max of whatever is left in the heap is the wrong greedy — it raises the floor instead of lowering the ceiling. It fails this problem's own second sample (`A = [5, 1, 4, 2]`, `B = 5` returns 6 instead of 5). Poll `N + B` times and track the largest value polled.",
+      "Adding the CURRENT value instead of the ORIGINAL doubles the element every time; keep `original` in the pair and never mutate it.",
+      "Forgetting the `max(A)` floor. An element whose original never makes it into the N+B smallest multiples is still physically in the array.",
+      "`A[i] * (B + 1)` reaches about 1e9 * 1e4, so hold the pair and the running answer in `long` and cast once at the end.",
+      "`B == 0` is legal — the loop still runs N times, and the answer comes out as `max(A)`."
+    ],
+    "solutions": [
+      {
+        "label": "Optimal — min-heap merge of multiple-chains",
+        "complexity": {
+          "time": "O((N + B) log N)",
+          "space": "O(N) — the heap"
+        },
+        "plain": "Seed a min-heap with the pair `(A[i], A[i])` for every index, ordered by the current value. Poll `N + B` times; each poll hands you the next smallest multiple across all chains, and pushing `(current + original, original)` keeps that chain alive. Track the largest value polled and floor it at `max(A)`. Each of the `N + B` polls costs O(log N).",
+        "approach": [
+          "Compute `maxOriginal = max(A)` and seed `answer = maxOriginal`.",
+          "Build a min-heap of `long[]{A[i], A[i]}` ordered by the first field (the current value).",
+          "Repeat `N + B` times: poll the smallest pair.",
+          "If the polled current value exceeds `answer`, raise `answer` to it.",
+          "Push `{current + original, original}` so that element's next multiple becomes available.",
+          "After the loop, return `answer` cast back to int."
+        ],
+        "pseudocode": "minHeap <- pairs (A[i], A[i]) ordered by the first field\nanswer  <- max(A)                  # every element keeps its original\nrepeat N + B times:\n    (curr, orig) <- poll(minHeap)\n    answer <- max(answer, curr)\n    push(minHeap, (curr + orig, orig))\nreturn answer",
+        "story": "Merge every element's multiple-chain and stop after N+B values — the largest one you took is the ceiling.",
+        "code": "public int minimumLargestElement(int[] A, int B) {\n    int n = A.length;\n    PriorityQueue<long[]> minHeap = new PriorityQueue<>((x, y) -> Long.compare(x[0], y[0]));\n    long maxOriginal = 0;\n    for (int val : A) {\n        minHeap.add(new long[]{val, val}); // {current, original}\n        if (val > maxOriginal) {\n            maxOriginal = val;\n        }\n    }\n    // every element must keep at least one copy of its original value\n    long answer = maxOriginal;\n    // N + B values are consumed in total: one per element, plus the B extra operations\n    for (int taken = 0; taken < n + B; taken++) {\n        long[] top = minHeap.poll();\n        if (top[0] > answer) {\n            answer = top[0];\n        }\n        minHeap.add(new long[]{top[0] + top[1], top[1]}); // always add the ORIGINAL\n    }\n    return (int) answer;\n}"
+      }
+    ]
+  },
+  {
+    "num": 239,
+    "id": "s4-heaps-misha-and-candies",
+    "title": "Misha and Candies",
+    "subTopic": "Min-heap merge of two smallest",
+    "tags": [
+      "Heaps",
+      "Priority Queue",
+      "Greedy",
+      "Simulation"
+    ],
+    "description": "Misha loves eating candies. She has been given N boxes of Candies.\nShe decides that every time she will choose a box having the minimum number of candies, eat half of the candies and put the remaining candies in the other box that has the minimum number of candies.\nMisha does not like a box if it has the number of candies greater than B so she won't eat from that box. Can you find how many candies she will eat?\nNOTE 1: If a box has an odd number of candies then Misha will eat the floor(odd / 2).\nNOTE 2: The same box will not be chosen again.\n\nProblem Constraints\n1 <= N <= 10^5\n1 <= A[i] <= 10^5\n1 <= B <= 10^6\n\nInput Format\nThe first argument is A an Array of Integers, where A[i] is the number of candies in the ith box.\nThe second argument is B, the maximum number of candies Misha like in a box.\n\nOutput Format\nReturn an integer denoting the number of candies Misha will eat.\n\nExample Input\nInput 1:\nA = [3, 2, 3]\nB = 4\nInput 2:\nA = [1, 2, 1]\nB = 2\n\nExample Output\nOutput 1:\n2\nOutput 2:\n1\n\nExample Explanation\nExplanation 1:\n 1st time Misha will eat from 2nd box, i.e 1 candy she'll eat and will put the remaining 1 candy in the 1st box.\n 2nd time she will eat from the 3rd box, i.e 1 candy she'll eat and will put the remaining 2 candies in the 1st box.\n She will not eat from the 3rd box as now it has candies greater than B.\n So the number of candies Misha eat is 2.\nExplanation 2:\n 1st time Misha will eat from 1st box, i.e she can't eat any and will put the remaining 1 candy in the 3rd box.\n 2nd time she will eat from the 3rd box, i.e 1 candy she'll eat and will put the remaining 1 candies in the 2nd box.\n She will not eat from the 2nd box as now it has candies greater than B.",
+    "sampleInput": "A = [3, 2, 3], B = 4",
+    "sampleOutput": "2",
+    "story": "Pop the smallest box, eat half, dump the rest into the next smallest box.",
+    "plain": "Put all box counts into a min-heap. Each round, poll the smallest count `first`. If `first > B` she refuses it, and since it is the minimum every other box is also above B, so stop immediately. Otherwise she eats `first / 2` (integer division = floor) and the leftover `first - first / 2` goes into the next smallest box, so poll `second` and push back `second + leftover`. The original box is discarded because the same box is never chosen again. Continue while at least two boxes remain.",
+    "howToThink": [
+      "Min-heap greedy: poll the two smallest each round, eat half of the first, and fold its remainder into the second.",
+      "The stop condition is cheap because the heap's minimum is the global minimum — once `min > B`, nothing is edible, so break rather than continue scanning.",
+      "Leftover is `first - first / 2`, which handles the odd case automatically (`floor` eaten, `ceil` carried) — do not write `first / 2` for both halves.",
+      "The consumed box vanishes from the heap permanently (`NOTE 2`), so each round shrinks the heap by one; at most `N - 1` rounds.",
+      "Guard the loop with `minHeap.size() > 1` — with one box left there is no 'other box' to receive the remainder."
+    ],
+    "pitfalls": [
+      "Pushing the eaten box back after taking half turns the discard into a reuse and inflates the answer — `NOTE 2` forbids re-choosing it.",
+      "Using `first / 2` as the leftover loses a candy on every odd box; the leftover must be `first - first / 2`.",
+      "Comparing against `B` after the merge instead of before eating lets her eat from a box she should have refused — check `first > B` the moment it is polled.",
+      "A single box can absorb every remainder, so its value can exceed `int` at the constraint ceiling (sum up to 10^10) — keep the heap and the running total in `long`.",
+      "`continue`-ing instead of `break`ing on `first > B` loops forever, since the same minimum keeps coming back."
+    ],
+    "solutions": [
+      {
+        "label": "Optimal — min-heap, two polls per round",
+        "complexity": {
+          "time": "O(N log N)",
+          "space": "O(N) — the heap"
+        },
+        "plain": "Building the heap is O(N log N) with repeated adds. Each round removes exactly one box permanently, so there are at most N - 1 rounds, each doing a constant number of O(log N) heap operations. The early break on min > B usually ends it much sooner.",
+        "approach": [
+          "Insert all `A[i]` into a `PriorityQueue<Long>`.",
+          "While `minHeap.size() > 1`: poll `first`.",
+          "If `first > B`, break — the global minimum is already inedible.",
+          "Add `first / 2` to `total`; compute `leftover = first - first / 2`.",
+          "Poll `second`, push `second + leftover` back; the `first` box is dropped.",
+          "Return `total`."
+        ],
+        "pseudocode": "minHeap <- all counts in A\ntotal <- 0\nwhile size(minHeap) > 1:\n    first <- poll(minHeap)\n    if first > B -> break\n    total <- total + first / 2\n    leftover <- first - first / 2\n    second <- poll(minHeap)\n    push(minHeap, second + leftover)      // first box is discarded\nreturn total",
+        "story": "The smallest box is both the only one she'll accept and the cheapest to empty.",
+        "code": "public int mishaAndCandies(int[] A, int B) {\n    PriorityQueue<Long> minHeap = new PriorityQueue<>();\n    for (int candies : A) {\n        minHeap.add((long) candies);\n    }\n    long total = 0;\n    while (minHeap.size() > 1) {\n        long first = minHeap.poll();\n        if (first > B) {\n            break; // min is inedible, so every remaining box is too\n        }\n        total = total + first / 2;\n        long leftover = first - first / 2; // ceil half, survives odd counts\n        long second = minHeap.poll();\n        minHeap.add(second + leftover); // the 'first' box is never reused\n    }\n    return (int) total;\n}"
+      }
+    ]
+  },
+  {
+    "num": 240,
+    "id": "s4-heaps-maximum-array-sum-after-b-negations",
+    "title": "Maximum Array Sum After B Negations",
+    "subTopic": "Min-heap greedy with parity tail",
+    "tags": [
+      "Heaps",
+      "Priority Queue",
+      "Greedy",
+      "Arrays"
+    ],
+    "description": "Given an array of integers A and an integer B. You must modify the array exactly B number of times. In a single modification, we can replace any one array element A[i] by -A[i].\nYou need to perform these modifications in such a way that after exactly B modifications, sum of the array must be maximum.\n\nNOTE: You can perform the modification on the same element multiple times.\n\nProblem Constraints\n1 <= length of the array <= 5*10^5\n1 <= B <= 5 * 10^6\n-100 <= A[i] <= 100\n\nInput Format\nThe first argument given is an integer array A.\nThe second argument given is an integer B.\n\nOutput Format\nReturn an integer denoting the maximum array sum after B modifications.\n\nExample Input\nInput 1:\nA = [24, -68, -29, -9, 84]\nB = 4\nInput 2:\nA = [57, 3, -14, -87, 42, 38, 31, -7, -28, -61]\nB = 10\n\nExample Output\nOutput 1:\n196\nOutput 2:\n362\n\nExample Explanation\nExplanation 1:\n\nOperation 1: Make -29 to 29,\nOperation 2: Make -9 to 9,\nOperation 3: Make 9 to -9,\nOperation 4: Make -68 to 68.\nThus, the final array after 4 modifications = [24, 68, 29, -9, 84]\nExplanation 2:\nFinal array after B modifications = [57, -3, 14, 87, 42, 38, 31, 7, 28, 61]",
+    "sampleInput": "A = [24, -68, -29, -9, 84], B = 4",
+    "sampleOutput": "196",
+    "story": "Flip the current minimum every time; once the minimum is non-negative, only parity matters.",
+    "plain": "Push everything into a min-heap. Each modification should go to the smallest element, because flipping the most negative value gains the most. Pop the minimum; if it is negative, push `-min` and spend one modification. Once the popped minimum is already non-negative you must still spend the remaining B modifications, but the best you can do is toggle that same smallest value back and forth — so if the leftover count is odd, negate it once and stop; if even, leave it alone and stop. Sum the heap for the answer.",
+    "howToThink": [
+      "Min-heap greedy: repeatedly flip the current minimum; the moment the minimum is >= 0, collapse the rest into a parity check.",
+      "Flipping the most negative element gives the largest gain (`-2 * min`), and the heap re-exposes the new minimum in O(log N).",
+      "Modifications are exact, not 'at most' — you cannot stop early, so leftovers must be burned on the smallest non-negative value.",
+      "Toggling the same element twice is a no-op, so only `B % 2` of the leftover matters.",
+      "`B <= 5 * 10^6` but at most `N` useful flips exist — without the parity short-circuit the loop does 5 million heap operations for nothing."
+    ],
+    "pitfalls": [
+      "Looping B times unconditionally is the main trap: with `B = 5 * 10^6` that is millions of pointless heap operations. Break out as soon as the minimum is non-negative.",
+      "Forgetting the parity step and just stopping when all values are non-negative gives the wrong answer when leftover B is odd — a zero in the array makes the odd case free, otherwise you must pay `-2 * min`.",
+      "Burning the leftover on the wrong element (e.g. the last polled one, or the max) — it has to land on the smallest absolute value still present.",
+      "Sorting once and sweeping is not enough: after flipping a negative it becomes positive and re-enters the ordering, which only the heap tracks cheaply.",
+      "Sum fits `int` here (`5 * 10^5 * 100 = 5 * 10^7`), but accumulate in `long` out of habit and cast at the return."
+    ],
+    "solutions": [
+      {
+        "label": "Optimal — min-heap flips with parity short-circuit",
+        "complexity": {
+          "time": "O(N log N)",
+          "space": "O(N) — the heap"
+        },
+        "plain": "Heap construction is O(N log N). At most N flips are productive, because after N pops every value is non-negative; each flip is O(log N). The remaining modifications are resolved in O(1) by a single parity test instead of B heap operations. A final O(N) pass sums the heap.",
+        "approach": [
+          "Insert every `A[i]` into a `PriorityQueue<Integer>`.",
+          "While `B > 0`: poll `min`.",
+          "If `min >= 0`: if `B` is odd, negate `min`; push it back and break.",
+          "Otherwise push `-min`, decrement `B`, and continue.",
+          "Sum every value left in the heap and return it."
+        ],
+        "pseudocode": "minHeap <- all values of A\nwhile B > 0:\n    min <- poll(minHeap)\n    if min >= 0:\n        B odd -> min <- -min\n        push(minHeap, min)\n        break\n    push(minHeap, -min)\n    B <- B - 1\nsum <- 0\nfor v in minHeap: sum <- sum + v\nreturn sum",
+        "story": "Every flip should undo the biggest loss; when there is no loss left, only the parity of what remains matters.",
+        "code": "public int maximumArraySumAfterBNegations(int[] A, int B) {\n    PriorityQueue<Integer> minHeap = new PriorityQueue<>();\n    for (int val : A) {\n        minHeap.add(val);\n    }\n    int remaining = B;\n    while (remaining > 0) {\n        int min = minHeap.poll();\n        if (min >= 0) {\n            if (remaining % 2 == 1) {\n                min = -min; // burn the odd leftover on the smallest value\n            }\n            minHeap.add(min);\n            break; // all further flips would just toggle this same element\n        }\n        minHeap.add(-min);\n        remaining = remaining - 1;\n    }\n    long sum = 0;\n    for (int val : minHeap) {\n        sum = sum + val;\n    }\n    return (int) sum;\n}"
+      }
+    ]
+  },
+  {
+    "num": 241,
+    "id": "s4-heaps-running-median",
+    "title": "Running Median",
+    "subTopic": "Two-heap running median",
+    "tags": [
+      "Heaps",
+      "Priority Queue",
+      "Two Heaps",
+      "Streaming Median"
+    ],
+    "description": "Flipkart is currently dealing with the difficulty of precisely estimating and displaying the expected delivery time for orders to a specific pin code. The existing method relies on historical delivery time data for that pin code, using the median value as the expected delivery time. As the order history expands with new entries, Flipkart aims to enhance this process by dynamically updating the expected delivery time whenever a new delivery time is added. The objective is to find the expected delivery time after each new element is incorporated into the list of delivery times. End Goal: With every addition of new delivery time, requirement is to find the median value.\n\nWhy Median ? The median is calculated because it provides a more robust measure of the expected delivery time The median is less sensitive to outliers or extreme values than the mean. In the context of delivery times, this is crucial because occasional delays or unusually fast deliveries (outliers) can skew the mean significantly, leading to inaccurate estimations.\n\nGiven an array of integers, A denoting the delivery times for each order. New arrays of integer B and C are formed, each time a new delivery data is encountered, append it at the end of B and append the median of array B at the end of C. Your task is to find and return the array C.\nNOTE:\n\n- If the number of elements is N in B and N is odd, then consider the median as B[N/2] ( B must be in sorted order).\n- If the number of elements is N in B and N is even, then consider the median as B[N/2-1]. ( B must be in sorted order).\n\nProblem Constraints\n1 <= length of the array <= 100000\n1 <= A[i] <= 10^9\n\nInput Format\nThe only argument given is the integer array A.\n\nOutput Format\nReturn an integer array C, C[i] denotes the median of the first i delivery times.\n\nExample Input\nInput 1:\nA = [1, 2, 5, 4, 3]\nInput 2:\nA = [5, 17, 100, 11]\n\nExample Output\nOutput 1:\n[1, 1, 2, 2, 3]\nOutput 2:\n[5, 5, 17, 11]\n\nExample Explanation\nExplanation 1:\nDelivery Times     median\n[1]                   1\n[1, 2]                1\n[1, 2, 5]             2\n[1, 2, 5, 4]          2\n[1, 2, 5, 4, 3]       3",
+    "sampleInput": "A = [1, 2, 5, 4, 3]",
+    "sampleOutput": "[1, 1, 2, 2, 3]",
+    "story": "Hold the middle of a growing stream between two heap tops so the median is always one peek away.",
+    "plain": "Maintain two heaps: a max-heap over the smaller half and a min-heap over the larger half. For each incoming value, push it into the left max-heap when it is not greater than the left top, otherwise into the right min-heap. Then rebalance with a single poll/add so the left heap always holds exactly ceil(k/2) of the k elements seen so far. Under that invariant the left top is exactly `B[ceil(k/2) - 1]`, which is `B[N/2]` for odd N and `B[N/2-1]` for even N — precisely the median this problem defines. Append that top to the result array after every insertion.",
+    "howToThink": [
+      "Two heaps: a max-heap for the lower half, a min-heap for the upper half, kept balanced so the median is a single `peek()`.",
+      "Re-sorting after each insert is O(N^2 log N). You never need the full order — only the element sitting at the middle index.",
+      "Read the median definition before coding: odd -> `B[N/2]`, even -> `B[N/2-1]`. Both are the lower-middle element, so fix the invariant `left.size() == ceil(k/2)` and the answer is always `leftMaxHeap.peek()`.",
+      "Pick the side by comparing against `leftMaxHeap.peek()`, then move at most one element across to restore the size invariant."
+    ],
+    "pitfalls": [
+      "The even-N median here is `B[N/2-1]`, the lower middle — NOT the average of the two middle values. Averaging produces a different array.",
+      "Rebalance on every insert. If you only correct when the gap exceeds 1 in both directions, the right heap can end up larger and `leftMaxHeap.peek()` stops being the answer.",
+      "`PriorityQueue<Integer>` is a min-heap by default; the left half needs `new PriorityQueue<>(Collections.reverseOrder())`.",
+      "Seed `leftMaxHeap` with `A[0]` and set `res[0]` before the loop — otherwise the first `peek()` hits an empty heap and returns `null`, which NPEs on unboxing into `int`."
+    ],
+    "solutions": [
+      {
+        "label": "Optimal — two heaps, median at the top",
+        "complexity": {
+          "time": "O(N log N)",
+          "space": "O(N) — the two heaps, plus the N-length result array"
+        },
+        "plain": "Keep `leftMaxHeap` over the smaller half and `rightMinHeap` over the larger half. Compare each incoming value with `leftMaxHeap.peek()` to choose a side, then move one element across if the sizes drifted apart. The invariant `leftMaxHeap.size() - rightMinHeap.size()` staying in `{0, 1}` means the left top is the lower-middle element at every step. Write that top into `res[i]` and move on.",
+        "approach": [
+          "Seed `leftMaxHeap` with `A[0]` and set `res[0] = A[0]`.",
+          "For each `i` from 1: if `A[i]` is greater than `leftMaxHeap.peek()`, push it into `rightMinHeap`, else push it into `leftMaxHeap`.",
+          "If `leftMaxHeap.size() - rightMinHeap.size() > 1`, move `leftMaxHeap.poll()` into `rightMinHeap`.",
+          "Else if `rightMinHeap.size() > leftMaxHeap.size()`, move `rightMinHeap.poll()` into `leftMaxHeap`.",
+          "Set `res[i] = leftMaxHeap.peek()` — the invariant guarantees it is the required median."
+        ],
+        "pseudocode": "left  = max-heap, right = min-heap\nleft.add(A[0]); res[0] = A[0]\n\nfor i in 1 .. n-1:\n    A[i] > left.top   → right.add(A[i])\n                      → else left.add(A[i])\n\n    |left| - |right| > 1 → right.add(left.pop())\n    |right| > |left|     → left.add(right.pop())\n\n    res[i] = left.top          // |left| == ceil((i+1)/2)\n\nreturn res",
+        "story": "Split the stream down the middle; the boundary between the two heaps is the median.",
+        "code": "public int[] expectedDeliveryTime(int[] A) {\n    int n = A.length;\n    PriorityQueue<Integer> leftMaxHeap = new PriorityQueue<>(Collections.reverseOrder());\n    PriorityQueue<Integer> rightMinHeap = new PriorityQueue<>();\n    int[] res = new int[n];\n    leftMaxHeap.add(A[0]);\n    res[0] = A[0];\n\n    for (int i = 1; i < n; i++) {\n        int maxOfLeftHalf = leftMaxHeap.peek();\n        if (maxOfLeftHalf < A[i]) {\n            rightMinHeap.add(A[i]);\n        } else {\n            leftMaxHeap.add(A[i]);\n        }\n\n        // invariant: |left| - |right| stays in {0, 1}, so left.peek() is the lower middle\n        if (leftMaxHeap.size() - rightMinHeap.size() > 1) {\n            rightMinHeap.add(leftMaxHeap.poll());\n        } else if (rightMinHeap.size() > leftMaxHeap.size()) {\n            leftMaxHeap.add(rightMinHeap.poll());\n        }\n\n        res[i] = leftMaxHeap.peek();\n    }\n    return res;\n}"
+      }
+    ]
+  },
+  {
+    "num": 242,
+    "id": "s4-heaps-finish-maximum-jobs",
+    "title": "Finish Maximum Jobs",
+    "subTopic": "Greedy interval scheduling",
+    "tags": [
+      "Greedy",
+      "Sorting",
+      "Interval Scheduling",
+      "Activity Selection"
+    ],
+    "description": "There are N jobs to be done, but you can do only one job at a time.\nGiven an array A denoting the start time of the jobs and an array B denoting the finish time of the jobs.\nYour aim is to select jobs in such a way so that you can finish the maximum number of jobs.\n\nReturn the maximum number of jobs you can finish.\n\nProblem Constraints\n1 <= N <= 10^5\n1 <= A[i] < B[i] <= 10^9\n\nInput Format\nThe first argument is an integer array A of size N, denoting the start time of the jobs.\nThe second argument is an integer array B of size N, denoting the finish time of the jobs.\n\nOutput Format\nReturn an integer denoting the maximum number of jobs you can finish.\n\nExample Input\nInput 1:\nA = [1, 5, 7, 1]\nB = [7, 8, 8, 8]\nInput 2:\nA = [3, 2, 6]\nB = [9, 8, 9]\n\nExample Output\nOutput 1:\n2\nOutput 2:\n1\n\nExample Explanation\nExplanation 1:\nWe can finish the job in the period of time: (1, 7) and (7, 8).\nExplanation 2:\nSince all three jobs collide with each other. We can do only 1 job.",
+    "sampleInput": "A = [1, 5, 7, 1]\nB = [7, 8, 8, 8]",
+    "sampleOutput": "2",
+    "story": "Always commit to the job that frees you up earliest.",
+    "plain": "Pair each start time with its finish time and sort the pairs by finish time ascending. Sweep them in that order carrying `prevEnd`, the finish time of the last job you accepted. Accept a job only when its start time is at least `prevEnd`, and on acceptance set `prevEnd` to that job's finish time. The number of accepted jobs is the answer. Finishing as early as possible leaves the maximum room for every job that follows, so this greedy choice is never wrong.",
+    "howToThink": [
+      "Classic activity selection: sort by finish time, then greedily take every job whose start is at least the last accepted finish.",
+      "Sorting by start time or by duration both break — one long job that starts early can swallow many short later jobs.",
+      "Exchange argument: take any optimal schedule and swap its first job for the globally earliest-finishing job. Nothing gets worse, so the greedy first pick is safe, and induction handles the rest.",
+      "No heap is needed. Because only one job runs at a time, a single `prevEnd` scalar carries all the state."
+    ],
+    "pitfalls": [
+      "Sorting by start time (or by shortest duration) is the intuitive wrong answer. Sort by `endTime`.",
+      "Use `Integer.compare(a.endTime, b.endTime)` in the comparator, not `a.endTime - b.endTime` — finish times reach 1e9 and the subtraction overflows int.",
+      "`prevEnd = 0` only works because the constraints guarantee `A[i] >= 1`. With possible zero or negative starts, seed it with `Integer.MIN_VALUE`.",
+      "Intervals here are half-open: `start >= prevEnd` must accept a job starting exactly when the previous one ends — using strict `>` loses the `(7, 8)` job in example 1."
+    ],
+    "solutions": [
+      {
+        "label": "Optimal — greedy by earliest finish time",
+        "complexity": {
+          "time": "O(N log N) — dominated by the sort",
+          "space": "O(N) — the paired jobs array"
+        },
+        "plain": "Build an array of `(startTime, endTime)` pairs and sort it by `endTime`. Walk the sorted array once with `prevEnd` initialised to 0. Whenever the current job's start is at least `prevEnd`, take it: bump the counter and advance `prevEnd` to that job's end. Skipped jobs cost nothing, since anything overlapping the accepted one could only displace it for no gain.",
+        "approach": [
+          "Build `Job[] jobs` where `jobs[i] = (A[i], B[i])`.",
+          "Sort `jobs` ascending by `endTime` using `Integer.compare`.",
+          "Initialise `prevEnd = 0` and `jobsCount = 0`.",
+          "For each job in sorted order: if `job.startTime >= prevEnd`, set `prevEnd = job.endTime` and increment `jobsCount`.",
+          "Return `jobsCount`."
+        ],
+        "pseudocode": "jobs = pair up (A[i], B[i]) for all i\nsort jobs by endTime ascending\n\nprevEnd = 0\ncount   = 0\n\nfor j in jobs:\n    j.start >= prevEnd → prevEnd = j.end; count++\n                       → else skip\n\nreturn count",
+        "story": "Earliest finish first: every job you clear sooner buys room for another.",
+        "code": "public int finishMaximumJobs(int[] A, int[] B) {\n    int n = A.length;\n    Job[] jobs = new Job[n];\n    for (int i = 0; i < n; i++) {\n        jobs[i] = new Job(A[i], B[i]);\n    }\n    Arrays.sort(jobs, (a, b) -> Integer.compare(a.endTime, b.endTime));\n\n    int prevEnd = 0;\n    int jobsCount = 0;\n    for (Job j : jobs) {\n        if (j.startTime >= prevEnd) {\n            prevEnd = j.endTime;\n            jobsCount++;\n        }\n    }\n    return jobsCount;\n}\n\nprivate static class Job {\n    int startTime;\n    int endTime;\n\n    Job(int startTime, int endTime) {\n        this.startTime = startTime;\n        this.endTime = endTime;\n    }\n}"
+      }
+    ]
+  },
+  {
+    "num": 243,
+    "id": "s4-heaps-seats",
+    "title": "Seats",
+    "subTopic": "Median minimises total distance",
+    "tags": [
+      "Greedy",
+      "Median",
+      "Strings",
+      "Math"
+    ],
+    "description": "There is a row of seats represented by string A. Assume that it contains N seats adjacent to each other.\nThere is a group of people who are already seated in that row randomly. i.e. some are sitting together & some are scattered.\nAn occupied seat is marked with a character 'x' and an unoccupied seat is marked with a dot ('.')\nNow your target is to make the whole group sit together i.e. next to each other, without having any vacant seat between them in such a way that the total number of hops or jumps to move them should be minimum.\nIn one jump a person can move to the adjacent seat (if available).\nNOTE: 1. Return your answer modulo 10^7 + 3.\n\nProblem Constraints\n1 <= N <= 1000000\nA[i] = 'x' or '.'\n\nInput Format\nThe first and only argument is a string A of size N.\n\nOutput Format\nReturn an integer denoting the minimum number of jumps required.\n\nExample Input\nInput 1:\nA = \"....x..xx...x..\"\nInput 2:\nA = \"....xxx\"\n\nExample Output\nOutput 1:\n5\nOutput 2:\n0\n\nExample Explanation\nExplanation 1:\nHere is the row having 15 seats represented by the String (0, 1, 2, 3, ......... , 14)\n                . . . . x . . x x . . . x . .\nNow to make them sit together one of approaches is -\n                . . . . . . x x x x . . . . .\nSteps To achieve this:\n1) Move the person sitting at 4th index to 6th index: Number of jumps by him =   (6 - 4) = 2\n2) Bring the person sitting at 12th index to 9th index: Number of jumps by him = (12 - 9) = 3\nSo, total number of jumps made: 2 + 3 = 5 which is the minimum possible.\n\nIf we other ways to make them sit together but the number of jumps will exceed 5 and that will not be minimum.\nExplanation 2:\nThey are already together. So, the cost is zero.",
+    "sampleInput": "A = \"....x..xx...x..\"",
+    "sampleOutput": "5",
+    "story": "Collapse the gaps by subtracting each person's rank, then everyone walks to the median.",
+    "plain": "Scan the string and record the index of every 'x' in order. Subtract from each recorded index its rank among the occupied seats, so the i-th person (0-based) becomes `pos - i`. That substitution turns the constraint 'the final seats must be consecutive' into 'all shifted values must land on one common point'. The point that minimises the sum of absolute distances is the median of the shifted values, and because the indices were collected left to right the shifted array is already sorted. Sum `|shifted[i] - median|` over all people and return it modulo 10^7 + 3.",
+    "howToThink": [
+      "Median trick: shift each occupied index down by its rank, then the answer is the total distance from every shifted value to their median.",
+      "Cost is `sum |p[i] - t_i|` where the targets `t_i` must be consecutive. Write `t_i = t + i`, substitute `q[i] = p[i] - i`, and it collapses to `sum |q[i] - t|` with a single free variable `t`.",
+      "`sum |q[i] - t|` is minimised at the median of `q`, never at the mean — one far outlier would drag the mean off the optimum.",
+      "`q` comes out already sorted because you scanned indices left to right, so no sort is needed and the whole thing is a single O(N) pass."
+    ],
+    "pitfalls": [
+      "Forgetting the `- i` shift. Without it you are solving 'everybody meets on one seat', which is a different and wrong cost.",
+      "Take the median of the shifted array — not the mean, not the middle seat of the row, not the average position.",
+      "MOD here is `10^7 + 3` (10000003), not the reflexive `10^9 + 7`.",
+      "Accumulate the sum in a `long` before taking the modulo: N reaches 1e6 and individual distances reach 1e6, so the raw total overflows int."
+    ],
+    "solutions": [
+      {
+        "label": "Optimal — shift by rank, meet at the median",
+        "complexity": {
+          "time": "O(N) — two linear passes over the string",
+          "space": "O(K) — K = number of occupied seats"
+        },
+        "plain": "Count the 'x' characters to size an array, then fill it with `index - rank` for each occupied seat. That array is sorted by construction, so the median is simply the element at position `k / 2`. Add up the absolute difference between each shifted value and the median, reducing modulo 10^7 + 3 as you go. With zero or one person the answer is trivially 0.",
+        "approach": [
+          "First pass: count the occupied seats into `k`.",
+          "If `k <= 1`, return 0 — nobody has to move.",
+          "Second pass: for the `idx`-th 'x' found at index `i`, store `shifted[idx] = i - idx`.",
+          "Take `median = shifted[k / 2]` — no sort needed, `shifted` is already ascending.",
+          "Accumulate `jumps = (jumps + |shifted[i] - median|) % MOD` in a `long`, then return it as int."
+        ],
+        "pseudocode": "MOD = 10^7 + 3\nk = count of 'x' in A\nk <= 1 → return 0\n\nidx = 0\nfor i in 0 .. n-1:\n    A[i] == 'x' → shifted[idx] = i - idx ; idx++\n\nmedian = shifted[k / 2]          // shifted is already sorted\n\njumps = 0\nfor i in 0 .. k-1:\n    jumps = (jumps + |shifted[i] - median|) % MOD\n\nreturn jumps",
+        "story": "Subtracting the rank turns 'sit contiguously' into 'all meet at one point' — and that point is the median.",
+        "code": "public int seatsMinimumJumps(String A) {\n    final int MOD = 10000003;\n    int n = A.length();\n\n    int k = 0;\n    for (int i = 0; i < n; i++) {\n        if (A.charAt(i) == 'x') {\n            k++;\n        }\n    }\n    if (k <= 1) {\n        return 0;\n    }\n\n    int[] shifted = new int[k];\n    int idx = 0;\n    for (int i = 0; i < n; i++) {\n        if (A.charAt(i) == 'x') {\n            shifted[idx] = i - idx;   // collapse the gaps: contiguous targets become one meeting point\n            idx++;\n        }\n    }\n\n    int median = shifted[k / 2];\n    long jumps = 0;\n    for (int i = 0; i < k; i++) {\n        jumps = (jumps + Math.abs(shifted[i] - median)) % MOD;\n    }\n    return (int) jumps;\n}"
+      }
+    ]
+  },
+  {
+    "num": 244,
+    "id": "s4-heaps-assign-mice-to-holes",
+    "title": "Assign Mice to Holes",
+    "subTopic": "Sort-and-pair greedy",
+    "tags": [
+      "Greedy",
+      "Sorting",
+      "Exchange Argument",
+      "Minimax"
+    ],
+    "description": "N Mice and N holes are placed in a straight line. Each hole can accommodate only one mouse.\nThe positions of Mice are denoted by array A, and the position of holes is denoted by array B.\nA mouse can stay at his position, move one step right from x to x + 1, or move one step left from x to x - 1. Any of these moves consume 1 minute.\nAssign mice to holes so that the time when the last mouse gets inside a hole is minimized.\n\nProblem Constraints\n1 <= N <= 10^5\n-10^9 <= A[i], B[i] <= 10^9\n\nInput Format\nThe first argument is an integer array A.\nThe second argument is an integer array B.\n\nOutput Format\nReturn an integer denoting the minimum time when the last nouse gets inside the holes.\n\nExample Input\nInput 1:\nA = [-4, 2, 3]\nB = [0, -2, 4]\nInput 2:\nA = [-2]\nB = [-6]\n\nExample Output\nOutput 1:\n2\nOutput 2:\n4\n\nExample Explanation\nExplanation 1:\nAssign the mouse at position (-4 to -2), (2 to 0) and (3 to 4).\nThe number of moves required will be 2, 2 and 1 respectively.\nSo, the time taken will be 2.\nExplanation 2:\nAssign the mouse at position -2 to -6.\nThe number of moves required will be 4.\nSo, the time taken will be 4.",
+    "sampleInput": "A = [-4, 2, 3]\nB = [0, -2, 4]",
+    "sampleOutput": "2",
+    "story": "Sort both lines and pair rank with rank; the worst pair is the answer.",
+    "plain": "Sort the mice positions and the hole positions independently, both ascending. Pair the i-th smallest mouse with the i-th smallest hole. Since all mice move in parallel and each consumes one minute per unit, the finish time is the largest `|A[i] - B[i]|` over that pairing. Scan once, track the maximum, return it. Any assignment where two paths cross can be uncrossed without increasing either distance, which is why the sorted pairing is optimal.",
+    "howToThink": [
+      "Sort both arrays and pair by rank: the answer is `max |A[i] - B[i]|` over the sorted pairing.",
+      "The objective is a minimax, not a sum — you are minimising the single worst travel time, since all mice move simultaneously.",
+      "Exchange argument: if mouse `a1 < a2` goes to hole `b2` and `a2` goes to `b1 < b2`, swapping them never increases either distance. Repeating the swap sorts the assignment, so the sorted pairing is at least as good as anything else.",
+      "Travel time equals `|position - hole|` because a move of one unit in either direction costs exactly 1 minute."
+    ],
+    "pitfalls": [
+      "Return the maximum of the per-pair distances, not the sum. The sum happens to be right for N = 1 and wrong everywhere else.",
+      "`Arrays.sort` mutates the caller's arrays in place — fine here, but a hazard if the arrays are reused afterwards.",
+      "Positions span [-1e9, 1e9], so `A[i] - B[i]` can reach 2e9 in magnitude. Cast to `long` before subtracting rather than trusting that it happens to fit in int.",
+      "Do not sort only one array (or sort by absolute value) — both need the same ascending order for rank-pairing to mean anything."
+    ],
+    "solutions": [
+      {
+        "label": "Optimal — sort both, pair by rank",
+        "complexity": {
+          "time": "O(N log N) — two sorts, then one linear scan",
+          "space": "O(1) auxiliary — sorts in place, plus O(log N) sort recursion stack"
+        },
+        "plain": "Sort `A` and `B` ascending. Walk a single index `i` across both arrays and compute `|A[i] - B[i]|` in `long`. Keep the running maximum. That maximum is the instant the last mouse disappears into its hole, because every other mouse finishes no later.",
+        "approach": [
+          "Sort `A` ascending.",
+          "Sort `B` ascending.",
+          "For each `i` in `0 .. n-1`, compute `diff = |(long) A[i] - (long) B[i]|`.",
+          "Track `max = Math.max(max, diff)` across the scan.",
+          "Return `max` cast back to int."
+        ],
+        "pseudocode": "sort A ascending\nsort B ascending\n\nmax = 0\nfor i in 0 .. n-1:\n    diff = |A[i] - B[i]|          // in long\n    diff > max → max = diff\n\nreturn max",
+        "story": "Uncross every crossing assignment and you are left with sorted-to-sorted; the slowest pair sets the clock.",
+        "code": "public int assignMiceToHolesMinimumTime(int[] A, int[] B) {\n    Arrays.sort(A);\n    Arrays.sort(B);\n\n    long max = 0;\n    for (int i = 0; i < A.length; i++) {\n        long diff = Math.abs((long) A[i] - (long) B[i]);\n        if (diff > max) {\n            max = diff;\n        }\n    }\n    return (int) max;\n}"
+      }
+    ]
+  },
+  {
+    "num": 245,
+    "id": "s4-heaps-ways-to-form-max-heap",
+    "title": "Ways to form Max Heap",
+    "subTopic": "Combinatorial DP on heap shape",
+    "tags": [
+      "Heaps",
+      "DP",
+      "Combinatorics",
+      "Binomial Coefficient"
+    ],
+    "description": "Max Heap is a special kind of complete binary tree in which for every node, the value present in that node is greater than the value present in its children nodes.\nFind the number of distinct Max Heap that can be made from A distinct integers.\nIn short, you have to ensure the following properties for the max heap :\n\n- Heap has to be a complete binary tree ( A complete binary tree is a binary tree in which every level, except possibly the last, is completely filled, and all nodes are as far left as possible.)\n- Every node is greater than all its children.\n\nNOTE: If you want to know more about Heaps, please visit this link. Return your answer modulo 10^9 + 7.\n\nProblem Constraints\n1 <= A <= 100\n\nInput Format\nThe first and only argument is an integer A.\n\nOutput Format\nReturn an integer denoting the number of distinct Max Heap.\n\nExample Input\nInput 1:\nA = 4\nInput 2:\nA = 10\n\nExample Output\nOutput 1:\n3\nOutput 2:\n3360\n\nExample Explanation\nExplanation 1:\nLet us take 1, 2, 3, 4 as our 4 distinct integers\nFollowing are the 3 possible max heaps from these 4 numbers :\n     4           4                    4\n   /  \\         / \\                  / \\\n  3    2   ,   2   3     and        3   1\n /            /                    /\n1            1                     2\nExplanation 2:\nNumber of distinct heaps possible with 10 distinct integers = 3360.",
+    "sampleInput": "A = 4",
+    "sampleOutput": "3",
+    "story": "The shape is fixed and the root is forced, so the only choice left is which values go left.",
+    "plain": "The tree shape is not a choice: `A` nodes force exactly one complete binary tree, and the largest value must sit at the root. So the only freedom is which `L` of the remaining `A-1` values go into the left subtree — `C(A-1, L)` ways — with the two subtrees then counted recursively. `L` is determined purely by the shape: every node of the full left subtree above the last level, plus whatever share of the last-level slots the left side takes (the last level fills left first). Precompute binomial coefficients with Pascal's rule up to `A`, then fill `dp[2..A]` bottom-up as `C(n-1, L) * dp[L] * dp[n-1-L]`. Everything is done modulo 10^9 + 7.",
+    "howToThink": [
+      "Combinatorial DP: `f(n) = C(n-1, L) * f(L) * f(n-1-L)`, where `L` is the left subtree size forced by the complete-tree shape.",
+      "The root is always the maximum, so it contributes no choice. The only decision is the partition of the remaining values between the two subtrees — and once the sets are chosen, each side is an independent subproblem.",
+      "Derive `L` from the shape, not from `n/2`: with `h` levels fully above the last, `L = (2^(h-1) - 1) + min(lastLevelNodes, 2^(h-1))` where `lastLevelNodes = n - (2^h - 1)`.",
+      "`A <= 100`, so an O(A^2) Pascal's triangle plus a linear `dp` array is plenty — no modular inverses or factorial tables needed."
+    ],
+    "pitfalls": [
+      "`L` is not `(n-1)/2`. Because the last level fills left to right, the left subtree is often strictly larger — e.g. `n = 10` gives `L = 6`, not 4 or 5.",
+      "Multiply in `long` and reduce `% MOD` after every multiplication. `C(99, 50) * dp * dp` blows past int on the first product.",
+      "Set `dp[0] = 1` and `dp[1] = 1`. An empty subtree has exactly one arrangement, not zero — a 0 there collapses the whole product to 0.",
+      "The MOD for this problem is `10^9 + 7`, while Seats on the same day uses `10^7 + 3`. Do not carry the constant over."
+    ],
+    "solutions": [
+      {
+        "label": "Optimal — binomial DP over the fixed tree shape",
+        "complexity": {
+          "time": "O(A^2) — Pascal's triangle dominates; the dp loop itself is O(A log A)",
+          "space": "O(A^2) — the binomial table, plus O(A) for dp"
+        },
+        "plain": "Build a Pascal's triangle `nCr[0..A][0..A]` reduced modulo 10^9 + 7. Seed `dp[0] = dp[1] = 1`. For each `n` from 2 to `A`, compute the forced left subtree size `L` from the complete-tree shape, then set `dp[n] = nCr[n-1][L] * dp[L] * dp[n-1-L]` with a modulo after each multiplication. Return `dp[A]`.",
+        "approach": [
+          "Build `nCr[i][j]` for `0 <= j <= i <= A` using `nCr[i][j] = nCr[i-1][j-1] + nCr[i-1][j]`, all mod 10^9 + 7.",
+          "Seed `dp[0] = 1` and, when `A >= 1`, `dp[1] = 1`.",
+          "For each `n` from 2 to `A`, find `h` as the largest value with `2^h - 1 <= n` — that is the count of levels fully filled above the last one.",
+          "Set `lastLevelNodes = n - (2^h - 1)` and `L = (2^(h-1) - 1) + min(lastLevelNodes, 2^(h-1))`.",
+          "Set `dp[n] = nCr[n-1][L] * dp[L] % MOD * dp[n-1-L] % MOD`, then return `dp[A]`."
+        ],
+        "pseudocode": "MOD = 10^9 + 7\nnCr[i][j] built by Pascal's rule, mod MOD\n\ndp[0] = 1\ndp[1] = 1\n\nfor n in 2 .. A:\n    h             = largest h with 2^h - 1 <= n\n    lastLevel     = n - (2^h - 1)\n    leftCapacity  = 2^(h-1)\n    L             = (leftCapacity - 1) + min(lastLevel, leftCapacity)\n    dp[n] = nCr[n-1][L] * dp[L] * dp[n-1-L]   (mod MOD)\n\nreturn dp[A]",
+        "story": "Choose which values go left, then recurse — the shape decides how many, the root decides nothing.",
+        "code": "public int waysToFormMaxHeap(int A) {\n    final int MOD = 1000000007;\n\n    long[][] nCr = new long[A + 1][A + 1];\n    for (int i = 0; i <= A; i++) {\n        nCr[i][0] = 1;\n        for (int j = 1; j <= i; j++) {\n            nCr[i][j] = (nCr[i - 1][j - 1] + nCr[i - 1][j]) % MOD;\n        }\n    }\n\n    long[] dp = new long[A + 1];\n    dp[0] = 1;\n    if (A >= 1) {\n        dp[1] = 1;\n    }\n    for (int n = 2; n <= A; n++) {\n        int left = leftSubtreeNodeCount(n);\n        dp[n] = nCr[n - 1][left] * dp[left] % MOD * dp[n - 1 - left] % MOD;\n    }\n    return (int) dp[A];\n}\n\nprivate int leftSubtreeNodeCount(int n) {\n    int h = 0;\n    while ((1 << (h + 1)) - 1 <= n) {\n        h++;\n    }\n    // 2^h - 1 nodes sit fully above the last level; the last level fills left first\n    int lastLevelNodes = n - ((1 << h) - 1);\n    int leftCapacity = 1 << (h - 1);\n    return (leftCapacity - 1) + Math.min(lastLevelNodes, leftCapacity);\n}"
+      }
+    ]
+  },
+  {
+    "num": 246,
+    "id": "s4-heaps-another-coin-problem",
+    "title": "Another Coin Problem",
+    "subTopic": "Greedy base conversion",
+    "tags": [
+      "Greedy",
+      "Math",
+      "Number Base",
+      "Coin Change"
+    ],
+    "description": "The monetary system in DarkLand is really simple and systematic. The locals-only use coins. The coins come in different values. The values used are:\n\n1, 5, 25, 125, 625, 3125, 15625, ...\n\nFormally, for each K >= 0 there are coins worth 5^K.\nGiven an integer A denoting the cost of an item, find and return the smallest number of coins necessary to pay exactly the cost of the item (assuming you have a sufficient supply of coins of each of the types you will need).\n\nProblem Constraints\n1 <= A <= 2x10^9\n\nInput Format\nThe only argument given is integer A.\n\nOutput Format\nReturn the smallest number of coins necessary to pay exactly the cost of the item.\n\nExample Input\nInput 1:\nA = 47\nInput 2:\nA = 9\n\nExample Output\nOutput 1:\n7\nOutput 2:\n5\n\nExample Explanation\nExplanation 1:\nRepresentation of 7 coins will be : (1 + 1 + 5 + 5 + 5 + 5 + 25).\nExplanation 2:\nRepresentation of 5 coins will be : (1 + 1 + 1 + 1 + 5).",
+    "sampleInput": "A = 47",
+    "sampleOutput": "7",
+    "story": "Denominations are powers of 5, so the answer is just the base-5 digit sum.",
+    "plain": "The denominations are exactly the powers of 5, so repeatedly taking the largest coin that still fits is optimal. That greedy is the same operation as writing `A` in base 5: the digit at position `k` is how many coins of value `5^k` you use. So the answer is the sum of `A`'s base-5 digits. Loop while `A > 0`: add `A % 5` to the count and divide `A` by 5. That is at most `log5(2e9)` iterations, about 14.",
+    "howToThink": [
+      "Greedy equals base-5 digit sum: coins are `5^K`, so the answer is the sum of the digits of `A` written in base 5.",
+      "Greedy is safe here only because each denomination divides the next — five coins of `5^k` can always be swapped for a single `5^(k+1)`, so no digit ever needs to exceed 4.",
+      "Do not reach for coin-change DP. `A` goes to 2e9, so any O(A) table is dead on arrival, and the structure makes DP unnecessary anyway.",
+      "The loop is literally `count += A % 5; A /= 5;` until `A` hits 0 — O(log5 A) iterations, O(1) space."
+    ],
+    "pitfalls": [
+      "This greedy is valid only because the denominations are powers of a single base. It is not a general coin-change solution — arbitrary denominations need DP.",
+      "The answer is the digit SUM in base 5, not the number of base-5 digits. `A = 9` is `14` in base 5, so the answer is 5, not 2.",
+      "`A` reaches 2e9, which fits in int but sits within 7% of `Integer.MAX_VALUE`. Hold the running value in a `long` so any intermediate arithmetic stays safe."
+    ],
+    "solutions": [
+      {
+        "label": "Optimal — base-5 digit sum",
+        "complexity": {
+          "time": "O(log A) — base 5, so about 14 iterations at the constraint limit",
+          "space": "O(1)"
+        },
+        "plain": "Copy `A` into a `long` and loop while it is positive. Each iteration, `remaining % 5` is exactly how many coins of the current denomination the greedy would take, so add it to the count, then divide `remaining` by 5 to move to the next power. When `remaining` reaches 0 the accumulated count is the minimum number of coins.",
+        "approach": [
+          "Set `remaining = A` as a `long` and `coins = 0`.",
+          "While `remaining > 0`: add `remaining % 5` to `coins`.",
+          "Divide `remaining` by 5 to advance to the next power of 5.",
+          "Return `coins`."
+        ],
+        "pseudocode": "coins = 0\nremaining = A\n\nwhile remaining > 0:\n    coins    += remaining % 5     // digit = count of 5^k coins used\n    remaining = remaining / 5\n\nreturn coins",
+        "story": "Peeling off `A % 5` each round is the greedy pick and the base-5 digit at once.",
+        "code": "public int anotherCoinProblemMinimumCoins(int A) {\n    long remaining = A;\n    int coins = 0;\n    while (remaining > 0) {\n        coins += (int) (remaining % 5);   // base-5 digit = number of 5^k coins taken\n        remaining /= 5;\n    }\n    return coins;\n}"
+      }
+    ]
+  },
+  {
+    "num": 247,
+    "id": "s4-heaps-distribute-candy",
+    "title": "Distribute Candy",
+    "subTopic": "Two-pass greedy",
+    "tags": [
+      "Greedy",
+      "Arrays",
+      "Two Pass"
+    ],
+    "description": "N children are standing in a line. Each child is assigned a rating value.\nYou are giving candies to these children subjected to the following requirements:\n1. Each child must have at least one candy.\n2. Children with a higher rating get more candies than their neighbors.\nWhat is the minimum number of candies you must give?\n\nProblem Constraints\n1 <= N <= 10^5\n-10^9 <= A[i] <= 10^9\n\nInput Format\nThe first and only argument is an integer array A representing the rating of children.\n\nOutput Format\nReturn an integer representing the minimum candies to be given.\n\nExample Input\nInput 1:\nA = [1, 2]\nInput 2:\nA = [1, 5, 2, 1]\n\nExample Output\nOutput 1:\n3\nOutput 2:\n7\n\nExample Explanation\nExplanation 1:\nThe candidate with 1 rating gets 1 candy and candidate with rating 2 cannot get 1 candy as 1 is its neighbor.\nSo rating 2 candidate gets 2 candies. In total, 2 + 1 = 3 candies need to be given out.\nExplanation 2:\nCandies given = [1, 3, 2, 1]",
+    "sampleInput": "A = [1, 2]",
+    "sampleOutput": "3",
+    "story": "Every child's candy count depends only on two neighbours, so two linear repair passes beat any sorting.",
+    "plain": "Give every child 1 candy to start, which satisfies the at-least-one rule. Sweep left to right: whenever a child's rating beats the left neighbour's, set that child's candy to left neighbour's plus one. Sweep right to left: whenever a child's rating beats the right neighbour's, raise that child's candy to the max of what it already has and right neighbour's plus one. The max is essential, because a plain assignment would wipe out the left-side guarantee earned in the first pass. Sum the array for the answer.",
+    "howToThink": [
+      "Two-pass greedy on a `candy[]` array: the left-to-right pass fixes every rising run, the right-to-left pass fixes every falling run.",
+      "Each constraint is purely local (only the two neighbours), so global sorting is overkill - local repair converges.",
+      "Initialise `candy[i] = 1` for all `i` (rule 1 done). Pass 1: if `A[i] > A[i-1]` then `candy[i] = candy[i-1] + 1`.",
+      "Pass 2 backwards: if `A[i] > A[i+1]` then `candy[i] = max(candy[i], candy[i+1] + 1)` - the `max` is what preserves pass 1's work.",
+      "Equal adjacent ratings carry NO constraint - neither pass touches them, which is why a single pass with `>=` is wrong."
+    ],
+    "pitfalls": [
+      "Pass 2 must be `Math.max(candy[i], candy[i+1] + 1)`, never a plain assignment - overwriting destroys the left-neighbour guarantee from pass 1.",
+      "Equal ratings (`A[i] == A[i-1]`) impose no requirement at all; using `>=` instead of `>` inflates the total.",
+      "One pass is not enough - a descending run like `[5, 4, 3]` is only fixed by the backward sweep.",
+      "`A[i]` can be as low as -10^9, so never assume positive ratings when writing the comparisons."
+    ],
+    "solutions": [
+      {
+        "label": "Optimal - two-pass greedy",
+        "complexity": {
+          "time": "O(N)",
+          "space": "O(N) - the candy array"
+        },
+        "plain": "Allocate a candy array filled with 1. Forward pass enforces the left-neighbour constraint by chaining increments up any ascending run. Backward pass enforces the right-neighbour constraint, taking a max so it never lowers a value the forward pass already justified. Sum the array. Both constraints hold simultaneously because each pass only ever raises values.",
+        "approach": [
+          "Fill `candy[]` of length `n` with 1.",
+          "For `i` from 1 to `n - 1`: if `A[i] > A[i - 1]`, set `candy[i] = candy[i - 1] + 1`.",
+          "For `i` from `n - 2` down to 0: if `A[i] > A[i + 1]`, set `candy[i] = max(candy[i + 1] + 1, candy[i])`.",
+          "Accumulate the sum of `candy[]` and return it."
+        ],
+        "pseudocode": "candy[0..n-1] = 1\n\nfor i = 1 .. n-1:\n    A[i] > A[i-1] -> candy[i] = candy[i-1] + 1\n\nfor i = n-2 .. 0:\n    A[i] > A[i+1] -> candy[i] = max(candy[i+1] + 1, candy[i])\n\nreturn sum(candy)",
+        "story": "Satisfy the left rule in one sweep, the right rule in the other, and take the max so neither sweep undoes the other.",
+        "code": "public int distributeCandyMinimum(int[] A) {\n    int n = A.length;\n    int candies = 0;\n    int[] candy = new int[n];\n    Arrays.fill(candy, 1);\n\n    for (int i = 1; i < n; i++) {\n        if (A[i] > A[i - 1]) {\n            candy[i] = candy[i - 1] + 1;\n        }\n    }\n\n    for (int i = n - 2; i >= 0; i--) {\n        if (A[i] > A[i + 1]) {\n            candy[i] = Math.max(candy[i + 1] + 1, candy[i]); // max, not assign - keeps pass 1 intact\n        }\n    }\n\n    for (int i = 0; i < n; i++) {\n        candies += candy[i];\n    }\n    return candies;\n}"
+      }
+    ]
+  },
+  {
+    "num": 248,
+    "id": "s4-heaps-merge-k-sorted-lists",
+    "title": "Merge K Sorted Lists",
+    "subTopic": "Min-heap over list heads",
+    "tags": [
+      "Heaps",
+      "Linked List",
+      "Priority Queue",
+      "Merge"
+    ],
+    "description": "Given a list containing head pointers of N sorted linked lists.\nMerge these given sorted linked lists and return them as one sorted list.\n\nProblem Constraints\n1 <= total number of elements in given linked lists <= 100000\n\nInput Format\nThe first and only argument is a list containing N head pointers.\n\nOutput Format\nReturn a pointer to the head of the sorted linked list after merging all the given linked lists.\n\nExample Input\nInput 1:\n1 -> 10 -> 20\n4 -> 11 -> 13\n3 -> 8 -> 9\nInput 2:\n10 -> 12\n13\n5 -> 6\n\nExample Output\nOutput 1:\n1 -> 3 -> 4 -> 8 -> 9 -> 10 -> 11 -> 13 -> 20\nOutput 2:\n5 -> 6 -> 10 -> 12 ->13\n\nExample Explanation\nExplanation 1:\nThe resulting sorted Linked List formed after merging is 1 -> 3 -> 4 -> 8 -> 9 -> 10 -> 11 -> 13 -> 20.\nExplanation 2:\nThe resulting sorted Linked List formed after merging is 5 -> 6 -> 10 -> 12 ->13.",
+    "sampleInput": "[1 -> 10 -> 20, 4 -> 11 -> 13, 3 -> 8 -> 9]",
+    "sampleOutput": "1 -> 3 -> 4 -> 8 -> 9 -> 10 -> 11 -> 13 -> 20",
+    "story": "Because each list is already sorted, the next global minimum is always one of the K current heads.",
+    "plain": "Put every non-null list head into a min-heap ordered by node value. The smallest unconsumed node across all lists is always sitting at the heap top, since each list is internally sorted. Poll that node, and if it has a next, push that next into the heap so the list stays represented. Detach the polled node and append it behind a moving tail pointer anchored to a dummy head. When the heap drains, return dummy.next.",
+    "howToThink": [
+      "Min-heap over the K current heads: poll the global minimum, push its `next`, repeat until the heap is empty.",
+      "Each list is sorted, so a candidate can only be the next output if it is a current head - the heap never needs more than K entries, not N.",
+      "Seed the heap with every non-null head and compare on `val`.",
+      "Use a `dummyHead` plus a `tail` pointer so appending is uniform and there is no special case for the first node.",
+      "O(N log K) beats concatenate-then-sort at O(N log N) whenever `K` is much smaller than `N`."
+    ],
+    "pitfalls": [
+      "Skip null heads when seeding - adding `null` makes the comparator dereference it and throw on the very first sift.",
+      "Set `node.next = null` before appending; otherwise the node's stale tail gets spliced into the output and you can build a cycle.",
+      "Return `dummyHead.next`, not `dummyHead` - the sentinel is not part of the answer.",
+      "Push `node.next` BEFORE you null it out, or the rest of that list is silently lost."
+    ],
+    "solutions": [
+      {
+        "label": "Optimal - min-heap over K heads",
+        "complexity": {
+          "time": "O(N log K) - N total nodes, K lists",
+          "space": "O(K) - heap holds at most one node per list"
+        },
+        "plain": "Build a min-heap comparing nodes by value and seed it with all non-null heads. Repeatedly poll the minimum node; if it has a successor, push that successor so its list keeps a representative in the heap. Cut the polled node free with next = null, then attach it to the running tail. Every node enters and leaves the heap exactly once, giving N log K.",
+        "approach": [
+          "Create `minHeap` with comparator `(c, b) -> c.val - b.val`.",
+          "For each list in `a`: if it is not null, add it to `minHeap`.",
+          "Create `dummyHead = new ListNode(-1)` and `tail = dummyHead`.",
+          "While `minHeap` is not empty: poll `node`; if `node.next != null` add `node.next`; set `node.next = null`; set `tail.next = node`; advance `tail = tail.next`.",
+          "Return `dummyHead.next`."
+        ],
+        "pseudocode": "minHeap = priority queue ordered by node.val\n\nfor each head in lists:\n    head != null -> minHeap.add(head)\n\ndummy = node(-1); tail = dummy\n\nwhile minHeap not empty:\n    node = minHeap.poll()\n    node.next != null -> minHeap.add(node.next)\n    node.next = null\n    tail.next = node\n    tail = node\n\nreturn dummy.next",
+        "story": "Keep one candidate per list in a heap and the output writes itself, one poll at a time.",
+        "code": "public ListNode mergeKSortedLists(ArrayList<ListNode> a) {\n    PriorityQueue<ListNode> minHeap = new PriorityQueue<>((c, b) -> c.val - b.val);\n\n    for (ListNode list : a) {\n        if (list != null) {\n            minHeap.add(list);\n        }\n    }\n\n    ListNode dummyHead = new ListNode(-1);\n    ListNode tail = dummyHead;\n    while (!minHeap.isEmpty()) {\n        ListNode node = minHeap.poll();\n        if (node.next != null) {\n            minHeap.add(node.next); // push the successor BEFORE detaching\n        }\n        node.next = null; // detach, else the old tail gets spliced in\n        tail.next = node;\n        tail = tail.next;\n    }\n    return dummyHead.next;\n}"
+      }
+    ]
+  },
+  {
+    "num": 249,
+    "id": "s4-heaps-ath-largest-element",
+    "title": "Ath Largest Element",
+    "subTopic": "Fixed-size min-heap over a prefix",
+    "tags": [
+      "Heaps",
+      "Priority Queue",
+      "Arrays",
+      "Streaming"
+    ],
+    "description": "Given an integer array B of size N.\nYou need to find the Ath largest element in the subarray [1 to i], where i varies from 1 to N. In other words, find the Ath largest element in the sub-arrays [1 : 1], [1 : 2], [1 : 3], ...., [1 : N].\nNOTE: If any subarray [1 : i] has less than A elements, then the output should be -1 at the ith index.\n\nProblem Constraints\n1 <= N <= 100000\n1 <= A <= N\n1 <= B[i] <= INT_MAX\n\nInput Format\nThe first argument is an integer A.\nThe second argument is an integer array B of size N.\n\nOutput Format\nReturn an integer array C, where C[i] (1 <= i <= N) will have the Ath largest element in the subarray [1 : i].\n\nExample Input\nInput 1:\nA = 4\nB = [1 2 3 4 5 6]\nInput 2:\nA = 2\nB = [15, 20, 99, 1]\n\nExample Output\nOutput 1:\n[-1, -1, -1, 1, 2, 3]\nOutput 2:\n[-1, 15, 20, 20]\n\nExample Explanation\nExplanation 1:\nfor i <= 3 output should be -1.\nfor i = 4, Subarray [1:4] has 4 elements 1, 2, 3 and 4. So, 4th maximum element is 1.\nfor i = 5, Subarray [1:5] has 5 elements 1, 2, 3, 4 and 5. So, 4th maximum element is 2.\nfor i = 6, Subarray [1:6] has 6 elements 1, 2, 3, 4, 5 and 6. So, 4th maximum element is 3.\nSo, output array is [-1, -1, -1, 1, 2, 3].\n\nExplanation 2:\nfor i <= 1 output should be -1.\nfor i = 2 , Subarray [1:2] has 2 elements 15 and 20. So, 2nd maximum element is 15.\nfor i = 3 , Subarray [1:3] has 3 elements 15, 20 and 99. So, 2nd maximum element is 20.\nfor i = 4 , Subarray [1:4] has 4 elements 15, 20, 99 and 1. So, 2nd maximum element is 20.\nSo, output array is [-1, 15, 20, 20].",
+    "sampleInput": "A = 4\nB = [1 2 3 4 5 6]",
+    "sampleOutput": "[-1, -1, -1, 1, 2, 3]",
+    "story": "A min-heap capped at size A holds exactly the top A seen so far, and its top is the Ath largest.",
+    "plain": "Prefill the answer array with -1 so any prefix shorter than A reports -1 for free. Walk the array once, pushing each element into a min-heap. If the heap grows past A entries, poll the smallest, which discards the element that can no longer be in the top A. Once you are at index A-1 or beyond, the heap holds exactly the A largest values of the prefix and its minimum, the heap top, is the Ath largest. Write that peek into the answer at the current index.",
+    "howToThink": [
+      "Fixed-size min-heap of size `A`: the heap top IS the `A`th largest element seen so far.",
+      "This is a prefix query per index, so maintain state incrementally - re-sorting `[1..i]` at every step is the trap.",
+      "Push `B[i]`, then if `size > A` poll the smallest; the heap now holds the top `A` values and its minimum is the answer.",
+      "A max-heap would be wrong for this: you would have to pop `A - 1` elements per query. The min-heap makes the answer an O(1) peek.",
+      "Indices below `A - 1` have fewer than `A` elements, so seed the result with `Arrays.fill(res, -1)` and only overwrite from `i >= A - 1`."
+    ],
+    "pitfalls": [
+      "It is a MIN-heap even though it tracks the largest elements - naming it `maxHeap` is the classic confusion; its top is the smallest of the top `A`.",
+      "Guard the write with `i >= A - 1` on 0-indexed loops, not `i >= A` - at `i = A - 1` you already have exactly `A` elements.",
+      "Poll AFTER adding, not before, or the current element never gets a chance to enter the top `A`.",
+      "Prefill `res` with `-1`; a default zero-filled array silently reports 0 for the short prefixes."
+    ],
+    "solutions": [
+      {
+        "label": "Optimal - size-A min-heap",
+        "complexity": {
+          "time": "O(N log A)",
+          "space": "O(A) - heap; plus O(N) for the output array"
+        },
+        "plain": "Keep a min-heap bounded at A elements. Add the current value, then evict the heap minimum whenever the size exceeds A, which keeps precisely the A largest values of the prefix. From index A-1 onward the top of that heap is the Ath largest, so peek and record it. Earlier indices keep their prefilled -1.",
+        "approach": [
+          "Create `minHeap` (natural order) and `res = new int[n]` filled with `-1`.",
+          "For `i` from 0 to `n - 1`: add `B[i]` to `minHeap`.",
+          "If `i >= A - 1`: if `minHeap.size() > A` poll once, then set `res[i] = minHeap.peek()`.",
+          "Return `res`."
+        ],
+        "pseudocode": "minHeap = min priority queue\nres[0..n-1] = -1\n\nfor i = 0 .. n-1:\n    minHeap.add(B[i])\n    i >= A-1 ->\n        minHeap.size() > A -> minHeap.poll()\n        res[i] = minHeap.peek()\n\nreturn res",
+        "story": "Cap the heap at A and its floor becomes the answer.",
+        "code": "public int[] aThLargestElement(int A, int[] B) {\n    PriorityQueue<Integer> minHeap = new PriorityQueue<>(); // min-heap, though it tracks the LARGEST A\n    int n = B.length;\n    int[] res = new int[n];\n    Arrays.fill(res, -1);\n\n    for (int i = 0; i < n; i++) {\n        minHeap.add(B[i]);\n        if (i >= A - 1) {\n            if (minHeap.size() > A) {\n                minHeap.poll();\n            }\n            int min = minHeap.peek(); // smallest of the top A = Ath largest\n            res[i] = min;\n        }\n    }\n    return res;\n}"
+      }
+    ]
+  },
+  {
+    "num": 250,
+    "id": "s4-heaps-flipkart-inventory-management",
+    "title": "Flipkart's Challenge in Effective Inventory Management",
+    "subTopic": "Deadline scheduling with min-heap",
+    "tags": [
+      "Heaps",
+      "Greedy",
+      "Priority Queue",
+      "Scheduling"
+    ],
+    "description": "In the recent expansion into grocery delivery, Flipkart faces a crucial challenge in effective inventory management. Each grocery item on the platform carries its own expiration date and profit margin, represented by two arrays, A and B of size N. A[i] denotes the time left before expiration date for the ith item, and B[i] denotes profit margin for the ith item. To mitigate potential losses due to expiring items, Flipkart is seeking a strategic solution.\n\nThe objective is to identify a method to strategically buy certain items, ensuring they are sold before their expiration date, thereby maximizing overall profit. Can you assist Flipkart in developing an innovative approach to optimize their grocery inventory and enhance profitability?\nYour task is to find the maximum profit one can earn by buying groceries considering that you can only buy one grocery item at a time.\nNOTE:\n\nYou can assume that it takes 1 minute to buy a grocery item, so you can only buy the ith grocery item when the current time <= A[i] - 1.\nYou can start buying from day = 0.\nReturn your answer modulo 10^9 + 7.\n\nProblem Constraints\n1 <= N <= 10^5\n1 <= A[i] <= 10^9\n0 <= B[i] <= 10^9\n\nInput Format\nThe first argument is an integer array A represents the deadline for buying the grocery items.\nThe second argument is an integer array B represents the profit obtained after buying the grocery items.\n\nOutput Format\nReturn an integer denoting the maximum profit you can earn.\n\nExample Input\nInput 1:\nA = [1, 3, 2, 3, 3]\nB = [5, 6, 1, 3, 9]\nInput 2:\nA = [3, 8, 7, 5]\nB = [3, 1, 7, 19]\n\nExample Output\nOutput 1:\n20\nOutput 2:\n30\n\nExample Explanation\nExplanation 1:\nAt time 0, buy item with profit 5.\nAt time 1, buy item with profit 6.\nAt time 2, buy item with profit 9.\nAt time = 3 or after , you can't buy any item, as there is no item with deadline >= 4.\nSo, total profit that one can earn is 20.",
+    "sampleInput": "A = [1, 3, 2, 3, 3]\nB = [5, 6, 1, 3, 9]",
+    "sampleOutput": "20",
+    "story": "Classic job sequencing with deadlines: process in deadline order and let a min-heap evict the least profitable item whenever the schedule overflows.",
+    "plain": "Pair each item with its deadline and profit, then sort ascending by deadline. Sweep the sorted items, pushing each profit into a min-heap that represents your currently chosen schedule. Because buying takes one minute from day zero, any item set that fits deadline d can have at most d members, so whenever the heap size exceeds the current item's deadline, poll the smallest profit out. That eviction always drops the least valuable member of an infeasible schedule. At the end the heap holds the optimal chosen set; drain and sum it with a long accumulator modulo 1e9+7.",
+    "howToThink": [
+      "Job sequencing with deadlines, min-heap variant: sort by deadline ascending, greedily keep the most profitable feasible set whose size never exceeds the deadline.",
+      "Each purchase costs 1 minute starting at day 0, so by deadline `A[i]` at most `A[i]` items can have been bought - heap size is exactly the feasibility bound.",
+      "Process items in increasing `expiry`. Push `profit`; if `minHeap.size() > item.expiry`, poll the smallest - that discards the least valuable item from an over-full schedule.",
+      "Invariant: after processing all items of deadline `d`, the heap holds the highest-profit schedulable subset of size at most `d`; adding later items can only extend it.",
+      "Drain the heap and sum modulo 10^9 + 7."
+    ],
+    "pitfalls": [
+      "Sort by deadline ascending, NOT by profit descending - the profit-first variant needs a DSU or slot search; the heap version requires deadline order.",
+      "The eviction test is strict: `minHeap.size() > item.expiry`. At exactly `expiry` items the schedule is still feasible, so popping there loses profit.",
+      "Profits reach 10^9 and N reaches 10^5, so the running sum overflows int - accumulate in `long`, apply `% MOD`, then cast back on return.",
+      "Apply the modulo only to the accumulated sum, never to individual profits before they enter the heap - modding first changes which items the heap keeps."
+    ],
+    "solutions": [
+      {
+        "label": "Optimal - sort by deadline + min-heap eviction",
+        "complexity": {
+          "time": "O(N log N) - sort dominates, heap ops are O(N log N)",
+          "space": "O(N) - item array and heap"
+        },
+        "plain": "Wrap each (deadline, profit) pair into an Item and sort by deadline ascending. Walk the sorted items adding every profit to a min-heap. If the heap now holds more items than the current deadline permits, poll off the smallest profit, keeping the best feasible subset at all times. Finally drain the heap into a long accumulator, taking the modulo at each step, and cast back to int.",
+        "approach": [
+          "Build `Item[] items` from `A[i]` (expiry) and `B[i]` (profit).",
+          "Sort `items` ascending by `expiry` using `Comparator.comparingInt(item -> item.expiry)`.",
+          "For each `item` in order: add `item.profit` to `minHeap`; if `minHeap.size() > item.expiry`, poll once.",
+          "Drain `minHeap` into `long maxProfit`, taking `% MOD` on each addition.",
+          "Return `(int) maxProfit`."
+        ],
+        "pseudocode": "items = [(A[i], B[i]) for all i]\nsort items by expiry ascending\nminHeap = min priority queue on profit\n\nfor item in items:\n    minHeap.add(item.profit)\n    minHeap.size() > item.expiry -> minHeap.poll()\n\nmaxProfit = 0 (long)\nwhile minHeap not empty:\n    maxProfit = (maxProfit + minHeap.poll()) % MOD\n\nreturn (int) maxProfit",
+        "story": "Admit everything in deadline order, then let the heap spit out the weakest whenever the schedule cannot hold them all.",
+        "code": "public int flipkartInventoryManagement(int[] A, int[] B) {\n    long MOD = 1_000_000_007L;\n    PriorityQueue<Integer> minHeap = new PriorityQueue<>();\n    int n = A.length;\n    Item[] items = new Item[n];\n    for (int i = 0; i < n; i++) {\n        items[i] = new Item(A[i], B[i]);\n    }\n    Arrays.sort(items, Comparator.comparingInt(item -> item.expiry));\n\n    for (Item item : items) {\n        minHeap.add(item.profit);\n        if (minHeap.size() > item.expiry) { // strict: size == expiry is still feasible\n            minHeap.poll();\n        }\n    }\n\n    long maxProfit = 0;\n    while (!minHeap.isEmpty()) {\n        maxProfit = (maxProfit + minHeap.poll()) % MOD;\n    }\n\n    return (int) maxProfit;\n}\n\nprivate static class Item {\n    int expiry;\n    int profit;\n\n    Item(int expiry, int profit) {\n        this.expiry = expiry;\n        this.profit = profit;\n    }\n}"
+      }
+    ]
+  },
+  {
+    "num": 251,
+    "id": "s4-heaps-product-of-3",
+    "title": "Product of 3",
+    "subTopic": "Running top-3 with min-heap",
+    "tags": [
+      "Heaps",
+      "Priority Queue",
+      "Arrays",
+      "Streaming"
+    ],
+    "description": "Given an integer array A of size N.\nYou have to find the product of the three largest integers in array A from range 1 to i, where i goes from 1 to N.\nReturn an array B where B[i] is the product of the largest 3 integers in range 1 to i in array A. If i < 3, then the integer at index i in B should be -1.\n\nProblem Constraints\n1 <= N <= 10^5\n0 <= A[i] <= 10^3\n\nInput Format\nFirst and only argument is an integer array A.\n\nOutput Format\nReturn an integer array B. B[i] denotes the product of the largest 3 integers in range 1 to i in array A.\n\nExample Input\nInput 1:\nA = [1, 2, 3, 4, 5]\nInput 2:\nA = [10, 2, 13, 4]\n\nExample Output\nOutput 1:\n[-1, -1, 6, 24, 60]\nOutput 2:\n[-1, -1, 260, 520]\n\nExample Explanation\nExplanation 1:\nFor i = 1, ans = -1\nFor i = 2, ans = -1\nFor i = 3, ans = 1 * 2 * 3 = 6\nFor i = 4, ans = 2 * 3 * 4 = 24\nFor i = 5, ans = 3 * 4 * 5 = 60\n\nSo, the output is [-1, -1, 6, 24, 60].\n\nExplanation 2:\nFor i = 1, ans = -1\nFor i = 2, ans = -1\nFor i = 3, ans = 10 * 2 * 13 = 260\nFor i = 4, ans = 10 * 13 * 4 = 520\n\nSo, the output is [-1, -1, 260, 520].",
+    "sampleInput": "A = [1, 2, 3, 4, 5]",
+    "sampleOutput": "[-1, -1, 6, 24, 60]",
+    "story": "Same prefix-query shape as the Ath largest problem, with the heap capped at 3 and the whole heap multiplied out.",
+    "plain": "Maintain a min-heap that never holds more than three elements. For each index push the current value, and if the heap exceeds three entries poll the smallest, so the heap always contains the three largest values of the prefix. If fewer than three elements have been seen, write -1 at that index. Otherwise poll all three, multiply them, and push all three back so the heap is intact for the next index. Because the heap is fixed at size three, every step is constant work.",
+    "howToThink": [
+      "Fixed-size min-heap of size 3 holding the three largest so far; the answer at `i` is the product of everything in it.",
+      "Prefix query again - push `A[i]`, drop the heap minimum whenever `size > 3`, exactly the Ath-largest pattern with `A = 3`.",
+      "Fewer than 3 elements seen means the answer is `-1` at that index.",
+      "Heap is capped at 3, so each step is O(1) - the whole scan is O(N), not O(N log N).",
+      "Equivalent without a heap: track `max1 >= max2 >= max3` in three scalars and shift on each insert."
+    ],
+    "pitfalls": [
+      "`B[i] = -1` for `i < 2` on 0-indexed loops - do not compute a product from a partially filled heap.",
+      "If you poll all three to multiply, you must push them back, else the heap is empty on the next iteration and every later answer is wrong.",
+      "`A[i] <= 10^3` caps the product at 10^9, which just fits `int` - widen the constraint at all and this needs `long`.",
+      "Duplicates count as separate elements; a `TreeSet`-based top-3 would silently collapse them, so the heap is required."
+    ],
+    "solutions": [
+      {
+        "label": "Optimal - size-3 min-heap",
+        "complexity": {
+          "time": "O(N) - heap capped at 3, so each op is constant",
+          "space": "O(1) auxiliary heap; plus O(N) for the output array"
+        },
+        "plain": "Scan left to right pushing each element into a min-heap and evicting the minimum whenever the size passes three. Until three elements have arrived, record -1. From then on the heap holds exactly the top three of the prefix, so poll all three, take the product, then push them back to restore the heap before moving on.",
+        "approach": [
+          "Create `minHeap` (natural order) and `B = new int[n]`.",
+          "For `i` from 0 to `n - 1`: add `A[i]` to `minHeap`; if `minHeap.size() > 3` poll once.",
+          "If `minHeap.size() < 3`: set `B[i] = -1` and continue.",
+          "Else poll three values `first`, `second`, `third`; set `B[i] = first * second * third`; push all three back.",
+          "Return `B`."
+        ],
+        "pseudocode": "minHeap = min priority queue\n\nfor i = 0 .. n-1:\n    minHeap.add(A[i])\n    minHeap.size() > 3 -> minHeap.poll()\n\n    minHeap.size() < 3 -> B[i] = -1\n    else ->\n        a, b, c = poll, poll, poll\n        B[i] = a * b * c\n        push a, b, c back\n\nreturn B",
+        "story": "Cap the heap at three and the answer is just its contents multiplied together.",
+        "code": "public int[] productOfThreeLargest(int[] A) {\n    int n = A.length;\n    int[] B = new int[n];\n    PriorityQueue<Integer> minHeap = new PriorityQueue<>();\n\n    for (int i = 0; i < n; i++) {\n        minHeap.add(A[i]);\n        if (minHeap.size() > 3) {\n            minHeap.poll();\n        }\n\n        if (minHeap.size() < 3) {\n            B[i] = -1;\n        } else {\n            int first = minHeap.poll();\n            int second = minHeap.poll();\n            int third = minHeap.poll();\n            B[i] = first * second * third;\n            minHeap.add(first); // push back, else the heap empties out\n            minHeap.add(second);\n            minHeap.add(third);\n        }\n    }\n    return B;\n}"
+      }
+    ]
+  },
+  {
+    "num": 252,
+    "id": "s4-heaps-kth-smallest-element-in-a-sorted-matrix",
+    "title": "Kth Smallest Element in a Sorted Matrix",
+    "subTopic": "Min-heap over the row frontier",
+    "tags": [
+      "Heaps",
+      "Priority Queue",
+      "Matrix",
+      "Binary Search"
+    ],
+    "description": "Given a sorted matrix of integers A of size N x M and an integer B.\nEach of the rows and columns of matrix A is sorted in ascending order, find the Bth smallest element in the matrix.\nNOTE: Return The Bth smallest element in the sorted order, not the Bth distinct element.\n\nProblem Constraints\n1 <= N, M <= 500\n1 <= A[i] <= 10^9\n1 <= B <= N * M\n\nInput Format\nThe first argument given is the integer matrix A.\nThe second argument given is an integer B.\n\nOutput Format\nReturn the B-th smallest element in the matrix.\n\nExample Input\nInput 1:\nA = [ [9, 11, 15],\n      [10, 15, 17] ]\nB = 6\nInput 2:\nA = [  [5, 9, 11],\n       [9, 11, 13],\n       [10, 12, 15],\n       [13, 14, 16],\n       [16, 20, 21] ]\nB = 12\n\nExample Output\nOutput 1:\n17\nOutput 2:\n16\n\nExample Explanation\nExplanation 1:\n6th smallest element in the sorted matrix is 17.\nExplanation 2:\n12th smallest element in the sorted matrix is 16.",
+    "sampleInput": "A = [ [9, 11, 15], [10, 15, 17] ]\nB = 6",
+    "sampleOutput": "17",
+    "story": "Treat the N sorted rows as N sorted lists and run a K-way merge, stopping after B pops.",
+    "plain": "Every row is sorted, so this is a K-way merge over N lists where you only need the first B outputs. Seed a min-heap with the first cell of each row, storing value plus its row and column so you know how to advance. Pop the smallest B times; on each pop, push the cell immediately to the right of the popped one if it exists. The Bth popped value is the answer. If B is much larger than N, binary search the answer value instead and count cells at most mid with a staircase walk, which is independent of B.",
+    "howToThink": [
+      "Min-heap over the row frontier: seed with each row's first cell, pop `B` times, pushing the popped cell's right neighbour each time.",
+      "Rows are sorted, so the next unseen candidate in a row is always the cell right of the last one popped from it - only `N` candidates are ever live.",
+      "Seed only `min(N, B)` rows; you can never need more rows than the number of pops you will make.",
+      "Store `{value, row, col}` in the heap so the pop knows where to advance.",
+      "When `B` is large, binary search the ANSWER value over `[A[0][0], A[N-1][M-1]]` and count cells `<= mid` in O(N + M) with a bottom-left staircase - O((N + M) log(maxA)), independent of `B`."
+    ],
+    "pitfalls": [
+      "Do not push both the right AND the down neighbour - with all rows pre-seeded that double-inserts cells and corrupts the pop count. Right-only covers the matrix exactly once.",
+      "Return the `B`th popped value including duplicates; the statement explicitly says sorted order, not the `B`th distinct element.",
+      "Use `Integer.compare(x[0], y[0])` in the comparator - `x[0] - y[0]` with values near 10^9 is an overflow class worth never risking.",
+      "In the binary search variant return `low`, the smallest value whose count reaches `B`, not `mid` - `mid` is often not an element of the matrix at all."
+    ],
+    "solutions": [
+      {
+        "label": "Optimal - min-heap K-way merge over rows",
+        "complexity": {
+          "time": "O(min(N, B) + B log N)",
+          "space": "O(min(N, B)) - heap holds one frontier cell per row"
+        },
+        "plain": "Seed a min-heap with the first cell of each row as a triple of value, row and column. Pop the global minimum B times; each pop is the next element in overall sorted order because every row's remaining elements are at least its frontier cell. After each pop, push the cell one column to the right in that same row if one exists. The value of the Bth pop is the answer.",
+        "approach": [
+          "Create `minHeap` over `int[]{value, row, col}` compared on value.",
+          "For `i` from 0 to `min(n, B) - 1`: add `{A[i][0], i, 0}`.",
+          "Repeat `B` times: poll `curr`, record `ans = curr[0]`; if `curr[2] + 1 < m`, add `{A[curr[1]][curr[2] + 1], curr[1], curr[2] + 1}`.",
+          "Return `ans`."
+        ],
+        "pseudocode": "minHeap = min PQ on value, entries {value, row, col}\n\nfor i = 0 .. min(n, B)-1:\n    minHeap.add({A[i][0], i, 0})\n\nans = -1\nrepeat B times:\n    {val, row, col} = minHeap.poll()\n    ans = val\n    col + 1 < m -> minHeap.add({A[row][col+1], row, col+1})\n\nreturn ans",
+        "story": "N sorted rows, one live candidate each, B pops off the top.",
+        "code": "public int kthSmallestElementInSortedMatrix(int[][] A, int B) {\n    int n = A.length;\n    int m = A[0].length;\n    PriorityQueue<int[]> minHeap = new PriorityQueue<>((x, y) -> Integer.compare(x[0], y[0]));\n\n    for (int i = 0; i < n && i < B; i++) {\n        minHeap.add(new int[]{A[i][0], i, 0});\n    }\n\n    int ans = -1;\n    for (int count = 0; count < B; count++) {\n        int[] curr = minHeap.poll();\n        ans = curr[0];\n        int row = curr[1];\n        int col = curr[2];\n        if (col + 1 < m) {\n            minHeap.add(new int[]{A[row][col + 1], row, col + 1}); // right only - rows are already seeded\n        }\n    }\n    return ans;\n}"
+      },
+      {
+        "label": "Alternative - binary search on the answer value",
+        "complexity": {
+          "time": "O((N + M) log(maxA - minA))",
+          "space": "O(1)"
+        },
+        "plain": "Instead of enumerating elements, binary search the value itself between the matrix minimum at top-left and maximum at bottom-right. For a candidate mid, count how many cells are at most mid by walking a staircase from the bottom-left corner: if the current cell fits, the whole column prefix above it fits too, so add row+1 and step right; otherwise step up. Shrink to the left half when the count reaches B, else to the right. The loop converges on the smallest value whose count reaches B, which is necessarily a real matrix element.",
+        "approach": [
+          "Set `low = A[0][0]`, `high = A[n - 1][m - 1]`.",
+          "While `low < high`: `int mid = low + (high - low) / 2;`.",
+          "If `countLessThanOrEqual(A, mid) >= B` set `high = mid`, else set `low = mid + 1`.",
+          "Return `low`.",
+          "Counting: start at `row = n - 1, col = 0`; if `A[row][col] <= target` add `row + 1` and `col++`, else `row--`."
+        ],
+        "pseudocode": "low = A[0][0]; high = A[n-1][m-1]\n\nwhile low < high:\n    mid = low + (high - low) / 2\n    count(A, mid) >= B -> high = mid\n    else -> low = mid + 1\n\nreturn low\n\ncount(A, target):\n    row = n-1; col = 0; c = 0\n    while row >= 0 and col < m:\n        A[row][col] <= target -> c += row + 1; col++\n        else -> row--\n    return c",
+        "story": "Search over values, not positions - the count of cells at most x is monotonic in x.",
+        "code": "public int kthSmallestElementBinarySearchOnValue(int[][] A, int B) {\n    int n = A.length;\n    int m = A[0].length;\n    int low = A[0][0];\n    int high = A[n - 1][m - 1];\n\n    while (low < high) {\n        int mid = low + (high - low) / 2;\n        if (countLessThanOrEqual(A, mid) >= B) {\n            high = mid;\n        } else {\n            low = mid + 1;\n        }\n    }\n    return low; // smallest value whose count reaches B - always a real element\n}\n\nprivate int countLessThanOrEqual(int[][] A, int target) {\n    int n = A.length;\n    int m = A[0].length;\n    int count = 0;\n    int row = n - 1;\n    int col = 0;\n    while (row >= 0 && col < m) {\n        if (A[row][col] <= target) {\n            count += row + 1; // column is sorted, so everything above also fits\n            col++;\n        } else {\n            row--;\n        }\n    }\n    return count;\n}"
+      }
+    ]
+  },
+  {
+    "num": 253,
+    "id": "s4-heaps-k-places-apart",
+    "title": "K Places Apart",
+    "subTopic": "Min-heap of size B+1",
+    "tags": [
+      "Heaps",
+      "Priority Queue",
+      "Sorting",
+      "Sliding Window"
+    ],
+    "description": "N people having different priorities are standing in a queue.\nThe queue follows the property that each person is standing at most B places away from its position in the sorted queue.\nYour task is to sort the queue in the increasing order of priorities.\nNOTE:\n\nNo two persons can have the same priority.\nUse the property of the queue to sort the queue with complexity O(NlogB).\n\nProblem Constraints\n1 <= N <= 100000\n0 <= B <= N\n\nInput Format\nThe first argument is an integer array A representing the priorities and initial order of N persons.\nThe second argument is an integer B.\n\nOutput Format\nReturn an integer array representing the sorted queue.\n\nExample Input\nInput 1:\nA = [1, 40, 2, 3]\nB = 2\nInput 2:\nA = [2, 1, 17, 10, 21, 95]\nB = 1\n\nExample Output\nOutput 1:\n[1, 2, 3, 40]\nOutput 2:\n[1, 2, 10, 17, 21, 95]\n\nExample Explanation\nExplanation 1:\nGiven array A = [1, 40, 2, 3]\nAfter sorting, A = [1, 2, 3, 40].\nWe can see that difference between initial position of elements amd the final position <= 2.\nExplanation 2:\nAfter sorting, the array becomes [1, 2, 10, 17, 21, 95].",
+    "sampleInput": "A = [1, 40, 2, 3], B = 2",
+    "sampleOutput": "[1, 2, 3, 40]",
+    "story": "Sort a nearly-sorted array where every element is at most B places off.",
+    "plain": "Because every element sits at most `B` places from its sorted position, the true smallest remaining element is always inside the next `B + 1` unprocessed slots. Push `A[0..B]` into a min-heap. Then for each further index `i`, poll the heap (that value is the next one in sorted order) and push `A[i]`, keeping the heap size at `B + 1`. When the array runs out, drain the heap in order. The heap never grows past `B + 1`, so each operation costs log B instead of log N.",
+    "howToThink": [
+      "Min-heap of fixed size `B + 1`: the next sorted element is always the minimum of the next `B + 1` candidates.",
+      "Read the guarantee literally — an element destined for output slot `j` started somewhere in `[j - B, j + B]`, so by the time you have consumed `j + B` inputs its value is already in the window.",
+      "That window is exactly `B + 1` wide, so a heap capped at `B + 1` is enough; a full sort would be O(N log N) and ignores the hint.",
+      "Seed with `A[0..B]`, then alternate poll-then-push for `i` from `B + 1`, and drain whatever is left."
+    ],
+    "pitfalls": [
+      "Seeding only `B` elements instead of `B + 1` — the window is inclusive on both ends, so the loop is `i <= places`.",
+      "Forgetting the `i < A.length` guard in the seed loop: `B` can equal `N`, so `B + 1` overruns the array.",
+      "Dropping the final drain loop — after the input is exhausted the heap still holds `B + 1` values that belong in the output.",
+      "Pushing first and then polling inside the main loop, which lets the heap grow to `B + 2` and can emit a value too early."
+    ],
+    "solutions": [
+      {
+        "label": "Optimal — min-heap of size B+1",
+        "complexity": {
+          "time": "O(N log B)",
+          "space": "O(B) — heap, excluding the output array"
+        },
+        "plain": "Fill a min-heap with the first `B + 1` values. For each remaining index, poll the heap into the result and push the new value, which keeps the heap at `B + 1` entries. Finally drain the heap into the tail of the result. Every poll emits the smallest value that could legally appear next.",
+        "approach": [
+          "Create `minHeap` and a result array `res` of length N, with write cursor `idx = 0`.",
+          "Push `A[i]` for `i` from 0 to `places`, guarding `i < A.length`.",
+          "For `i` from `places + 1` to N-1: `res[idx++] = minHeap.poll()` then `minHeap.add(A[i])`.",
+          "While the heap is non-empty, `res[idx++] = minHeap.poll()`.",
+          "Return `res`."
+        ],
+        "pseudocode": "minHeap = empty min-heap\nfor i in 0..min(places, N-1):\n    push A[i]\n\nidx = 0\nfor i in places+1 .. N-1:\n    res[idx++] = poll()         // smallest legal next value\n    push A[i]                   // heap stays at size places+1\n\nwhile heap not empty:\n    res[idx++] = poll()\nreturn res",
+        "story": "A window of B+1 candidates always contains the next element in sorted order.",
+        "code": "public int[] kPlacesApart(int[] A, int places) {\n    PriorityQueue<Integer> minHeap = new PriorityQueue<>();\n    int[] res = new int[A.length];\n\n    for (int i = 0; i <= places && i < A.length; i++) { // B can equal N, guard the bound\n        minHeap.add(A[i]);\n    }\n\n    int idx = 0;\n    for (int i = places + 1; i < A.length; i++) {\n        res[idx++] = minHeap.poll();\n        minHeap.add(A[i]);\n    }\n\n    while (!minHeap.isEmpty()) {\n        res[idx++] = minHeap.poll();\n    }\n    return res;\n}"
+      }
+    ]
+  },
+  {
+    "num": 254,
+    "id": "s4-heaps-meeting-rooms-ii",
+    "title": "Meeting Rooms II",
+    "subTopic": "Sort by start + min-heap of end times",
+    "tags": [
+      "Heaps",
+      "Priority Queue",
+      "Intervals",
+      "Greedy",
+      "Sorting"
+    ],
+    "description": "You are given an array B of meeting time intervals where each interval is represented as [start, end] (with start < end). You need to find the minimum number of conference rooms required to host all the meetings.\n\nProblem Constraints\nA == B.length\n1 <= B.length <= 10^4\n0 <= start < end <= 10^6\n\nInput Format\nFirst Argument is an Integer A, denoting the number of meetings.\nSecond Argument is a 2-D integer Array B of Size Ax2, representing the start and end timing of the meetings.\n\nOutput Format\nReturn a single integer representing the minimum number of conference rooms required.\n\nExample Input\nInput 1:\nA = 3\nB = [ [0, 30],\n      [5, 10],\n      [15, 20] ]\nInput 2:\nA = 1\nB = [ [0, 1] ]\n\nExample Output\nOutput 1:\n2\nOutput 2:\n1\n\nExample Explanation\nExplanation 1:\nWe need two rooms:\n\nRoom 1: [0, 30]\n\nRoom 2: [5, 10], [15, 20]\nExplanation 2:\nSince there is only one meeting, we need one room",
+    "sampleInput": "A = 3, B = [[0, 30], [5, 10], [15, 20]]",
+    "sampleOutput": "2",
+    "story": "Minimum rooms = maximum number of meetings overlapping at any instant.",
+    "plain": "Sort the meetings by start time and sweep them in that order, keeping a min-heap of the end times of currently occupied rooms. For each meeting, push its end time, then look at the heap minimum: if the earliest-finishing room is already free at this meeting's start, poll it — that room is being reused, so no new room is needed. Otherwise every room is still busy and you open a new one. The count of new rooms opened is the answer, which equals the peak concurrent overlap.",
+    "howToThink": [
+      "Sort by start, min-heap of end times: the room that frees up first is the only one worth checking.",
+      "The answer is the maximum number of intervals alive at the same instant, so process events in chronological start order.",
+      "When meeting `i` begins, any room whose end time is `<= currentStart` has been vacated. Only the smallest end time can qualify, so `peek` is enough — no scan of all rooms.",
+      "Reusing a room is a poll-then-push; failing to reuse is an increment of `meetingRooms`. The heap size is the live room count."
+    ],
+    "pitfalls": [
+      "Sorting by end time instead of start — the sweep must follow the order meetings actually begin.",
+      "Sorting the start array and the end array independently and then pairing them is a different (still valid) two-pointer trick; mixing it half-way with the heap version silently breaks the pairing.",
+      "Getting the boundary wrong: `start < end` is guaranteed, so a room ending exactly at `currentStart` IS reusable — the comparison must be `currentStart >= minHeap.peek()`, not `>`.",
+      "Comparing against an arbitrary heap element instead of `peek()`; only the minimum end time can have expired."
+    ],
+    "solutions": [
+      {
+        "label": "Optimal — sort by start, min-heap of end times",
+        "complexity": {
+          "time": "O(N log N) — sort dominates, N heap ops at log N",
+          "space": "O(N) — heap plus the interval array"
+        },
+        "plain": "Build interval objects and sort them by start time. Sweep them in order maintaining a min-heap of end times for the rooms in use. Push the current end, then if the earliest end in the heap is at or before the current start, poll it to reuse that room; otherwise bump the room counter. The counter is the minimum number of rooms.",
+        "approach": [
+          "Wrap each row of `meetingInfo` into a `MeetingTime(start, end)`.",
+          "Sort the array by `start` ascending.",
+          "Create an empty min-heap of end times and `meetingRooms = 0`.",
+          "For each meeting in sorted order: add `currentEnd` to the heap.",
+          "If `currentStart >= minHeap.peek()`, poll — an existing room freed up and is reused.",
+          "Else increment `meetingRooms` — every room is still occupied, open a new one.",
+          "Return `meetingRooms`."
+        ],
+        "pseudocode": "sort meetings by start ascending\nminHeap = empty min-heap of end times\nmeetingRooms = 0\n\nfor each (currentStart, currentEnd) in sorted order:\n    push currentEnd\n    if currentStart >= peek():      // earliest room already vacated\n        poll()                      // reuse it, no new room\n    else:\n        meetingRooms++              // all rooms busy, open one\n\nreturn meetingRooms",
+        "story": "Only the room that frees up earliest can ever be reused, so a min-heap on end times is all the state you need.",
+        "code": "public int minimumMeetingRoomsRequired(int numberOfMeetings, int[][] meetingInfo) {\n    MeetingTime[] meeting = new MeetingTime[numberOfMeetings];\n    for (int i = 0; i < numberOfMeetings; i++) {\n        meeting[i] = new MeetingTime(meetingInfo[i][0], meetingInfo[i][1]);\n    }\n\n    Arrays.sort(meeting, Comparator.comparingInt(x -> x.start));\n\n    PriorityQueue<Integer> minHeap = new PriorityQueue<>();\n\n    int meetingRooms = 0;\n    for (int i = 0; i < numberOfMeetings; i++) {\n        int currentStart = meeting[i].start;\n        int currentEnd = meeting[i].end;\n        minHeap.add(currentEnd);\n\n        if (!minHeap.isEmpty() && currentStart >= minHeap.peek()) {\n            minHeap.poll(); // earliest-ending room is free, reuse it\n        } else {\n            meetingRooms++;\n        }\n    }\n    return meetingRooms;\n}\n\nprivate static class MeetingTime {\n    int start;\n    int end;\n\n    MeetingTime(int start, int end) {\n        this.start = start;\n        this.end = end;\n    }\n}"
+      }
+    ]
+  }
+]

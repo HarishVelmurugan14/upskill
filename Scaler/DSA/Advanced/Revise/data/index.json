@@ -1,5 +1,5 @@
 {
-  "nextNum": 235,
+  "nextNum": 307,
   "topics": [
     {
       "name": "Arrays",
@@ -114,6 +114,30 @@
       "section": "Section 3",
       "file": "s3-hashing-2.json",
       "notesFile": "s3-hashing-2.notes.json"
+    },
+    {
+      "name": "Heaps & Greedy",
+      "section": "Section 4",
+      "file": "s4-heaps.json",
+      "notesFile": "s4-heaps.notes.json"
+    },
+    {
+      "name": "Dynamic Programming",
+      "section": "Section 4",
+      "file": "s4-dp.json",
+      "notesFile": "s4-dp.notes.json"
+    },
+    {
+      "name": "Graphs",
+      "section": "Section 4",
+      "file": "s4-graphs.json",
+      "notesFile": "s4-graphs.notes.json"
+    },
+    {
+      "name": "Mixed Interview Problems",
+      "section": "Section 4",
+      "file": "s4-mixed.json",
+      "notesFile": "s4-mixed.notes.json"
     }
   ]
 }

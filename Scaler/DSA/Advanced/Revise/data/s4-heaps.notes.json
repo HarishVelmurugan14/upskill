@@ -1,0 +1,194 @@
+{
+  "topic": "Heaps & Greedy",
+  "summary": "A heap gives you the min (or max) in O(1) and lets you remove or insert in O(log N). Reach for it when you need the best element repeatedly, not once -- if you need it once, a linear scan is O(N) and simpler. The three heap shapes that cover almost everything: a greedy that always consumes the current smallest (connect ropes, job scheduling), a size-K heap of the opposite polarity for K-th largest/smallest, and two heaps facing each other for a running median. The greedy half of this chapter is the other side of the same coin: a heap is only the delivery mechanism, and the real work is proving that taking the locally best move is globally optimal. When the greedy order is fixed up front, a sort replaces the heap.",
+  "thoughtProcess": [
+    {
+      "title": "1. Do I need the extreme repeatedly, or just once?",
+      "body": "Once -> linear scan, O(N), done. Repeatedly, with inserts in between -> heap. That single question decides the whole problem. 'Find the min' is not a heap problem; 'keep taking the min while adding new values' is."
+    },
+    {
+      "title": "2. K-th largest -> min-heap of size K (opposite polarity).",
+      "body": "Counter-intuitive but fixed: for K-th LARGEST keep a MIN-heap capped at size K; the root is your answer. Push, then poll whenever size exceeds K. O(N log K) time, O(K) space. Flip both words for K-th smallest."
+    },
+    {
+      "title": "3. Greedy that always consumes the current best -> heap.",
+      "body": "If the optimal move is provably 'take the two smallest / the most profitable next', a heap is the data structure that serves that greedy in O(log N). Connect ropes, candy distribution, job selection. Prove the greedy first, then the heap is just plumbing."
+    },
+    {
+      "title": "4. Running median -> two heaps, balanced.",
+      "body": "Max-heap holds the lower half, min-heap the upper half. Keep their sizes within 1 of each other. Median is the larger heap's root, or the average of both roots when sizes are equal. Always push then rebalance -- never assume which side a value belongs to."
+    },
+    {
+      "title": "5. Merging K sorted sequences -> min-heap of the K heads.",
+      "body": "Push one node per list, poll the smallest, push that node's successor. O(N log K) instead of O(N log N) from concatenate-and-sort, and it streams -- you never hold all N at once."
+    },
+    {
+      "title": "6. Intervals + 'how many concurrent' -> min-heap on end time.",
+      "body": "Sort by start. For each interval, poll every heap root whose end time is <= the current start (those are finished), then push the current end. Heap size is the live count; its maximum is the answer. This is the meeting-rooms skeleton."
+    },
+    {
+      "title": "7. Greedy needs a proof, not a hunch.",
+      "body": "Before coding, argue it with an exchange: take any optimal solution, swap in your greedy first move, and show the result is no worse. If that argument does not go through, greedy is wrong and you are probably looking at a DP. Most wrong-answer greedy submissions are ones nobody tried to justify."
+    },
+    {
+      "title": "8. Maximise non-overlapping intervals -> sort by END time.",
+      "body": "Finishing earliest leaves the most room for everything after it. This is the opposite of the meeting-rooms count, which sorts by START and uses a heap on end times. Same input shape, two different sorts -- read which question is being asked."
+    },
+    {
+      "title": "9. Pairing two sets optimally -> sort both, pair in order.",
+      "body": "For minimising the largest gap or the total distance between two sets (mice to holes), sorting both and matching i-th to i-th is optimal. The exchange argument: any crossing pair can be uncrossed without making the result worse."
+    },
+    {
+      "title": "10. 'Minimise total distance to a point' -> the median, not the mean.",
+      "body": "Sum of absolute deviations is minimised at the median; sum of SQUARED deviations is minimised at the mean. Seats-style problems want the median. For an even count any point between the two middle values works, so take either."
+    }
+  ],
+  "keyPatterns": [
+    {
+      "name": "Min-heap greedy (always consume the two smallest)",
+      "when": "Cost of combining = sum of the two parts, and you must combine everything into one.",
+      "template": "PriorityQueue<Integer> minHeap = new PriorityQueue<>();\nfor (int x : A) {\n    minHeap.add(x);\n}\nint total = 0;\nwhile (minHeap.size() > 1) {\n    int a = minHeap.poll();\n    int b = minHeap.poll();\n    total += a + b;\n    minHeap.add(a + b);   // the merged rope re-enters the pool\n}\nreturn total;",
+      "examples": [
+        "Connect Ropes"
+      ]
+    },
+    {
+      "name": "K-th largest via size-K min-heap",
+      "when": "K-th largest / top-K, streaming or one-shot, K much smaller than N.",
+      "template": "PriorityQueue<Integer> minHeap = new PriorityQueue<>();\nfor (int x : B) {\n    minHeap.add(x);\n    if (minHeap.size() > A) {\n        minHeap.poll();   // evict the smallest, keep the top-A alive\n    }\n}\nreturn minHeap.peek();   // A-th largest",
+      "examples": [
+        "A-th Largest Element in a Running Stream"
+      ]
+    },
+    {
+      "name": "Two heaps for a running median",
+      "when": "Median after every insertion on a stream.",
+      "template": "// lower = max-heap, upper = min-heap, |lower| - |upper| is 0 or 1\nlower.add(num);\nupper.add(lower.poll());              // push across, then rebalance\nif (upper.size() > lower.size()) {\n    lower.add(upper.poll());\n}\nreturn lower.size() > upper.size()\n     ? lower.peek()\n     : (lower.peek() + upper.peek()) / 2.0;",
+      "examples": [
+        "Running Median"
+      ]
+    },
+    {
+      "name": "Merge K sorted lists",
+      "when": "K already-sorted sequences into one sorted output.",
+      "template": "PriorityQueue<ListNode> pq = new PriorityQueue<>((x, y) -> x.val - y.val);\nfor (ListNode head : lists) {\n    if (head != null) {\n        pq.add(head);\n    }\n}\nListNode dummy = new ListNode(0), tail = dummy;\nwhile (!pq.isEmpty()) {\n    ListNode node = pq.poll();\n    tail.next = node;\n    tail = node;\n    if (node.next != null) {\n        pq.add(node.next);   // push the successor, not the whole list\n    }\n}\nreturn dummy.next;",
+      "examples": [
+        "Merge K Sorted Lists"
+      ]
+    },
+    {
+      "name": "Interval overlap count (min-heap on end time)",
+      "when": "Minimum rooms / machines / platforms for overlapping intervals.",
+      "template": "Arrays.sort(intervals, (x, y) -> x[0] - y[0]);   // by START\nPriorityQueue<Integer> ends = new PriorityQueue<>();\nfor (int[] it : intervals) {\n    while (!ends.isEmpty() && ends.peek() <= it[0]) {\n        ends.poll();        // that meeting already finished\n    }\n    ends.add(it[1]);\n}\nreturn ends.size();",
+      "examples": [
+        "Minimum Meeting Rooms"
+      ]
+    },
+    {
+      "name": "Manual heapify / sift-down",
+      "when": "You must implement the heap yourself (no PriorityQueue allowed).",
+      "template": "// children of i are 2i+1, 2i+2; parent of i is (i-1)/2\nprivate void siftDown(int[] heap, int n, int i) {\n    int smallest = i;\n    int left = 2 * i + 1;\n    int right = 2 * i + 2;\n    if (left < n && heap[left] < heap[smallest]) {\n        smallest = left;\n    }\n    if (right < n && heap[right] < heap[smallest]) {\n        smallest = right;\n    }\n    if (smallest != i) {\n        swap(heap, i, smallest);\n        siftDown(heap, n, smallest);\n    }\n}\n// build in O(N): for (int i = n/2 - 1; i >= 0; i--) siftDown(heap, n, i);",
+      "examples": [
+        "Build a Min Heap",
+        "Heap Queries"
+      ]
+    },
+    {
+      "name": "Custom comparator on a value object",
+      "when": "You are ordering by a field (profit, expiry, end time) rather than a raw int.",
+      "template": "PriorityQueue<Item> pq = new PriorityQueue<>((a, b) -> a.profit - b.profit);\n// descending: (a, b) -> b.profit - a.profit\n// long / possible overflow: use Long.compare(a.v, b.v), never a.v - b.v",
+      "examples": [
+        "Flipkart's Inventory Management",
+        "Maximum Jobs"
+      ]
+    },
+    {
+      "name": "Activity selection (sort by end time)",
+      "when": "Maximise how many intervals you can finish without overlap.",
+      "template": "Arrays.sort(jobs, (x, y) -> x.end - y.end);   // by END, not start\nint count = 0;\nint lastEnd = 0;\nfor (Job j : jobs) {\n    if (j.start >= lastEnd) {\n        count++;\n        lastEnd = j.end;\n    }\n}\nreturn count;",
+      "examples": [
+        "Finish Maximum Jobs"
+      ]
+    },
+    {
+      "name": "Sort both sides and pair in order",
+      "when": "Match two sets so the largest (or total) difference is minimised.",
+      "template": "Arrays.sort(A);\nArrays.sort(B);\nint worst = 0;\nfor (int i = 0; i < A.length; i++) {\n    worst = Math.max(worst, Math.abs(A[i] - B[i]));\n}\nreturn worst;",
+      "examples": [
+        "Assign Mice to Holes"
+      ]
+    },
+    {
+      "name": "Median minimises total absolute distance",
+      "when": "Gather everything to one position at minimum total cost.",
+      "template": "// collect the positions, sort, take the middle one\nint median = pos.get(pos.size() / 2);\nlong cost = 0;\nfor (int p : pos) {\n    cost += Math.abs(p - median);\n}\n// for 'make them contiguous', first subtract the index: pos[i] -= i",
+      "examples": [
+        "Seats"
+      ]
+    },
+    {
+      "name": "Two-pass greedy (satisfy each side independently)",
+      "when": "A constraint looks both left and right; one pass cannot see both.",
+      "template": "int[] give = new int[n];\nfor (int i = 0; i < n; i++) {\n    give[i] = 1;\n}\nfor (int i = 1; i < n; i++) {                 // left to right\n    if (A[i] > A[i - 1]) {\n        give[i] = give[i - 1] + 1;\n    }\n}\nfor (int i = n - 2; i >= 0; i--) {            // right to left\n    if (A[i] > A[i + 1]) {\n        give[i] = Math.max(give[i], give[i + 1] + 1);\n    }\n}",
+      "examples": [
+        "Distribute Candy"
+      ]
+    }
+  ],
+  "commonMistakes": [
+    {
+      "title": "Max-heap for K-th largest",
+      "wrong": "PriorityQueue<Integer> maxHeap = new PriorityQueue<>(Collections.reverseOrder());\n// then poll K times",
+      "right": "PriorityQueue<Integer> minHeap = new PriorityQueue<>();\nminHeap.add(x);\nif (minHeap.size() > K) { minHeap.poll(); }",
+      "why": "A max-heap of all N costs O(N) space and O(N + K log N) time. A min-heap capped at K is O(K) space and O(N log K), and it works on a stream where you never hold all N."
+    },
+    {
+      "title": "Comparator written as a subtraction that overflows",
+      "wrong": "(a, b) -> (int)(a.weight - b.weight)   // weights are long",
+      "right": "(a, b) -> Long.compare(a.weight, b.weight)",
+      "why": "a - b wraps around when the difference exceeds int range, so the comparator returns the wrong sign and the heap silently orders incorrectly. Long.compare / Integer.compare are always safe."
+    },
+    {
+      "title": "Rebalancing the two median heaps by guessing the side",
+      "wrong": "if (num < lower.peek()) { lower.add(num); } else { upper.add(num); }",
+      "right": "lower.add(num);\nupper.add(lower.poll());\nif (upper.size() > lower.size()) { lower.add(upper.poll()); }",
+      "why": "Guessing the side needs a non-empty check and still leaves the sizes unbalanced. Always push into one heap, move its root across, then correct the sizes -- it is branch-free and correct on the first element."
+    },
+    {
+      "title": "Building a heap by N inserts",
+      "wrong": "for (int x : A) { heap.add(x); }   // O(N log N)",
+      "right": "for (int i = n / 2 - 1; i >= 0; i--) { siftDown(heap, n, i); }   // O(N)",
+      "why": "Bottom-up heapify is O(N) because most nodes are near the leaves and sift down only a step or two. N inserts is O(N log N). Matters when N is 1e5 and you build repeatedly."
+    },
+    {
+      "title": "Sorting intervals by end time for the meeting-rooms count",
+      "wrong": "Arrays.sort(intervals, (x, y) -> x[1] - y[1]);",
+      "right": "Arrays.sort(intervals, (x, y) -> x[0] - y[0]);",
+      "why": "Counting concurrent intervals requires processing in START order so that 'has this one begun yet' is meaningful. End-time sorting is for the different problem of maximising the number of non-overlapping intervals."
+    },
+    {
+      "title": "Comparing the heap root with < instead of <= when releasing intervals",
+      "wrong": "while (!ends.isEmpty() && ends.peek() < it[0]) { ends.poll(); }",
+      "right": "while (!ends.isEmpty() && ends.peek() <= it[0]) { ends.poll(); }",
+      "why": "A meeting that ends exactly when the next begins does not need a second room. Whether <= or < is right depends on whether intervals are half-open -- read the constraints and decide deliberately rather than by habit."
+    },
+    {
+      "title": "peek() on an empty heap",
+      "wrong": "int top = pq.peek();   // NPE when unboxing null",
+      "right": "if (!pq.isEmpty()) { int top = pq.peek(); }",
+      "why": "PriorityQueue.peek() returns null rather than throwing, so the crash surfaces later as an NullPointerException during unboxing -- far from the real bug."
+    }
+  ],
+  "edgeCases": [
+    "Single element: connect-ropes cost is 0 (nothing to merge); the while loop must be size() > 1, not size() > 0.",
+    "K larger than N for K-th largest -- the answer is undefined; check and return -1 per the problem statement.",
+    "Running median on the very first element: upper is empty, so the rebalance must not peek it.",
+    "All values equal -- a comparator that returns a constant is fine, but do not assume any particular tie order.",
+    "Sums of merged ropes can exceed int when N is 1e5 and A[i] is 1e3; use long for the running total if constraints allow.",
+    "Merge-K-lists where some input lists are null or empty -- skip them before the first push.",
+    "Intervals that touch exactly (end == next start): decide <= vs < from the statement.",
+    "Empty input array: return 0 / -1 before touching the heap.",
+    "Duplicate values in a size-K heap are legitimate and must not be de-duplicated.",
+    "PriorityQueue iteration order is NOT sorted -- only poll() gives sorted order; never iterate the heap expecting order."
+  ]
+}

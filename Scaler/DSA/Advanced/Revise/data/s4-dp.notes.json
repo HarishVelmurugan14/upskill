@@ -1,0 +1,164 @@
+{
+  "topic": "Dynamic Programming",
+  "summary": "DP is recursion with the repeated work cached. The method is always the same four steps: define the state (what actually varies), write the transition (how a state is built from smaller ones), pin the base cases, then memoise. Top-down memo is the safe default because it mirrors the recursion you already wrote; convert to bottom-up only when you need the space optimisation or want to drop the call stack. Most of Section 4 is one of three shapes: linear 1-D (stairs, min squares), grid/2-D (paths, max sum), or knapsack (pick-or-skip on index plus capacity).",
+  "thoughtProcess": [
+    {
+      "title": "1. State first: what actually varies down the recursion?",
+      "body": "Write the brute-force recursion, then look at its parameters. Whatever changes is the state; whatever is constant (the arrays, MOD, N) is not and must not enter the memo key. Getting this wrong is the single biggest source of wrong DP -- an under-specified state silently returns a cached answer computed under different conditions."
+    },
+    {
+      "title": "2. Memo dimensions = the product of the state ranges.",
+      "body": "State (index, capacity) -> int[N + 1][C + 1]. State (pos, sum) -> int[pos][sum + 1]. Size each dimension to max + 1 so the largest legal value is addressable. Time is then O(states * work per state), which is usually O(states) for an O(1) transition."
+    },
+    {
+      "title": "3. The memo sentinel must be a value the answer can never take.",
+      "body": "-1 is the usual choice, but it is WRONG when the answer can legitimately be -1 or when 0 means 'not computed' for a counting problem whose real answer is 0. Use Arrays.fill with -1 and make sure 0 is a valid cached result, or use Integer.MIN_VALUE for maximisation problems that can go negative."
+    },
+    {
+      "title": "4. Pick-or-skip is 0/1; pick-and-stay is unbounded.",
+      "body": "0/1 knapsack: taking item i moves you to index i+1 (each item once). Unbounded: taking item i keeps you AT index i (unlimited copies). That one index difference is the whole distinction -- everything else about the two recursions is identical."
+    },
+    {
+      "title": "5. Grid DP: the answer at (i, j) comes from its predecessors, not its successors.",
+      "body": "Decide direction once and keep it. Going from (1,1) to (n,m) moving right/down means dp[i][j] = dp[i-1][j] + dp[i][j-1]. Obstacles zero the cell out BEFORE the transition reads it. Base case is the start cell, and an obstacle sitting on the start or end makes the answer 0."
+    },
+    {
+      "title": "6. Convert to bottom-up only for a reason.",
+      "body": "Top-down costs an O(depth) call stack but writes itself from the recursion. Go bottom-up when the depth risks a StackOverflow, or when row i only depends on row i-1 and you can roll a 2-D table into two 1-D arrays (or one, iterated backwards for 0/1 knapsack). Do not rewrite for style alone."
+    }
+  ],
+  "keyPatterns": [
+    {
+      "name": "Top-down memo skeleton",
+      "when": "Always start here once you have a working brute-force recursion.",
+      "template": "int[] memory = new int[A + 1];\nArrays.fill(memory, -1);\nreturn solve(A, memory);\n\nprivate int solve(int n, int[] memory) {\n    if (n <= 0) {\n        return 0;                 // base case\n    }\n    if (memory[n] != -1) {\n        return memory[n];         // cache hit\n    }\n    int best = /* transition over smaller states */;\n    memory[n] = best;             // store BEFORE returning\n    return best;\n}",
+      "examples": [
+        "Minimum Number of Squares",
+        "Stairs"
+      ]
+    },
+    {
+      "name": "0/1 knapsack (pick or skip, each item once)",
+      "when": "Choose a subset under a capacity limit, maximising value.",
+      "template": "private int knapsack(int[] values, int[] weights, int cap, int i, int[][] memo) {\n    if (i == values.length || cap == 0) {\n        return 0;\n    }\n    if (memo[i][cap] != -1) {\n        return memo[i][cap];\n    }\n    int skip = knapsack(values, weights, cap, i + 1, memo);\n    int pick = 0;\n    if (weights[i] <= cap) {\n        pick = values[i] + knapsack(values, weights, cap - weights[i], i + 1, memo);\n    }                                                          // ^ i + 1 = each item once\n    memo[i][cap] = Math.max(pick, skip);\n    return memo[i][cap];\n}",
+      "examples": [
+        "0-1 Knapsack"
+      ]
+    },
+    {
+      "name": "Unbounded knapsack (unlimited copies)",
+      "when": "Same as 0/1 but each item may be reused any number of times.",
+      "template": "int pick = 0;\nif (weights[i] <= cap) {\n    pick = values[i] + knapsack(values, weights, cap - weights[i], i, memo);\n}                                                              // ^ stay at i\nint skip = knapsack(values, weights, cap, i + 1, memo);\nreturn Math.max(pick, skip);",
+      "examples": [
+        "Unbounded Knapsack",
+        "Rod Cutting",
+        "Coin Change 2"
+      ]
+    },
+    {
+      "name": "Grid paths with obstacles",
+      "when": "Count paths / min cost on a 2-D grid with blocked cells.",
+      "template": "if (A[i][j] == 1) {\n    return 0;                      // obstacle: no path THROUGH this cell\n}\nif (i == 0 && j == 0) {\n    return 1;                      // start reached\n}\nif (i < 0 || j < 0) {\n    return 0;\n}\nif (memo[i][j] != -1) {\n    return memo[i][j];\n}\nmemo[i][j] = path(A, i - 1, j) + path(A, i, j - 1);\nreturn memo[i][j];",
+      "examples": [
+        "Unique Paths in a Grid"
+      ]
+    },
+    {
+      "name": "Linear 1-D DP (take one step back, or a few)",
+      "when": "dp[i] depends on a fixed window of earlier indices.",
+      "template": "int[] dp = new int[A + 1];\ndp[0] = 1;\ndp[1] = 1;\nfor (int i = 2; i <= A; i++) {\n    dp[i] = (dp[i - 1] + dp[i - 2]) % MOD;\n}\nreturn dp[A];",
+      "examples": [
+        "Stairs",
+        "Fibonacci"
+      ]
+    },
+    {
+      "name": "Two-state counting DP (position + running aggregate)",
+      "when": "Count sequences constrained by a running sum / digit / parity.",
+      "template": "// state = (position, sum so far); digits 0..9, leading digit cannot be 0\nprivate int count(int pos, int sum, int[][] memo) {\n    if (sum < 0) {\n        return 0;\n    }\n    if (pos == 0) {\n        return sum == 0 ? 1 : 0;\n    }\n    if (memo[pos][sum] != -1) {\n        return memo[pos][sum];\n    }\n    int total = 0;\n    int start = (pos == N) ? 1 : 0;            // no leading zero\n    for (int d = start; d <= 9; d++) {\n        total = (total + count(pos - 1, sum - d, memo)) % MOD;\n    }\n    memo[pos][sum] = total;\n    return total;\n}",
+      "examples": [
+        "N-digit Numbers with Digit Sum S"
+      ]
+    },
+    {
+      "name": "Space-rolled bottom-up (2-D collapsed to 1-D)",
+      "when": "Row i depends only on row i-1 and you need O(C) space.",
+      "template": "int[] dp = new int[cap + 1];\nfor (int i = 0; i < n; i++) {\n    for (int c = cap; c >= weights[i]; c--) {        // BACKWARDS for 0/1\n        dp[c] = Math.max(dp[c], values[i] + dp[c - weights[i]]);\n    }\n}\n// forwards (c = weights[i] .. cap) gives UNBOUNDED knapsack instead\nreturn dp[cap];",
+      "examples": [
+        "0-1 Knapsack",
+        "Coin Change 2"
+      ]
+    },
+    {
+      "name": "Count-ways vs minimise-coins (same shape, different fold)",
+      "when": "Coin problems -- read carefully which one is being asked.",
+      "template": "// count ways: sum the branches\nways = pick + skip;\n// minimise count: take the min, and guard the unreachable sentinel\nif (sub != Integer.MAX_VALUE) {\n    best = Math.min(best, 1 + sub);\n}",
+      "examples": [
+        "Coin Change 2",
+        "Minimum Number of Squares"
+      ]
+    }
+  ],
+  "commonMistakes": [
+    {
+      "title": "Memo keyed on too few dimensions",
+      "wrong": "int[] memo = new int[n];\n// but the recursion is solve(index, capacity)",
+      "right": "int[][] memo = new int[n + 1][capacity + 1];",
+      "why": "Two different capacities at the same index share one slot, so the second call returns the first call's answer. The result is wrong but plausible-looking, which makes it very hard to spot. The memo key must contain every parameter that varies."
+    },
+    {
+      "title": "Sentinel -1 when -1 (or 0) is a real answer",
+      "wrong": "Arrays.fill(memo, -1);\nif (memo[n] != -1) { return memo[n]; }   // but the answer can be -1",
+      "right": "Arrays.fill(memo, Integer.MIN_VALUE);\nif (memo[n] != Integer.MIN_VALUE) { return memo[n]; }",
+      "why": "A legitimately-cached -1 is re-treated as 'not computed', so that state recomputes forever and the memo stops working -- you silently fall back to exponential time and TLE."
+    },
+    {
+      "title": "Storing into the memo after returning",
+      "wrong": "return Math.max(pick, skip);   // never written to memo",
+      "right": "memo[i][cap] = Math.max(pick, skip);\nreturn memo[i][cap];",
+      "why": "The recursion is still correct but nothing is ever cached, so it runs at brute-force complexity. The symptom is TLE on large inputs with correct answers on small ones."
+    },
+    {
+      "title": "0/1 knapsack that recurses on the same index after picking",
+      "wrong": "pick = values[i] + knapsack(cap - weights[i], i, memo);",
+      "right": "pick = values[i] + knapsack(cap - weights[i], i + 1, memo);",
+      "why": "Staying at i lets the same item be taken repeatedly -- that is unbounded knapsack. One character separates the two problems, and the wrong one over-counts."
+    },
+    {
+      "title": "Rolling the 1-D knapsack array forwards for 0/1",
+      "wrong": "for (int c = weights[i]; c <= cap; c++) { dp[c] = max(dp[c], v[i] + dp[c - w[i]]); }",
+      "right": "for (int c = cap; c >= weights[i]; c--) { dp[c] = max(dp[c], v[i] + dp[c - w[i]]); }",
+      "why": "Iterating forwards reads dp[c - w[i]] that was ALREADY updated for item i in this same pass, so item i gets reused -- you silently compute unbounded knapsack. Backwards keeps the read on the previous row."
+    },
+    {
+      "title": "Forgetting % MOD on intermediate sums",
+      "wrong": "total = total + count(pos - 1, sum - d, memo);\nreturn total % MOD;",
+      "right": "total = (total + count(pos - 1, sum - d, memo)) % MOD;",
+      "why": "The accumulator overflows int before the final modulo ever runs, so the modulo is applied to an already-wrapped negative number. Take the modulo at every addition, not once at the end."
+    },
+    {
+      "title": "Obstacle check placed after the base case",
+      "wrong": "if (i == 0 && j == 0) { return 1; }\nif (A[i][j] == 1) { return 0; }",
+      "right": "if (A[i][j] == 1) { return 0; }\nif (i == 0 && j == 0) { return 1; }",
+      "why": "An obstacle sitting on the start cell must yield 0, not 1. The blocked-cell test has to run before any 'we arrived' test."
+    },
+    {
+      "title": "Memo array allocated inside the recursive helper",
+      "wrong": "private int solve(int n) {\n    int[] memo = new int[n + 1];   // fresh every call\n    ...\n}",
+      "right": "int[] memo = new int[A + 1];\nArrays.fill(memo, -1);\nreturn solve(A, memo);   // pass it down",
+      "why": "A memo re-allocated per call caches nothing. Allocate once in the public entry method and thread it through every recursive call."
+    }
+  ],
+  "edgeCases": [
+    "N = 0 or an empty array -- return the identity (0 for sums/max, 1 for 'number of ways to make nothing').",
+    "Capacity 0 in knapsack: answer is 0, and the recursion must terminate before indexing weights.",
+    "An obstacle on the start or the destination cell makes the unique-paths answer 0.",
+    "A 1x1 grid: exactly one path (the empty path) unless that single cell is blocked.",
+    "Counting answers that are legitimately 0 -- make sure 0 is distinguishable from 'not yet computed'.",
+    "Answers that exceed int: use long for the accumulator, or apply % MOD at every step.",
+    "Unreachable states in a minimisation DP: represent them as Integer.MAX_VALUE and guard before doing 1 + sub.",
+    "Recursion depth near 1e5 will StackOverflow -- switch to bottom-up.",
+    "Coin denominations larger than the target: they must be skippable without indexing out of range.",
+    "Duplicate items in 0/1 knapsack are distinct items, not one reusable item."
+  ]
+}

@@ -2,23 +2,7 @@ package LLD.Part2.CreationalDesignPattern.Singleton;
 
 public class SingletonPattern {
 
-    static void main() {
-    SingletonPattern sp = new SingletonPattern();
-
-    sp.SingleThreadSingletonPattern(); // Good but only used for single threaded problems
-
-    sp.InEfficient(); // Thread safe but not efficient | do not use
-
-    sp.BasicEagerApproach(); // Thread safe with good efficiency || Good for web application with few cons
-    sp.LazyApproach(); // Thread safe good eff || double checking singleton pattern
-    sp.StaticHolderSingleton(); // Avoids variable load on class startup
-
-    sp.EnumSingleton(); // Best possible singleton approach
-
-    }
-
-
-    private void SingleThreadSingletonPattern(){
+    void SingleThreadSingletonPattern(){
         DBConnectionPool1_STSP instance = DBConnectionPool1_STSP.getInstance();
         instance.doSomething();
         // NOTE : This is implementable for single thread
@@ -29,7 +13,7 @@ public class SingletonPattern {
         // If condition allows by checking as it won't instantiated then later causes duplicate object creation
     }
 
-    private void InEfficient() {
+    void InEfficient() {
         DBConnectionPool2_MT_INF_SP instance = DBConnectionPool2_MT_INF_SP.getInstance();
         instance.doSomething();
         // Thread safe by using synchronized so only N number of objects created for N threads available
@@ -39,7 +23,7 @@ public class SingletonPattern {
         // But we only need that for 10 instantiation
     }
 
-    private void BasicEagerApproach() {
+    void BasicEagerApproach() {
         DBConnectionPool3_MT_EAGER_SP instance = DBConnectionPool3_MT_EAGER_SP.getInstance();
         instance.doSomething();
         // Ensures thread safety
@@ -51,7 +35,7 @@ public class SingletonPattern {
         // Exception cause application crash
     }
 
-    private void LazyApproach(){
+    void LazyApproach(){
         DBConnectionPool4_MT_LAZY_SP instance = DBConnectionPool4_MT_LAZY_SP.getInstance();
         instance.doSomething();
         instance.markedAsVolatile();
@@ -62,14 +46,14 @@ public class SingletonPattern {
         // Best for ANDROID Apps as it cannot apply huge startup time
     }
 
-    private void StaticHolderSingleton() {
+    void StaticHolderSingleton() {
         DBConnectionPool5_MT_STATICHolder_SP instance = DBConnectionPool5_MT_STATICHolder_SP.getInstance();
         instance.doSomething();
         //NOTE : Best possible lazy version by making changes in eager approach
     }
 
 
-    private void EnumSingleton(){
+    void EnumSingleton(){
         // Best possible singleton approach
     }
 }
