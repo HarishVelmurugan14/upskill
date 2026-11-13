@@ -1,4 +1,4 @@
-package LLD.Part2.StructuralDesignPattern;
+package LLD.Part2.StructuralDesignPattern.Adapter;
 
 // 1. Target: what PhonePe/GPay expect
 interface BankAPI {

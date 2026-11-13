@@ -1,4 +1,4 @@
-package LLD.Part2.StructuralDesignPattern;
+package LLD.Part2.StructuralDesignPattern.Adapter;
 
 public class OriginClasses {
     // OWNED BY BANK
